@@ -99,7 +99,20 @@ def load_detector(category: str):
 
 
 def fixture_file_count(category: str) -> int:
-    return len(list((REPO_ROOT / "fixtures" / category).rglob("*.md")))
+    """Every file the corpus ships, not only its Markdown.
+
+    Counting `*.md` was right while every fixture was a lone SKILL.md. AST08's
+    corpus now ships Python sources, real zip archives, real `.pyc` files and
+    symlinks, because three of its four static-detectable scenarios are not
+    expressible in Markdown -- and a matrix that printed only the Markdown count
+    would understate the corpus an auditor has to review. Symlinks are counted
+    without following them: `is_file()` alone resolves the link, which is the
+    traversal AST08-S07 is about.
+    """
+    base = REPO_ROOT / "fixtures" / category
+    if not base.exists():
+        return 0
+    return sum(1 for path in base.rglob("*") if path.is_symlink() or path.is_file())
 
 
 # --- the file exists and is the one SKILL.md points at ---------------------
@@ -248,7 +261,7 @@ def test_ast07_publishes_no_f1_and_the_detector_agrees(manifest):
     assert cat["published_f1"] is None
 
     report = load_detector("AST07").f1_report()
-    assert report == {"status": "declared-and-uncovered", "f1": None}
+    assert report == {"status": "declared-and-uncovered", "f1": None, "scope": "none"}
 
 
 def test_ast08_f1_denominator_names_its_four_static_detectable_scenarios(registry):
@@ -298,11 +311,61 @@ def test_stated_on_disk_fixture_count_is_the_real_one(category):
     )
 
 
-def test_ast07_records_that_its_fixtures_are_not_admitted_to_the_corpus(manifest):
-    """Six files on disk, zero cases labeled — the gap must be stated, not hidden."""
+def test_ast07_ships_no_orphan_fixture_corpus(manifest):
+    """Zero cases labeled and zero files on disk, and the matrix says why.
+
+    AST07 used to ship six labeled vulnerable/clean files that the manifest
+    declared as zero cases. Three encoded the artifact_signals the registry
+    declares for AST07-S01 and AST07-S02, and the other three proxied nothing
+    named at all. A category with a zero-case entitlement does not get to keep
+    a labeled corpus on disk, so they were deleted; the matrix has to record
+    the deletion and the reason rather than let the files quietly vanish.
+    """
     assert manifest["categories"]["AST07"]["cases"] == []
-    assert fixture_file_count("AST07") == 6
-    assert "The six files on disk are not the corpus." in matrix_text("AST07")
+    assert fixture_file_count("AST07") == 0
+    assert not (REPO_ROOT / "fixtures" / "AST07").exists(), (
+        "fixtures/AST07/ must be gone, not emptied — an empty scaffold reads as a corpus in progress"
+    )
+    text = matrix_text("AST07")
+    assert "the six files that used to sit on disk are deleted" in text.lower()
+    assert "Why deletion rather than re-labeling." in text
+
+
+#: The six pre-reconciliation AST02 fixture directories that the manifest declared as
+#: zero cases. They proxied an AST01 agent-judgable scenario, AST02-S02's pin-posture
+#: artifact_signal, and no named scenario at all. Deleted, and named here so the
+#: regression pin survives AST02 later acquiring a real, declared corpus.
+_DELISTED_AST02_FIXTURE_DIRS = (
+    "V1-typosquatted-dependency",
+    "C2-typosquatted-dependency",
+    "V3-unpinned-wildcard-dependency",
+    "C4-unpinned-wildcard-dependency",
+    "V5-lockfile-hash-mismatch",
+    "C6-lockfile-hash-mismatch",
+)
+
+
+def test_ast02_ships_no_orphan_fixture_corpus(manifest):
+    """The same resolution for the other orphaned corpus (AST02's six files).
+
+    The invariant is "no fixture on disk that the manifest does not declare",
+    not "AST02 has no fixtures". AST02 now labels its one static-detectable
+    scenario (AST02-S03 Config-File Hijacking) and ships the six cases the
+    gate-4 formula entitles it to, every one of them declared. What must stay
+    gone is the delisted pre-reconciliation corpus, which is named explicitly
+    below so re-adding it cannot hide inside a legitimate corpus.
+    """
+    entry = manifest["categories"]["AST02"]
+    declared = {(REPO_ROOT / case["path"]).parent.name for case in entry["cases"]}
+    root = REPO_ROOT / "fixtures" / "AST02"
+    on_disk = {p.name for p in root.iterdir() if p.is_dir()} if root.is_dir() else set()
+    assert on_disk == declared, (
+        f"AST02 fixture directories on disk {sorted(on_disk)} do not match the declared "
+        f"cases {sorted(declared)}; an undeclared corpus must be deleted or declared"
+    )
+    assert on_disk.isdisjoint(_DELISTED_AST02_FIXTURE_DIRS), (
+        "a delisted pre-reconciliation AST02 fixture directory is back on disk"
+    )
 
 
 # --- the matrix must not smuggle what it documents -------------------------
@@ -364,8 +427,15 @@ def test_ast08_matrix_claim_engine_refuses_the_local_fixture_id(registry):
         run_category("AST08", coverage, [fixture], lambda sample: False)
 
 
-def test_ast08_matrix_claim_the_shipped_corpus_would_manufacture_a_hollow_zero():
-    """The 0.0 the matrix warns about: `measured` status over an empty intersection."""
+def test_a_corpus_labeled_with_ids_the_detector_does_not_know_manufactures_a_hollow_zero():
+    """The 0.0 the matrix warns about: `measured` status over an empty intersection.
+
+    This was AST08's real state while its corpus was labeled `AST08-S1` and its
+    detector answered to a different id. The corpus has been re-keyed to registry
+    ids since, so the pairing below is synthetic -- but the routing rule it proves
+    is the one that stopped that 0.0 being published, and it has to keep holding
+    for the next category that gets there.
+    """
     detector = load_detector("AST08")
     corpus = [({"manifest": {"description": ""}, "files": {}}, {"AST08-S1"})] * 3
     corpus += [({"manifest": {"description": ""}, "files": {}}, set())] * 3
@@ -395,13 +465,38 @@ def test_ast08_full_coverage_entitlement_of_eight_is_the_manifest_figure(manifes
     assert "| Entitlement at full registry coverage | 8 |" in matrix_text("AST08")
 
 
-def test_ast08_duplicate_fixture_claim_is_true():
-    """The matrix says three identical vulnerable files and three identical clean ones."""
+def test_ast08_corpus_is_one_distinct_pair_per_static_detectable_scenario(registry, manifest):
+    """The replacement for a test that pinned a defect.
+
+    It used to assert that AST08 shipped three byte-identical vulnerable files and
+    three byte-identical clean ones -- six cases over a single frontmatter field
+    that no detector read, carrying roughly one case of information and labeled
+    against a local id (`AST08-S1`) that is not a whitepaper scenario at all. That
+    corpus was replaced, so the claim it pinned is gone; the assertion is inverted
+    rather than dropped, and now holds the corpus to the shape the entitlement
+    formula assumes: one vulnerable/clean pair per static-detectable scenario, every
+    package distinct, every case labeled with a registry id.
+    """
     base = REPO_ROOT / "fixtures" / "AST08"
-    vulnerable = {p.read_bytes() for p in sorted(base.glob("V*/SKILL.md"))}
-    clean = {p.read_bytes() for p in sorted(base.glob("C*/SKILL.md"))}
-    assert len(list(base.glob("V*/SKILL.md"))) == 3
-    assert len(list(base.glob("C*/SKILL.md"))) == 3
-    assert len(vulnerable) == 1, "vulnerable fixtures are no longer byte-identical"
-    assert len(clean) == 1, "clean fixtures are no longer byte-identical"
-    assert "byte-identical to one another" in matrix_text("AST08")
+    static_ids = sorted(s["id"] for s in registry_scenarios(registry, "AST08") if s["tier"] == "static-detectable")
+    cases = manifest["categories"]["AST08"]["cases"]
+
+    by_scenario: dict[str, set[str]] = {}
+    for case in cases:
+        by_scenario.setdefault(case["scenario_id"], set()).add(case["label"])
+    assert sorted(by_scenario) == static_ids, "every static-detectable scenario needs its own labeled pair"
+    assert all(labels == {"vulnerable", "clean"} for labels in by_scenario.values())
+
+    packages = sorted(p for p in base.iterdir() if p.is_dir())
+    assert len(packages) == len(cases) == 2 * len(static_ids)
+    digests = {
+        package.name: sorted(
+            (path.relative_to(package).as_posix(), path.read_bytes())
+            for path in package.rglob("*")
+            if path.is_file() and not path.is_symlink()
+        )
+        for package in packages
+    }
+    assert len({repr(files) for files in digests.values()}) == len(packages), (
+        "two fixture packages are byte-identical; duplicates add count, not information"
+    )

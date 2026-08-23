@@ -9,20 +9,26 @@ Pattern: Knowledge. The decision rule this category turns on: a log an operator
 controls can be edited after the fact; a receipt an independent verifier can
 cryptographically check cannot — "we have logging" and "we have compliance-grade
 audit evidence" are different claims, and most AST09 mitigation lists conflate them.
-Mechanism (receipt schema validation, inventory reconciliation) lives in `scripts/`;
-frozen scenario tiers live in `coverage-matrix.md`.
+`scripts/` ships **no detector** for this category — every scenario is out-of-artifact,
+and the section below explains why that is the finished state; frozen scenario tiers
+live in `coverage-matrix.md`.
 
 ## Why "we have logs" does not close this category
 
-Cisco's State of AI Security 2026 reports 83% of organizations planning agentic AI
-deployment against only 29% who feel ready to deploy it securely — the whitepaper
-frames this gap as adoption outpacing governance, not as a logging-tooling gap
-specifically. The sharper evidence is structural: skill installation requires no
-enterprise logging hook, no CMDB entry, and no IAM integration by default — a
-one-line `openclaw skill install` or a bare SKILL.md upload creates no artifact any
-existing SAM tool recognizes. Adding a logging *feature* to one runtime does not
-close AST09 fleet-wide; the absence is architectural, not a missing checkbox in one
-product.
+The gap here is architectural, not a missing checkbox in one product, and the test for
+that is simple: skill installation produces **no artifact any existing asset-management
+tool recognizes**. No enterprise logging hook, no CMDB entry, no IAM integration, no
+package receipt — a one-line install or a bare SKILL.md upload leaves the fleet's
+existing inventory exactly as it was. That is why adding a logging feature to one
+runtime does not move the category: the tool now records what it already knew about, and
+the skills nobody knew about stay invisible.
+
+Two consequences a reviewer should carry into any AST09 conversation. First, "we have
+logging" and "we have compliance-grade audit evidence" are different claims: a log the
+operator can edit after the fact answers neither *what was authorized* nor *what
+happened*, only *what the operator is currently willing to say*. Second, coverage claims
+in this category must name their discovery method, because each method is blind to a
+different population — see decision rule 4.
 
 ## Decision rules
 
@@ -90,6 +96,26 @@ product.
   broad for its function; AST09's "lack of permission review processes" finding is
   that no *process* exists to catch that condition at scale — the organizational
   absence, not the individual over-grant.
+
+## This category ships zero detectors, and that is the finding
+
+All seven AST09 scenarios are tiered out-of-artifact — the only category in the suite
+where that is true of every scenario — so the detector map is empty by construction and
+this category publishes no F1 at all. The reason is one sentence, and it is worth
+holding onto because it generalizes: **an approved copy and an unapproved copy of the
+same skill are byte identical.** Approval, inventory, offboarding state, data
+classification and install-count provenance are all facts held about the artifact by an
+organization, never facts held *in* it.
+
+That also disposes of the tempting workaround. One could write fixtures whose SKILL.md
+prose says "this skill was never approved", detect the prose, and publish a number. The
+number would measure a fixture-authoring convention, not a governance control, and it
+would be indistinguishable in any report from a real detection rate. The registry
+records no `artifact_signal` for any of the seven — unlike other categories, AST09 does
+not even have an in-package proxy worth naming — so there is nothing here to promote
+even accidentally. Report `declared-and-uncovered` and put the effort into the
+off-artifact evidence each scenario actually needs; `coverage-matrix.md` names that
+evidence per scenario.
 
 ## Scope and out-of-artifact boundary
 

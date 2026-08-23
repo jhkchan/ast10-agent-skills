@@ -112,6 +112,45 @@ over-convicts legitimate AST03-adjacent API-integration patterns. Classify the
 underlying missed attack under its own category and the tool/process gap that missed
 it under AST08 — do not merge them into one finding.
 
+## What the four shipped checks decide, and the boundary each one buys
+
+Four of AST08's eight scenarios are static-detectable and each has one check. The other
+four are agent-judgable (Natural-Language Bypass, Scanner Impersonation) or
+out-of-artifact (Model-Dependent Injection Resistance, Scanner-Target Evasion) and ship
+nothing. Every one of the four that does ship made a deliberate trade, and the trade is
+the reviewer's inheritance.
+
+- **Obfuscated Instruction fires on a rule matching a view the raw bytes hid — never on
+  carrier presence.** Rule 2's discipline is enforced in code: a normalized view, a
+  decoded layer, or a zero-width run that itself decodes to text. The single exception —
+  a zero-width run standing alone — is allowed only because no legitimate authoring path
+  produces one. Consequence: an encoded payload whose *decoded* form matches no rule is
+  read as inert. Decode-and-look-yourself remains a manual step for any blob the bound
+  reached.
+- **Context-Dependent Malice deliberately excludes portability predicates from the guard
+  class.** `platform.system()`, `sys.platform` and `os.name` are the most common benign
+  wrapper around a subprocess call, so convicting them would over-flag exactly as rule 6
+  warns. The cost is exact and worth stating out loud: a logic bomb keyed on
+  `platform.system() == 'Darwin'` is uncovered by this check. Hostname, username, date
+  and file-existence guards are covered; platform is not.
+- **Scanner Host Hazard measures a decompression bomb from the zip central directory,
+  because that is the only way to measure one without detonating it.** The declared
+  uncompressed size is attacker-controlled, so an archive that understates it evades the
+  ratio limit while the file-count, nesting-depth, member-count, path-escape and symlink
+  limits still apply. Never resolve this by extracting to check.
+- **Bytecode Cache Poisoning reads the 16-byte PEP 552 header only and never unmarshals
+  a code object** — running `marshal` on hostile input is the AST08-S07 compromise this
+  module refuses to demonstrate while implementing AST08-S08. So a `.pyc` whose header is
+  consistent with its source while the code object diverges is not caught here. Hash the
+  artifact actually loaded at runtime; that is rule 8's manual half.
+- **INCOMPLETE is encoded in the evidence string, not in the verdict.** A `Finding` is
+  binary, so any evidence beginning with `INCOMPLETE:` is a coverage event rather than a
+  demonstrated payload. Where the incompleteness is itself what enables silent selection
+  (a truncated `.pyc` header, an exhausted decode bound) it is reported as detected;
+  where the scan merely could not see part of the package it sits beside a negative. A
+  consumer that reads only the boolean converts the whole PASS/FAIL/INCOMPLETE discipline
+  back into the binary this category exists to reject.
+
 ## Scope and out-of-artifact boundary
 
 Model-Dependent Injection Resistance (an approved, signed skill behaves differently

@@ -13,10 +13,11 @@ the defect.
 
 **Read this first.** AST08 is the category where the contract's two failure modes come
 apart. AST07 has nothing to detect and honestly publishes nothing. AST08 has **four**
-scenarios the registry tiers static-detectable and ships **zero** detectors for any of
-them, while its six labeled fixtures measure a property that is not one of the
-whitepaper's eight AST08 scenarios at all. The absence of an F1 here is a **debt**, not an
-honesty carve-out, and the sections below say exactly what would pay it off.
+scenarios the registry tiers static-detectable, and as of this revision it ships **four**
+detector functions — one per scenario, each deciding that scenario's defining condition,
+each measured against a labeled vulnerable/clean pair authored for it. The coverage debt
+this file used to record is discharged; what replaces it is a number, and a number needs
+its own scepticism. Read *What the published 1.0 is, and what it is not* before quoting it.
 
 **Sources cross-checked when this file was written (2026-08-23).**
 
@@ -25,7 +26,7 @@ honesty carve-out, and the sections below say exactly what would pay it off.
 | Scenario list, titles, tiers, written reasons | `scenarios/registry.yaml`, entries `AST08-S01`–`AST08-S08` |
 | Whitepaper body | OWASP Agentic Skills Top 10, §9 "AST08 - Poor Scanning", pp. 40–45; the eight Attack Scenarios sub-headings run pp. 41–42 |
 | Detector | `skills/AST08/scripts/detector.py`, plus the shared scan in `detectors/scaffold.py` |
-| Corpus labelling | `fixtures/manifest.yaml`, category `AST08` (`tier_lock_hash: 3a70c4332c9d0794e248baf728cb65715f9e0b6956dab506927f8b8f7d11526b`) |
+| Corpus labelling | `fixtures/manifest.yaml`, category `AST08` (`tier_lock_hash: 08ea76d31a710007ab28c9d14480159426cd9e98c46f08950ceb22a8aa82dbd3`) |
 | Fixture files on disk | `fixtures/AST08/` |
 | Sizing and never-pad rules | `features/owasp-ast10-agent-skills/spec.md` gate-4, S-003, S-007 |
 
@@ -42,6 +43,15 @@ detectable surface before any detector was written.
 `tests/test_scenario_registry.py::test_scenario_counts_match_the_whitepaper_extraction`
 pins the count at 8 so it cannot drift back.
 
+**Authority chain.** The whitepaper's own "Attack Scenarios" body for AST08 outranks
+everything here on the enumeration itself — how many scenarios exist, and their titles
+verbatim. `scenarios/registry.yaml` is authoritative on tier; this file reproduces its
+tiering and may not diverge from it. This file is authoritative on the F1 denominator,
+the corpus accounting and the coverage debt. `fixtures/manifest.yaml` is authoritative on
+which fixture cases exist and what they are labeled against. The `SCENARIO_TIERS` dict
+inside `skills/AST08/scripts/detector.py` is implementation and is subordinate to all of
+them.
+
 ## Scenario table
 
 Legend for the detector column:
@@ -50,70 +60,84 @@ Legend for the detector column:
   package cannot decide the scenario (`out-of-artifact`), or the decision is semantic and
   routed to the judge rather than to a deterministic rule (`agent-judgable`).
 - **`nothing shipped`** — the registry tiers this scenario static-detectable, a detector
-  *is* owed, and `detector.py` does not contain one.
+  *is* owed, and `detector.py` does not contain one. No AST08 row reads this any more.
 - A named function — the function in `detector.py` that decides the scenario.
 
 | Scenario id | Whitepaper title | Tier | What the detector actually checks | Written reason for the tier |
 | --- | --- | --- | --- | --- |
 | `AST08-S01` | Natural-Language Bypass | `agent-judgable` | — | The scenario is defined by the absence of any static signal — that is its whole point. The prose is in the package, so it is in-artifact, but only semantic judgement can decide it. |
-| `AST08-S02` | Obfuscated Instruction | `static-detectable` | **`nothing shipped`** | The encoded blob is in the package's bytes. Decoding candidate encodings and re-running the detection rules over the decoded view is deterministic — the whitepaper's own "run every detection rule over the normalized view as well as the raw bytes" mitigation. |
+| `AST08-S02` | Obfuscated Instruction | `static-detectable` | `detect_obfuscated_instruction` — re-runs the rule set over the **normalized view** (invisibles stripped, then NFKC) and over every **decoded layer** of an embedded encoding to depth 4 / 1 MiB, comparing match *counts* per view so a decoy in the clear cannot mask a smuggled occurrence in the same file; fires on a zero-width run that decodes to text; reports bound exhaustion as `INCOMPLETE`. Never fires on carrier presence alone. | The encoded blob is in the package's bytes. Decoding candidate encodings and re-running the detection rules over the decoded view is deterministic — the whitepaper's own "run every detection rule over the normalized view as well as the raw bytes" mitigation. |
 | `AST08-S03` | Scanner Impersonation | `agent-judgable` | — | The self-presentation is prose in the package, and judging that it manufactures unearned trust is semantic. The exfiltration half is separately static (AST01-S10); the impersonation half is not. |
-| `AST08-S04` | Context-Dependent Malice | `static-detectable` | **`nothing shipped`** | The logic bomb ships with the package: an environment-keyed guard (hostname, username, date comparison, file-existence probe) wrapping a dangerous branch is a control-flow shape a static rule matches, without ever running the code. |
+| `AST08-S04` | Context-Dependent Malice | `static-detectable` | `detect_context_dependent_malice` — parses each `.py` with `ast` and matches an **environment-identity guard** (hostname, username, uid, env-var equality, date comparison, file-existence probe, debugger probe) whose branch contains a **dangerous call** (exec, subprocess, egress, destruction). OS-portability predicates are excluded from the guard class on purpose. Unparseable sources are recorded `INCOMPLETE`. | The logic bomb ships with the package: an environment-keyed guard (hostname, username, date comparison, file-existence probe) wrapping a dangerous branch is a control-flow shape a static rule matches, without ever running the code. |
 | `AST08-S05` | Model-Dependent Injection Resistance | `out-of-artifact` | — | The whitepaper is explicit: "The artifact never changed, and every gate still passes ... injection resistance is a behavioral property of the runtime model rather than of the skill's bytes." There is nothing in the package to detect. |
 | `AST08-S06` | Scanner-Target Evasion | `out-of-artifact` | — | The defining condition is a property of the adversary's process and of a specific scanner's ruleset — that this artifact was tuned against that scanner. No package can testify to how it was produced. As the whitepaper puts it, a published detection rate is measured against an adversary who does not yet hold the scanner while the deployed one does. |
-| `AST08-S07` | Scanner Host Compromise and Resource Exhaustion | `static-detectable` | **`nothing shipped`** | Every listed vector is a measurable property of the files in the package: archive nesting depth, compression ratio, file count, symlink targets escaping the scan root, and non-regular file types. Deterministic limits decide it before any parsing happens. |
-| `AST08-S08` | Bytecode Cache Poisoning | `static-detectable` | **`nothing shipped`** | Both the .pyc and the source ship in the package. A sourceless .pyc, or a .pyc whose disassembly does not correspond to its adjacent source, is a source-to-bytecode provenance comparison over package contents. |
+| `AST08-S07` | Scanner Host Compromise and Resource Exhaustion | `static-detectable` | `detect_scanner_host_hazard` — enforces declared bounds **before parsing**: `MAX_PACKAGE_FILES` 500, `MAX_FILE_BYTES` 2 MiB, `MAX_PADDING_RUN` 1000, `MAX_ARCHIVE_DEPTH` 1, `MAX_ARCHIVE_MEMBERS` 1000, `MAX_COMPRESSION_RATIO` 100:1, plus zip members escaping the extraction root, symlinks resolving outside the scan root, and non-regular files. Ratios come from the zip central directory; nothing is decompressed. | Every listed vector is a measurable property of the files in the package: archive nesting depth, compression ratio, file count, symlink targets escaping the scan root, and non-regular file types. Deterministic limits decide it before any parsing happens. |
+| `AST08-S08` | Bytecode Cache Poisoning | `static-detectable` | `detect_bytecode_cache_poisoning` — source-to-bytecode provenance from the 16-byte PEP 552 header only: a sourceless `.pyc`, an **unchecked** hash-based `.pyc` (flags bit 1 clear), a checked hash-based `.pyc` whose recorded source hash contradicts the adjacent source, or a timestamp-based `.pyc` whose recorded source size does. A truncated header is `INCOMPLETE`-and-detected. The code object is never unmarshalled. | Both the .pyc and the source ship in the package. A sourceless .pyc, or a .pyc whose disassembly does not correspond to its adjacent source, is a source-to-bytecode provenance comparison over package contents. |
 
 Tier totals: **4 static-detectable, 2 agent-judgable, 2 out-of-artifact.** Detector
-functions bound to a named scenario: **0 of 4 owed.**
+functions bound to a named scenario: **4 of 4 owed.**
 
 `SKILL.md` promises this file will fix "whether [Model-Dependent Injection Resistance] is
 checkable at all from a static skill package". It is not: `AST08-S05` is
 `out-of-artifact`, with the whitepaper's own sentence as the reason.
 
-## What the detector does ship, and why it is not in the table
+Re-derive the ids, titles and tiers in this table from the authority at rank 2,
+so a reader can check the table rather than believe it:
 
-`detector.py` contains exactly one function, registered under the id
-`AST08-invisible-unicode-smuggling`:
+```
+python3 -c "import yaml; [print(s['id'], '|', s['title'], '|', s['tier']) for s in yaml.safe_load(open('scenarios/registry.yaml'))['scenarios'] if s['category']=='AST08']"
+```
 
-- **What it checks.** `detect_invisible_unicode_smuggling` delegates to
-  `detectors.scaffold.detect_invisible_unicode_smuggling`, which scans every entry of
-  `pkg["files"]` plus `pkg["manifest"]["description"]` against
-  `INVISIBLE_UNICODE_RE = [\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]` —
-  zero-width characters, bidi embedding/override/isolate controls, word joiners, and BOM —
-  and returns a `Finding` naming the first file that carries any, with the distinct code
-  points as evidence. The same function backs AST04's own smuggling scenario; the two
-  categories share the regex and supply only their scenario id. (The class is quoted here
-  in `\uXXXX` escapes for the same reason `detectors/scaffold.py` writes it that way:
-  pasting the literal glyphs into an audit file would smuggle the exact code points the
-  rule exists to catch, invisibly, into a document reviewers read by eye.)
-- **Why it is not a row above.** `AST08-invisible-unicode-smuggling` is not one of the
-  whitepaper's eight AST08 scenarios. It derives from AST08's preventive mitigations
-  ("strip zero-width characters, bidirectional embedding/override/isolate controls
-  (U+202A–U+202E, U+2066–U+2069), variation selectors and tag characters ... then
-  re-match"), and the mitigation text itself points at AST04 for the attack. It is a real
-  check of a real control; it is not coverage of an AST08 scenario, and the table would be
-  lying if it appeared there.
-- **What it is specifically not.** It is **not** `AST08-S02` Obfuscated Instruction. S02 is
-  a payload hidden in an encoded blob — base64 in a comment block — that the model decodes
-  at runtime; deciding it requires iterative decode-then-rescan under a depth and size
-  bound. The shipped function performs no decoding of any kind. It flags a carrier class
-  and stops. Treating a carrier-presence check as coverage of S02 would be the exact error
-  the whitepaper names: "Reporting the anomaly is not detecting the payload."
+## How each check discriminates, and what it deliberately does not convict
 
-`SCENARIO_TIERS` in the same module carries a second local id,
-`AST08-scan-evasion-narrative: agent-judgable`, with no registry counterpart. Its nearest
-registry relation is `AST08-S06` Scanner-Target Evasion, which the registry tiers
-`out-of-artifact`, not agent-judgable — the module's local tiering is one tier more
-optimistic than the registry's. The registry wins; there is no such agent-judgable scenario
-in AST08. The module's docstring records that it predates the registry.
+A detector that fires on every package in its own corpus has an F1 of 0.667 and no
+information. The four rules below are each a *conjunction* or a *differential*, never a
+keyword, and each one's clean fixture carries the same surface feature as its vulnerable
+one so that the difference being measured is the scenario and not the vocabulary.
 
-**The F1 number that exists in the repo today measures none of this category.**
-`skills/AST08/scripts/test_ast08_detector.py::test_s007_f1_at_least_080_on_declared_detectable_tier`
-asserts F1 >= 0.80 against six fixtures authored inline in the test file, for
-`AST08-invisible-unicode-smuggling`. It is a unit test of the Unicode scan against a corpus
-written beside it — not a run over `fixtures/AST08/`, and not a scenario-level AST08
-number. It should never be quoted as one.
+| Check | Fires on | Deliberately does **not** fire on |
+| --- | --- | --- |
+| `detect_obfuscated_instruction` (S02) | A rule matching a view the raw bytes hid: the normalized view (more matches than raw), a decoded layer, or a zero-width run that decodes to text | A base64 blob that decodes to binary (a PNG, a key, a digest); a shell command written in the clear — nothing was hidden, so this is AST01's question; a bare BOM, whose legitimate use is explained |
+| `detect_context_dependent_malice` (S04) | An environment-identity guard **and** a dangerous call inside the guarded branch | An OS-portability branch (`platform.system`, `sys.platform`, `os.name`) around a subprocess call; an env-var read with no dangerous branch; an unconditional subprocess call |
+| `detect_scanner_host_hazard` (S07) | A measured bound being exceeded | A single-level archive with an ordinary ratio; a symlink that stays inside the package; a few blank lines |
+| `detect_bytecode_cache_poisoning` (S08) | Bytecode whose provenance cannot be tied to shipped source | A checked hash-based `.pyc` whose recorded hash is the hash of the source beside it |
+
+The measured consequence over `fixtures/AST08/` is in *F1 denominator for AST08* below:
+each of the four checks scores 1 true positive, 0 false positives, 0 false negatives and
+7 true negatives across the eight packages. The 7 matters as much as the 1 — every check
+stays silent on the *other three scenarios'* vulnerable packages, not merely on the clean
+ones, which is the cross-check a V-versus-C count alone would miss.
+
+## What else the module carries, and why it is not in the table
+
+`detect_invisible_unicode_smuggling` is still defined in `detector.py`, delegating to
+`detectors.scaffold`, and is still exercised by two unit tests. It is **not** in
+`DETECTORS`, `SCENARIO_TIERS`, or `CHECK_COVERAGE`, so it is not in the F1 denominator and
+makes no coverage claim at all.
+
+That is a demotion from its previous status as this category's only shipped check, and the
+reason is the whitepaper's own scoping rule: "Report a hidden carrier as a finding in its
+own right only where legitimate use does not explain it — scope that signal to constructs
+with no plausible authoring path, such as ... a zero-width run that decodes to text." The
+unscoped scan flags any code point in the class, a BOM included, which over-reports by that
+standard. The *scoped* form of the same signal now lives inside
+`detect_obfuscated_instruction`, where the stripped view is re-matched and a zero-width run
+is decoded before anything is reported — which is also where the whitepaper puts it, in one
+mitigation bullet with decode-and-rescan. Nothing was lost: AST04 keeps the unscoped scan
+under its own scenario, which is where the mitigation text points for the attack.
+
+(The character class is quoted throughout this file in `\uXXXX` escapes for the same reason
+`detectors/scaffold.py` writes it that way: pasting the literal glyphs into an audit file
+would smuggle the exact code points the rule exists to catch, invisibly, into a document
+reviewers read by eye.)
+
+`SCENARIO_TIERS` also used to carry a second local id,
+`AST08-scan-evasion-narrative: agent-judgable`, with no registry counterpart and one tier
+more optimistic than the registry's `out-of-artifact` for its nearest relation
+(`AST08-S06`). It is gone: the table is now keyed to the registry's eight ids and restates
+the registry's eight tiers, and
+`skills/AST08/scripts/test_ast08_detector.py::test_the_registry_is_the_authority_for_every_tier_this_module_declares`
+compares the two dictionaries directly so the module cannot acquire a private opinion again.
 
 ## Declared and uncovered
 
@@ -189,9 +213,10 @@ it would itself be a scanning failure. What raises or lowers the posterior:
 *"Context-padding, unopened archive or binary containers, and scanner-directed prose — each
 individually static (AST08-S02, S07, S08) but none evidence that tuning occurred."* This is
 the most seductive false-coverage claim in the category. Detecting all three of those
-signals is worth doing and is exactly what the four owed detectors below would do — but
+signals is worth doing and is exactly what the three shipped detectors below now do — but
 finding them proves a payload was hidden, not that the hiding was iterated against a
-specific scanner. Reporting "no evasion detected" on their absence would invert the
+specific scanner, and the checks landing has not moved this scenario one inch toward
+decidable. Reporting "no evasion detected" on their absence would invert the
 scenario's own logic: a successfully tuned artifact is precisely the one where they are
 absent.
 
@@ -205,27 +230,32 @@ into the F1 denominator. `AST08-S01` in particular cannot be moved to `static-de
 by any amount of rule-writing: it is *defined* as the case where no static signal exists,
 so a rule that matched it would be matching something else.
 
-## What is owed: the four static-detectable scenarios with no detector
+## What shipped for the four static-detectable scenarios
 
-This is AST08's coverage debt, distinct from the declared-and-uncovered set above. Each is
-decidable from package bytes; none has a function.
-`fixtures/manifest.yaml` lists `AST08-S04`, `AST08-S07`, `AST08-S08` under
-`uncovered_static_detectable` and omits `AST08-S02` only because AST01's corpus exercises
-S02's shape from its own side (`AST01-S1`, an obfuscated payload pair, links
-`registry_ids: [AST08-S02]` at `covers: full`). From *this* package's perspective all four
-are unimplemented.
+This section used to be titled "What is owed" and listed four scenarios with no function.
+Each row now names the function that decides it and the mechanism it decides it with.
 
-| Scenario | What a detector would have to decide | Why it is deterministic |
+| Scenario | What the detector decides | Why it is deterministic |
 | --- | --- | --- |
-| `AST08-S02` Obfuscated Instruction | Iteratively decode candidate encodings (base64 and friends) under an explicit depth and size bound, re-run every rule over each decoded layer, and report against the raw artifact with the decoded view retained as evidence. Bound exhaustion is an INCOMPLETE event, never a clean result. | The encoded blob is in the bytes; decoding is a pure function of them. |
-| `AST08-S04` Context-Dependent Malice | Match the control-flow shape: an environment-keyed guard — hostname, username, date comparison, file-existence probe — wrapping a dangerous branch. | The logic bomb ships with the package; the shape is visible without executing anything. |
-| `AST08-S07` Scanner Host Compromise and Resource Exhaustion | Enforce limits before parsing: archive nesting depth, compression ratio, file count, symlink targets resolving outside the scan root, non-regular file types. | Each is a measurable property of the files as they sit on disk. |
-| `AST08-S08` Bytecode Cache Poisoning | Flag a sourceless `.pyc`, and compare a `.pyc`'s disassembly against its adjacent source for divergence. | Both artifacts ship in the package; the comparison is provenance arithmetic over its contents. |
+| `AST08-S02` Obfuscated Instruction | `detect_obfuscated_instruction`: iteratively decodes base64 / base64url / hex candidates under an explicit depth (4) and size (1 MiB) bound, re-runs every rule over each decoded layer, re-runs every rule over the normalized view and compares match counts against the raw bytes, and decodes zero-width runs. Bound exhaustion is an `INCOMPLETE` event, never a clean result. Findings are reported against the raw artifact with the decoded view as evidence. | The encoded blob is in the bytes; decoding is a pure function of them. |
+| `AST08-S04` Context-Dependent Malice | `detect_context_dependent_malice`: matches the control-flow shape — an environment-identity guard wrapping a dangerous branch — from the `ast` parse tree. | The logic bomb ships with the package; the shape is visible without executing anything. |
+| `AST08-S07` Scanner Host Compromise and Resource Exhaustion | `detect_scanner_host_hazard`: enforces the declared limits before parsing — file count, file size, padding runs, archive nesting depth, member count, declared compression ratio, members escaping the extraction root, symlinks escaping the scan root, non-regular files. | Each is a measurable property of the files as they sit on disk. |
+| `AST08-S08` Bytecode Cache Poisoning | `detect_bytecode_cache_poisoning`: flags a sourceless `.pyc`, an unchecked hash-based `.pyc`, and a header whose recorded source hash or size contradicts the adjacent source. | Both artifacts ship in the package; the comparison is provenance arithmetic over its contents. |
 
-Note that `AST08-S07` is the scenario that attacks the detector itself. A detector for it
-must be written to survive its own input — which is why the whitepaper puts the limits
-*before* parsing, and why "the scan crashed" and "the scan found nothing" must be different
-outcomes.
+`AST08-S07` is the scenario that attacks the detector itself, so two implementation
+decisions are load-bearing rather than stylistic and are pinned by tests:
+
+- **Nothing is decompressed.** Compression ratios are read from the zip central directory.
+  Measuring a decompression bomb by decompressing it is detonating it.
+- **Nothing is unmarshalled.** `AST08-S08` reads the 16-byte PEP 552 header and stops.
+  `marshal.loads` on attacker-controlled bytes is a memory-safety hazard, so a scanner that
+  unmarshals a package's `.pyc` to inspect it has handed the package the scanner host —
+  demonstrating S07's failure while implementing S08's check.
+  `test_s08_never_unmarshals_a_shipped_code_object` asserts the module imports neither
+  `marshal` nor `pickle`.
+- **The loader never follows a symlink.** `load_package_dir` records a link's target and
+  whether it resolves outside the scan root, and reads nothing through it. The scan root is
+  the thing being escaped, and the walker is the first thing an S07 package attacks.
 
 ## F1 denominator for AST08
 
@@ -242,89 +272,149 @@ static-detectable tier, four scenarios.**
 - `AST08-S05` and `AST08-S06` are excluded as `out-of-artifact`, and appear in the
   published breakdown as declared-uncovered rows rather than vanishing from it.
 
-**What AST08 publishes today: no F1.** `fixtures/manifest.yaml` records
-`published_f1: pending-detector`, `f1_scope: category-precondition`,
-`status: proxy-covered`. That is the correct state, for a reason worth stating precisely:
+**What AST08 publishes: `f1: 1.00`, scope `scenario-level`, over the eight labeled cases in
+`fixtures/AST08/`.** `fixtures/manifest.yaml` records
+`published_f1: "scenario-level 1.00 (4 scenario checks, n=8)"`, `f1_scope: scenario-level`,
+`status: covered` — the number is published as a qualified string rather than a bare float
+so that the scope and the corpus size travel with it into every summary table that quotes
+it, including the CLI's and the README's. The measurement, reproduced by
+`skills/AST08/scripts/test_ast08_detector.py::test_s007_f1_over_the_labeled_corpus_on_disk`
+by loading each package off disk with `load_package_dir`:
+
+| Check | TP | FP | FN | TN |
+| --- | --- | --- | --- | --- |
+| `AST08-S02` Obfuscated Instruction | 1 | 0 | 0 | 7 |
+| `AST08-S04` Context-Dependent Malice | 1 | 0 | 0 | 7 |
+| `AST08-S07` Scanner Host Compromise | 1 | 0 | 0 | 7 |
+| `AST08-S08` Bytecode Cache Poisoning | 1 | 0 | 0 | 7 |
+| **Category** | **4** | **0** | **0** | — |
+
+`test_the_published_f1_in_the_manifest_is_the_measured_one` recomputes the number and
+compares it to the manifest, so the published figure cannot drift from the corpus it
+claims to come from.
+
+### What the published 1.0 is, and what it is not
+
+This is the strongest claim in this file and it deserves the category's own scepticism
+applied to it, because AST08 is precisely the category about scanners that publish numbers.
+
+- **It is measured, not asserted.** It comes from running the four shipped functions over
+  eight packages on disk, in a test that fails if either side changes.
+- **n = 8, and the corpus was written by the people who wrote the rules.** That is the
+  smallest corpus gate-4 permits for four checks, and it is the single most important
+  qualifier on the number. AST08's own mitigations demand a false-positive rate measured
+  "against a benign corpus of real, widely installed skills", with the corpus's size and
+  provenance stated. No such corpus is used here; the eight clean/vulnerable packages are
+  hand-authored. **This number is not a false-positive rate.**
+- **It is a non-adaptive measurement.** The whitepaper's decision rule 5 and the underlying
+  adversarial-ML result (Carlini and Wagner 2017; Tramer et al. 2020) say a detection rate
+  measured without an adaptive adversary overstates robustness. No bypass rate under
+  white-box access is claimed, and every rule here is published in a public repository, so
+  the adversary holds the scanner. Each of the four checks has a knowable evasion: prose
+  that carries the payload with no encoding at all (which is `AST08-S01`, agent-judgable by
+  construction), a guard predicate outside the listed identity set, an archive format the
+  member-name test does not recognise, or bytecode that never ships as a `.pyc`.
+- **It says nothing about the other four scenarios.** Two are judged, two are undecidable
+  from a package. A category-level "1.0" that a reader takes as "AST08 is covered" would be
+  the exact misreading `f1_scope` exists to prevent: the scope label is `scenario-level`
+  over four named scenarios, not over the category.
 
 **AST08 is not entitled to the empty-tier exemption.** gate-4's never-pad rule ("a category
 whose detectable tier is empty publishes no F1 at all") is what protects AST07 permanently.
-It does not apply here — AST08's detectable tier holds four scenarios. AST08's silence is
-therefore temporary and owed, and the four detectors above are what discharge it.
+It does not apply here — AST08's detectable tier holds four scenarios — which is why the
+silence this file used to record was a debt rather than an honesty carve-out, and why
+discharging it meant writing detectors rather than re-tiering scenarios.
 
-**What must not be published in the meantime.** Feeding the six fixtures currently labeled
-for this category into the shipped detector returns
+**The routing rule that still stands.** Any number this category publishes
+must name the scenario it measures. The corpus this one replaced was labeled `AST08-S1`, a local id, while
+the shipped detector answered to `AST08-invisible-unicode-smuggling`: the two intersected to
+nothing, so `f1_report` returned
 `{"status": "measured", "f1": 0.0, "precision": 0.0, "recall": 0.0, "tp": 0, "fp": 0, "fn": 0}`
-— verified by running it. Every counter is zero because the labels (`AST08-S1`) and the
-detector's scenario set (`AST08-invisible-unicode-smuggling`) intersect to nothing, so the
-0.0 is not a measurement of poor detection; it is the arithmetic of an empty intersection
-wearing a `measured` status. Publishing it as AST08's F1 would be worse than publishing
-nothing, in both directions: it understates a Unicode scan that does work, and it implies a
-corpus/detector pairing that does not exist. The routing rule stands: any number this
-category publishes must name the scenario it measures.
-
-`detectors/engine.py` refuses the same pairing outright. Passing an `AST08-S1`-labeled
+— a 0.0 that measured an empty intersection while wearing a `measured` status. Publishing
+that would have been worse than publishing nothing, in both directions.
+`detectors/engine.py` refuses the same pairing outright: passing an `AST08-S1`-labeled
 fixture to `run_category` against a registry-keyed coverage matrix raises
-`UnregisteredScenarioFixtureError: fixture(s) reference scenario_id(s) absent from the
-coverage matrix for category 'AST08': ['AST08-S1']` (verified) — deliberately loud rather
-than silently shrinking the denominator by one case.
+`UnregisteredScenarioFixtureError` rather than silently shrinking the denominator by one
+case, and
+`tests/test_coverage_matrix_ast07_ast08.py::test_a_corpus_labeled_with_ids_the_detector_does_not_know_manufactures_a_hollow_zero`
+keeps the arithmetic pinned for the next category that gets there.
 
 ## Corpus entitlement versus what is on disk
 
 | Quantity | Value | Where it comes from |
 | --- | --- | --- |
 | Static-detectable scenarios (registry) | 4 | `scenarios/registry.yaml` |
-| Labeled detectable checks (manifest) | 1 | `fixtures/manifest.yaml` `AST08.registry_coverage.labeled_detectable_checks` |
-| **Entitlement under `max(6, 2 x labeled)`** | **6** | `max(6, 2 x 1) = 6`; `declared_expected_cases: 6` |
+| Labeled detectable checks (manifest) | 4 | `fixtures/manifest.yaml` `AST08.registry_coverage.labeled_detectable_checks` |
+| **Entitlement under `max(6, 2 x labeled)`** | **8** | `max(6, 2 x 4) = 8`; `declared_expected_cases: 8` |
 | Entitlement at full registry coverage | 8 | `max(6, 2 x 4) = 8`; `cases_at_full_static_coverage: 8` |
-| Cases admitted to the corpus | 6 | `fixtures/manifest.yaml` `AST08.cases` |
-| Fixture files present under `fixtures/AST08/` | **6** | `find fixtures/AST08 -type f` |
+| Cases admitted to the corpus | 8 | `fixtures/manifest.yaml` `AST08.cases` |
+| Fixture files present under `fixtures/AST08/` | **21** | every file and symlink under `fixtures/AST08/`, not only the Markdown |
 
-The count reconciles: six entitled, six labeled, six on disk, three vulnerable
-(`V1`, `V2`, `V3`) and three clean (`C4`, `C5`, `C6`), class-balanced as gate-4 requires.
-Writing the four owed detectors raises the entitlement from 6 to 8 — `max(6, 2 x 4)` —
-and those cases must be authored before this category's F1 may be published. That 8
-assumes the scan-attestation precondition check is *replaced*, not kept alongside: the
-formula counts labeled checks, so retaining it as a fifth would put the entitlement at
-`max(6, 2 x 5) = 10`. The manifest's `cases_at_full_static_coverage: 8` is computed off
-the registry's four static-detectable scenarios only and therefore encodes the replace
-reading.
+Eight entitled, eight labeled, eight packages on disk, four vulnerable (`V1`–`V4`) and four
+clean (`C5`–`C8`), class-balanced as gate-4 requires. The two entitlement figures coincide
+because the corpus now labels exactly the registry's static-detectable set and nothing else.
 
-**What the six cases actually vary.** All six carry `fixture_scenario_id: AST08-S1`, a
-local id, not a registry id — the registry's `AST08-S01` is Natural-Language Bypass, an
-unrelated agent-judgable scenario, so the visual near-collision is a trap for a reader
-skimming frontmatter. The vulnerable files set `scan_attestation: null`; the clean files set
-`scan_attestation: "reports/scan-2026-08-20.json"`. Nothing else differs — the three
-vulnerable files are byte-identical to one another, as are the three clean ones. The
-manifest declares this honestly as `covers: category-precondition` with a stated
-`derivation` from AST08's mitigations ("Require every scan to emit a machine-readable
-coverage record...", "Continuously re-scan installed skills as scanner models improve") and
-from the Universal Skill Format's `scan_status` field, linking `registry_ids: []`.
+**The corpus this replaced, and why replacement rather than re-labeling.** The previous six
+cases all carried `fixture_scenario_id: AST08-S1` — a local id, not a registry id; the
+registry's `AST08-S01` is Natural-Language Bypass, an unrelated agent-judgable scenario, so
+the visual near-collision was a trap for a reader skimming frontmatter. The three vulnerable
+files set `scan_attestation: null`, the three clean files set
+`scan_attestation: "reports/scan-2026-08-20.json"`, and nothing else differed: the three
+vulnerable files were byte-identical to one another, as were the three clean ones. No
+detector in the repository read that field — the only code that touches scan attestation is
+`validators/usf.py` check 6, a manifest validator that no F1 scores — so six cases over a
+single binary field, three duplicates a side, carried roughly one observation and exercised
+nothing. Re-labeling could not fix that: the field is a category precondition drawn from
+AST08's mitigations, not one of the whitepaper's eight scenarios, so no re-labeling makes it
+measure a scenario. It is gone, and the entitlement formula is why it is not kept alongside:
+counting it as a fifth labeled check would put the entitlement at `max(6, 2 x 5) = 10` for
+one field read.
+
+**What the eight packages vary.** One vulnerable/clean pair per scenario, and each pair's
+clean half carries the same surface feature as its vulnerable half so the pair measures the
+scenario rather than the vocabulary:
+
+| Case | Package | Encodes |
+| --- | --- | --- |
+| `AST08-V1` | `fixtures/AST08/V1-obfuscated-instruction` | A payload two base64 layers deep in a comment block, decoding to an agent-directed override plus a credential read and an egress destination |
+| `AST08-C5` | `fixtures/AST08/C5-obfuscated-instruction` | The same carriers, no payload: a base64 blob that is a real PNG, and `curl ... \| sh` written in the clear |
+| `AST08-V2` | `fixtures/AST08/V2-context-dependent-malice` | `scripts/collect.py` gating a credential-tar-to-`curl` on `socket.gethostname()` and a date comparison |
+| `AST08-C6` | `fixtures/AST08/C6-context-dependent-malice` | Both halves separately: a `platform.system()` portability branch, and an unconditional `subprocess.check_output` |
+| `AST08-V3` | `fixtures/AST08/V3-scanner-host-hazard` | A 5,000-newline padding run, a real zip whose only member is another zip, and a symlink to `../../../../etc/passwd` |
+| `AST08-C7` | `fixtures/AST08/C7-scanner-host-hazard` | A real single-level `.docx` with an ordinary ratio, and a symlink that stays inside the package |
+| `AST08-V4` | `fixtures/AST08/V4-bytecode-cache-poisoning` | A sourceless `__pycache__/uploader.cpython-311.pyc`, plus an unchecked hash-based `util` cache beside a `util.py` |
+| `AST08-C8` | `fixtures/AST08/C8-bytecode-cache-poisoning` | A checked hash-based `.pyc` whose recorded hash is the hash of the `util.py` shipped beside it |
 
 Two consequences an auditor should not have to discover on their own:
 
-1. **No detector reads `scan_attestation`.** The only code in the repo that touches scan
-   attestation is `validators/usf.py` check 6, which enforces coherence between
-   `scan_status.scanner` and `scan_status.result` (an unscanned package must declare
-   `scanner: none`) and warns when the field is absent. That is a manifest validator, not an
-   AST08 detector, and it is not scored by any F1. The six cases are currently unexercised
-   by anything.
-2. **Three identical copies do not add statistical power.** Six cases over a single
-   binary field, with three duplicates on each side, is one distinguishing observation
-   repeated — the corpus satisfies gate-4's count and class balance while carrying roughly
-   one case worth of information. If these fixtures are retained when the four real
-   detectors land, they should be diversified or replaced rather than counted.
+1. **The binary fixtures are verified, not trusted.** A fixture that does not actually
+   encode its scenario cannot test a detector, so the corpus is checked structurally by
+   `test_the_clean_bytecode_fixture_really_is_a_checked_hash_based_cache`,
+   `test_the_vulnerable_bytecode_fixture_really_is_sourceless_and_unchecked`,
+   `test_the_scanner_host_fixture_really_carries_a_nested_archive_and_an_escaping_symlink`
+   and `test_the_clean_scanner_host_fixture_carries_the_same_features_within_bounds` — PEP
+   552 flag bits read directly, zip members enumerated, the symlink's escape recomputed.
+2. **`fixtures/AST08/` is exempted from this repository's `.gitignore` for `*.pyc` and
+   `__pycache__/`.** That exemption is deliberate and is what makes `AST08-S08` testable at
+   all; the two `!` lines in `.gitignore` carry the reason. The clean fixture's `.pyc`
+   verifies its recorded source hash only when the header's magic is the running
+   interpreter's (the hash is keyed by magic), so on another CPython version that one
+   comparison is skipped and reported `INCOMPLETE` rather than failing — the checked flag
+   bit, which is what forecloses silent selection, is version-independent and always
+   asserted.
 
 ## Changing a tier in this file
 
 The tiering is frozen against the labeled corpus by `fixtures/manifest.yaml`'s
 `tier_lock_hash` for AST08
-(`3a70c4332c9d0794e248baf728cb65715f9e0b6956dab506927f8b8f7d11526b`), a sha256 over the
+(`08ea76d31a710007ab28c9d14480159426cd9e98c46f08950ceb22a8aa82dbd3`), a sha256 over the
 sorted `id:tier` pairs (`validators/tier_lock.py`). Moving any AST08 scenario between tiers
 changes that hash, which per S-011 forces the corpus back through re-labeling and the judge
 matrix back through a re-run before any F1 for this category may be published. The
 reclassification most likely to be attempted is `AST08-S06` Scanner-Target Evasion, from
-`out-of-artifact` up to `agent-judgable`, on the strength of `detector.py`'s local
-`AST08-scan-evasion-narrative` id. Resist it on the merits: a judge reading the package can
-assess whether prose looks scanner-directed, but the scenario is defined by an authoring
-process that left no trace in the package, so a confident verdict either way would be
-unearned.
+`out-of-artifact` up to `agent-judgable`. Resist it on the merits: a judge reading the
+package can assess whether prose looks scanner-directed, but the scenario is defined by an
+authoring process that left no trace in the package, so a confident verdict either way would
+be unearned. Now that this category publishes a number, the second most likely pressure is
+the opposite one — re-tiering a scenario *down* to make a rule's failure disappear. The lock
+catches both directions, and the F1 is republished only after the corpus is re-labeled.

@@ -8,20 +8,29 @@ description: "Detect and triage OWASP AST06 Weak Isolation — skills executing 
 Pattern: Knowledge. The decision rule for this category: isolation is a binary
 architectural default, not a tunable policy — a runtime either sandboxes by default
 or it doesn't, and "sandboxing is available if configured" is evidence *for* this
-finding, not evidence against it. Mechanism (default-mode detection, bind-address
-checks) lives in `scripts/`; frozen scenario tiers live in `coverage-matrix.md`.
+finding, not evidence against it. Mechanism lives in `scripts/detector.py`: the two
+halves of Host Escape's defining condition — a bundled-script call site planting host
+persistence, and a declared write scope reaching filesystem root — plus the declared
+shell posture and shared-state write scope. Frozen scenario tiers live in
+`coverage-matrix.md`.
 
 ## Why "available if configured" does not close this finding
 
-The whitepaper's own evidence is precise on this point: OpenClaw's documentation
-states "tools run on the host for the main session, so the agent has full access when
-it's just you" — Docker sandboxing exists but requires explicit configuration most
-users never apply. Bitdefender (Feb 2026) attributed 135,000+ internet-facing OpenClaw
-instances to misconfiguration and insufficient controls, not to the *absence* of a
-sandboxing feature. The decision consequence: a finding of "host-mode is the default
-execution mode" is not resolved by "a sandboxed mode exists" — resolve it only by
-confirming the *actual deployment* runs in the sandboxed mode, with host-mode
-requiring explicit, documented opt-in.
+Isolation findings get closed on the wrong evidence more often than any other category
+here, and the wrong evidence always has the same shape: *a sandboxed mode exists*. It is
+the wrong evidence because the population that gets compromised is the population
+running the default, and the default is host mode — the agent holds full filesystem,
+shell and network access, and the container is an opt-in most operators never take. The
+large internet-exposure counts published for agent runtimes are attributed to
+misconfiguration and absent controls, not to a missing sandboxing *feature*; the feature
+was there in every one of them.
+
+So the resolution rule is a change of subject, not a stronger argument: a finding of
+"host mode is the default execution mode" is closed only by evidence about the **actual
+deployment** — this instance runs sandboxed, and host mode requires a documented,
+explicit opt-in. A vendor capability statement, a documentation link, and a config file
+that *could* enable the sandbox are all evidence about the product, and the finding is
+about the deployment. Note which one you have before you close it.
 
 ## Decision rules
 
@@ -68,6 +77,37 @@ requiring explicit, documented opt-in.
   a technical isolation gap (AST06) at the individual-deployment level. The technical
   control (containerize by default) is AST06's fix; the fleet-visibility control
   (inventory which deployments run host-mode) is AST09's.
+
+## What the two shipped checks decide, and where they go quiet
+
+`AST06-S01` Host Escape is the one scenario a package decides, and the registry states
+it as a disjunction, so the module implements one check per disjunct: a bundled-script
+call site planting host persistence (cron table, systemd unit, shell rc, launch agent),
+or a declared write scope reaching filesystem root. Both are structural facts of the
+package. The two remaining checks in the module read `artifact_signal`s for scenarios
+they do not decide, and say so in their own `CHECK_COVERAGE`.
+
+- **The script disjunct needs the persistence path as a literal string argument of a
+  shell-exec or write call.** It matches `ast.Call` nodes, not text — which is why the
+  module's own pattern table is not a hit against itself. A path assembled from
+  fragments, read from configuration, passed through a variable, or living in a `.sh`
+  file rather than a `.py` file produces no match at all.
+- **An unparsed Python file is named in the evidence and still returns negative.** Treat
+  the `unparsed:` note as an INCOMPLETE result; nothing downstream will do it for you.
+- **The manifest disjunct compares against a closed literal set of root-ish scopes**
+  (`/`, `/**`, `*`, `~`, `$HOME`, and a few spellings of each). A scope like `/etc/**` or
+  `/usr/local/**` is enormously broad and is not in that set — it fires only if it also
+  matches a named persistence location. Broad-but-not-root write scopes are a manual
+  read.
+- **Entries fully shadowed by `deny_write` are not scope and are skipped.** Correct, and
+  also the shape an author uses to declare a wide `write` list that evaluates to
+  nothing — which means the declaration's breadth never appears in any finding here.
+- **Everything about the running system is outside the artifact.** Bind address,
+  workspace-over-bundled precedence, hot-reload behaviour and cross-agent shared state
+  are properties of a deployment, not of a package; three of this category's five
+  scenarios are tiered out-of-artifact for exactly that reason. Decision rules 2, 3 and 4
+  above are what you apply by hand, against the deployment, when this detector has
+  nothing to say.
 
 ## Scope and out-of-artifact boundary
 

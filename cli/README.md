@@ -71,10 +71,15 @@ Two package views are used, deliberately:
   surface.
 
 The findings are detector-level checks — each module's own `SCENARIO_TIERS` — and are
-**not** coverage of the whitepaper's named scenarios. For that, read
+**not** coverage of the whitepaper's named scenarios. Each module's `CHECK_COVERAGE` says
+so per check, in `fixtures/manifest.yaml`'s vocabulary (`full`, `artifact-signal-only`,
+`category-precondition`), and `f1_report` returns the resulting `F1_SCOPE` beside any
+number. For the full picture, read
 `skills/<AST>/coverage-matrix.md`, or run `coverage`, which reports what each category
 publishes and, where it publishes no F1, which of the two distinct reasons applies:
 
 - `declared-and-uncovered` — the detectable tier is empty, so no number is published and
   the corpus is never padded to manufacture one;
-- `pending-detector` — a labeled corpus exists and no detector consumes it yet.
+- `pending-detector` — a labeled corpus exists and no detector consumes it yet. **No
+  category is in this state today**; the CLI keeps the branch so that a corpus landing
+  ahead of its detector reports as unmeasured rather than as measured-at-zero.

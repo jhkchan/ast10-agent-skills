@@ -1,34 +1,71 @@
 """AST03 -- Over-Privileged Skills detector.
 
-Anchors on the USF manifest's `permissions.deny_write`, `permissions.shell`,
-and `permissions.network` fields (spec.md Behavior item 2). The canonical
-example spec.md itself uses for this category is "overprivileged agent with
-write access to production secrets" (S-002); both scenarios below are static
-audits of exactly the manifest fields that grant that kind of write/exec/
-network reach.
+AST03's one static-detectable scenario in ``scenarios/registry.yaml`` is
+**AST03-S03 Identity File Backdoors**: "a skill requesting write access to
+SOUL.md and MEMORY.md installs persistent behavioural backdoors". The registry's
+own reason states the mechanism -- "a declared write permission naming
+``SOUL.md``, ``MEMORY.md``, or ``AGENTS.md`` ... is a pure structural check on
+the manifest" -- and the whitepaper's preventive-mitigation list states the
+control: "Flag skills requesting write access to agent identity files (SOUL.md,
+MEMORY.md, AGENTS.md) for elevated review."
 
-Interim scenario-tier declaration (T-3.3); superseded by T-1.3's registry and
-T-3.1's authored `skills/AST03/coverage-matrix.md` once locked.
+``detect_identity_file_write_grant`` is that check, and it is the only one in
+this module that claims coverage of a named scenario. The other three say what
+they are instead:
 
-Package shape (see AST01/scripts/detector.py for the full contract):
-    manifest.permissions = {
-        "deny_write": [str, ...] | None,
-        "shell": {"allowed": bool, "commands": [str, ...] | None},
-        "network": {"policy": "deny-all" | "allow-list" | "allow-all", "allow": [str, ...]},
-    }
+* ``detect_shell_network_privilege_combo`` and ``detect_wildcard_network_egress``
+  compute ``artifact_signal``s the registry declares on AST03-S01 and AST06-S02.
+  Package-decidable, never coverage (see ``CHECK_COVERAGE``).
+* ``detect_unbounded_write_scope`` derives from AST03's first preventive
+  mitigation -- "require skills to declare a permission manifest (files,
+  network, shell, tools) - reject skills without one" -- and decides no named
+  scenario at all.
+
+SHAPE
+-----
+Permission fields are read through ``detectors.scaffold``'s accessors, which
+understand all three vocabularies one package reaches a detector in: USF v1
+(``permissions.files.deny_write``, ``permissions.shell`` as a boolean,
+``permissions.network.allow``), the flattened detector shape that
+``scripts/dogfood.py::translate_permissions`` and ``cli/lib/bridge.py`` produce,
+and the bare-boolean SKILL.md frontmatter shorthand. Reading only the flattened
+spelling is what made the previous ``deny_write`` check report
+``detected=True`` against this repository's own AST03 manifest, which declares
+three ``deny_write`` entries -- a false positive on every conformant package,
+recorded in ``skills/AST03/coverage-matrix.md`` and closed here.
 """
 
 from __future__ import annotations
 
+import fnmatch
 from typing import Callable
 
-from detectors.scaffold import Finding, static_detectable
+from detectors.scaffold import (
+    Finding,
+    file_scopes,
+    network_allowlist,
+    network_unbounded,
+    permissions,
+    shell_granted,
+    static_detectable,
+)
 from detectors.scaffold import f1_report as _f1_report
+from detectors.scaffold import f1_scope as _f1_scope
 from detectors.scaffold import run_all as _run_all
 
+#: Agent identity files, verbatim from AST03's preventive mitigation. Kept in
+#: sync with ``validators/usf.py::IDENTITY_FILES``, which the USF semantic pass
+#: uses for the same three names; asserted equal in the module's tests so the
+#: two lists cannot drift.
+IDENTITY_FILES: tuple[str, ...] = ("SOUL.md", "MEMORY.md", "AGENTS.md")
+
+_GLOB_CHARS = "*?[]"
+
 SCENARIO_TIERS: dict[str, str] = {
+    "AST03-identity-file-write-grant": "static-detectable",
     "AST03-unbounded-write-scope": "static-detectable",
     "AST03-shell-network-privilege-combo": "static-detectable",
+    "AST03-wildcard-network-egress": "static-detectable",
     # Whether the *task* actually needs the privileges it was granted requires
     # reading intent against the skill's stated purpose -- semantic judgment.
     "AST03-task-scope-mismatch": "agent-judgable",
@@ -36,36 +73,238 @@ SCENARIO_TIERS: dict[str, str] = {
 
 STATIC_DETECTABLE: set[str] = static_detectable(SCENARIO_TIERS)
 
+CHECK_COVERAGE: dict[str, dict] = {
+    "AST03-identity-file-write-grant": {
+        "registry_ids": ["AST03-S03"],
+        "covers": "full",
+        "reason": (
+            "AST03-S03 Identity File Backdoors is tiered static-detectable on exactly this "
+            "predicate: a declared write permission naming SOUL.md, MEMORY.md or AGENTS.md "
+            "that deny_write does not shadow. The check evaluates USF's most-specific-wins "
+            "precedence (deny_write beats write) over the package's own manifest and reads "
+            "nothing outside it, so it decides the scenario rather than proxying it."
+        ),
+    },
+    "AST03-unbounded-write-scope": {
+        "registry_ids": [],
+        "covers": "category-precondition",
+        "derivation": (
+            "AST03's first preventive mitigation -- 'require skills to declare a permission "
+            "manifest (files, network, shell, tools) - reject skills without one' -- not "
+            "AST03-S03, whose defining condition names the identity-file paths that "
+            "detect_identity_file_write_grant reads and this check does not."
+        ),
+        "reason": (
+            "The check fires when no write floor is declared at all: no permissions block, "
+            "or a files block with no deny_write key. It is deliberately blind to the "
+            "CONTENT of a declared floor, so a manifest with deny_write: ['/etc/hosts'] "
+            "passes it while SOUL.md stays writable -- that case is AST03-S03's and is "
+            "decided by the identity-file check. An explicitly empty deny_write is a stated "
+            "floor, not an absent one (schemas/usf-v1.schema.json requires the key for "
+            "exactly that reason), so it does not fire."
+        ),
+    },
+    "AST03-shell-network-privilege-combo": {
+        "registry_ids": ["AST03-S01", "AST06-S02"],
+        "covers": "artifact-signal-only",
+        "reason": (
+            "Shell execution together with unbounded egress is breadth, not mismatch. Its "
+            "two conjuncts are exactly the artifact_signals the registry declares on "
+            "AST03-S01 ('unrestricted shell ... alongside a narrow stated function') and "
+            "AST06-S02 ('a manifest declaring network: true or policy: allow-all rather "
+            "than a domain allowlist'). Both are package-decidable and neither is "
+            "decidable-as-the-scenario: AST03-S01 turns on a purpose-versus-scope judgement "
+            "and AST06-S02 on the host's sandbox and co-located services."
+        ),
+    },
+    "AST03-wildcard-network-egress": {
+        "registry_ids": ["AST06-S02"],
+        "covers": "artifact-signal-only",
+        "reason": (
+            "An egress declaration that is a blanket rather than an enumerated domain list "
+            "is verbatim AST06-S02's declared artifact_signal, and AST03's own mitigation "
+            "asks for the same shape ('adopt network allowlists scoped to specific domains, "
+            "not a binary network: true/false'). The registry tiers AST06-S02 "
+            "out-of-artifact because the pivot depends on the host's sandbox and co-located "
+            "services, so a blanket policy is a precondition and never the scenario."
+        ),
+    },
+}
 
-def _permissions(pkg: dict) -> dict:
-    return pkg.get("manifest", {}).get("permissions") or {}
+F1_SCOPE: str = _f1_scope(CHECK_COVERAGE)
+
+
+# --------------------------------------------------------------------------- helpers
+
+
+def _normalize(path: str) -> str:
+    normalized = path.strip().replace("\\", "/")
+    return normalized[2:] if normalized.startswith("./") else normalized
+
+
+def _basename(path: str) -> str:
+    return _normalize(path).rstrip("/").rsplit("/", 1)[-1]
+
+
+def _write_entry_reaches(entry: str, identity_file: str) -> bool:
+    """Does one declared ``write`` entry put ``identity_file`` in reach?
+
+    Three shapes count, and nothing else does:
+
+    * the entry names the file (``SOUL.md``, ``./SOUL.md``, ``memory/SOUL.md``) --
+      the literal shape USF v1 permits, since it forbids globs in path lists;
+    * a glob that matches the file at the package root (``*.md``, ``SOUL.*``);
+    * a recursive grant rooted at the package or the home directory (``**``,
+      ``./**``, ``~/**``), which reaches every path beneath it.
+
+    A scoped recursive grant such as ``/secrets/**`` does NOT reach it. That
+    distinction is the whole point: a broad write scope is a different finding
+    (see ``detect_unbounded_write_scope``) from a write that names the agent's
+    identity.
+    """
+    normalized = _normalize(entry)
+    if not normalized:
+        return False
+    if _basename(normalized) == identity_file:
+        return True
+    if not any(ch in normalized for ch in _GLOB_CHARS):
+        return False
+    for candidate in (identity_file, f"./{identity_file}", f"~/{identity_file}", f"/{identity_file}"):
+        if fnmatch.fnmatch(_normalize(candidate), normalized):
+            return True
+    if normalized.endswith("**"):
+        return normalized[:-2].rstrip("/") in ("", ".", "~")
+    return False
+
+
+def _deny_shadows(deny_write: tuple[str, ...], identity_file: str) -> bool:
+    """USF precedence: ``deny_write`` beats ``write``, bare filenames deny everywhere.
+
+    Mirrors ``validators/usf.py::_write_allowed`` so a manifest the USF validator
+    calls protected is not reported as exposed here.
+    """
+    for entry in deny_write:
+        normalized = _normalize(entry)
+        if _basename(normalized) == identity_file:
+            return True
+        if normalized.endswith("**") and normalized[:-2].rstrip("/") in ("", ".", "~"):
+            return True
+    return False
+
+
+# ------------------------------------------------------------------------- checks
+
+
+def detect_identity_file_write_grant(pkg: dict) -> Finding:
+    """AST03-S03: a write grant reaching SOUL.md / MEMORY.md / AGENTS.md.
+
+    The scenario is the *request*. A package that names an identity file in
+    ``permissions.files.write`` and does not shadow it in ``deny_write`` has asked
+    for the ability to rewrite the agent rather than its data -- which is why
+    ``validators/usf.py::derive_risk_tier`` puts the same grant at L3,
+    "destructive by definition".
+    """
+    perms = permissions(pkg)
+    scopes = file_scopes(perms)
+    granted: list[str] = []
+    for identity_file in IDENTITY_FILES:
+        reaching = [entry for entry in scopes.write if _write_entry_reaches(entry, identity_file)]
+        if reaching and not _deny_shadows(scopes.deny_write, identity_file):
+            granted.append(f"{identity_file} via write entry {reaching[0]!r}")
+    if granted:
+        return Finding(
+            "AST03-identity-file-write-grant",
+            True,
+            "declared write reaches agent identity file(s): " + "; ".join(granted),
+        )
+    if not scopes.write:
+        return Finding(
+            "AST03-identity-file-write-grant",
+            False,
+            "no write scope declared, so no identity file is reachable",
+        )
+    return Finding(
+        "AST03-identity-file-write-grant",
+        False,
+        f"{len(scopes.write)} write entr(y/ies) declared, none reaching {list(IDENTITY_FILES)} "
+        f"(deny_write shadows {len(scopes.deny_write)} path(s))",
+    )
 
 
 def detect_unbounded_write_scope(pkg: dict) -> Finding:
-    """No `deny_write` list at all == unrestricted filesystem write."""
-    deny_write = _permissions(pkg).get("deny_write")
-    detected = not deny_write
-    evidence = (
-        "permissions.deny_write is unset or empty" if detected else f"deny_write covers {len(deny_write)} path(s)"
+    """No declared write floor at all -- the category precondition, not AST03-S03.
+
+    ``deny_write: []`` is a stated floor and passes. A missing key, or a package
+    with no permission manifest whatsoever, is what the mitigation rejects.
+    """
+    perms = permissions(pkg)
+    if not perms:
+        return Finding(
+            "AST03-unbounded-write-scope",
+            True,
+            "no permissions block at all: the package declares no files/network/shell scope",
+        )
+    scopes = file_scopes(perms)
+    if not scopes.declares_deny_write:
+        return Finding(
+            "AST03-unbounded-write-scope",
+            True,
+            "permissions declares no deny_write key: no write floor survives a port to a "
+            "runtime whose default is write-everything",
+        )
+    return Finding(
+        "AST03-unbounded-write-scope",
+        False,
+        f"write floor declared: deny_write lists {len(scopes.deny_write)} path(s)",
     )
-    return Finding("AST03-unbounded-write-scope", detected, evidence)
 
 
 def detect_shell_network_privilege_combo(pkg: dict) -> Finding:
-    """Arbitrary shell exec *and* unrestricted outbound network is the
-    exfiltration-capable combo the S-002 example names: write access plus a
-    channel to move what was written."""
-    perms = _permissions(pkg)
-    shell_allowed = bool((perms.get("shell") or {}).get("allowed"))
-    network_policy = (perms.get("network") or {}).get("policy")
-    detected = shell_allowed and network_policy == "allow-all"
-    evidence = f"shell.allowed={shell_allowed} network.policy={network_policy}"
-    return Finding("AST03-shell-network-privilege-combo", detected, evidence)
+    """Shell execution *and* unbounded egress: an execution primitive plus a channel.
+
+    Proxy only. See ``CHECK_COVERAGE``: this is AST03-S01's and AST06-S02's
+    declared ``artifact_signal``, never either scenario.
+    """
+    perms = permissions(pkg)
+    shell = shell_granted(perms)
+    unbounded = network_unbounded(perms)
+    detected = shell and unbounded
+    return Finding(
+        "AST03-shell-network-privilege-combo",
+        detected,
+        f"shell_granted={shell} network_unbounded={unbounded} allowlist={list(network_allowlist(perms))}",
+    )
+
+
+def detect_wildcard_network_egress(pkg: dict) -> Finding:
+    """Egress declared as a blanket rather than an enumerated domain allowlist.
+
+    Proxy only: AST06-S02's declared ``artifact_signal``. An empty allowlist is
+    no egress under USF default-deny and does not fire.
+    """
+    perms = permissions(pkg)
+    unbounded = network_unbounded(perms)
+    allowlist = list(network_allowlist(perms))
+    network = perms.get("network")
+    policy = network.get("policy") if isinstance(network, dict) else network
+    if unbounded:
+        return Finding(
+            "AST03-wildcard-network-egress",
+            True,
+            f"egress is not a bounded domain allowlist: allow={allowlist} policy={policy!r}",
+        )
+    return Finding(
+        "AST03-wildcard-network-egress",
+        False,
+        f"egress is a bounded allowlist of {len(allowlist)} host(s): {allowlist}",
+    )
 
 
 DETECTORS: dict[str, Callable[[dict], Finding]] = {
+    "AST03-identity-file-write-grant": detect_identity_file_write_grant,
     "AST03-unbounded-write-scope": detect_unbounded_write_scope,
     "AST03-shell-network-privilege-combo": detect_shell_network_privilege_combo,
+    "AST03-wildcard-network-egress": detect_wildcard_network_egress,
 }
 
 
@@ -74,4 +313,4 @@ def run_all(pkg: dict) -> list[Finding]:
 
 
 def f1_report(fixtures: list[tuple[dict, set[str]]]) -> dict:
-    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures)
+    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures, F1_SCOPE)

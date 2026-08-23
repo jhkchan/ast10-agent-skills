@@ -258,3 +258,87 @@ def test_cli_json_output_is_machine_readable(capsys):
     assert payload["ok"] is True
     assert len(payload["skills_scanned"]) == 11
     assert all(f["waived"] for f in payload["findings"])
+
+
+# ------------------------------------------------------- the published report
+
+DOGFOOD_REPORT = REPO_ROOT / "docs" / "dogfood-report.md"
+
+
+def test_the_committed_dogfood_report_is_up_to_date():
+    """A report that no longer matches the run is worse than no report: it is the
+    half a reader checks."""
+    assert dogfood.main(["--markdown", "--out", str(DOGFOOD_REPORT), "--check"]) == 0, (
+        "run `python3 scripts/dogfood.py --markdown --out docs/dogfood-report.md`"
+    )
+
+
+def test_the_report_lists_every_finding_the_run_produced():
+    """No finding may be summarised away. Each one appears with its own evidence."""
+    report = dogfood.run()
+    text = DOGFOOD_REPORT.read_text(encoding="utf-8")
+    for finding in report.findings:
+        assert finding.skill in text and finding.scenario in text
+        # The evidence itself, not a paraphrase (pipes are escaped for the table).
+        assert finding.evidence.replace("\n", " ") in text.replace("\\|", "|"), finding
+
+
+def test_the_report_states_the_check_denominator_not_only_the_numerator():
+    """ "9 findings" is unanchored without "out of how many checks"."""
+    text = DOGFOOD_REPORT.read_text(encoding="utf-8")
+    executions = dogfood.check_executions()
+    assert executions > 0
+    assert f"{executions} individual check executions" in text
+
+
+def test_an_unwaived_finding_renders_as_unwaived():
+    """The report must be able to say the bad word, or its PASS means nothing."""
+    doctored = dogfood.DogfoodReport(
+        findings=(
+            dogfood.DogfoodFinding(
+                skill="AST03",
+                detector="AST06",
+                scenario="AST06-root-write-scope",
+                evidence="write scope reaches /",
+                waived=False,
+            ),
+        ),
+        stale_waivers=("AST04::AST04-yaml-injection",),
+        skills_scanned=("AST03",),
+        detectors_run=("AST06",),
+    )
+    rendered = dogfood.render_markdown(doctored)
+    assert "**UNWAIVED**" in rendered
+    assert "Verdict: **FAIL**" in rendered
+    assert "### Stale waivers" in rendered
+    assert "AST04::AST04-yaml-injection" in rendered
+
+
+def test_the_wider_scan_view_claim_in_the_report_is_recomputed_not_asserted():
+    """The report says scanning `skill.usf.yaml` as text adds nothing. That is a
+    measurable claim, so it is measured here rather than believed."""
+    surface = {(f.skill, f.scenario, f.evidence) for f in dogfood.run().findings}
+    scan = dogfood.scan_view_findings()
+    only_in_scan = scan - surface
+    text = DOGFOOD_REPORT.read_text(encoding="utf-8")
+    if only_in_scan:
+        assert "appear only when the manifests and prose are scanned as text" in text
+        for skill, scenario, _evidence in only_in_scan:
+            assert skill in text and scenario in text
+    else:
+        assert "The wider view finds exactly the same set" in text
+
+
+def test_the_wider_scan_view_actually_reads_the_usf_manifests():
+    """Guards the section above from passing vacuously: if the bridge stopped
+    reading `skill.usf.yaml` the claim would be true and meaningless."""
+    from cli.lib import bridge
+
+    files, _skipped = bridge.read_scan_files(REPO_ROOT / "skills" / "AST01")
+    assert "skill.usf.yaml" in files
+    assert "coverage-matrix.md" in files
+
+
+def test_markdown_to_stdout_needs_no_output_path(capsys):
+    assert dogfood.main(["--markdown"]) == 0
+    assert capsys.readouterr().out.startswith("# Dogfood report")

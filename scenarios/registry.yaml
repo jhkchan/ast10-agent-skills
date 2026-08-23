@@ -44,6 +44,43 @@
 #   `covers: artifact-signal-only`, and such a corpus never claims to measure
 #   the named scenario.
 #
+# THE SIGNAL-SYMMETRY RULE (added after a tier-doctrine integrity review)
+#   An independent review found the same predicate ruled two ways depending on
+#   which way it cut: content-hash absence and missing-permission metadata were
+#   `static-detectable` inside the detector modules that claimed them as
+#   coverage, and `artifact_signal`-only in the registry entries where counting
+#   them would have enlarged an F1 denominator. "When it lets you claim a
+#   detector, it's static; when it would oblige you to build one, it's
+#   out-of-artifact."
+#
+#   The ruling, applied uniformly in BOTH files:
+#
+#   1. Package-decidability and scenario coverage are TWO questions, and the
+#      answer to the first never settles the second. Nearly every
+#      `artifact_signal` in this file is decidable by inspecting the package
+#      alone — that is what makes it a signal rather than nothing. Declaring a
+#      scenario out-of-artifact has never meant "invisible in the package"; it
+#      means the package cannot decide the scenario's DEFINING condition.
+#   2. So each non-null `artifact_signal` now states `artifact_signal_decidable`
+#      outright, and names in `artifact_signal_checks` any shipped detector
+#      check that computes exactly that predicate. Nothing hides behind the
+#      tier any more: where a signal is package-decidable, this file says so.
+#   3. And the obligation runs the other way too. A check named in
+#      `artifact_signal_checks` MUST declare `covers: artifact-signal-only` in
+#      its module's `CHECK_COVERAGE` and may never be published as coverage of
+#      the scenario. Its F1 travels with an `artifact-signal-only` /
+#      `mixed-proxy` scope label or it is not published.
+#   4. No scenario tier moved. Each contested predicate was re-tested against
+#      the defining-condition rule and each failed it for the same reason it
+#      always did: a hash-pinned skill can still be maliciously updated, a
+#      package with no permission block is indistinguishable from one that
+#      never had one, and an `allow-all` network policy is contained on a
+#      sandboxed host. What moved is the DETECTOR-side claim, which is where
+#      the overclaim actually lived.
+#
+#   `tests/test_tier_doctrine_symmetry.py` enforces both directions, so the
+#   double standard cannot return silently.
+#
 # Tally: 62 scenarios — 20 static-detectable, 8 agent-judgable, 34
 # out-of-artifact. Two thirds of the whitepaper's named attack surface is not
 # decidable from a single skill package. That is the honest number.
@@ -81,6 +118,16 @@ tier_doctrine:
     itself. A package that shows only an enabling precondition leaves the
     scenario out-of-artifact; the precondition is recorded as artifact_signal
     and is never counted as coverage of the scenario.
+  signal_symmetry_rule: >-
+    Package-decidability and scenario coverage are two separate questions.
+    Most artifact_signals ARE decidable by inspecting the package alone, and
+    each one now says so in artifact_signal_decidable rather than letting the
+    scenario's out-of-artifact tier imply otherwise. Where a shipped detector
+    check computes exactly that predicate it is named in
+    artifact_signal_checks, and that check must declare
+    covers: artifact-signal-only in its module's CHECK_COVERAGE. The same
+    predicate therefore gets the same ruling in scenarios/registry.yaml and in
+    skills/*/scripts/detector.py, whichever direction the ruling cuts.
 
 counts:
   total: 62
@@ -201,6 +248,8 @@ scenarios:
     artifact_signal: >-
       Unbounded retry or loop constructs and absent output-size budgets in
       bundled scripts. A weak proxy: benign skills exhibit the same shapes.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
 
   - id: AST01-S08
     category: AST01
@@ -286,6 +335,8 @@ scenarios:
       sha256: pins, which is the precondition the whitepaper's own mitigation
       ("Pin all nested dependencies to immutable hashes") targets, and is a
       decidable lockfile property.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
 
   - id: AST02-S03
     category: AST02
@@ -328,11 +379,20 @@ scenarios:
       Both the declared read scope and the stated description are in the
       package, but the scenario turns on "far beyond what it needs", which is a
       purpose-versus-scope judgement no fixed rule settles: the same read scope
-      is legitimate for a credential-management skill.
+      is legitimate for a credential-management skill. Signal-symmetry ruling:
+      the structural half of the signal below — a declared credential-store or
+      unrestricted-shell scope — is decidable by inspecting the package alone and
+      skills/AST03/scripts/detector.py's AST03-shell-network-privilege-combo
+      computes it; the "narrow stated function" half is not. That check is
+      therefore declared covers: artifact-signal-only and is never published as
+      coverage of this scenario.
     artifact_signal: >-
       A declared read or exec scope naming credential stores, or unrestricted
       shell, alongside a narrow stated function — a structural proxy for the
       mismatch, not the mismatch itself.
+    artifact_signal_decidable: partly-package-decidable
+    artifact_signal_checks:
+      - AST03-shell-network-privilege-combo
 
   - id: AST03-S02
     category: AST03
@@ -345,10 +405,18 @@ scenarios:
       The defining event is a runtime trick: an injected instruction arriving
       in input the package does not contain, acted on by a host runtime that
       evaluates permissions at the tool-call level. Neither the payload nor the
-      runtime is in the package.
+      runtime is in the package. Signal-symmetry ruling: the grant below IS
+      decidable by inspecting the package alone — an unscoped administrative
+      credential grant and a missing per-action-confirmation declaration are both
+      manifest fields — and no shipped check reads them yet, so
+      artifact_signal_checks is empty. Any check written for it enters its
+      module's CHECK_COVERAGE as covers: artifact-signal-only: a broad grant is
+      not a wipe.
     artifact_signal: >-
       An unscoped administrative credential grant carrying destructive
       capability with no per-action confirmation declared in the manifest.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
 
   - id: AST03-S03
     category: AST03
@@ -380,6 +448,8 @@ scenarios:
     artifact_signal: >-
       Bundled code that routes external input or tool output into a privileged
       action path with no provenance tag or instruction-versus-data boundary.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
 
   - id: AST03-S05
     category: AST03
@@ -401,6 +471,8 @@ scenarios:
   # =========================================================================
   # AST04 — Insecure Metadata (7)
   # =========================================================================
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
   - id: AST04-S01
     category: AST04
     title: "Brand Impersonation"
@@ -467,6 +539,8 @@ scenarios:
       A SKILL.md referencing an install-time-executing dependency file
       (requirements.txt, package.json with a postinstall, setup.py) whose
       resolved contents are not shipped in the package.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
 
   - id: AST04-S06
     category: AST04
@@ -508,11 +582,20 @@ scenarios:
     reason: >-
       The defining event is an edit to remotely hosted content after review.
       Deciding it requires the referenced document at two points in time; the
-      package is byte-identical before and after the rug-pull.
+      package is byte-identical before and after the rug-pull. Signal-symmetry
+      ruling: the absent pin below IS decidable by inspecting the package alone
+      — skills/AST01/scripts/detector.py's AST01-content-hash-missing is one
+      field read — and that is precisely why it is not coverage: a pinned
+      reference can still be rug-pulled once the operator accepts the new hash,
+      and an unpinned one may never be edited at all. The check is declared
+      covers: artifact-signal-only.
     artifact_signal: >-
       An external instruction reference carried with no pinned content hash —
       the precondition the whitepaper's "record a content hash ... re-verify it
       on every load" mitigation targets.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks:
+      - AST01-content-hash-missing
 
   - id: AST05-S02
     category: AST05
@@ -543,6 +626,8 @@ scenarios:
     artifact_signal: >-
       References that are neither enumerated nor pinned transitively, leaving
       the chain unbounded from the package's point of view.
+    artifact_signal_decidable: partly-package-decidable
+    artifact_signal_checks: []
 
   - id: AST05-S04
     category: AST05
@@ -560,6 +645,8 @@ scenarios:
     artifact_signal: >-
       Decision rules that consume upstream skill output without re-establishing
       an instruction-versus-data boundary at the hop.
+    artifact_signal_decidable: partly-package-decidable
+    artifact_signal_checks: []
 
   - id: AST05-S05
     category: AST05
@@ -579,6 +666,8 @@ scenarios:
       Bundled document or response handling that concatenates extracted content
       into an instruction or executable sink with no provenance tag or boundary
       delimiter.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
 
   - id: AST05-S06
     category: AST05
@@ -599,6 +688,8 @@ scenarios:
   # =========================================================================
   # AST06 — Weak Isolation (5)
   # =========================================================================
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
   - id: AST06-S01
     category: AST06
     title: "Host Escape"
@@ -622,11 +713,20 @@ scenarios:
     reason: >-
       The scenario turns on the host having no network sandbox and on which
       services are co-located — deployment facts. The same package is contained
-      on a sandboxed host and pivots on an unsandboxed one.
+      on a sandboxed host and pivots on an unsandboxed one. Signal-symmetry
+      ruling: the policy below IS decidable by inspecting the package alone and
+      skills/AST05/scripts/detector.py computes it twice
+      (AST05-unrestricted-network-fetch, AST05-wildcard-domain-allowlist). Both
+      checks are declared covers: artifact-signal-only; declaring a wide egress
+      posture is not egressing to a C2.
     artifact_signal: >-
       A manifest declaring network: true or policy: allow-all rather than a
       domain allowlist, which the whitepaper's "domain allowlists, not a binary
       network: true/false" mitigation targets.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks:
+      - AST05-unrestricted-network-fetch
+      - AST05-wildcard-domain-allowlist
 
   - id: AST06-S03
     category: AST06
@@ -657,6 +757,8 @@ scenarios:
       A bundled script that binds a listening socket without authentication —
       a related but distinct exposure from the host control interface the
       scenario names.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
 
   - id: AST06-S05
     category: AST06
@@ -676,6 +778,8 @@ scenarios:
   # =========================================================================
   # AST07 — Update Drift (3)
   # =========================================================================
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
   - id: AST07-S01
     category: AST07
     title: "Malicious Update"
@@ -686,10 +790,18 @@ scenarios:
     reason: >-
       "Update" is a relation between two versions and "compromised account" is
       registry-side state. A single package cannot show that it differs
-      maliciously from a predecessor it does not contain.
+      maliciously from a predecessor it does not contain. Signal-symmetry
+      ruling: the absent pinning below IS decidable by inspecting the package
+      alone and skills/AST01/scripts/detector.py's AST01-content-hash-missing
+      computes it, but a hash-pinned skill can still be maliciously updated once
+      the operator accepts the new hash, so that check is declared
+      covers: artifact-signal-only and never coverage of this scenario.
     artifact_signal: >-
       Absent signature or content-hash pinning, which is what lets an update
       land unverified.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks:
+      - AST01-content-hash-missing
 
   - id: AST07-S02
     category: AST07
@@ -705,6 +817,8 @@ scenarios:
     artifact_signal: >-
       Version ranges rather than immutable pins in the dependency
       specification.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
 
   - id: AST07-S03
     category: AST07
@@ -804,6 +918,8 @@ scenarios:
       Context-padding, unopened archive or binary containers, and
       scanner-directed prose — each individually static (AST08-S02, S07, S08)
       but none evidence that tuning occurred.
+    artifact_signal_decidable: partly-package-decidable
+    artifact_signal_checks: []
 
   - id: AST08-S07
     category: AST08
@@ -943,6 +1059,8 @@ scenarios:
       A package declaring security properties in fields the target format does
       not carry — decidable only once the target schema is supplied alongside
       it.
+    artifact_signal_decidable: not-package-decidable
+    artifact_signal_checks: []
 
   - id: AST10-S02
     category: AST10
@@ -983,11 +1101,19 @@ scenarios:
     reason: >-
       Deciding that metadata was stripped needs the pre-port manifest to
       compare against. A ported package with no permission block is
-      indistinguishable from one that never declared any.
+      indistinguishable from one that never declared any. Signal-symmetry
+      ruling: that absence IS decidable by inspecting the package alone and
+      skills/AST06/scripts/detector.py's AST06-missing-sandbox-declaration
+      computes it; because the absence cannot be attributed to porting, the
+      check is declared covers: artifact-signal-only and never coverage of this
+      scenario.
     artifact_signal: >-
       Absent permission or risk metadata in a package whose format supports it
       — the same signal AST06's missing-sandbox-declaration check reads, and
       equally unable to attribute the absence to porting.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks:
+      - AST06-missing-sandbox-declaration
 
   - id: AST10-S05
     category: AST10
@@ -1003,6 +1129,8 @@ scenarios:
       and, read alone, look safe.
     artifact_signal: >-
       Reliance on platform defaults instead of explicitly declared scopes.
+    artifact_signal_decidable: package-decidable
+    artifact_signal_checks: []
 
   - id: AST10-S06
     category: AST10

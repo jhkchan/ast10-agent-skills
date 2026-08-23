@@ -233,7 +233,7 @@ def test_route_needs_a_finding():
 
 
 def test_audit_groups_findings_by_category_over_every_ast():
-    result = run_cli("audit", "fixtures/AST01/V1-obfuscated-payload")
+    result = run_cli("audit", "fixtures/AST01/V1-obfuscated-payload-exec")
     assert result.returncode == 0, result.stderr
     for ast_id in AST_IDS:
         assert ast_id in result.stdout
@@ -242,13 +242,39 @@ def test_audit_groups_findings_by_category_over_every_ast():
 
 
 def test_audit_json_reports_every_check_and_names_the_undetectable_categories():
-    payload = run_json("audit", "fixtures/AST01/V1-obfuscated-payload")
+    payload = run_json("audit", "fixtures/AST01/V1-obfuscated-payload-exec")
     assert [c["category"] for c in payload["categories"]] == list(AST_IDS)
     assert payload["totals"]["checks_run"] > 0
-    assert payload["totals"]["categories_without_detectors"] == 4
+
+    # The count is derived rather than hard-coded, because it moves every time a
+    # category's detector is implemented; what must never drift is the total
+    # disagreeing with the rows it summarises.
+    without = {c["category"] for c in payload["categories"] if c["status"] == "no-static-detectors"}
+    assert payload["totals"]["categories_without_detectors"] == len(without)
+
+    # Two per-category pins so the derived count cannot go vacuous. AST09 is the
+    # only category the registry tiers zero static-detectable AND zero
+    # agent-judgable, so "no static detectors" is the correct, permanent answer
+    # there; AST10 has a static-detectable scenario and therefore owes a check.
+    assert "AST09" in without
+    assert "AST10" not in without, "AST10-S06 is static-detectable; the category must ship a detector"
+
+    ast10 = next(c for c in payload["categories"] if c["category"] == "AST10")
+    fired = {f["scenario"] for f in ast10["findings"] if f["detected"]}
+    assert fired == {"AST10-S06"}, (
+        "the AST01 obfuscated-payload fixture decodes an eval'd base64 shell command, "
+        "which is AST10-S06's defining condition as well as AST01's"
+    )
+
     ast01 = next(c for c in payload["categories"] if c["category"] == "AST01")
     scenarios = {f["scenario"]: f for f in ast01["findings"]}
-    assert scenarios["AST01-content-hash-missing"]["detected"] is True
+    # The fixture is a well-formed package carrying a truthful digest, so both
+    # content-hash checks are CLEAR on it and the obfuscation check is what
+    # fires. That combination is the point: the finding comes from the payload,
+    # not from the package having forgotten to declare a hash.
+    assert scenarios["AST01-content-hash-missing"]["detected"] is False
+    assert scenarios["AST01-content-hash-mismatch"]["detected"] is False
+    assert scenarios["AST01-obfuscated-payload-exec"]["detected"] is True
     # Every finding carries its tier, so a reader can tell a static check from
     # a judged one without leaving the output.
     for entry in payload["categories"]:
@@ -296,7 +322,7 @@ def test_audit_fail_on_detect_exits_one_only_when_something_fired(tmp_path):
     clean = run_cli("audit", str(package), "--fail-on-detect")
     assert clean.returncode == 0, clean.stdout
 
-    vulnerable = run_cli("audit", "fixtures/AST01/V1-obfuscated-payload", "--fail-on-detect")
+    vulnerable = run_cli("audit", "fixtures/AST01/V1-obfuscated-payload-exec", "--fail-on-detect")
     assert vulnerable.returncode == 1
 
 
@@ -316,8 +342,14 @@ def test_coverage_prints_per_category_tier_counts_and_the_no_f1_reasons():
     assert result.returncode == 0
     for ast_id in AST_IDS:
         assert ast_id in result.stdout
+    # The two states the shipped manifest is in today: categories that publish a
+    # measured number, and categories whose detectable tier is empty and are
+    # reported declared-and-uncovered rather than padded.
     assert "declared-and-uncovered" in result.stdout
-    assert "pending-detector" in result.stdout
+    assert "Categories publishing an F1 number:" in result.stdout
+    published = sum(1 for row in run_json("coverage")["categories"] if row["publishes_f1"])
+    assert f"Categories publishing an F1 number: {published} of 10." in result.stdout
+    assert published > 0, "every category reporting no F1 would make this assertion vacuous"
 
 
 def test_coverage_numbers_agree_with_the_registry_read_through_pyyaml():
@@ -364,10 +396,27 @@ def test_coverage_f1_state_agrees_with_the_fixture_manifest():
 
 
 def test_coverage_distinguishes_the_two_reasons_a_category_publishes_no_f1():
+    """Two different reasons for "no F1" must never be blended into one.
+
+    `empty-detectable-tier` means the registry leaves the category nothing a
+    package can decide, so the never-pad rule forbids manufacturing a number.
+    `no-detector-consumes-corpus` means a labeled corpus exists and nothing
+    reads it. The second used to describe AST01 and AST03-AST08; every labeled
+    corpus is now wired to a detector, so no category is in that state today.
+    The vocabulary stays separate anyway -- collapsing it would make a
+    detector gap indistinguishable from an honest undecidability.
+    """
     payload = run_json("coverage")
     reasons = {row["category"]: row["no_f1_reason"] for row in payload["categories"]}
-    assert reasons["AST02"] == "empty-detectable-tier"
-    assert reasons["AST01"] == "no-detector-consumes-corpus"
+    assert reasons["AST07"] == "empty-detectable-tier"
+    assert reasons["AST09"] == "empty-detectable-tier"
+    assert "no-detector-consumes-corpus" not in reasons.values(), (
+        "a category regressed to a labeled corpus no detector consumes; wire it or "
+        "delist the corpus, and update this assertion deliberately"
+    )
+    for row in payload["categories"]:
+        assert row["no_f1_reason"] in {None, "empty-detectable-tier", "no-detector-consumes-corpus"}
+        assert (row["no_f1_reason"] is None) is bool(row["publishes_f1"])
     assert len(payload["categories_without_f1"]) == sum(1 for row in payload["categories"] if not row["publishes_f1"])
 
 

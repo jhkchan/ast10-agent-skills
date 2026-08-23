@@ -8,20 +8,30 @@ description: "Detect and triage OWASP AST05 Untrusted External Instructions — 
 Pattern: Knowledge. The category exists because textual external references have none
 of the tooling that code dependencies already have — no hash-pin field, no lockfile
 for prose, and signing the skill package says nothing about what a URL returns at
-runtime. Mechanism (content-hash pinning checks, reference-chain auditing) lives in
-`scripts/`; frozen scenario tiers live in `coverage-matrix.md`.
+runtime. Mechanism lives in `scripts/detector.py`: a call-site dataflow scan that
+follows a fetched response body to the agent's instruction channel or to an
+executable sink, a gated check for a declared instruction-versus-data convention,
+and two reads of how wide the declared fetch surface is. Every one of them is an
+`artifact_signal` proxy, never coverage of a named AST05 scenario — frozen scenario
+tiers and the reason for that live in `coverage-matrix.md`.
 
 ## Why review-time inspection cannot close this category
 
-Anthropic's own Agent Skills security guidance states plainly that "even trustworthy
-Skills can be compromised if their external dependencies change over time" — this is
-the platform vendor documenting, not hypothesizing, both the injection and the
-rug-pull variants of AST05. The structural reason review cannot close it: the skill
-*package* can be reviewed, signed, and hash-pinned; the *referenced* content cannot,
-because nothing in the skill format pins a document's hash the way a lockfile pins a
-dependency's. A skill that passed review yesterday and points at a URL the author
-still controls can be silently rewritten today with no version bump, no re-signature,
-and no visible diff to the skill itself.
+The reviewed object and the executed object are different objects, and no control in
+the skill format connects them. A package can be reviewed, signed and hash-pinned; the
+*documents it points at* cannot, because the format has no hash-pin field for prose and
+no lockfile for a URL. A skill that passed review yesterday and points at a URL its
+author still controls is silently rewritten today with no version bump, no
+re-signature, and no diff anywhere in the artifact — the Author Rug-Pull shape.
+
+That is why this category's static-detectable tier is **empty** and why this package
+publishes no scenario-level F1 at all. It is not a gap in the detector. Every one of
+AST05's six scenarios needs evidence the artifact cannot hold: the referenced document
+at two points in time, or from several fetch vantage points, or the chain actually
+followed, or the pipeline's per-node backbone models. The five checks that do ship read
+*enabling preconditions* and are declared `artifact-signal-only` — a label that travels
+with every number they produce, so no consumer can quietly promote a proxy into
+coverage.
 
 ## Decision rules
 
@@ -84,14 +94,51 @@ and no visible diff to the skill itself.
   above) — this widens AST08's detection gap specifically to content a scanner may
   never actually observe, regardless of how good the scanner's own analysis is.
 
+## Where the shipped checks go quiet
+
+The two dataflow checks parse Python with `ast` and match call nodes — never source
+text. That choice is load-bearing: a regex for `requests.get` matches this module's own
+pattern tables and every fixture literal quoted in the tests beside it, so a text-based
+version of these checks convicts the scanner itself. It also fixes the boundaries of
+what they can see.
+
+- **A declared boundary and an implemented boundary are indistinguishable here.** The
+  taint is cleared by a call to any name in the boundary set (`sanitize`, `quarantine`,
+  `as_reference_data`, `tag_untrusted`, …) or by a provenance marker in a nearby string
+  literal. A function named `sanitize()` whose body is `return text` clears the finding
+  completely. At the static layer, naming the control is the control — verifying that it
+  does anything is a manual step, and it is the highest-yield one on this whole page.
+- **Taint does not cross a function boundary or a file.** Fetch in one helper, sink in
+  another, and both checks clear. Same for a fetch whose response is stored on an object
+  attribute and read back later.
+- **Python only, and an unparsed file is an INCOMPLETE that reads as a pass.** A
+  JavaScript or shell fetcher produces no nodes at all. A `.py` file that fails to parse
+  is counted and named in the evidence string, but the verdict is still negative — read
+  the evidence, not the boolean.
+- **The instruction-channel name list is narrow on purpose.** Only names that denote the
+  channel itself (`prompt`, `messages`, `instructions`, `system_prompt`, …) are sinks.
+  `rules`, `context`, `system` and `persona` were removed after they fired on a
+  correctly-written clean fixture. A skill whose channel is spelled anything else is
+  uncovered — precision was bought with recall here, deliberately.
+- **`json.loads(response.text)` is not a sink and must not be made one.** Parsing a body
+  as data is the correct handling; convicting it would fire on every well-written HTTP
+  client in the corpus and destroy the check's usefulness.
+- **The absent-boundary check is gated on a Python fetch call site.** A package that
+  fetches only through a shell command never opens the gate, so the boundary question is
+  never asked of it.
+
 ## Scope and out-of-artifact boundary
 
 Whether a given referenced URL currently serves clean or malicious content is a live,
 time-varying fact about an external host — not a property this artifact can determine
-once and cache as ground truth. A detector can check *whether pinning/re-verification
-exists as a control* (static-detectable) without being able to certify *what the
-pinned content currently says on the open internet* (out of this artifact's reach).
-The exact split is fixed in `coverage-matrix.md`.
+once and cache as ground truth. **None of AST05's six named scenarios is decidable from
+a single skill package**, so this category publishes no scenario-level F1 at all. A
+detector can check *whether a control exists* — an unpinned reference, a fetched body
+reaching an instruction or executable sink, an absent boundary convention, an unbounded
+fetch surface — without being able to certify *what the referenced content currently
+says on the open internet*, or that the author will edit it after review. Those checks
+are declared `artifact-signal-only` for exactly that reason. The exact split, and the
+number the proxy corpus does publish, are fixed in `coverage-matrix.md`.
 
 ## References
 

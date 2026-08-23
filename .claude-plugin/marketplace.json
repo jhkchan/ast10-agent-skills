@@ -1,5 +1,5 @@
 {
-  "name": "OWASP Agentic Skills Top 10 Agent Skills",
+  "name": "Unofficial OWASP Agentic Skills Top 10 Detector Skills",
   "description": "Eleven agent skills operationalizing the OWASP Agentic Skills Top 10 (AST01-AST10) whitepaper: ten per-category triage skills plus an advisory router. Independent community implementation — NOT an OWASP project and carrying no OWASP endorsement.",
   "version": "1.0.0",
   "author": "Jacky Chan",

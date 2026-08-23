@@ -311,24 +311,50 @@ def test_entitlement_at_present_labeling_follows_the_locked_formula(category, ma
     assert _quantity(category, "Entitlement at present labeling") == expected
 
 
+def _fixture_dirs_on_disk(category: str) -> list:
+    """Fixture directories for a category, tolerating a category with none.
+
+    AST02's six orphaned fixture directories were deleted outright rather than
+    emptied, so `fixtures/AST02/` no longer exists. A missing directory is zero
+    fixtures, which is the number the matrix must state."""
+    root = REPO_ROOT / "fixtures" / category
+    return sorted(p for p in root.iterdir() if p.is_dir()) if root.is_dir() else []
+
+
 @pytest.mark.parametrize("category", AUTHORED_CATEGORIES)
 def test_actual_fixture_count_matches_what_is_on_disk(category):
-    on_disk = sorted(p for p in (REPO_ROOT / "fixtures" / category).iterdir() if p.is_dir())
-    assert _quantity(category, "Actual fixture count") == len(on_disk)
+    assert _quantity(category, "Actual fixture count") == len(_fixture_dirs_on_disk(category))
 
 
 @pytest.mark.parametrize("category", AUTHORED_CATEGORIES)
 def test_matrix_records_a_disk_versus_manifest_discrepancy_when_one_exists(category, manifest):
-    """AST02 ships six delisted fixture directories the manifest declares as zero
-    cases. A matrix that quietly reported one number or the other would hide the
-    orphaned corpus; it has to show both and say so."""
-    on_disk = len([p for p in (REPO_ROOT / "fixtures" / category).iterdir() if p.is_dir()])
+    """A matrix that quietly reported one number or the other would hide an
+    orphaned corpus; where disk and manifest disagree it has to show both and
+    say so. AST02's disagreement was resolved by deleting the six delisted
+    directories, so the two now agree at zero -- which the next test pins."""
+    on_disk = len(_fixture_dirs_on_disk(category))
     declared = len(manifest["categories"][category]["cases"])
     if on_disk == declared:
         return
     text = _matrix_text(category)
     assert "orphan" in text.lower()
     assert _quantity(category, "Declared cases") == declared
+
+
+@pytest.mark.parametrize("category", AUTHORED_CATEGORIES)
+def test_no_category_ships_fixture_files_it_does_not_declare(category, manifest):
+    """The orphan-corpus rule, enforced rather than merely documented.
+
+    A labeled vulnerable/clean file on disk that no manifest case declares is
+    either padding waiting to happen or a corpus for a category that publishes
+    nothing. AST02 shipped six of them; they were deleted. This test is what
+    stops the next six appearing."""
+    on_disk = len(_fixture_dirs_on_disk(category))
+    declared = len(manifest["categories"][category]["cases"])
+    assert on_disk == declared, (
+        f"{category}: {on_disk} fixture directories on disk but {declared} declared cases; "
+        f"an undeclared fixture corpus must be deleted or declared, never left orphaned"
+    )
 
 
 # ------------------------------------------------------------------------ tier lock

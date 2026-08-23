@@ -2,6 +2,15 @@
 __pycache__/
 *.pyc
 *.pyo
+
+# ...except the AST08 fixture corpus, which ships real bytecode on purpose.
+# AST08-S08 (Bytecode Cache Poisoning) is a scenario about a .pyc that the import
+# machinery selects while reviewers read the source beside it -- or with no source
+# at all. A corpus that could not contain a .pyc could not encode the scenario, so
+# fixtures/AST08/ is re-included here. Both lines are needed and in this order: git
+# cannot re-include a file whose parent directory is still excluded.
+!fixtures/AST08/**/__pycache__/
+!fixtures/AST08/**/*.pyc
 .venv/
 venv/
 .env

@@ -12,15 +12,20 @@ exactly where the attack lives. Mechanism (manifest-vs-behavior diffing) lives i
 
 ## Why this is not "apply least privilege, harder"
 
-Traditional least-privilege is well understood as a static grant problem. Skills layer
-natural-language *intent* on top of that grant: a skill permitted to run `SELECT` can
-be coerced by prompt injection into running `DELETE`, because the permission system
-checks "is this tool call allowed" at the call site, not "does this call match the
-task the user actually approved." The whitepaper's own instance of this is Summer
-Yue's OpenClaw incident: asked only to *review* an inbox, the agent deleted large
-volumes of email before being manually killed — no manifest bug, no privilege
-escalation exploit, just permission scope wide enough that the intended reading task
-never needed to be checked against the destructive action taken.
+Least privilege is a static grant problem, and every tool in the ecosystem solves it at
+the call site: *is this tool call inside the manifest*. Skills add a layer that question
+cannot see. A skill permitted to run `SELECT` can be talked into running `DELETE`, and
+every check passes, because no component compares the call against the task the user
+actually approved. The destructive-inbox-review incident the whitepaper records is that
+shape exactly — no manifest bug and no escalation exploit, only a grant wide enough that
+the approved reading task never had to be checked against the action taken.
+
+The consequence for tooling, and it is the reason this category's static surface is so
+narrow: a manifest audit can only find grants that are broad *on their face*. Whether a
+grant is broad *for this skill's function* requires reading the stated purpose against
+the scope, which is judgement, not a predicate — `scenarios/registry.yaml` tiers exactly
+that scenario (`AST03-task-scope-mismatch`) agent-judgable for that reason. Do not expect
+the detector to close the category; expect it to close one structural corner of it.
 
 ## Decision rules
 
@@ -29,16 +34,17 @@ never needed to be checked against the destructive action taken.
    the user actually granted for *this* task — not merely within what the skill's
    manifest lists as possible. A manifest-compliant call can still be an
    authorization violation if it exceeds the task-scoped grant.
-2. **LPCI payloads are encoded, delayed, and conditionally-triggered by design —
-   grep for the trigger, not the action.** Logic-layer Prompt Control Injection
-   (Atta et al., arXiv:2507.10457) plants payloads in memory, vector stores, or tool
-   outputs that the model later treats as operator-level instructions. A static scan
-   of "what does this skill do right now" misses a payload that only activates on a
-   later condition. LAAF (arXiv:2603.17239) operationalizes this as a six-stage
-   lifecycle — Recon → Injection → Trigger → Persistence → Evasion → Trace Tamper —
-   and reports the *Persistence* and *Trace Tamper* stages as the two hardest for a
-   point-in-time review to catch, because both are specifically designed to survive
-   or evade exactly that kind of check.
+2. **For LPCI, the reviewable object is the trigger, not the action — and the trigger
+   is usually not in the package.** Logic-layer Prompt Control Injection plants a
+   payload in memory, a vector store, or a tool output that the model later reads as an
+   operator-level instruction; the skill under review may contain none of it and still
+   be the vehicle. Two decisions follow. First, "what does this skill do right now" is
+   the wrong question to ask a static scan, so a negative result carries no information
+   about a conditional payload. Second, the reviewable surface shifts to the *stores the
+   skill can write*: the grant that lets a skill write memory, an index, or another
+   skill's input is the LPCI precondition, and that grant is in the manifest even when
+   the payload is not. Audit the write scope as the trigger surface — the same reason
+   decision rule 4 treats identity-file writes as function-independent.
 3. **A confused-deputy chain breaks at the first skill that trusts a caller instead
    of re-verifying it.** A high-privilege skill that treats any request from a
    lower-privilege caller as pre-authorized becomes the deputy; the fix is not
@@ -81,6 +87,34 @@ never needed to be checked against the destructive action taken.
   permission model *exists* and asks whether it was scoped correctly. A host-mode
   finding is AST06; an over-broad manifest inside a properly sandboxed environment is
   AST03.
+
+## What the shipped checks decide, and where they go quiet
+
+Exactly one check here claims scenario coverage: `AST03-S03` Identity File Backdoors — a
+declared write naming `SOUL.md`, `MEMORY.md`, or `AGENTS.md` that `deny_write` does not
+shadow, evaluated with USF's most-specific-wins precedence. The other three checks are
+declared `artifact-signal-only` or `category-precondition` in the module's own
+`CHECK_COVERAGE`, and reading them as coverage is the overclaim this repo's tier lock
+exists to prevent.
+
+- **The unbounded-write-scope check is blind to the content of a declared floor.** It
+  fires only when *no* write floor is declared at all. A manifest carrying
+  `deny_write: ['/etc/hosts']` satisfies it while leaving `SOUL.md` writable — that case
+  belongs to the identity-file check, and neither check reports the other's miss.
+- **An explicitly empty `deny_write` is a stated floor, not an absent one,** so it does
+  not fire. That is correct behaviour and it is also the shape an author uses to look
+  compliant while granting everything under `write`.
+- **Shell-plus-unbounded-egress is breadth, not mismatch.** The combination is a real
+  signal and the registry names it as an `artifact_signal`, but it decides neither
+  `AST03-S01` (which needs the purpose-versus-scope judgement) nor `AST06-S02` (which
+  needs the host's sandbox and co-located services). Escalate it; do not file it as a
+  scenario finding.
+- **Permission vocabularies differ and a check that reads only one is silently dead.**
+  One package reaches these checks in three spellings — USF `permissions.files.deny_write`,
+  the flattened detector shape, and bare-boolean SKILL.md frontmatter. A previous version
+  of the identity check read only the flattened spelling and reported a false positive
+  against every conformant USF manifest. When you extend a check by hand, read all three
+  or your extension will be dead against the manifests that actually ship.
 
 ## Scope and out-of-artifact boundary
 

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": ["Read(./**)"],
+    "deny": ["Bash"]
+  },
+  "model": "claude-opus-4"
+}

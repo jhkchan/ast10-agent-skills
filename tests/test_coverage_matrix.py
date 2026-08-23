@@ -400,70 +400,182 @@ def _usf_conformant_permissions() -> dict:
     }
 
 
-def test_ast05_network_checks_are_dead_against_a_conformant_usf_manifest():
-    """Pinned: skills/AST05/coverage-matrix.md, Reconciliation debt item 2.
+def test_ast05_network_checks_read_the_usf_shape_and_still_pass_a_bounded_manifest():
+    """Was pinned as a GAP; now pinned as the fix. Same fact, opposite sign.
 
-    Both AST05 checks gate on `permissions.network.policy`, which USF v1 does not
-    define, so neither can fire on a conformant manifest.
+    The original pin recorded that both AST05 network checks gated on
+    `permissions.network.policy`, a key `schemas/usf-v1.schema.json` does not define
+    (`permissions.network` is `additionalProperties: false` with only
+    `allow`/`deny`), so neither could fire on any conformant manifest at all. They
+    now read `permissions.network.allow` as well, and the two halves of that have to
+    hold together: a bounded allowlist stays clean, and an allowlist that bounds
+    nothing fires. Asserting only the first half would let the dead check come back.
     """
     module = _load_detector("AST05")
-    pkg = {"manifest": {"permissions": _usf_conformant_permissions()}, "files": {}}
-    findings = module.run_all(pkg)
-    assert findings, "AST05 declares no runnable checks at all"
-    assert not any(f.detected for f in findings), (
-        "an AST05 check now fires on a USF-conformant manifest — update "
-        "skills/AST05/coverage-matrix.md, which records both as dead"
+    bounded = {"manifest": {"permissions": _usf_conformant_permissions()}, "files": {}}
+    assert not any(f.detected for f in module.run_all(bounded)), (
+        "AST05 fires on a conformant manifest whose egress is bounded to one host"
+    )
+
+    unbounded = _usf_conformant_permissions() | {"network": {"allow": ["*"]}}
+    finding = module.detect_wildcard_domain_allowlist({"manifest": {"permissions": unbounded}, "files": {}})
+    assert finding.detected, (
+        "the AST05 wildcard check is dead against the USF `network.allow` shape again — "
+        "it must read the allowlist, not a `policy` key USF v1 has no spelling for"
     )
 
 
-def test_ast06_shell_check_crashes_on_a_conformant_usf_manifest():
-    """Pinned: skills/AST06/coverage-matrix.md, Reconciliation debt item 1.
+def test_ast06_shell_check_reads_the_usf_bare_boolean_instead_of_crashing():
+    """Was pinned as a GAP; now pinned as the fix. Same fact, opposite sign.
 
-    USF v1 declares `permissions.shell` a boolean; the detector calls `.get("allowed")`
-    on it.
+    USF v1 declares `permissions.shell` a BOOLEAN. The check used to call
+    `.get("allowed")` on it and raise `AttributeError` on a manifest conforming to
+    this repository's own schema — so the one category with a static-detectable
+    scenario could not be run against a conformant package at all. It now reads the
+    boolean, the `{allowed, commands}` mapping, and a bare command string, and
+    `skills/AST06/coverage-matrix.md`'s Reconciliation debt section was rewritten in
+    the same change.
     """
     module = _load_detector("AST06")
-    pkg = {"manifest": {"permissions": _usf_conformant_permissions()}, "files": {}}
-    with pytest.raises(AttributeError):
-        module.detect_unrestricted_shell_exec(pkg)
+    granted = {"manifest": {"permissions": _usf_conformant_permissions()}, "files": {}}
+    assert module.detect_unrestricted_shell_exec(granted).detected is True
+
+    closed = _usf_conformant_permissions() | {"shell": False}
+    assert module.detect_unrestricted_shell_exec({"manifest": {"permissions": closed}, "files": {}}).detected is False
+
+    # And every other check in the module survives the same conformant shape.
+    findings = module.run_all(granted)
+    assert {f.scenario for f in findings} == set(module.DETECTORS)
 
 
-def test_ast04_toml_check_cannot_see_a_duplicate_table_override():
-    """Pinned: skills/AST04/coverage-matrix.md, AST04-S07 row.
+def test_ast04_toml_check_sees_a_duplicate_table_override():
+    """Was pinned as a GAP; now pinned as the fix. Same fact, opposite sign.
 
-    `tomllib` raises on a redefined table, and the detector swallows the decode error,
-    so the duplicate-`[permissions]` shape the fixture encodes is skipped, not flagged.
+    The original pin recorded that `tomllib` raises on a redefined table and the
+    detector swallowed the decode error, so the duplicate-`[permissions]` shape the
+    fixture encodes was skipped rather than flagged. That was AST04-S07's own
+    defining condition going undetected. The check now scans the config TEXT for a
+    redefined single-bracket table before asking `tomllib` to parse, and
+    `skills/AST04/coverage-matrix.md`'s AST04-S07 row was rewritten in the same
+    change. This assertion is what stops the gap reopening quietly.
     """
     module = _load_detector("AST04")
     duplicate_table = "[permissions]\nwrite = false\n\n[permissions]\nwrite = true\n"
     pkg = {"manifest": {}, "files": {"config.toml": duplicate_table}}
-    assert not module.detect_toml_injection(pkg).detected, (
-        "the TOML check now sees duplicate-table overrides — update skills/AST04/coverage-matrix.md's AST04-S07 row"
+    finding = module.detect_toml_injection(pkg)
+    assert finding.detected, (
+        "the TOML check stopped seeing duplicate-table overrides — AST04-S07's defining "
+        "condition is unimplemented again"
     )
+    assert "permissions" in finding.evidence
+
+
+#: Categories whose labeled corpus still has no loader feeding it to a detector.
+#: Now empty. AST04 left the list when `detectors/fixture_loader.py` landed, and
+#: AST05 and AST06 left it when their detectors were implemented; each is replaced
+#: below by a positive assertion that is strictly stronger than the gap pin it
+#: retires -- the corpus runs, every labeled check separates its own pair, and no
+#: check fires on any clean case. A category may only leave this list together with
+#: its positive counterpart; dropping one without the other would delete coverage.
+UNWIRED: list[str] = []
 
 
 @pytest.mark.parametrize("category", AUTHORED)
-def test_no_fixture_loader_wires_the_corpus_to_the_detectors(category, manifest):
-    """Pinned: every matrix's "Publication status" paragraph and its
-    `published_f1: pending-detector`.
+def test_every_authored_category_has_a_wired_corpus_or_is_declared_unwired(category, manifest):
+    """The bookkeeping half of retiring the gap pin.
 
-    Read the fixture bytes straight into the `pkg` shape the detectors consume and the
-    result carries no discriminative signal: for AST04 and AST05 nothing fires at all,
-    and for AST06 `missing-sandbox-declaration` fires uniformly on vulnerable and clean
-    alike because the constructed package has no manifest. That is a wiring gap, and
-    `pending-detector` is the honest report until it closes.
+    A category is either in `UNWIRED` -- and then its manifest must still say
+    `pending-detector` -- or it is wired, and then it must not. This is what stops
+    a category quietly leaving the list while its manifest keeps advertising a
+    corpus nothing consumes, and vice versa.
     """
-    assert manifest["categories"][category]["published_f1"] == "pending-detector"
-    module = _load_detector(category)
-    verdicts: dict[str, set[bool]] = {}
-    for case in manifest["categories"][category]["cases"]:
-        text = (REPO_ROOT / case["path"]).read_text(encoding="utf-8")
-        pkg = {"manifest": {}, "files": {"SKILL.md": text}}
-        for finding in module.run_all(pkg):
-            verdicts.setdefault(finding.scenario, set()).add(finding.detected)
-    assert verdicts, f"{category} has no runnable checks"
-    for scenario, seen in verdicts.items():
-        assert seen != {True, False}, (
-            f"{scenario} now discriminates across the fixture corpus — the corpus is "
-            f"wired; update {category}/coverage-matrix.md and publish a real F1"
+    published = manifest["categories"][category]["published_f1"]
+    if category in UNWIRED:
+        assert published == "pending-detector", f"{category} is declared unwired but publishes {published!r}"
+    else:
+        assert published != "pending-detector", (
+            f"{category} is not in UNWIRED, so a loader consumes its corpus; "
+            f"`pending-detector` is no longer the honest report"
         )
+
+
+@pytest.mark.parametrize("category", ["AST05", "AST06"])
+def test_corpus_is_wired_and_every_labeled_check_discriminates(category, manifest):
+    """The positive counterpart of the gap pin AST05 and AST06 left.
+
+    The pin recorded that reading the fixture bytes straight into the `pkg` shape
+    produced no discriminative signal -- nothing fired for AST05, and AST06's
+    `missing-sandbox-declaration` fired on vulnerable and clean alike because the
+    constructed package carried no manifest. `detectors/fixture_loader.py` now loads
+    each fixture directory the way `cli/lib/bridge.py` loads a candidate package,
+    and every labeled check is scored over its OWN vulnerable/clean pair.
+    """
+    from detectors.fixture_loader import load_category_cases, run_corpus
+
+    entry = manifest["categories"][category]
+    result = run_corpus(category)
+    assert result.cases() == len(entry["cases"]) == 6
+    for check in result.checks:
+        verdicts = {predicted for _case, predicted, _label in check.case_verdicts}
+        assert verdicts == {True, False}, f"{check.detector_check} does not discriminate: {check}"
+        assert check.false_positives == 0 and check.false_negatives == 0, check
+    assert result.f1() == 1.0
+
+    # "Fires identically on vulnerable and clean alike", checked directly: no
+    # check in the module may fire on any case labeled clean.
+    module = _load_detector(category)
+    for case in load_category_cases(category):
+        if case.is_vulnerable:
+            continue
+        fired = [f.scenario for f in module.run_all(case.pkg) if f.detected]
+        assert fired == [], f"{case.case_id} is labeled clean but fired {fired}"
+
+
+def test_ast05_publishes_no_scenario_level_number_because_its_detectable_tier_is_empty(manifest, by_id):
+    """AST05's corpus is wired and still may not be quoted as scenario coverage.
+
+    The registry tiers none of AST05's six scenarios static-detectable, so the
+    published figure must carry the `artifact-signal-only` label -- publishing a
+    number is allowed; publishing it as coverage of Author Rug-Pull is not.
+    """
+    assert not [s for s in _category_scenarios(by_id, "AST05").values() if s["tier"] == "static-detectable"]
+    entry = manifest["categories"]["AST05"]
+    assert entry["f1_scope"] == "artifact-signal-only"
+    assert "artifact-signal-only" in entry["published_f1"]
+    assert "scenario-level" not in entry["published_f1"]
+    module = _load_detector("AST05")
+    assert module.F1_SCOPE == "artifact-signal-only"
+    assert {e["covers"] for e in module.CHECK_COVERAGE.values()} == {"artifact-signal-only"}
+
+
+def test_ast04_corpus_is_wired_and_discriminates(manifest):
+    """The positive counterpart of the gap pin AST04 left.
+
+    `detectors/fixture_loader.py` loads each fixture directory the way
+    `cli/lib/bridge.py` loads a candidate package and scores every labeled check
+    over its OWN vulnerable/clean pair. Per-pair scoring is what makes the number
+    falsifiable: a check that fired on everything would take a false positive on
+    its own clean case instead of hiding inside a category-wide average.
+    """
+    from detectors.fixture_loader import load_category_cases, run_corpus
+
+    entry = manifest["categories"]["AST04"]
+    assert entry["published_f1"] != "pending-detector", (
+        "AST04's corpus is wired; `pending-detector` is no longer the honest report"
+    )
+    result = run_corpus("AST04")
+    assert result.cases() == len(entry["cases"]) == 10
+    for check in result.checks:
+        verdicts = {predicted for _case, predicted, _label in check.case_verdicts}
+        assert verdicts == {True, False}, f"{check.detector_check} does not discriminate: {check}"
+        assert check.false_positives == 0 and check.false_negatives == 0, check
+    assert result.f1() == 1.0
+
+    # And nothing fires on a clean case, from any check in the module -- the
+    # "fires identically on vulnerable and clean alike" shape, checked directly.
+    module = _load_detector("AST04")
+    for case in load_category_cases("AST04"):
+        if case.is_vulnerable:
+            continue
+        fired = [f.scenario for f in module.run_all(case.pkg) if f.detected]
+        assert fired == [], f"{case.case_id} is labeled clean but fired {fired}"

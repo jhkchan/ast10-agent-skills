@@ -10,7 +10,7 @@ official OWASP project and carries no OWASP endorsement (see `NOTICE`).
 
 AST02 is the category where the honest answer is smallest. Three of its four named
 scenarios are properties of a registry, a resolver, or an account — none of which is
-inside the package a skill reviewer holds.
+inside the package a skill reviewer holds. The fourth is decided here.
 
 ## Authority chain
 
@@ -28,7 +28,7 @@ inside the package a skill reviewer holds.
 | --- | --- | --- | --- | --- |
 | AST02-S01 | Registry Flooding | out-of-artifact | — | "Coordinated" and "hundreds" are properties of the registry's publication corpus over time. A single package is indistinguishable from one member of a flood and from one honest publication. |
 | AST02-S02 | Dependency Confusion | out-of-artifact | — | The defining condition is that the resolver selects an attacker's package in place of the intended nested one. Deciding it needs the resolution namespace and the registry's contents at install time; neither is in the package. |
-| AST02-S03 | Config-File Hijacking | static-detectable | not implemented in this package — see Coverage debt | Those config files ship inside the package. A command-bearing value under a key the host auto-executes at project open (a hook entry, `.claude/settings.json`, an `ANTHROPIC_BASE_URL` override) is a structural key-and-value match. |
+| AST02-S03 | Config-File Hijacking | static-detectable | `detect_config_file_hijacking` — over the config paths a host auto-reads at project open only, firing on a hook entry carrying a command, an MCP server entry that spawns a process, a control-plane environment override, or a task declared `runOn: folderOpen` | Those config files ship inside the package. A command-bearing value under a key the host auto-executes at project open (a hook entry, `.claude/settings.json`, an `ANTHROPIC_BASE_URL` override) is a structural key-and-value match. |
 | AST02-S04 | Maintainer Account Takeover | out-of-artifact | — | Requires registry-side authentication and session state. A post-takeover release signed with the legitimate key is byte-indistinguishable from an honest one, so no in-package signal exists at all. |
 
 Tally: **1 static-detectable, 0 agent-judgable, 3 out-of-artifact**.
@@ -53,53 +53,74 @@ partial proxy to implement. AST02-S02 declares one: transitive dependencies pinn
 version ranges rather than immutable `sha256:` hashes, the precondition the whitepaper's
 own mitigation ("Pin all nested dependencies to immutable hashes") targets. That signal is
 a decidable lockfile property and is **not** coverage of AST02-S02; a corpus built against
-it measures pin posture, never resolver behaviour.
+it measures pin posture, never resolver behaviour. No shipped check computes it, so
+`artifact_signal_checks` for AST02-S02 is still empty and nothing may be labeled against
+it.
+
+## What the detector ships
+
+One check, for the one scenario a package can decide.
+
+| Detector function | Check id | `CHECK_COVERAGE` | Registry link |
+| --- | --- | --- | --- |
+| `detect_config_file_hijacking` | `AST02-config-file-hijacking` | `full` | AST02-S03 |
+
+`SCENARIO_TIERS` additionally declares `AST02-registry-flooding`,
+`AST02-dependency-confusion` and `AST02-maintainer-account-takeover` as `out-of-artifact`
+with no function behind them, so a reader of the module — not only a reader of this file —
+sees the three-quarters of the category that is out of reach. `F1_SCOPE` is
+`scenario-level`: the module's only check is `covers: full` against a scenario the registry
+independently tiers static-detectable.
+
+### Two decisions inside the check, both load-bearing
+
+1. **It is keyed on the config surface, not on the presence of a command.** A shell command
+   in a bundled script is ordinary; the same command in `.claude/settings.json` is an
+   execution path the host enters with no user action. The scan therefore runs only over
+   the paths a host auto-reads at project open (`.claude/settings.json`,
+   `.claude/hooks.json`, `.mcp.json`, `.cursor/*`, `.vscode/tasks.json`,
+   `.vscode/settings.json`), matched on the tail of the package-relative path so a config
+   nested one directory down still counts. A `package.json` `postinstall` command is
+   deliberately out of scope: it is a real risk and it is not this scenario's trigger.
+2. **Within those files it is keyed on the auto-executed key.** A settings file carrying
+   permissions, a model name, or `EDITOR=vim` is the normal case. The four shapes that fire
+   are the ones the whitepaper names: a hook entry with a `command`, an MCP server entry
+   that spawns a process, an environment override of a control-plane variable
+   (`ANTHROPIC_BASE_URL`, `NODE_OPTIONS`, `LD_PRELOAD`, `GIT_SSH_COMMAND`, …), and a task
+   declared `runOn: folderOpen`.
+
+An unparseable config file is reported as *undecided*, not clean — malformed metadata is
+AST04's parsing surface, and silently treating it as an absence of findings would be the
+scanner-coverage failure AST08 is about.
 
 ## Coverage debt
 
-`skills/AST02/scripts/detector.py` ships **zero detector functions**, by design: its
-docstring reasons from Maintainer Account Takeover being registry-side and concludes the
-category's declared-detectable tier is empty. Under the registry that conclusion is now
-one scenario too strong. AST02-S03 Config-File Hijacking is `static-detectable`, so the
-category's declared-detectable tier contains exactly one scenario, and the detector
-implements none of it.
+**AST02-S03 is now labeled and implemented here, not booked to another category.** It
+previously had no detector at all, and its only corpus was a pair filed under AST01
+(`AST01-V3` / `AST01-C4`, "destructive postinstall") that varied a `postinstall` value
+between `rm -rf $HOME` and `mkdir -p .cache`. Both this file and AST01's recorded, in
+writing, that the pair "does not exercise that trigger" while still declaring
+`covers: full` over AST02-S03. That is the fixture-authorship failure the detectability
+contract exists to prevent: a corpus labeled against a scenario whose defining condition it
+never encodes, passed by a detector that never existed.
 
-The detector's interim `SCENARIO_TIERS` names only `AST02-maintainer-account-takeover`.
-That agrees with the registry on AST02-S04's tier and is silent on the other three.
+The pair is **deleted from AST01's corpus**, and AST02 now ships six cases of its own that
+exercise the project-open trigger on the three surfaces the whitepaper names. Nothing was
+retuned to make a detector pass: the fixture was wrong about the scenario and was replaced.
 
-**AST02-S03's coverage is booked to another category.** `fixtures/manifest.yaml` records
-that the pair `AST01-V3` / `AST01-C4` (destructive postinstall) links to registry parent
-AST02-S03 at `covers: full`, which is why AST02-S03 does not appear in this category's
-`uncovered_static_detectable` list. A reviewer reading AST02's row as
-`declared-and-uncovered` while its only detectable scenario is fixture-covered under
-AST01 is reading an accounting artefact, not a detection claim. Two consequences worth
-stating plainly:
+Remaining debt for this category is the three out-of-artifact scenarios, which is not debt
+this package can pay. AST02-S02's pin-posture `artifact_signal` remains unimplemented; if a
+check is written for it, it enters `CHECK_COVERAGE` as `covers: artifact-signal-only` and a
+corpus may then be labeled against *that*, under a scope which is explicitly not AST02's
+scenario coverage.
 
-- The AST02 row understates coverage: the category's one detectable scenario has a
-  labeled corpus, it is just not filed here.
-- That corpus covers less of AST02-S03 than `covers: full` implies. It varies a
-  `postinstall` value between `rm -rf $HOME` and `mkdir -p .cache`, exercising
-  destructive-command matching inside a declared lifecycle hook. AST02-S03's defining
-  condition is a command-bearing value in a config file the host auto-executes **at
-  project open** — `.claude/settings.json`, a hook entry, an `ANTHROPIC_BASE_URL`
-  override, the trigger CVE-2025-59536 and CVE-2026-21852 anchor. The pair does not
-  exercise that trigger.
-
-**Six orphaned fixture files.** `fixtures/AST02/` contains three vulnerable/clean pairs on
-disk that `fixtures/manifest.yaml` no longer declares (`cases: []`, `cases_present: 0`).
-They were built before the registry reconciliation and were delisted by it, correctly:
-
-| On-disk pair | Fixture check | Registry parent | Parent tier | Why it cannot be a static-detectable AST02 case |
-| --- | --- | --- | --- | --- |
-| `V1` / `C2` typosquatted-dependency | `AST02-S1` Typosquatted dependency name | AST01-S01 Typosquatting | agent-judgable | The scenario is not tiered static-detectable, so it cannot enter a static-detectable corpus; and it is AST01's scenario, not AST02's. |
-| `V3` / `C4` unpinned-wildcard-dependency | `AST02-S2` Unpinned wildcard dependency version | AST02-S02 Dependency Confusion | out-of-artifact | S-003 bars a fixture bound to an out-of-artifact scenario outright. The pair measures that scenario's `artifact_signal` (pin posture) and may only ever be reported as `artifact-signal-only`. |
-| `V5` / `C6` lockfile-hash-mismatch | `AST02-S3` Lockfile content-hash mismatch | none | — | Maps to no named AST02 scenario. It derives from the category's mitigations ("pin all nested dependencies to immutable hashes"; "have the signature cover a canonical digest of SKILL.md plus every declared resource file"), which makes it `category-precondition`, not scenario coverage. |
-
-Leaving the files on disk while the manifest declares none is a state a reviewer will
-trip over. Resolution belongs to a fixture task, not to this matrix, and has exactly two
-honest forms: delete the six files, or re-declare them in a non-F1 proxy lane labeled
-`artifact-signal-only` / `category-precondition`. Re-listing them as
-`detectable_scenarios` to give AST02 an F1 is the padding the never-pad rule forbids.
+**Six orphaned fixture files, deleted earlier and still gone.** `fixtures/AST02/` once held
+three vulnerable/clean pairs that `fixtures/manifest.yaml` did not declare: a typosquat pair
+proxying an AST01 scenario the registry tiers agent-judgable, a pin-posture pair proxying
+AST02-S02's `artifact_signal`, and a lockfile-hash pair mapping to no named scenario. None
+of them encoded AST02-S03, and none of them is among the six cases the directory holds now.
+`tests/test_coverage_matrix_ast07_ast08.py::test_ast02_ships_no_orphan_fixture_corpus` names
+all six by directory so re-adding one cannot hide inside a legitimate corpus.
 
 ## F1 denominator for AST02
 
@@ -108,29 +129,45 @@ honest forms: delete the six files, or re-declare them in a non-F1 proxy lane la
 out-of-artifact and are excluded from the denominator, published above as declared-and-
 uncovered.
 
-**AST02 publishes no F1.** The labeled detectable tier in `fixtures/manifest.yaml` is
-empty (`detectable_scenarios: []`, `cases: []`, `status: declared-and-uncovered`,
-`published_f1: null`) and the shipped detector implements no check, so there is nothing to
-compute a number over. Under gate-4 that is the required outcome, not a shortfall to be
-worked around: a category whose detectable tier is empty publishes no F1 and is reported
-`declared-and-uncovered`, never padded.
+**Published number.** `fixtures/manifest.yaml` publishes
+`scenario-level 1.000 (AST02-S03, n=6)`, recomputed from the corpus by
+`skills/AST02/scripts/test_ast02_detector.py` on every run. Measured: tp 3, fp 0, fn 0
+across 3 vulnerable and 3 clean cases.
 
-**Why that is a deliberate honesty choice, stated precisely.** Three quarters of AST02's
-named attack surface is genuinely out of reach of any single-package detector, and for
-two of those three scenarios the registry records no artifact signal at all. A category
-in that position can always be given a respectable-looking F1 by authoring fixtures
-against whatever a detector already happens to match — pin posture, name similarity,
-lockfile hash equality — and labeling them as AST02 coverage. Each of those is a real
-static property and none of them decides a named AST02 scenario. That number would
-measure the fixture author's choice of proxy, not detection, and it would report the
-category as covered while Registry Flooding, Dependency Confusion and Maintainer Account
-Takeover remain exactly as undetectable as before. Publishing `null` states the true
-position: the one AST02 scenario a package can decide is not yet decided here, and the
-other three cannot be decided here at all.
+**What that number is and is not.** It is one scenario, six hand-authored cases, and an
+author who also wrote the detector — internal consistency, not field performance. It is
+also not a statement about the category: three quarters of AST02's named attack surface is
+still exactly as undetectable as before, and the number carries the scenario id precisely
+so it cannot be read as "AST02 is covered". The clean half of each pair is a deliberate
+near-miss chosen so a command-string grep would score 0.5 rather than 1.0:
 
-Note the two different reasons "no F1" can have, both live in this repository: AST02's is
-an empty *labeled* detectable tier under a non-empty *registry* one; AST09's is a registry
-tier with no static-detectable scenario in it whatsoever.
+| Pair | Vulnerable | Clean — the near miss |
+| --- | --- | --- |
+| hook command | `SessionStart` hook running `curl … \| sh` | the same settings file with permissions and a model name only |
+| environment override | `ANTHROPIC_BASE_URL` pointed at an attacker proxy | the same `env` block setting `EDITOR` and `PAGER` |
+| folder-open task | `runOn: folderOpen` executing `bootstrap.sh` | the byte-identical task command with no `runOn` trigger |
+
+That claim is measured rather than asserted. `tests/test_corpus_discriminates_mechanism.py`
+re-runs this corpus through an ablated check — a command-looking string inside any shipped
+JSON, with both halves of the real predicate (is the file auto-read at project open? does
+the value sit under a key the host executes?) deleted. It scores **F1 0.667**
+(tp 2, fp 1, fn 1) against the shipped check's 1.000: it misses the environment-override
+case entirely, because that vulnerable file contains a URL and no command, and it
+false-positives on the clean folder-open case, which carries the byte-identical command
+with no trigger. Both errors are the corpus doing its job.
+
+**Why a number here is not the padding the never-pad rule forbids.** The rule bars
+manufacturing an F1 for a category whose detectable tier is empty. AST02's is not empty —
+the registry tiers AST02-S03 static-detectable — and the corpus labels exactly that one
+scenario, at the entitlement the formula gives it. What the rule *would* forbid, and what
+this corpus does not do, is labeling cases against pin posture, name similarity, or
+lockfile hash equality and reporting the result as AST02 coverage. Those three were the
+delisted corpus and they stay delisted.
+
+Note the two different reasons "no F1" can have, both still live in this repository:
+AST07's and AST09's is a registry tier with no static-detectable scenario in it at all.
+AST02 used to be reported alongside them for a third reason — an empty *labeled* tier under
+a non-empty *registry* one — and no longer is.
 
 ## Corpus entitlement and actual corpus
 
@@ -141,19 +178,23 @@ drawn only from the static-detectable tier.
 | --- | --- | --- |
 | Registry static-detectable scenarios | 1 | `scenarios/registry.yaml` (AST02-S03) |
 | **Entitlement at full registry coverage** | **6** | `max(6, 2 x 1)` |
-| Labeled detectable checks in the corpus | 0 | `fixtures/manifest.yaml` `detectable_scenarios: []` |
-| Entitlement at present labeling | 0 | empty detectable tier — the never-pad rule sets this to 0, not to the floor of 6 |
-| **Actual fixture count under `fixtures/AST02/`** | **6** | 3 vulnerable + 3 clean, all orphaned: declared by no manifest entry |
-| Declared cases | 0 | `cases: []` |
+| Labeled detectable checks in the corpus | 1 | `fixtures/manifest.yaml` `detectable_scenarios` |
+| Entitlement at present labeling | 6 | `max(6, 2 x 1)` — the floor, not the doubling |
+| **Actual fixture count under `fixtures/AST02/`** | **6** | 3 vulnerable + 3 clean |
 
-The 6 files on disk are not the 6-case entitlement. They are the delisted pre-
-reconciliation corpus described under [Coverage debt](#coverage-debt); the entitled corpus
-for AST02-S03 — six cases exercising `.claude/settings.json`, hook entries and
-environment-override keys — has not been authored.
+The floor of 6 over a single scenario is what pushed the corpus to cover three distinct
+surfaces of AST02-S03 rather than one shape three times. That is the formula doing useful
+work: a one-scenario category still has to show the scenario in more than one dress.
 
 ```
 ls -1d fixtures/AST02/*/ | wc -l
 python3 -c "import yaml; c=yaml.safe_load(open('fixtures/manifest.yaml'))['categories']['AST02']; print(len(c['cases']), len(c['detectable_scenarios']), c['status'], c['published_f1'])"
+```
+
+Re-run the published number:
+
+```
+python3 -c "import sys; sys.path.insert(0,'.'); import importlib.util; from detectors import corpus; s=importlib.util.spec_from_file_location('d','skills/AST02/scripts/detector.py'); m=importlib.util.module_from_spec(s); sys.modules['d']=m; s.loader.exec_module(m); print(m.f1_report(corpus.category_fixtures('AST02')))"
 ```
 
 ## Tier lock
@@ -166,4 +207,8 @@ python3 -c "import yaml; from validators.tier_lock import tier_lock_hash; print(
 
 Reclassifying any AST02 scenario changes this hash, which is the signal that the corpus
 must be re-labeled and the judge matrix re-run before an F1 for this category can be
-published (spec.md S-011, `validators/tier_lock.py`).
+published (spec.md S-011, `validators/tier_lock.py`). The corpus-internal `tier_lock_hash`
+in `fixtures/manifest.yaml` now equals this value, because every AST02 entry in that file
+is keyed by its registry id and carries the registry's tier — the two hashes are computed
+over identical `id:tier` sets. That is agreement, not a copied constant; edit either side
+and they diverge.

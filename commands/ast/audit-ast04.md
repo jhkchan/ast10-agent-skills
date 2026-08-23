@@ -3,7 +3,7 @@ name: audit-ast04
 description: >-
   Audit one candidate skill package against OWASP AST04 - Insecure Metadata alone, using the
   ast04-insecure-metadata skill's decision rules and the frozen per-scenario detectability
-  contract in skills/AST04/coverage-matrix.md. Runs the 4 static-detectable check(s) this
+  contract in skills/AST04/coverage-matrix.md. Runs the 6 static-detectable check(s) this
   category implements, then reports the tiering gap the run did not close.
 nl_triggers:
   - "is this manifest lying"
@@ -52,9 +52,11 @@ malicious while the metadata tells the truth.
 
 | Check id | Tier | Fires when |
 | --- | --- | --- |
-| `AST04-yaml-injection` | static-detectable | an unsafe YAML deserialization API (`yaml.load` with `UnsafeLoader`/`FullLoader`, `yaml.unsafe_load`) parses attacker-reachable metadata |
+| `AST04-permission-understating` | static-detectable | a bundled script reaches an `http(s)` host that `permissions.network.allow` does not permit, evaluated default-deny and host-exact (AST04-S02) |
+| `AST04-risk-tier-spoofing` | static-detectable | the declared `risk_tier` ranks below the floor `validators/usf.py::derive_risk_tier` computes from the declared permission scope (AST04-S03) |
+| `AST04-yaml-injection` | static-detectable | a `!!python/…` construction tag appears in shipped YAML or a SKILL.md frontmatter block, or bundled Python opts into an unsafe deserializer (`yaml.unsafe_load`, `Loader=yaml.UnsafeLoader`, a bare `yaml.load`) |
 | `AST04-json-injection` | static-detectable | prototype-pollution keys (`__proto__`, `constructor`, `prototype`) appear in JSON metadata |
-| `AST04-toml-injection` | static-detectable | unexpected top-level TOML keys smuggle configuration past the schema |
+| `AST04-toml-injection` | static-detectable | a single-bracket `[table]` is redefined (a precedence violation `tomllib` refuses to parse), or an unexpected top-level TOML key smuggles configuration past the schema |
 | `AST04-invisible-unicode-smuggling` | static-detectable | zero-width, bidi-override or word-joiner code points hide instructions inside the frontmatter or description |
 
 Check ids are the detector's own, not registry scenario ids (`AST04-S01`, `AST04-S02`, …).
@@ -125,17 +127,17 @@ VERDICT:  CLEAN
 EVIDENCE: no invisible Unicode control code points found
 TIER:     static-detectable
 
-CHECKS RUN:  4 detector check(s) at the static-detectable tier, 1 DETECTED
+CHECKS RUN:  6 detector check(s) at the static-detectable tier, 1 DETECTED
 REGISTRY:    7 named scenario(s): 5 static-detectable, 1 agent-judgable, 1 out-of-artifact
 UNCOVERED:   2 static-detectable scenarios with no labeled fixture: AST04-S02, AST04-S03
 NOT DECIDED: 1 agent-judgable scenario needs a judge, not this run
 NOT DECIDED: 1 out-of-artifact scenario is not decidable from one package
-F1:          not published (pending-detector)
-             status=covered, scope=scenario-level, corpus=6 case(s)
+F1:          scenario-level 1.00 (n=10)
+             status=covered, scope=scenario-level, corpus=10 case(s)
 ```
 
 The coverage footer is not decoration. A DETECTED-free run of this command means
-"none of the 4 implemented checks fired", never "AST04 is clean".
+"none of the 6 implemented checks fired", never "AST04 is clean".
 
 ## Coverage caveat
 

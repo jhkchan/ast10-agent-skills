@@ -47,6 +47,11 @@ category from the adjacent ones, which preventive controls fail and under what
 conditions, what makes a finding *this* category rather than a neighbour's.
 Executable logic lives in `scripts/`; long-form material lives in
 `references/`. A `SKILL.md` that is mostly a procedure has the split backwards.
+No skill in this repository ships a `references/` directory today — the long-form
+source is the whitepaper, which is not redistributable here — so if you add one,
+re-stamp the manifest: `references/*.md` is inside the `content_hash` surface
+(`scripts/content_hash.py`) and every stamped digest here currently covers
+`SKILL.md` plus `scripts/*.py` and nothing else.
 
 The frontmatter needs a `name` and a `description`. The `name` is the
 identifier a runtime matches invocations against, so it must equal the entry in
@@ -191,8 +196,10 @@ from the category's `static-detectable` tier. Six is a floor, not a target.
 **An empty detectable tier publishes no F1.** A category with nothing
 static-detectable reports `declared-and-uncovered` and no number. Do not pad the
 corpus to manufacture one. `detectors/scaffold.f1_report()` enforces this in
-code, and four categories ship in exactly that state today —
-`AST02`, `AST07`, `AST09` and `AST10` have empty `DETECTORS` maps and say so.
+code, and the categories that ship in exactly that state say so — `AST09`, whose seven
+named scenarios are all out-of-artifact, is the clearest case and its
+`skills/AST09/scripts/detector.py` derives its empty `DETECTORS` map from its empty
+static-detectable tier rather than merely asserting it.
 
 **Zero denominators report `0.0`, never `1.0`.** A corpus where nothing was
 detected must not come back as a perfect score. Both `detectors/scaffold.py` and

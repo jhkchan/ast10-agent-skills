@@ -53,8 +53,9 @@ imagination, not a detector.
 ## What "declared-and-uncovered" means
 
 A category whose static-detectable tier is empty publishes **no F1 number at all** and is
-reported `declared-and-uncovered`. It is never padded to manufacture a number. Four
-categories are in that state today — AST02, AST07, AST09, AST10 — and each says why.
+reported `declared-and-uncovered`. It is never padded to manufacture a number. The
+categories in that state today — AST02, AST07, AST09 — each say why. AST10 left that state
+when its one static-detectable scenario, AST10-S06, was implemented and labeled.
 
 Corpus sizing for the categories that do publish: `cases = max(6, 2 × detectable_scenarios)`,
 class-balanced vulnerable/clean, drawn only from the static-detectable tier. The command
@@ -113,7 +114,7 @@ EOF
 
 ```text
 CATEGORY: AST05 - Untrusted External Instructions
-STATUS:   proxy-covered   f1_scope=artifact-signal-only   published_f1=pending-detector
+STATUS:   proxy-covered   f1_scope=artifact-signal-only   published_f1=artifact-signal-only 1.00 (n=6)
 CORPUS:   6 case(s) present / 6 declared (max(6, 2 x 3 labeled checks))
 
 STATIC-DETECTABLE (0):
@@ -160,7 +161,7 @@ AST06  proxy-covered           mixed-proxy              5 scenarios (1/0/4)   co
 AST07  declared-and-uncovered  none                     3 scenarios (0/0/3)   corpus 0
 AST08  proxy-covered           category-precondition    8 scenarios (4/2/2)   corpus 6
 AST09  declared-and-uncovered  none                     7 scenarios (0/0/7)   corpus 0
-AST10  declared-and-uncovered  none                     6 scenarios (1/0/5)   corpus 0
+AST10  covered                 scenario-level           6 scenarios (1/0/5)   corpus 6
                                              (static-detectable/agent-judgable/out-of-artifact)
 ```
 

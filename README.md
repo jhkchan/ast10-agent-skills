@@ -44,7 +44,9 @@ identify the standard being implemented.
 
 ## Installation
 
-Three ways in. All of them install the same eleven skill packages.
+Two ways to install the eleven skill packages, plus one machine-readable index to drive
+either of them from a script. None of the three copies `commands/ast/` — those come with
+the clone; see [Or just use the slash commands](#or-just-use-the-slash-commands).
 
 ### Method 1 — Copy the skills into your agent's skills directory
 
@@ -101,7 +103,7 @@ which runs every detector over a candidate package, and `coverage` — while `in
 Python-only.
 
 ```bash
-node cli/bin/cli.js audit fixtures/AST01/V1-obfuscated-payload --fail-on-detect
+node cli/bin/cli.js audit fixtures/AST01/V1-obfuscated-payload-exec --fail-on-detect
 node cli/bin/cli.js coverage
 ```
 
@@ -140,6 +142,14 @@ PY
 ```
 AST01-content-hash-missing True - manifest.content_hash.value is unset
 AST01-content-hash-mismatch False - no declared hash to compare
+AST01-social-engineering-prerequisites False - no install instruction pipes a remote fetch into a shell
+AST01-soul-md-persistence False - no declared write scope and no bundled script writes to SOUL.md
+AST01-memory-poisoning False - no declared write scope and no bundled script writes to MEMORY.md
+AST01-identity-clone-exfiltration False - no bundled script both reads an identity artifact and sends outbound
+AST01-websocket-c2 False - no bundled script opens a WebSocket to an undeclared host
+AST01-undeclared-egress False - every hardcoded egress destination is covered by the declared allowlist
+AST01-hidden-output-injection False - no concealed instruction carrier in the package's output templates
+AST01-obfuscated-payload-exec False - no encoded blob is decoded into an execution sink
 ```
 
 `run_all` returns one `Finding` per registered check, **including the ones that did not
@@ -251,34 +261,95 @@ python3 -c "import yaml; [print(s['id'], '|', s['title'], '|', s['tier']) for s 
 
 ## Skills
 
-`F1` is the number the category publishes today, in the manifests' own vocabulary:
+Two independent states per category, and collapsing them is the mistake this table exists
+to prevent: one says what code exists, the other says what was measured.
 
-- **`pending-detector`** — the category has a labeled, class-balanced fixture corpus, and
-  no shipped detector function consumes it yet. The denominator exists; the measurement
-  does not.
-- **`declared-and-uncovered`** — the labeled detectable tier is *empty*. Per the never-pad
-  rule this category publishes no F1 at any corpus size, and says so in its matrix rather
-  than manufacturing a number off fixtures written to separate perfectly.
+**Detector state** — derived, not asserted. `scenarios/registry.yaml` is authoritative on
+which scenarios are `static-detectable`; `fixtures/manifest.yaml` is authoritative on
+which of those carry a shipped check and a labeled fixture pair.
+`tests/test_docs.py::test_readme_detector_state_matches_the_state_derived_from_the_manifests`
+re-derives every value below from those two files and fails on drift, so this column
+cannot describe a check that does not exist:
 
-| AST | Skill | What it detects | F1 |
-| --- | --- | --- | --- |
-| AST01 | `ast01-malicious-skills` | Hidden payloads in an otherwise-legitimate package — credential stealers, backdoors, and the natural-language instruction layer that carries a payload with zero suspicious code | `pending-detector` |
-| AST02 | `ast02-supply-chain-compromise` | Registry flooding, dependency confusion in a nested `requirements.txt` / `package.json`, config-file hijacking, maintainer account takeover | `declared-and-uncovered` |
-| AST03 | `ast03-over-privileged-skills` | Permission manifests broader than the stated function, write scopes reaching secrets or admin scope, undeclared shell exec, wildcard egress | `pending-detector` |
-| AST04 | `ast04-insecure-metadata` | Brand-impersonating names, permission-understating manifests, `risk_tier` spoofing, unsafe YAML/JSON/TOML deserialization at load time | `pending-detector` |
-| AST05 | `ast05-untrusted-external-instructions` | Skills that fetch external documents and follow them as instruction rather than treat them as data; missing provenance boundaries; remote responses reaching an executable sink | `pending-detector` |
-| AST06 | `ast06-weak-isolation` | Execution in the host agent's own security context — full filesystem, shell and network — because sandboxing is optional, absent, or escaped | `pending-detector` |
-| AST07 | `ast07-update-drift` | Unpinned installs, rollback attacks, hot-reload abuse, auto-update onto a malicious "patch" release | `declared-and-uncovered` |
-| AST08 | `ast08-poor-scanning` | Natural-language-only malicious intent, shell-parsing evasion, zero-width / bidi / homoglyph smuggling, scanner impersonation, missing scan attestation | `pending-detector` |
-| AST09 | `ast09-no-governance` | No inventory, no approval workflow, orphaned skills after offboarding, regulated-data exposure with no audit trail | `declared-and-uncovered` |
-| AST10 | `ast10-cross-platform-reuse` | Security metadata — `risk_tier`, permissions, signatures, `deny_write` — silently dropped when a skill is ported between runtimes | `declared-and-uncovered` |
-| — | `advisory` | Not a detector. Routes a free-text finding to its primary AST category via the whitepaper's decision tree and returns category-specific remediation | not scored on F1 (judged on guidance quality) |
+- **`implemented`** — every scenario the registry tiers `static-detectable` for this
+  category has a check in `skills/<AST>/scripts/detector.py` and a labeled fixture pair.
+  Nothing decidable is unbuilt.
+- **`coverage-debt`** — the registry tiers a scenario `static-detectable`, so one package's
+  own bytes *can* decide it, and no shipped check does. Decidable-but-unbuilt, which is a
+  different and more embarrassing thing than undetectable. **No category is in this state
+  today.** The state is defined and tested for anyway, so that regressing into it shows up
+  on the front page instead of only inside a matrix.
+- **`declared-and-uncovered`** — the registry tiers *every* scenario in the category
+  `agent-judgable` or `out-of-artifact`. There is nothing for a static check to decide, so
+  no check ships and no F1 is published at any corpus size.
 
-Four of the ten publish nothing, and that is the honest reading of the registry rather
-than a gap in the work: AST07 and AST09 have **zero** static-detectable scenarios in the
-whitepaper's own enumeration (every scenario is temporal or organisational), and AST02 and
-AST10 each have exactly one, unlabeled and unimplemented. See each category's
-`coverage-matrix.md` for the per-scenario reasoning and the evidence that would decide it.
+**F1** — what was measured, quoted verbatim from `fixtures/manifest.yaml`. Every number
+carries the scope it was measured at, because quoting one without its scope is the
+overclaim the labels exist to block:
+
+- **`scenario-level`** — measured over checks that decide a named whitepaper scenario's
+  *defining condition*.
+- **`artifact-signal-only`** — measured over checks that decide an enabling *precondition*
+  a benign package can also exhibit (an unbounded retry loop, an unpinned reference, an
+  absent permissions block). It is **not** coverage of any named scenario and may never be
+  quoted as one. AST05 publishes only this.
+- **both, separated by `;`** — a `mixed-proxy` category, scored separately per scope so the
+  proxy half cannot ride on the scenario half.
+- **`declared-and-uncovered`** — no number, at any corpus size. This is the never-pad rule:
+  an empty detectable tier is reported as empty rather than filled with fixtures written to
+  separate perfectly.
+- **a bare number (`1.0`)** — AST10 alone stores `published_f1` as a JSON float rather than
+  a labeled string; its scope is `scenario-level`, carried in the sibling `f1_scope` field
+  and printed beside it by `python3 cli/ast10.py status`.
+
+The "What the shipped detector decides" column describes **only checks that exist and run
+today** — it is the check roster, not the category's subject matter. For what each category
+*covers as knowledge*, read its `SKILL.md`; for what is decidable and refused, read its
+`coverage-matrix.md`.
+
+| AST | Skill | What the shipped detector decides | Detector state | F1 |
+| --- | --- | --- | --- | --- |
+| AST01 | `ast01-malicious-skills` | Ten checks: `content_hash` absent or mismatched; install prose that pipes a remote fetch into a shell; a declared or coded write to `SOUL.md`; the same for `MEMORY.md`; a script that both reads an identity artifact and sends outbound; a WebSocket to an undeclared host; a hardcoded egress destination outside the declared allowlist; concealed instructions in the package's own output templates; an encoded blob decoded into an execution sink | `implemented` | `scenario-level 1.000 (8 labeled checks, n=16)` |
+| AST02 | `ast02-supply-chain-compromise` | One check: a command-bearing value in a config file the host auto-executes **at project open** — `.claude/settings.json` hooks, an MCP/env control-plane override, a `.vscode/tasks.json` `folderOpen` task. Registry flooding, dependency confusion and maintainer-account takeover are tiered `out-of-artifact` and no check claims them | `implemented` | `scenario-level 1.000 (AST02-S03, n=6)` |
+| AST03 | `ast03-over-privileged-skills` | Four checks: a declared write grant reaching the agent's own identity files (`SOUL.md`, `MEMORY.md`, `AGENTS.md`); no declared write floor at all; shell execution combined with unbounded egress; a blanket or wildcard egress declaration in place of an enumerated domain allowlist. Only the first covers a named scenario — the other three are a precondition and two signals | `implemented` | `scenario-level 1.00 (AST03-S03, n=2); artifact-signal-only 1.00 (n=4)` |
+| AST04 | `ast04-insecure-metadata` | Six checks: a declared allowlist contradicted by the destination a bundled script actually reaches; `risk_tier` below the floor its own permissions derive; code-executing YAML tags and unsafe loaders; `__proto__` / `constructor` keys in shipped JSON next to an unsafe merge site; redefined TOML tables; invisible code points (flagged as a carrier class and stopped there, not convicted as an instruction) | `implemented` | `scenario-level 1.00 (n=10)` |
+| AST05 | `ast05-untrusted-external-instructions` | Five checks, **every one a precondition**: a fetched document reaching an instruction sink; a remote response body reaching an executable sink; decision rules that consume upstream content with no provenance boundary; a blanket egress grant; a wildcard entry in the declared allowlist. The registry tiers all six AST05 scenarios `agent-judgable` or `out-of-artifact`, so none of these covers one | `implemented` | `artifact-signal-only 1.00 (n=6)` |
+| AST06 | `ast06-weak-isolation` | Five checks: a bundled script that shell-execs or writes a host-persistence path; a declared write scope reaching the filesystem root or the home directory; shell granted with no bounding command list; declared writes into a shared workspace namespace; an absent or empty permissions block. The first two decide AST06-S01's two disjuncts; the rest are a precondition and two signals | `implemented` | `scenario-level 1.00 (AST06-S01, n=4); artifact-signal-only 1.00 (n=2)` |
+| AST07 | `ast07-update-drift` | **No check ships, and none can.** All three AST07 scenarios — malicious update, rollback, hot-reload abuse — are defined by a *change between versions*, and one package at one moment carries no second version to compare against. The skill is knowledge only; `coverage-matrix.md` names the version-history evidence that would decide each one | `declared-and-uncovered` | `declared-and-uncovered` |
+| AST08 | `ast08-poor-scanning` | Four checks: an obfuscated instruction found by decode-and-rescan over the normalized view (comparing match counts per view, so a decoy in the clear cannot mask a smuggled copy); a branch that arms only under a specific environment; scanner-host hazards (padding runs, recursive archives, decompression ratio, symlink escape); bytecode the import machinery would prefer over its own source | `implemented` | `scenario-level 1.00 (4 scenario checks, n=8)` |
+| AST09 | `ast09-no-governance` | **No check ships, and none can.** All seven AST09 scenarios are `out-of-artifact`: inventory, approval, ownership and offboarding live in an organisation's process, not in a package. The skill is knowledge only; `coverage-matrix.md` names the governance-system evidence that would decide each one | `declared-and-uncovered` | `declared-and-uncovered` |
+| AST10 | `ast10-cross-platform-reuse` | One check: a payload hidden in an encoded blob that survives a port — decoded (base64, hex escapes, gzip-under-base64), then judged at the *content* layer, so a package carrying a legitimate encoded blob is not convicted for carrying one. Security metadata stripped during a port can be narrated inside a fake `SKILL.md`, so it is tiered `out-of-artifact` and no check claims it | `implemented` | `1.0` |
+| — | `advisory` | Not a detector. Routes a free-text finding to its primary AST category via the whitepaper's decision tree and returns category-specific remediation | n/a — not a detector | not scored on F1 (judged on guidance quality) |
+
+Four readings of that table are worth spelling out, because each is easy to get backwards.
+
+**Shipped checks and measured checks are different counts, on purpose.** AST01 ships ten
+checks and publishes an F1 over eight: its two `content_hash` checks decide a
+*precondition* rather than a named scenario, so they run on every audit and enter no
+denominator. AST03 (4 shipped / 3 labeled), AST04 (6 / 5), AST05 (5 / 3) and AST06 (5 / 3)
+have the same shape. A check that runs and is never scored is not a hidden number — it is
+a check whose `CHECK_COVERAGE` entry says outright that firing it proves nothing about a
+whitepaper scenario.
+
+**AST07 and AST09 publish nothing, and that is the registry talking, not a backlog.** Both
+have **zero** static-detectable scenarios in the whitepaper's own enumeration — every
+scenario is temporal or organisational — so no corpus size would give them a denominator.
+
+**AST05 ships five checks and still covers no scenario.** It has an empty detectable tier
+like AST07 and AST09, yet it publishes a number, because its checks decide real
+preconditions and the corpus that measures them is real. What stops that from being a
+padded F1 is the scope label: `artifact-signal-only` is not comparable with a
+`scenario-level` number and cannot be quoted as AST05 coverage.
+`tests/test_coverage_matrix.py::test_ast05_publishes_no_scenario_level_number_because_its_detectable_tier_is_empty` fails if
+AST05's `published_f1` ever says `scenario-level`.
+
+**A 1.00 is a discrimination claim about one hand-built corpus.** AST10's single
+static-detectable scenario (AST10-S06, Silent Supply Chain Injection) is implemented and
+measured over six labeled cases whose three *clean* packages each carry a real encoded
+blob — one of them the same gzip-under-base64 shape as the vulnerable case — so a check
+that fired on "contains an encoded blob" scores 0.67, not 1.00, and the matrix shows that
+arithmetic. Read `skills/AST10/coverage-matrix.md` before quoting the number. The same
+caveat applies to every 1.00 in the column.
 
 ---
 
@@ -302,9 +373,16 @@ pretend otherwise rather than shipping a proxy that scores well.
 - **No sandbox, no enforcement, no blocking.** These skills report; they do not quarantine
   a package, revoke a signature, or stop an install. A verified signature answers *who
   published this*, never *is this safe*, and this repo will not conflate the two.
-- **No published F1 for four of ten categories**, and `pending-detector` for the other six.
-  The fixture corpora are class-balanced and real; the detector functions that consume them
-  are largely not written yet. The coverage matrices name every gap.
+- **Every published F1 is a floor, not a rate.** The per-category numbers in the table above
+  are measured over that category's own hand-labeled corpus at the locked gate-4 size —
+  `max(6, 2 x detectable_scenarios)` — by authors who also wrote the checks. They establish
+  that each check separates its vulnerable case from its clean one; they do not estimate
+  performance on skills nobody here wrote. Categories reading `declared-and-uncovered`
+  publish no number at any corpus size. A fourth state the tooling still understands,
+  `pending-detector` — a labeled corpus exists that no detector consumes — is **unused
+  today**: every labeled corpus in the repository is read by a detector, and
+  `tests/test_coverage_matrix.py::test_every_authored_category_has_a_wired_corpus_or_is_declared_unwired`
+  fails any category that publishes `pending-detector` while its corpus is wired. The coverage matrices name every gap.
 - **No judged scorecards yet.** The eight-dimension skill-judge run has not been executed.
   [`docs/skill-judge-dashboard.md`](docs/skill-judge-dashboard.md) publishes the rubric,
   the ship rule, and the provider roster with an explicit *no judged run recorded yet*
@@ -355,9 +433,22 @@ python3 validators/usf.py skills/*/skill.usf.yaml   # every shipped manifest
 python3 validators/tier_lock.py fixtures/manifest.yaml   # tier-drift check
 python3 scripts/dogfood.py                      # our detectors over our own skills
 python3 scripts/ship_floor.py                   # recompute every stored judge verdict
+python3 eval/generate_f1_report.py              # re-measure every corpus, rewrite the F1 report
 python3 eval/generate_dashboard.py              # rewrite the dashboard results table
 ruff check . && ruff format --check .           # exactly what CI runs; see ruff.toml
 ```
+
+Two of those write documents that are committed alongside the code, and both are
+regenerated-and-compared by the test suite rather than trusted:
+
+- [`docs/f1-report.md`](docs/f1-report.md) — every category's measured precision,
+  recall and F1, with each individual case verdict recorded in
+  [`eval/f1-report.json`](eval/f1-report.json) so any figure can be re-derived by
+  hand. Written by `python3 eval/generate_f1_report.py`.
+- [`docs/dogfood-report.md`](docs/dogfood-report.md) — every firing of every
+  detector over this repository's own eleven skill packages, waived or not, with
+  the reason for each waiver. Written by
+  `python3 scripts/dogfood.py --markdown --out docs/dogfood-report.md`.
 
 Reformatting a skill's `scripts/*.py` changes the bytes its `content_hash` covers, so the
 manifests have to be re-stamped afterwards or `validators/usf.py` will (correctly) report

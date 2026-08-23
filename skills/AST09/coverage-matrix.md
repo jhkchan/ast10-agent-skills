@@ -20,6 +20,15 @@ this matrix binding on the F1 denominator is `docs/adr/0004-per-scenario-detecta
 Changing any tier below changes the tier-lock hash and forces re-labeling plus a judge
 re-run before an F1 for this category could be published (`validators/tier_lock.py`).
 
+**Authority chain.** The whitepaper's own "Attack Scenarios" body for AST09 outranks
+everything here on the enumeration itself — how many scenarios exist, and their titles
+verbatim. `scenarios/registry.yaml` is authoritative on tier; this file reproduces its
+tiering and may not diverge from it. This file is authoritative on the F1 denominator,
+the corpus accounting and the coverage debt. `fixtures/manifest.yaml` is authoritative on
+which fixture cases exist and what they are labeled against. The `SCENARIO_TIERS` dict
+inside `skills/AST09/scripts/detector.py` is implementation and is subordinate to all of
+them.
+
 ## Scenario table
 
 Titles are the whitepaper's own sub-headings, verbatim. The "detector checks" column
@@ -38,14 +47,31 @@ plausibly be extended to check.
 
 **Detector reconciliation.** `skills/AST09/scripts/detector.py` registers `DETECTORS = {}`
 — zero detector functions — and `STATIC_DETECTABLE` derives to the empty set, which is
-consistent with every row above. Two known drifts in that file, recorded here rather than
-silently tolerated: its interim `SCENARIO_TIERS` map is keyed by slugs
-(`AST09-orphaned-skill`, `AST09-regulatory-exposure`, `AST09-undetected-compromise`) that
-are not registry ids, and it enumerates only 3 of the 7 scenarios. Its own docstring
-declares it superseded by the registry and by this file. This matrix, not that map, is the
-tier of record for AST09; the map's omissions change nothing about coverage, because all
-seven scenarios are out-of-artifact and the detector set would be empty under either
-enumeration.
+consistent with every row above. The two drifts earlier revisions of this matrix recorded
+are **closed**: the module's `SCENARIO_TIERS` map is now keyed by canonical registry ids
+and enumerates all seven scenarios rather than three under a private slug dialect, so the
+module and the registry are the same enumeration rather than two that happen not to
+contradict each other. This matrix remains the tier of record for AST09, and
+`tests/test_coverage_matrix_ast09_ast10.py` fails if the module, the registry and this file
+diverge again.
+
+**Emptiness that is derived, not asserted.** "No detector ships" is the outcome a reader is
+most entitled to be suspicious of, because it is indistinguishable from "nobody has written
+one yet". The distinction is mechanised rather than promised:
+`skills/AST09/scripts/test_ast09_detector.py` derives the empty detector set from the empty
+static-detectable tier (`set(DETECTORS) == {s for s, t in SCENARIO_TIERS.items() if t ==
+"static-detectable"} == set()`), checks every tier against `scenarios/registry.yaml`
+directly, and asserts that `f1_report` refuses to score even a *non-empty* corpus — so the
+never-pad rule is a property of the code, not of the fact that `fixtures/AST09/` happens to
+be empty today. Re-tier any AST09 scenario static-detectable and those tests fail, the tier
+lock trips, and this category owes a check.
+
+Re-derive the ids, titles and tiers in this table from the authority at rank 2,
+so a reader can check the table rather than believe it:
+
+```
+python3 -c "import yaml; [print(s['id'], '|', s['title'], '|', s['tier']) for s in yaml.safe_load(open('scenarios/registry.yaml'))['scenarios'] if s['category']=='AST09']"
+```
 
 ## Declared and uncovered
 

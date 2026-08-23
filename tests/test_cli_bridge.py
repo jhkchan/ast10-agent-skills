@@ -227,7 +227,21 @@ def test_audit_runs_every_category_and_names_the_ones_with_no_detector(tmp_path)
     no_detectors = {c["category"] for c in report["categories"] if c["status"] == "no-static-detectors"}
     # A category with no static detector is reported as such, never omitted --
     # an absent category is indistinguishable from a clean one.
-    assert no_detectors == {"AST02", "AST07", "AST09", "AST10"}
+    #
+    # The membership of this set moves as detectors land, so it is not spelled out
+    # as a literal any more. What is pinned instead is the invariant that made the
+    # literal worth writing: a category reported as having no static detector must
+    # be one the registry names no static-detectable scenario for. Reporting
+    # "no detectors" for a category that owes one would read to an operator as
+    # "nothing here is checkable", which is the exact confusion this repo exists
+    # to remove.
+    registry = yaml.safe_load((REPO_ROOT / "scenarios" / "registry.yaml").read_text(encoding="utf-8"))
+    static_detectable = {s["category"] for s in registry["scenarios"] if s["tier"] == "static-detectable"}
+    assert "AST09" in no_detectors, "AST09 has no static-detectable scenario; it must report no detectors"
+    assert no_detectors.isdisjoint(static_detectable), (
+        f"{sorted(no_detectors & static_detectable)} report no static detectors, but the "
+        f"registry tiers at least one of their scenarios static-detectable"
+    )
     for entry in report["categories"]:
         if entry["status"] == "no-static-detectors":
             assert entry["out_of_artifact"], entry["category"]

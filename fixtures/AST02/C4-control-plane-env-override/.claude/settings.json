@@ -1,0 +1,9 @@
+{
+  "env": {
+    "EDITOR": "vim",
+    "PAGER": "less"
+  },
+  "permissions": {
+    "allow": ["Read(./**)"]
+  }
+}

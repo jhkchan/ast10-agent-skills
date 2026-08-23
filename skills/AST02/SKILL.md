@@ -6,32 +6,48 @@ description: "Detect and triage OWASP AST02 Supply Chain Compromise — registry
 # AST02 - Supply Chain Compromise
 
 Pattern: Knowledge. Decision rules for where AST02 controls reach and where they
-structurally cannot; mechanism (hash-pinning checks, config-file diffing) lives in
-`scripts/`, and the frozen scenario tiers live in `coverage-matrix.md`.
+structurally cannot. The one mechanism a package can decide — an execution path in a
+config file the host auto-reads at project open — lives in `scripts/`; the frozen scenario
+tiers, and the three scenarios no package decides, live in `coverage-matrix.md`.
 
-## Why this is not "npm supply-chain security, renamed"
+## Why this category has almost no in-artifact surface
 
-Mature ecosystems (npm, PyPI, Cargo) already have provenance norms — code signing,
-security review, sandbox-by-default. The whitepaper's own evidence is that the barrier
-to publishing on ClawHub was a SKILL.md file and a one-week-old GitHub account: no
-code signing, no security review, no sandbox by default. The decision consequence is
-that "the skill is on a registry" carries near-zero provenance signal for AST02
-purposes — a registry-membership lookup is not verification. Treat registry presence
-and cryptographic verification as two different assertions with two different checks.
+Three of AST02's four named scenarios are properties of a *corpus over time*, not of a
+package: Registry Flooding is a publication rate, Dependency Confusion is a resolver
+outcome in a namespace the package does not contain, and Maintainer Account Takeover
+produces a release that verifies exactly as an honest one does — the attacker holds the
+legitimate key. One package is indistinguishable from one member of a flood, and the
+registry records no in-package signal for any of the three. That is why this skill
+ships exactly one check and why its coverage matrix is mostly empty: the emptiness is
+the measurement, and padding it with proxy checks filed under scenario ids would be an
+overclaim, not coverage.
+
+The corollary for review practice: "the skill is on a registry" carries near-zero
+provenance signal. Registry membership and cryptographic verification are two different
+assertions answered by two different mechanisms; a lookup that returns *found* has not
+verified anything.
 
 ## Decision rules
 
-1. **A registry membership check is not integrity verification.** Cryptographic
-   verification requires a signature over a canonical digest, plus append-only
-   inclusion proofs and consistency proofs (Certificate-Transparency-style). A lookup
-   that only confirms "this hash is listed" cannot detect a transparency-log operator
-   silently rewriting history; it only detects a hash mismatch against whatever the
-   log currently claims.
+1. **"Listed", "signed", and "unrewritten" are three separate questions, and a system
+   that answers only the first reports PASS for all three.** A membership lookup
+   answers *does this digest appear in what the log currently serves*. It does not
+   answer *is this the digest the publisher actually signed* (that needs a signature
+   over a canonical serialization, verified against a resolvable publisher key), and it
+   does not answer *has the log's own history been rewritten* (that needs inclusion and
+   consistency proofs against a monitored root). The failure mode is silent by
+   construction: each unanswered question degrades to a pass, so the composite verdict
+   looks identical whether all three controls exist or only the cheapest one does. When
+   auditing, name which of the three a given implementation performs — the absence of
+   the other two is the finding, and it will not appear as an error anywhere.
 2. **Sign the bundle, not the entry point.** The signature must cover a canonical
    digest of SKILL.md *plus every declared resource file*, so a post-publish edit to
    any declared file — not just the top-level manifest — invalidates it. A signature
    scheme that only hashes SKILL.md leaves every referenced resource file an
-   unauthenticated attack surface.
+   unauthenticated attack surface. The in-package half of this *is* decidable and this
+   repository decides it: a declared `content_hash` that contradicts the shipped bytes
+   is a self-contained contradiction, owned by AST01's check and recorded there as a
+   category precondition — never as coverage of an AST02 scenario.
 3. **The payload is usually in the nested dependency, not the top-level skill.**
    Dependency Confusion tampers with a transitive package, not the surface skill file
    — this is precisely why a scanner that only inspects the skill's own top-level
@@ -79,16 +95,44 @@ and cryptographic verification as two different assertions with two different ch
   attacks to go undetected. Classify the missed detection capability as AST08 and the
   underlying compromise as AST02; they are not interchangeable labels for one finding.
 
-## Real-world anchors worth citing precisely
+## What the one shipped check decides, and the six ways it goes quiet
 
-Claude Code CVE-2025-59536 and CVE-2026-21852 are the concrete evidence that config-file
-hijacking is not theoretical: simply cloning and opening a malicious repository
-triggered RCE and API-key exfiltration before the user saw any dialog. Trail of Bits
-(Jun 3, 2026) is the concrete evidence against relying on scanning alone here — they
-bypassed every scanner they tested and explicitly recommend the traditional
-supply-chain response (curated marketplace, pinned versions, controlled publish/update
-rights) *because* automated scanning cannot replace trust decisions. Cite these, not a
-generic "supply chain attacks are increasing" framing.
+`AST02-S03` is keyed on the **config surface**, not on the presence of a command
+string: the same shell command is unremarkable inside a bundled script and is an
+execution path the host enters unprompted inside `.claude/settings.json`. CVE-2025-59536
+and CVE-2026-21852 are why the keying is that way round — cloning and opening a
+repository was sufficient, with no dialog shown. Within those files the check fires on
+four auto-executed shapes only: a hook entry carrying a command, an MCP server entry
+that spawns a process, a control-plane environment override, and a folder-open task.
+
+Each of the following returns a negative verdict that is not a clean one.
+
+- **The check reads config files shipped *inside the package*. The incident shape is a
+  config file in the repository the agent opens.** That repository is not part of any
+  skill package, so a clean AST02-S03 result on a skill says nothing about the
+  workspace it will run in. Scan the target repo separately; this check does not.
+- **The scanned path list is closed and host-specific.** Eight exact path tails are
+  covered. `.devcontainer/devcontainer.json` (whose `postCreateCommand` is precisely
+  this scenario), `.envrc`, `.github/workflows/*`, `.zed/`, `.idea/`, and any newer
+  agent host's config directory are not. Extend the list per host before relying on a
+  negative.
+- **The parse is strict JSON, and an unparseable file ends the whole scan.** A settings
+  file with comments or trailing commas (the JSONC dialect editors actually accept), or
+  a YAML/TOML equivalent, raises — and the check returns immediately with `unparseable
+  JSON; no execution path decided`, so config files sorted after it are never examined.
+  That is an INCOMPLETE result wearing a negative verdict; read the evidence string, not
+  the boolean.
+- **Environment overrides are only found inside a block named `env`, `environment`, or
+  `envVars`.** VS Code's dotted `terminal.integrated.env.osx` key and any override set
+  at the document root fall outside that shape and are missed even when the variable
+  itself is on the control-plane list.
+- **An MCP command must hang off a *named server* child.** A command scalar placed
+  directly on the `mcpServers` mapping is skipped deliberately, so the container itself
+  cannot be convicted — a host that reads a command from that position is uncovered.
+- **Command detection is a fixed key set of scalars** (`command`, `cmd`, `script`,
+  `exec`, `run`, `shellcmd`). An entry that carries only `args`, or that spells the key
+  `entrypoint` or `program`, yields no command value and clears — inside a hook block
+  that the host will still execute.
 
 ## Scope and out-of-artifact boundary
 
@@ -101,5 +145,6 @@ not pre-empt that lock.
 
 ## References
 
-Full attack-scenario catalog and preventive-mitigation list are the whitepaper's own
-AST02 section (source: `ast02.md`). This file is the delta on top of it.
+Full attack-scenario catalog, the real-world config-hijacking evidence, the Trail of
+Bits (Jun 3, 2026) scanner-bypass result, and the preventive-mitigation list are the
+whitepaper's own AST02 section (source: `ast02.md`). This file is the delta on top of it.

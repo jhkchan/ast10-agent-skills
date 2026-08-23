@@ -23,8 +23,8 @@
 # source that defines that signature or the unit-test corpus that exercises it.
 # The alternative — excluding the detectors' own scripts from the dogfooded
 # surface — would make the dogfooded file set diverge from the one the manifest
-# `content_hash` covers, trading five recorded exceptions for a silent blind
-# spot across the whole scripts/ tree.
+# `content_hash` covers, trading the recorded exceptions below for a silent
+# blind spot across the whole scripts/ tree.
 
 waivers:
   - skill: AST04
@@ -50,17 +50,6 @@ waivers:
       code points it detects. The smuggled characters are confined to the test
       module's fixture literals and reach no shipped prose.
 
-  - skill: AST04
-    scenario: AST08-invisible-unicode-smuggling
-    evidence_contains: "scripts/test_ast04_detector.py"
-    reason: >-
-      Same file and same fixture literals as the AST04 waiver above. AST04 and
-      AST08 share one implementation (detectors/scaffold.detect_invisible_
-      unicode_smuggling) and differ only in the scenario id they report, so the
-      same test corpus is found twice under two ids. Recorded twice on purpose:
-      one waiver silencing both ids would also silence a genuine AST08 finding
-      in this package.
-
   - skill: AST08
     scenario: AST04-invisible-unicode-smuggling
     evidence_contains: "scripts/test_ast08_detector.py"
@@ -71,8 +60,78 @@ waivers:
       detector scans every package, not only its own.
 
   - skill: AST08
-    scenario: AST08-invisible-unicode-smuggling
-    evidence_contains: "scripts/test_ast08_detector.py"
+    scenario: AST08-S02
+    evidence_contains: "scripts/test_ast08_detector.py: rule 'remote-fetch-piped-to-shell'"
     reason: >-
-      The same test corpus reported under its own category's scenario id — the
-      detector correctly finding the fixtures written to make it fire.
+      Test corpus, found by the detector it tests. AST08-S02 is the obfuscated-
+      instruction check, and its true-positive case has to contain a genuinely
+      obfuscated instruction: test_s02_true_positive_keyword_split_by_a_zero_
+      width_character embeds `curl ... | sh` with U+200B inserted inside the
+      verb, which is exactly the normalized-view-versus-raw-bytes divergence the
+      rule reports. Note that the finding fires despite the same module also
+      carrying a plainly written `curl ... | sh` in its true-negative case: the
+      rule compares match COUNTS per view, so a decoy in the clear no longer
+      masks a smuggled occurrence in the same file. Confined to the test
+      module's fixture literals; no shipped prose carries it.
+
+  - skill: AST08
+    scenario: AST04-permission-understating
+    evidence_contains: "scripts/test_ast08_detector.py:79 reaches 'drop.example'"
+    reason: >-
+      Test corpus, found by another category's detector. The AST08-S02 fixtures
+      need a destination host inside the payload they encode, and drop.example
+      is an RFC 2606 reserved name appearing only inside a bytes literal that is
+      base64-encoded at test time and handed to the detector as data. This
+      package declares network.allow: [] and makes no request of any kind; the
+      detector under test performs no I/O. Kept as a waiver rather than
+      obfuscating the host in the fixture, because a fixture edited to escape
+      another scanner is the AST08 evasion pattern turned inward.
+
+  - skill: AST05
+    scenario: AST04-yaml-injection
+    evidence_contains: "scripts/detector.py: yaml.load() with no explicit Loader"
+    reason: >-
+      Self-match on the detector's own evidence string, the same shape as the
+      AST04 waiver above. skills/AST05/scripts/detector.py reports an unsafe
+      deserializer reached by a fetched response body, and the sentence it
+      formats for that finding contains the literal "yaml.load(" that AST04's
+      _YAML_LOAD_CALL_RE matches. Confirmed by reading the file: the module
+      never imports PyYAML and never deserializes anything — it walks an
+      ast.Call tree and compares dotted callee names. Kept as a waiver rather
+      than reworded, because editing a finding's own wording purely to escape
+      another scanner is the evasion behaviour AST08 exists to flag.
+
+  - skill: AST06
+    scenario: AST04-permission-understating
+    evidence_contains: "scripts/test_ast06_detector.py"
+    reason: >-
+      Test corpus, found by another category's detector. The AST06 fixtures write a
+      sandbox-escape payload into a temporary file to exercise the escape check, and
+      that payload has to contain a destination host; c2.example is an RFC 2606
+      reserved name confined to a string literal in the test module. AST06's own
+      package declares network.allow: [] and performs no egress. Waived rather than
+      rewritten, for the same reason the AST08 entry above is.
+
+  - skill: AST10
+    scenario: AST04-permission-understating
+    evidence_contains: "scripts/test_ast10_detector.py"
+    reason: >-
+      Test corpus, found by another category's detector. AST10-S06's check decides
+      whether a package's ENCODED blobs decode to payload behaviour, so its tests must
+      hold the plaintext of such a payload in order to encode it at run time;
+      cdn.skill-pack.example is an RFC 2606 reserved name inside that plaintext
+      constant. Nothing in the package requests it: AST10's manifest declares
+      network.allow: [] and the detector performs no egress of any kind. Waived rather
+      than rewritten, for the same reason the AST08 entry above is — a detector that
+      cannot state the payload it detects cannot be tested.
+
+  - skill: AST02
+    scenario: AST04-permission-understating
+    evidence_contains: "scripts/test_ast02_detector.py"
+    reason: >-
+      Test corpus, found by another category's detector. AST02's postinstall-hook
+      fixtures have to contain a fetch-and-execute command for the check under test
+      to find, and x.example is an RFC 2606 reserved name inside a Python string
+      passed to a fixture builder. AST02's own package declares network.allow: []
+      and its detector reads lockfiles and manifests without making a request.
+      Waived rather than rewritten, for the same reason the AST08 entry above is.

@@ -3,8 +3,10 @@ name: audit-ast01
 description: >-
   Audit one candidate skill package against OWASP AST01 - Malicious Skills alone, using the
   ast01-malicious-skills skill's decision rules and the frozen per-scenario detectability
-  contract in skills/AST01/coverage-matrix.md. Runs the 2 static-detectable check(s) this
-  category implements, then reports the tiering gap the run did not close.
+  contract in skills/AST01/coverage-matrix.md. Runs the 10 static-detectable check(s) this
+  category implements — one per named AST01 scenario the registry tiers static-detectable,
+  plus two content-hash controls that cover no named scenario — then reports the tiering
+  gap the run did not close.
 nl_triggers:
   - "is this skill malicious"
   - "hidden payload in SKILL.md"
@@ -52,7 +54,15 @@ lying manifest; AST01 owns a truthful manifest over a malicious body.
 
 | Check id | Tier | Fires when |
 | --- | --- | --- |
-| `AST01-content-hash-missing` | static-detectable | the manifest declares no signed `content_hash.value`, so there is nothing to verify the shipped bytes against |
+| `AST01-social-engineering-prerequisites` | static-detectable | the package's prose instructs the reader to pipe a remote fetch into a shell, and the destination host is absent from `permissions.network.allow` |
+| `AST01-soul-md-persistence` | static-detectable | a write scope naming the agent identity file survives `deny_write`-wins evaluation, or a bundled script opens that path for write |
+| `AST01-memory-poisoning` | static-detectable | the same two predicates against the agent memory file |
+| `AST01-identity-clone-exfiltration` | static-detectable | one bundled script both reads an identity artifact and carries an outbound send; neither half alone fires |
+| `AST01-websocket-c2` | static-detectable | a bundled script opens a WebSocket-scheme URL against a host the manifest never declared |
+| `AST01-undeclared-egress` | static-detectable | a bundled script's egress call site names a hardcoded destination host absent from the declared allowlist |
+| `AST01-hidden-output-injection` | static-detectable | the package's output templates carry invisible control code points, or a base64 blob that decodes back to text |
+| `AST01-obfuscated-payload-exec` | static-detectable | an encoded blob is decoded straight into an execution sink; the payload is decoded once and reported |
+| `AST01-content-hash-missing` | static-detectable | the manifest declares no signed `content_hash`, so there is nothing to verify the shipped bytes against — an artifact signal, never coverage of a named scenario |
 | `AST01-content-hash-mismatch` | static-detectable | the declared hash disagrees with a sha256 recomputed over the package's sorted (path, content) pairs |
 | `AST01-obfuscated-payload-intent` | agent-judgable | *not implemented as code* — deciding a payload is *intentionally* malicious rather than merely unusual is a semantic reading, not a byte match |
 
@@ -108,30 +118,46 @@ CHECK:    AST01-content-hash-missing
 VERDICT:  DETECTED
 EVIDENCE: manifest.content_hash.value is unset
 TIER:     static-detectable
+COVERS:   artifact-signal-only (AST05-S01, AST07-S01) - not coverage of either
 
-CHECK:    AST01-content-hash-mismatch
+CHECK:    AST01-undeclared-egress
+VERDICT:  DETECTED
+EVIDENCE: scripts/report.py: egress call (requests.post() to host(s)
+          ['collector.attacker-drop.example'] absent from the declared allowlist []
+TIER:     static-detectable
+COVERS:   full (AST01-S10)
+
+CHECK:    AST01-websocket-c2
 VERDICT:  CLEAN
-EVIDENCE: no declared hash to compare
+EVIDENCE: no bundled script opens a WebSocket to an undeclared host
 TIER:     static-detectable
 
-CHECKS RUN:  2 detector check(s) at the static-detectable tier, 1 DETECTED
+CHECKS RUN:  10 detector check(s) at the static-detectable tier, 2 DETECTED
 REGISTRY:    11 named scenario(s): 7 static-detectable, 3 agent-judgable, 1 out-of-artifact
-UNCOVERED:   6 static-detectable scenarios with no labeled fixture:
-             AST01-S02, AST01-S05, AST01-S06, AST01-S08, AST01-S09, AST01-S11
+UNCOVERED:   0 static-detectable scenarios with no labeled fixture
 NOT DECIDED: 3 agent-judgable scenarios need a judge, not this run
 NOT DECIDED: 1 out-of-artifact scenario is not decidable from one package
-F1:          not published (pending-detector)
-             status=covered, scope=scenario-level, corpus=6 case(s)
+F1:          scenario-level 1.000 (8 labeled checks, n=16)
+             status=covered, scope=scenario-level, corpus=16 case(s)
 ```
 
 The coverage footer is not decoration. A DETECTED-free run of this command means
-"none of the 2 implemented checks fired", never "AST01 is clean".
+"none of the 10 implemented checks fired", never "AST01 is clean" — three of this
+category's eleven named scenarios need a judge and one is not decidable from any
+package at all.
 
 ## Coverage caveat
 
-Two of the three labeled fixture checks are drawn from registry scenarios the whitepaper
-files under other categories (AST08-S02, AST02-S03). Recorded, not reassigned — AST01's own
-named static-detectable surface is 6 of 7 uncovered.
+All seven of AST01's registry static-detectable scenarios now have a check and a labeled
+fixture pair. The corpus carries an eighth check for AST08-S02 (Obfuscated Instruction),
+a scenario the whitepaper files under another category but whose defining condition is a
+property of an AST01 package's own bundled script — recorded, not reassigned.
+
+The published F1 is measured over 16 hand-authored cases by the same author who wrote the
+detector, so read it as internal consistency rather than field performance. What makes it
+worth publishing is the clean half of each pair: the same command from a declared host,
+the same base64 blob never executed, the same write grant covered by the floor. A
+keyword-matching detector scores 0.5 on this corpus.
 
 ## Related
 

@@ -35,8 +35,16 @@ on:
       - 'scripts/**'
       - 'adapters/**'
       - 'cli/**'
+      - 'eval/**'
       - 'fixtures/**'
       - 'scenarios/**'
+      # docs/f1-report.md and docs/dogfood-report.md are GENERATED and
+      # committed; tests/test_generate_f1_report.py and tests/test_dogfood.py
+      # regenerate them and compare. A hand-edit to either has to be able to
+      # trigger the run that catches it, and so does an edit to README.md,
+      # whose every path, count and CLI verb tests/test_docs.py re-derives.
+      - 'docs/**'
+      - 'README.md'
       - 'schemas/**'
       - 'config/**'
       - 'tests/**'

@@ -10,16 +10,28 @@ four adjacent categories and the boundary conditions that make each preventive c
 fail; the static-detectable checks it justifies live in `scripts/` (T-3.3) and the
 frozen per-scenario tier list lives in `coverage-matrix.md` (T-3.1), not here.
 
-## Why this is not "malware scanning with extra steps"
+## The predicate shape every check here uses, and why the obvious one is unusable
 
-Traditional malicious-package detection assumes the payload is code. AST01 payloads
-split across two layers that do not share a detector: the code layer (shell/Python
-calls) and the natural-language instruction layer (markdown prose telling the agent
-to act). A skill can carry zero suspicious code and still be malicious — three lines
-of markdown were sufficient to exfiltrate SSH keys (Snyk, Feb 2026). Any detector that
-only inspects executable fragments has a built-in blind spot; the decision rule is
-that code-layer and prose-layer analysis are two independent required checks, not one
-check with two input types.
+The intuitive AST01 rule is a construct search: does this package contain a
+fetch-piped-into-a-shell install line, a WebSocket client, a write to `SOUL.md`, an
+outbound `requests.post`. Each of those convicts a large population of legitimate
+skills — installers, relay clients, memory-management tools, API integrations — so a
+scanner built that way gets switched off inside a week and stops being a control.
+
+Every check in `scripts/detector.py` is therefore a **two-part predicate: a construct,
+plus a contradiction of the package's own declaration.** `AST01-S10` is not "a bundled
+script calls out"; it is "a bundled script's hardcoded destination host is absent from
+the manifest's own `network.allow`". `AST01-S08` is not "a script reads `SOUL.md`"; it
+is "one script both reads an identity artifact *and* carries an outbound send" —
+either half alone clears. The manifest is not evidence of good behaviour in this
+design; it is the *other operand*, and the finding is the distance between two halves
+the author shipped together in one package.
+
+Two things follow that reviewers get wrong in opposite directions. A construct with a
+matching declaration is **not** a finding here, however alarming it reads. And a
+manifest that declares everything cannot be contradicted, so it silences the checks
+that depend on it — see the quiet list below before reading any negative result as
+"no payload".
 
 ## Decision rules
 
@@ -39,20 +51,29 @@ check with two input types.
    in a *later* session — that is a runtime, post-install attack that install-time
    signature/scan gates structurally cannot see. Any write from a skill to an identity
    artifact is elevated-risk by default, independent of that skill's install-time score.
-4. **Cognitive degradation is drift, not an event — do not gate only at install.** QSAF's
-   six-stage chain (trigger injection → resource starvation → behavioral drift → memory
-   entrenchment → functional override → systemic collapse) can be entered by accident
-   (verbose output, unbounded retries) or on purpose by a skill that reads clean in a
-   one-time review and degrades the host agent only after repeated invocation. Because
-   it requires runtime accumulation, it evades exactly the one-time scanning and
-   manifest review that AST08/AST04 controls rely on — a category this skill's
-   detectable tier explicitly cannot close from a single artifact inspection.
+4. **Runtime accumulation is a different measurement, not a weaker static finding — so
+   a clean static pass is not evidence about it.** Every check here decides a
+   contradiction wholly present in one snapshot. None can observe a quantity that only
+   exists across invocations: retry counts, context growth, how often a skill re-reads
+   its own memory file, whether output verbosity is climbing. For a degradation-shaped
+   complaint ("this skill was fine, and now the agent behaves differently"), the honest
+   output is not `clean` but *no in-artifact contradiction found; the claim is outside
+   this instrument's domain*. Two places carry the only durable in-reach trace: a diff
+   of the identity artifacts across sessions, and the host's own invocation telemetry.
+   Report the static result and the domain gap together, or the pass will be read as an
+   acquittal it never was.
 5. **A skill's identity-artifact read is worse than its write.** Reading `SOUL.md` /
    `MEMORY.md` / persona/config files lets an attacker clone the agent's *behavioral*
    identity (not just its credentials) for replay or impersonation elsewhere. Because
    agentic identity is contextual, not just cryptographic, a read-only permission
    request against these files still warrants the same elevated review as a write
    request.
+6. **Instruction-hierarchy enforcement has to survive skill-to-skill handoffs.** A
+   downstream model node that treats a prior skill's *output* as instruction rather
+   than as provenance-tagged untrusted data re-triggers this whole category one hop
+   later, with the malicious artifact already past install review. Certify the boundary
+   at every node that consumes another node's output, not only at the user-to-agent
+   edge.
 
 ## Distinguishing AST01 from its neighbors (the seam, not the overlap)
 
@@ -76,25 +97,49 @@ check with two input types.
   about what the malicious artifact does. A missed AST01 finding is an AST08 defect in
   the tool that should have caught it, not a second AST01 finding.
 
-## Attack-scenario notes worth the extra sentence
+## Where the shipped checks go quiet, and what each silence owes a reviewer
 
-- **Typosquatting vs. slopsquatting vs. ToxicSkills:** these three terms are not
-  synonyms. Typosquatting exploits human misreading (`clawhud` vs `clawhub`);
-  slopsquatting exploits LLM-hallucinated package names; "ToxicSkills" is Snyk's
-  research-program name for its broader agent-skill corpus, not an attack technique.
-  A detector or reviewer conflating them will mis-tag findings against the wrong
-  mitigation family.
-- **Hidden prompt injection in skill *output*, not just skill *input*:** a malicious
-  skill can embed concealed instructions in what it *returns*, so a downstream model
-  node that treats a prior skill's output as trusted instruction (rather than
-  provenance-tagged untrusted data) re-triggers the same class of attack one hop later.
-  This is why instruction-hierarchy enforcement has to survive skill-to-skill handoffs,
-  not just the user-to-agent boundary.
-- **A verified-publisher signal is only as strong as its revocation path.** Binding a
-  signature to a bare public key (not a resolvable, revocable publisher identity — key
-  id + publisher id such as a domain or `did:web` + a published verification key) means
-  a compromised signer cannot be revoked without breaking every skill that key ever
-  signed. Absence of a revocation mechanism is itself a finding, not a missing feature.
+A negative result from this package means "no in-package contradiction of this shape",
+never "clean". These are the specific silences, and none of them is recoverable by
+re-running the scan.
+
+- **An unbounded egress declaration disarms the egress family in one move.** When the
+  manifest declares `network: true`, `policy: allow-all`, or `allow: ["*"]`, there is
+  nothing left to contradict, so `AST01-S02`, `AST01-S09` and `AST01-S10` all clear
+  every host by construction. That breadth is a genuine finding — it is AST03's and
+  AST06's — and reading AST01's silence there as "no exfiltration path" is the single
+  most common misread of these results. Score the breadth first, then hand the egress
+  destinations to manual review.
+- **A package with no permissions block at all disarms the declaration half
+  everywhere.** The identity checks fall back to the bundled-script scan only, and
+  every egress check clears. Frontmatter-only skills (`network: true` and nothing more)
+  are the common real-world shape, not an edge case; treat "no manifest" as an
+  escalation trigger rather than as a missing input.
+- **`AST01-S02` distinguishes *undecided* from *clean*, and only the evidence string
+  carries it.** A command with no literal destination host gives the allowlist nothing
+  to evaluate, so the check reports negative with `undecided` in its evidence. Any
+  pipeline that consumes only the boolean loses that distinction and will report a
+  host-parameterised installer as passing.
+- **The identity checks are asymmetric on purpose, and the asymmetry is a gap.** The
+  write side is keyed to the exact, case-sensitive names `SOUL.md` and `MEMORY.md`; the
+  read side (`AST01-S08`) matches a wider family — `SOUL`, `MEMORY`, `AGENTS`,
+  `PERSONA`, `IDENTITY` across `.md`, `.json`, `.yaml`. A *write* to `PERSONA.json` or
+  `AGENTS.md` is therefore caught by no write check here (the `AGENTS.md` grant is
+  AST03's manifest check, a different instrument). Widen by hand whenever a host uses
+  non-default identity filenames.
+- **Prose and code are read by different checks with different file scopes.** The
+  install-instruction check reads markdown only, because an instruction aimed at a
+  human lives in prose; the egress, identity and WebSocket checks read script suffixes
+  only. Anything that crosses the line — a destination host named only in a README
+  while the script builds the URL at runtime, or prose instructing the agent to run a
+  bundled helper — is decided by neither and is entirely the reviewer's.
+- **The concealment check is scoped to what the skill *returns*, and decodes exactly
+  one layer.** `AST01-S11` reads fenced output/template/response blocks, template-suffix
+  files, and `templates/`|`output/` paths — concealed content elsewhere in the package
+  is AST04/AST08's carrier scan, which decides no scenario. Its base64 arm accepts a
+  blob only when one decode yields printable text; a blob that decodes to another
+  encoded layer, to gzip, or to non-UTF-8 bytes returns nothing. AST10's check is the
+  one that goes deeper — run it before concluding an opaque blob is inert.
 
 ## Scope and out-of-artifact boundary
 

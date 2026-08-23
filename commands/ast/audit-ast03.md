@@ -3,7 +3,7 @@ name: audit-ast03
 description: >-
   Audit one candidate skill package against OWASP AST03 - Over-Privileged Skills alone,
   using the ast03-over-privileged-skills skill's decision rules and the frozen per-scenario
-  detectability contract in skills/AST03/coverage-matrix.md. Runs the 2 static-detectable
+  detectability contract in skills/AST03/coverage-matrix.md. Runs the 4 static-detectable
   check(s) this category implements, then reports the tiering gap the run did not close.
 nl_triggers:
   - "is this skill over-privileged"
@@ -53,8 +53,10 @@ skill with a tight manifest that the runtime ignores is AST06, not AST03.
 
 | Check id | Tier | Fires when |
 | --- | --- | --- |
-| `AST03-unbounded-write-scope` | static-detectable | `permissions.deny_write` is unset or empty — no `deny_write` list at all means unrestricted filesystem write |
-| `AST03-shell-network-privilege-combo` | static-detectable | arbitrary shell execution *and* unrestricted outbound network are granted together, which is the exfiltration primitive |
+| `AST03-identity-file-write-grant` | static-detectable | a declared `write` entry reaches `SOUL.md`, `MEMORY.md` or `AGENTS.md` and no `deny_write` entry shadows it — the only check here that decides a named registry scenario (AST03-S03) |
+| `AST03-unbounded-write-scope` | static-detectable | no write floor is declared at all: no permissions block, or a files block with no `deny_write` key. An explicitly empty `deny_write: []` is a stated floor and does not fire |
+| `AST03-shell-network-privilege-combo` | static-detectable | shell execution *and* an unbounded egress declaration are granted together, which is the exfiltration primitive |
+| `AST03-wildcard-network-egress` | static-detectable | egress is declared as a blanket (`network: true`, `policy: allow-all`, or an allowlist entry carrying a glob) rather than an enumerated domain list |
 | `AST03-task-scope-mismatch` | agent-judgable | *not implemented as code* — deciding a permission is broader than the skill's *stated function* needs the stated function read as prose |
 
 Check ids are the detector's own, not registry scenario ids (`AST03-S01`, `AST03-S02`, …).
@@ -107,24 +109,24 @@ CATEGORY: AST03 - Over-Privileged Skills
 
 CHECK:    AST03-unbounded-write-scope
 VERDICT:  DETECTED
-EVIDENCE: permissions.deny_write is unset or empty
+EVIDENCE: permissions declares no deny_write key: no write floor survives a port
 TIER:     static-detectable
 
 CHECK:    AST03-shell-network-privilege-combo
 VERDICT:  DETECTED
-EVIDENCE: shell.allowed=True network.policy=allow-all
+EVIDENCE: shell_granted=True network_unbounded=True allowlist=['*']
 TIER:     static-detectable
 
-CHECKS RUN:  2 detector check(s) at the static-detectable tier, 2 DETECTED
+CHECKS RUN:  4 detector check(s) at the static-detectable tier, 2 DETECTED
 REGISTRY:    5 named scenario(s): 1 static-detectable, 1 agent-judgable, 3 out-of-artifact
 NOT DECIDED: 1 agent-judgable scenario needs a judge, not this run
 NOT DECIDED: 3 out-of-artifact scenarios are not decidable from one package
-F1:          not published (pending-detector)
+F1:          scenario-level 1.00 (AST03-S03, n=2); artifact-signal-only 1.00 (n=4)
              status=proxy-covered, scope=mixed-proxy, corpus=6 case(s)
 ```
 
 The coverage footer is not decoration. A DETECTED-free run of this command means
-"none of the 2 implemented checks fired", never "AST03 is clean".
+"none of the 4 implemented checks fired", never "AST03 is clean".
 
 ## Coverage caveat
 

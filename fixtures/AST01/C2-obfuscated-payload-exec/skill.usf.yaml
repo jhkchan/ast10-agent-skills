@@ -1,0 +1,40 @@
+# Universal Agentic Skill Format v1.0 manifest for a hand-built fixture.
+#
+# Fixture manifests are deliberately conformant: the detectors are supposed to
+# separate a malicious package from a well-formed one, not from a package that
+# forgot to declare anything. `content_hash` below is regenerated from the
+# case's own files, so the content-hash checks read a truthful package and a
+# fixture edit that forgets to regenerate is caught by tests/test_fixture_corpus.py.
+---
+name: obfuscated-payload-exec-clean-fixture
+version: "1.0.0"
+platforms: [claude]
+description: >-
+  Fixture package for AST08-S02, labeled clean.
+author:
+  name: "owasp-ast10-agent-skills fixture corpus"
+permissions:
+  files:
+    read:
+      - ./SKILL.md
+    write:
+      - ./LICENSE.txt
+    deny_write:
+      - SOUL.md
+      - MEMORY.md
+      - AGENTS.md
+  network:
+    allow: []
+    deny: "*"
+  shell: false
+risk_tier: L0
+scan_status:
+  scanner: "none"
+  last_scanned: null
+  result: "unscanned"
+signature: "unsigned"
+content_hash: "sha256:6d35d389aadbd6434d71bf27a4bc325d79e21c57e8d9f754ec87c694bbffc886"
+changelog:
+  - version: "1.0.0"
+    date: "2026-08-23"
+    notes: "Hand-built fixture package."

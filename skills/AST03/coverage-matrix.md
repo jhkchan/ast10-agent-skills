@@ -30,9 +30,9 @@ here (`docs/adr/0004` Amendment 2026-08-23).
 
 | Scenario | Whitepaper title | Tier | What the detector actually checks | Why this tier |
 | --- | --- | --- | --- | --- |
-| AST03-S01 | Weather Assistant Data Exfiltration | agent-judgable | — (proxy only: `detect_shell_network_privilege_combo` fires on `shell.allowed` and `network.policy == "allow-all"` together, which is breadth, not mismatch) | Both the declared read scope and the stated description are in the package, but the scenario turns on "far beyond what it needs" — a purpose-versus-scope judgement no fixed rule settles. The same read of `~/.clawdbot/.env` is legitimate for a credential-management skill. |
+| AST03-S01 | Weather Assistant Data Exfiltration | agent-judgable | — (proxy only: `detect_shell_network_privilege_combo` fires when a shell grant and an unbounded egress declaration appear together, which is breadth, not mismatch) | Both the declared read scope and the stated description are in the package, but the scenario turns on "far beyond what it needs" — a purpose-versus-scope judgement no fixed rule settles. The same read of `~/.clawdbot/.env` is legitimate for a credential-management skill. |
 | AST03-S02 | Database Admin Wipe | out-of-artifact | — | The defining event is a runtime trick: an injected instruction arriving in input the package does not contain, acted on by a host runtime that evaluates permissions at the tool-call level. Neither the payload nor the runtime is in the package. |
-| AST03-S03 | Identity File Backdoors | static-detectable | partially — `detect_unbounded_write_scope` fires only when `permissions.deny_write` is absent or empty; it does not check identity-file paths | The request is the artifact: a declared write permission naming `SOUL.md`, `MEMORY.md` or `AGENTS.md`, or the absence of the USF `deny_write` entries for them, is a pure structural check on the manifest. |
+| AST03-S03 | Identity File Backdoors | static-detectable | `detect_identity_file_write_grant` — fires when a declared `write` entry reaches `SOUL.md`, `MEMORY.md` or `AGENTS.md` (by name, by a glob matching it at the package root, or by a root-recursive grant such as `./**`) and no `deny_write` entry shadows it, applying USF's most-specific-wins precedence. A scoped recursive grant like `/secrets/**` does not reach them and does not fire. | The request is the artifact: a declared write permission naming `SOUL.md`, `MEMORY.md` or `AGENTS.md`, or the absence of the USF `deny_write` entries for them, is a pure structural check on the manifest. |
 | AST03-S04 | Logic-layer Injection of Privileged Actions (LPCI) | out-of-artifact | — | The payload arrives at runtime in input the package never holds, and the escalation depends on the host runtime's permission-evaluation granularity. LAAF validates this by executing against a live runtime, which is precisely what a package snapshot cannot substitute for. |
 | AST03-S05 | Low-Privilege Skill Invokes a High-Privilege Skill | out-of-artifact | — | The scenario spans two packages plus the host's inter-skill trust configuration. Nothing in either package alone shows the delegation edge or whether the host verifies the original caller. |
 
@@ -65,76 +65,90 @@ implement them under a proxy label and never as coverage:
 
 ## Coverage debt
 
-### The one static-detectable scenario is only partially implemented
+### What was closed, and what the closure does not buy
 
-AST03-S03's defining condition has two halves, and `detect_unbounded_write_scope`
-implements neither of them directly. It fires when `permissions.deny_write` is absent or
-empty and passes otherwise, reporting `deny_write covers N path(s)`. It never inspects
-which paths those are, and it never inspects `permissions.files.write`. Both of the
-scenario's own shapes therefore slip past it:
+Three defects this file previously recorded are fixed. They are named here rather than
+deleted, because a coverage matrix that only ever describes the present state cannot be
+audited against its own history.
 
-- a manifest declaring `write: ["SOUL.md"]` — the scenario's literal wording, "a skill
-  requesting write access to SOUL.md and MEMORY.md" — is not read at all;
-- a manifest whose `deny_write` is non-empty but omits the identity files, e.g.
-  `deny_write: ["/etc/**"]`, passes on a length check while leaving `SOUL.md` writable.
+1. **AST03-S03 had no implementing check.** `detect_unbounded_write_scope` was the only
+   write-side check and it never read a path — it fired on `deny_write` being absent or
+   empty and passed otherwise, so both of the scenario's shapes slipped past it: a
+   manifest declaring `write: ["SOUL.md"]` was not read at all, and a manifest whose
+   `deny_write` was non-empty but omitted the identity files passed on a length check
+   while leaving `SOUL.md` writable. `detect_identity_file_write_grant` now decides both.
+2. **Every check read a field vocabulary the USF schema does not define.** The module
+   documented its shape as `permissions.deny_write`, `permissions.shell.allowed` and
+   `permissions.network.policy`, none of which appears in `schemas/usf-v1.schema.json`.
+   The consequence was concrete: run against this repository's own AST03 manifest — which
+   denies writes to `SOUL.md`, `MEMORY.md` and `AGENTS.md` — `AST03-unbounded-write-scope`
+   reported `detected=True`. Permission reads now go through
+   `detectors/scaffold.py`'s accessors, which understand the USF spelling, the flattened
+   spelling `scripts/dogfood.py::translate_permissions` produces, and the bare-boolean
+   frontmatter shorthand. `test_identity_write_grant_is_clear_on_this_repositorys_own_ast03_manifest`
+   pins the regression.
+3. **The fixture corpus was not wired to the detector.** Nothing loaded a fixture into a
+   detector. `detectors/fixture_loader.py` now does, reusing `cli/lib/bridge.py`'s
+   candidate-package reader rather than adding a third translator.
 
-What the check does decide is a broader, weaker property: no write floor was declared at
-all. That is worth keeping, and it is not AST03-S03.
+What the closure does not buy: AST03-S03's scenario-level number rests on **two** cases,
+which is below the six-case floor and is stated as under-powered wherever it is published.
 
-### The detector reads fields the USF v1 schema does not define
+### A fixture pair did not encode its scenario, and was rewritten
 
-`skills/AST03/scripts/detector.py` documents its own package shape as
-`manifest.permissions.deny_write`, `manifest.permissions.shell.allowed` and
-`manifest.permissions.network.policy`. `schemas/usf-v1.schema.json` — the schema
-`docs/adr/0004` says detectors anchor on — defines `permissions.files.deny_write`,
-`permissions.shell` as a **boolean**, and `permissions.network.allow` as a domain list
-with an optional `deny`. There is no `permissions.deny_write`, no `shell.allowed` and no
-`network.policy` anywhere in the schema.
+`fixtures/manifest.yaml` labeled the `AST03-V1`/`AST03-C2` pair `covers: full` against
+AST03-S03 on the strength of being "generalised … from identity files to a sensitive-path
+list": it varied `allow_write: ["/secrets/**"]` against `["./workdir/**"]` and never
+mentioned `SOUL.md`, `MEMORY.md` or `AGENTS.md`. A production-secrets write is a real
+over-privilege finding and it is not Identity File Backdoors, so the pair measured
+something other than the scenario it was counted against. Both files were rewritten to
+request an identity-file write and the directories renamed to
+`fixtures/AST03/{V1,C2}-identity-file-write-grant`. The **claim** was wrong, not the tier;
+the correction is recorded in the manifest's own `reason` field so it cannot read as a
+silent retune.
 
-The consequence is not cosmetic. Run the detector over this repository's own AST03
-manifest — a package that explicitly denies writes to `SOUL.md`, `MEMORY.md` and
-`AGENTS.md`:
+The other two pairs were rewritten from ad-hoc frontmatter keys (`shell_exec`,
+`network_allow`) onto the USF permission block, which is what made them readable by any
+detector at all.
 
-```
-python3 -c "
-import sys, yaml; sys.path.insert(0,'.')
-from skills.AST03.scripts import detector as d
-m = yaml.safe_load(open('skills/AST03/skill.usf.yaml').read().split('---\n',1)[1])
-print(*d.run_all({'manifest': m, 'files': {}}), sep='\n')"
-```
+### The signal-symmetry ruling, applied here
 
-`AST03-unbounded-write-scope` reports `detected=True`, evidence
-`permissions.deny_write is unset or empty`, against a manifest that declares three
-deny_write entries. Every conforming USF manifest is a false positive, and
-`AST03-shell-network-privilege-combo` can never fire because `network.policy` is always
-`None`. A shape adapter, or a rewrite onto the schema's field paths, is a prerequisite to
-any F1 from this detector.
+`skills/AST03/scripts/detector.py` declares, per check, what it does NOT claim:
 
-### The fixture corpus is not wired to the detector
+| Check | `CHECK_COVERAGE` | Ruling |
+| --- | --- | --- |
+| `AST03-identity-file-write-grant` | `full` → `AST03-S03` | The only check in the module that claims a named scenario. Its predicate *is* the registry's stated defining condition — a declared write reaching an identity file that `deny_write` does not shadow — evaluated over the package's own manifest with nothing read from outside it. |
+| `AST03-unbounded-write-scope` | `category-precondition` | Derives from AST03's first preventive mitigation ("require skills to declare a permission manifest … reject skills without one"), not from AST03-S03. It fires only when no write floor is declared at all — no permissions block, or a files block with no `deny_write` key — and is deliberately blind to the content of a declared floor. An explicitly empty `deny_write: []` is a stated floor and does not fire; `schemas/usf-v1.schema.json` requires the key for exactly that reason. |
+| `AST03-shell-network-privilege-combo` | `artifact-signal-only` → `AST03-S01`, `AST06-S02` | Its two conjuncts are verbatim the `artifact_signal`s the registry declares on those scenarios — "unrestricted shell … alongside a narrow stated function" and "a manifest declaring `network: true` or `policy: allow-all` rather than a domain allowlist". Both halves are decidable from the package and the registry now says so (`artifact_signal_decidable`); neither decides its scenario, so the check may never be published as coverage. |
+| `AST03-wildcard-network-egress` | `artifact-signal-only` → `AST06-S02` | The same signal read alone. AST03's own mitigation asks for the shape it tests ("adopt network allowlists scoped to specific domains, not a binary `network: true/false`"), and the registry tiers AST06-S02 out-of-artifact because the pivot depends on the host's sandbox and co-located services. Precondition, never scenario. |
+| `AST03-task-scope-mismatch` | *declared `agent-judgable`; no function ships* | The module's fifth declared id, and the only one with no code behind it. It is the AST03-S01 row of the tiering table above: deciding that a permission is broader than the skill's *stated function* means reading the stated function as prose. It is in `SCENARIO_TIERS` so the judge harness and `/ast:audit-ast03`'s coverage footer can report it as not decided by this run, and it is absent from `DETECTORS` and from `STATIC_DETECTABLE`, so it never enters an F1 denominator. |
 
-`fixtures/AST03/` cases carry their signal in SKILL.md frontmatter keys — `allow_write`,
-`shell_exec`, `network_allow` — which match neither the detector's package shape nor the
-USF schema. Nothing in the repository loads a fixture file into a detector; the corpus and
-the detector were built against different shapes and have never met. `published_f1` for
-this category reads `pending-detector` for that reason.
+`F1_SCOPE` for this module is therefore **`mixed-proxy`**, and `f1_report` returns that
+label beside any number it computes. The point of the ruling is that the same predicate
+gets the same answer in `scenarios/registry.yaml` and here — a signal is not
+package-decidable when that lets a detector claim coverage and out-of-artifact when it
+would oblige someone to build one. `tests/test_tier_doctrine_symmetry.py` fails if the two
+files diverge.
 
-### Two of the three labeled fixture pairs are proxies
+### Two of the three labeled fixture pairs are still proxies
 
 `fixtures/manifest.yaml` records this category as `status: proxy-covered`,
 `f1_scope: mixed-proxy`:
 
 | Fixture check | Cases | Registry parent | Parent tier | `covers` | What the pair actually varies |
 | --- | --- | --- | --- | --- | --- |
-| `AST03-S1` Production-secrets write scope | `V1` / `C2` | AST03-S03 Identity File Backdoors | static-detectable | full | `allow_write: ["/secrets/**"]` vs `["./workdir/**"]` |
-| `AST03-S2` Undeclared shell-exec permission | `V3` / `C4` | AST03-S01 Weather Assistant Data Exfiltration | agent-judgable | artifact-signal-only | `shell_exec: unrestricted` vs `none`, description held fixed at "formats markdown tables" |
-| `AST03-S3` Wildcard network egress | `V5` / `C6` | AST06-S02 Network Pivot | out-of-artifact | artifact-signal-only | `network_allow: ["*"]` vs `["api.example.com"]` |
+| `AST03-S1` Identity-file write grant | `V1` / `C2` | AST03-S03 Identity File Backdoors | static-detectable | full | `write: ["SOUL.md","MEMORY.md", …]` with a `deny_write` that omits them, against a non-identity write with all three pinned in `deny_write` |
+| `AST03-S2` Unrestricted shell grant alongside unbounded egress | `V3` / `C4` | AST03-S01 Weather Assistant Data Exfiltration | agent-judgable | artifact-signal-only | `shell: true` + `network.allow: ["*"]` against `shell: false` + an enumerated single-host allowlist, description held fixed at "formats markdown tables" |
+| `AST03-S3` Wildcard network egress | `V5` / `C6` | AST06-S02 Network Pivot | out-of-artifact | artifact-signal-only | `network.allow: ["*"]` against `["api.example.com"]`, shell closed in both so the conjunctive combo check cannot fire on either |
 
 Two thirds of the corpus measures artifact signals for scenarios the registry does not
 tier static-detectable, one of them belonging to AST06. Those four cases may be reported
-only under a proxy heading. Adequacy caveat on the one `covers: full` pair: it varies a
-production-secrets glob, which generalises AST03-S03's structural check from identity
-files to a sensitive-path list; it does not exercise `SOUL.md`, `MEMORY.md` or
-`AGENTS.md`, the paths the scenario and the whitepaper's mitigation both name.
+only under a proxy heading.
+
+One expected cross-fire, stated rather than hidden: `AST03-wildcard-network-egress` also
+fires on `AST03-V3`, because that package genuinely declares blanket egress. It is a true
+reading of the predicate, not a false positive — each check is scored only over its own
+labeled pair, so the two never blend. No check fires on any case labeled clean.
 
 ## F1 denominator for AST03
 
@@ -152,12 +166,16 @@ measured by different instruments and are never summed:
 - **AST03-S02, S04, S05** are out-of-artifact: excluded from both, published above as
   declared-and-uncovered.
 
-**Nothing is publishable today**, for the reasons under Coverage debt: the detector reads
-field paths the USF schema does not define and reports a false positive on every
-conforming manifest, and no code path feeds a fixture into it.
+**Measured** (`python3 detectors/fixture_loader.py AST03`):
 
-**What must ship with the number when it exists.** Any AST03 F1 has to be published as
-two figures, not one:
+| Corpus check | Detector check | `covers` | TP | FP | FN | TN | F1 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `AST03-S1` | `AST03-identity-file-write-grant` | full | 1 | 0 | 0 | 1 | 1.00 |
+| `AST03-S2` | `AST03-shell-network-privilege-combo` | artifact-signal-only | 1 | 0 | 0 | 1 | 1.00 |
+| `AST03-S3` | `AST03-wildcard-network-egress` | artifact-signal-only | 1 | 0 | 0 | 1 | 1.00 |
+
+**Published as two figures, never one.** `fixtures/manifest.yaml` records
+`published_f1: "scenario-level 1.00 (AST03-S03, n=2); artifact-signal-only 1.00 (n=4)"`:
 
 1. a scenario-level F1 over AST03-S03, denominator 2 cases — below the 6-case floor, and
    therefore explicitly under-powered;
@@ -170,6 +188,11 @@ rule's "publishes no F1" clause does not apply; the discipline it imposes here i
 narrower and stricter — publish the scenario-level number over the two cases that earn
 it, and keep the proxy cases visible and separate rather than letting them inflate the
 denominator.
+
+`AST03-unbounded-write-scope` has no labeled pair at all: it is a category precondition
+with no scenario to be scored against, and every fixture in this corpus declares a write
+floor, so it fires on none of them. Its true-positive and true-negative behaviour is
+covered by unit tests in `skills/AST03/scripts/test_ast03_detector.py`, not by the corpus.
 
 ## Corpus entitlement and actual corpus
 
@@ -185,13 +208,14 @@ drawn only from the static-detectable tier.
 | **Actual fixture count under `fixtures/AST03/`** | **6** | 3 vulnerable + 3 clean, one pair per labeled check |
 | Cases bound to a `covers: full` scenario | 2 | `AST03-V1` / `AST03-C2` |
 
-AST03 is the only one of these three categories whose case count matches its entitlement
-on both readings — the count is right and the *distribution* is not. Six cases are owed to
-AST03-S03; two are bound to it, and four are spent on proxies for scenarios that can never
-enter this denominator. Closing the gap means authoring four more AST03-S03 cases
-(`SOUL.md` / `MEMORY.md` / `AGENTS.md` write requests, and non-empty `deny_write` lists
-that omit them) and moving the existing four proxy cases into a separately reported lane —
-not raising the total.
+AST03's case count matches its entitlement on both readings — the count is right and the
+*distribution* is not. Six cases are owed to AST03-S03; two are bound to it, and four are
+spent on proxies for scenarios that can never enter this denominator. Closing the gap
+means authoring four more AST03-S03 cases as their own labeled checks (a `MEMORY.md`
+grant, an `AGENTS.md` grant, a root-recursive `./**` grant, a grant fully shadowed by
+`deny_write`) and moving the existing four proxy cases into a separately reported lane —
+which under the locked formula raises the entitlement rather than redistributing within
+it, and is therefore a corpus-growth decision rather than a relabeling.
 
 ```
 ls -1d fixtures/AST03/*/ | wc -l

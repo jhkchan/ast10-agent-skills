@@ -100,12 +100,56 @@ frequently co-occur (a stripped `deny_write` field is both an AST10 porting defe
 an AST01-relevant exposure) — record both, since they are fixed by different actors
 (the porting tool vendor vs. the skill author/reviewer).
 
+9. **Silent Supply Chain Injection is the one AST10 scenario a single package decides,
+   and the decision is made on the decoded bytes, not on the source.** The whitepaper's
+   wording is precise: payloads "hidden inside encoded script blocks ... execute at agent
+   speed once imported into a new ecosystem without structural validation", and the
+   matching mitigation is to "build platform-agnostic skill scanners that evaluate the
+   content layer independently of the runtime". Two consequences follow, and reviewers get
+   both wrong in opposite directions. **Encoding is not the finding.** An embedded icon, a
+   configuration blob, a compressed policy document, and the format's own hex
+   `content_hash` and `signature` fields are all encoded, and flagging them makes a
+   scanner unusable on precisely the conformant packages the Universal Skill Format exists
+   to produce. **Nor is an unreadable payload a clean one.** When a blob is encrypted or
+   triple-wrapped, the decoded content says nothing — but a package that hands an opaque
+   literal to an interpreter has skipped the structural validation the scenario names, and
+   that structure is itself the finding. Judge the decoded content layer where you can read
+   it, and the decode-to-execution path where you cannot.
+
+## Where the one shipped check goes quiet
+
+`detect_encoded_payload_injection` fires on two structural conditions and nothing else:
+**C1**, an encoded blob whose decoded text matches a payload-behaviour signature, and
+**C2**, an encoded literal whose decoded result reaches an execution sink on the same
+line or through a single assignment. Both arms have edges a reviewer inherits.
+
+- **C1 convicts decoded *behaviour*, so a payload the signature set does not describe
+  decodes and reads as inert.** The set covers interpreter invocation, destructive
+  filesystem operations, credential harvesting, identity-file writes, fetch-and-execute,
+  exfiltration, reverse shells and dynamic-execution sinks. A payload expressed outside
+  that vocabulary passes C1 and is caught only if it also satisfies C2.
+- **C2 follows the decode to a sink across at most one assignment.** Two hops — decode,
+  store on an object attribute, execute later — breaks the link, and the package reads
+  clean on both arms.
+- **The USF integrity-field exclusion is keyed on the line's text, and only for bare
+  hex.** Any hex run sharing a line with `content_hash`, `signature`, `digest`,
+  `checksum`, `etag`, `uuid` and the rest of that list is skipped regardless of which
+  field it actually belongs to; base64 candidates are never excluded this way. The
+  exclusion is what makes the scanner usable on conformant packages, and it is also a
+  named place to hide a hex blob.
+- **The decode is bounded: depth 2, 256 KiB per blob, 400 candidates per file.** Past any
+  of those, content is unexamined rather than examined-and-cleared. A deeply nested or
+  blob-dense package needs a manual pass, not a re-run.
+
 ## Scope and out-of-artifact boundary
 
 Cross-Registry Arbitrage and Multi-Platform Campaign require observing a skill (or its
 install-count history) across *multiple registries at once* — no single skill artifact
-carries another registry's state. Whether these are checkable at all, and at what
-tier, is fixed in `coverage-matrix.md`; this file does not assert a tier for them.
+carries another registry's state. Security Property Loss in Translation needs two
+manifests plus the target schema, and Manifest Stripping and Implicit Privilege Escalation
+need the pre-port copy and the target platform's defaults respectively. The tier for each,
+and the evidence that would decide it, is fixed in `coverage-matrix.md`; this file does not
+assert a tier for them.
 
 ## References
 

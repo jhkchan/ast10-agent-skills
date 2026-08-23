@@ -2,13 +2,13 @@
 artifact: coverage-matrix
 category: AST04
 category_name: Insecure Metadata
-version: "1.0"
+version: "1.1"
 created: 2026-08-23
 task: T-3.1b
 tier_authority: scenarios/registry.yaml
 corpus_authority: fixtures/manifest.yaml
 detector: skills/AST04/scripts/detector.py
-tier_lock_hash: "16a47c857a31fd6ac2bc7e441933b1232023f3b964727100cf3d8c8e9c9283ba"
+tier_lock_hash: "59f45799d2b1b4522f230694615b3d283d91c6c436373f14f7fa5be025b808f0"
 registry_scenarios: 7
 static_detectable: 5
 agent_judgable: 1
@@ -27,45 +27,61 @@ answer is "nothing".
 **Authority chain.** `scenarios/registry.yaml` is authoritative on tier; this file
 reproduces its tiering and may not diverge from it. `fixtures/manifest.yaml` is
 authoritative on which fixture cases exist and what they are labeled against. The
-`SCENARIO_TIERS` dict inside `skills/AST04/scripts/detector.py` is an interim
-declaration by its own docstring ("superseded by … T-3.1's authored
-`skills/AST04/coverage-matrix.md` once locked") — where it disagrees with this file,
-this file wins and the module is the thing that must be reconciled. The delta is
-recorded in [Detector checks that are not whitepaper scenarios](#detector-checks-that-are-not-whitepaper-scenarios)
-and [Reconciliation debt](#reconciliation-debt).
+`SCENARIO_TIERS` dict inside `skills/AST04/scripts/detector.py` is implementation and is
+subordinate to both.
+
+**What changed in v1.1.** Every one of AST04's five static-detectable scenarios now has
+a deterministic check and a labeled fixture pair, and the corpus is run through the
+detector by `detectors/fixture_loader.py` rather than sitting unread. Three claims this
+file previously made are therefore retired, and each is recorded below rather than
+quietly dropped: the two "**not implemented**" rows, the `tomllib`-swallows-the-finding
+gap on AST04-S07, and the "no fixture loader" publication status.
 
 ## Scenario table
 
 Legend for the detector column:
 
 - A named function means a deterministic check ships and runs for that scenario.
-- **not implemented** means the registry tiers the scenario static-detectable but no
-  check for it exists in this skill's detector. This is coverage debt, not a
-  detectability claim.
 - `—` means no deterministic check is possible from one package (agent-judgable or
   out-of-artifact); the tier column says which.
 
 | Scenario | Whitepaper title | Tier | What the detector actually checks | Reason for the tier |
 | --- | --- | --- | --- | --- |
 | `AST04-S01` | Brand Impersonation | agent-judgable | `—` | `name`, `author` and `description` all ship in the package, so the evidence is in-artifact — but deciding that `google-workspace-integration` implies a vendor relationship its author does not have is a semantic judgement against world knowledge. A deterministic rule needs the trademark and vendor-namespace corpus the whitepaper's own mitigation assumes ("enforce brand/trademark protection … in the registry UI"), and no package carries it. |
-| `AST04-S02` | Permission Understating | static-detectable | **not implemented** | Both sides of the contradiction ship together: the declared permission in the USF manifest and the egress call site in the bundled script. A declared-versus-observed cross-check decides it from package bytes alone, so it is static-detectable — but no function in this detector reads `permissions.network.allow` against fetch call sites in bundled code. `skills/AST04/SKILL.md` decision rule 4 asserts the closing check is behavioral (sandboxed runtime observation); the registry's static tier rests on the narrower, purely structural half — a call to a host absent from the declared allowlist — which is decidable at rest. |
-| `AST04-S03` | Risk Tier Spoofing | static-detectable | **not implemented** | The whitepaper's mitigation states the check outright: "cross-reference `risk_tier` declarations against the permission manifest scope". The declared tier and the scope contradicting it are two fields of the same manifest. The derivation exists in this repo — `validators/usf.py::derive_risk_tier` maps a permission set onto L0–L3 — but nothing in `skills/AST04/scripts/detector.py` imports or calls it, and no fixture pair exercises it. |
-| `AST04-S04` | YAML Code Execution | static-detectable | `detect_yaml_injection()` — scans every `.py` file in the package for `yaml.unsafe_load(`, `Loader=yaml.UnsafeLoader`, or a bare `yaml.load(` with no `SafeLoader` inside a 200-character window after the call. It does **not** scan `.yaml`/frontmatter bytes for the `!!python/object` tag. | The dangerous tag is a literal byte sequence in the frontmatter and the loader opt-in is a call site in bundled code; both are parse-time facts. The detector deliberately implements only the loader half, per `SKILL.md`'s decision rule that PyYAML has been `FullLoader`-safe since 5.1 so the loader choice is the load-bearing finding. Consequence to audit: a package that carries the `!!python/object` payload but ships no Python loader of its own is not flagged by this check. |
+| `AST04-S02` | Permission Understating | static-detectable | `detect_permission_understating()` — for every line of a bundled `.py`/`.sh`/`.js`/`.ts`/`.rb`/`.ps1` file carrying both an egress primitive (`curl`, `wget`, `requests.get`, `fetch`, `urlopen`, …) and an absolute `http(s)://` URL, extract the destination host and test it against `permissions.network.allow` default-deny and host-exact, the same rule `validators/usf.py::network_egress_allowed` applies. An allowlist containing `*` does not fire: breadth is AST03's finding, not this one. | Both sides of the contradiction ship together: the declared permission in the USF manifest and the egress call site in the bundled script. A declared-versus-observed cross-check decides it from package bytes alone. Requiring a literal host is what keeps prose and identifier names (`detect_unrestricted_network_fetch`) out of the result — the finding has to name a destination the manifest can be checked against. |
+| `AST04-S03` | Risk Tier Spoofing | static-detectable | `detect_risk_tier_spoofing()` — re-nests the declared permission block into the USF shape, calls `validators/usf.py::derive_risk_tier` for the L0–L3 floor, and fires when the declared `risk_tier` ranks strictly below it. Declaring *above* the floor is conservative and does not fire; an absent tier does not fire, because there is no self-classification to contradict. | The whitepaper's mitigation states the check outright: "cross-reference `risk_tier` declarations against the permission manifest scope". The declared tier and the scope contradicting it are two fields of the same manifest. The derivation is this repository's one ladder rather than a second one invented in the detector, so the validator and the detector cannot give different answers to the same manifest. |
+| `AST04-S04` | YAML Code Execution | static-detectable | `detect_yaml_injection()` — both halves. Raw-text scan of every shipped `.yaml`/`.yml` file, and of the *frontmatter block only* of every `.md` file, for a `!!python/…` or `!!ruby/…` construction tag; plus a scan of bundled `.py` for `yaml.unsafe_load(`, `Loader=yaml.UnsafeLoader`, or a bare `yaml.load(` with no `SafeLoader` within 200 characters. Either half firing is the finding. Nothing is ever deserialized. | The dangerous tag is a literal byte sequence in the frontmatter and the loader opt-in is a call site in bundled code; both are parse-time facts. Scanning only the frontmatter of a Markdown file, never its body, is deliberate: this repository's own `skills/AST04/SKILL.md` names `!!python/object` in prose, and documentation is not a payload. A package can ship the payload for a host loader it does not bundle, which is why the halves are OR-ed rather than AND-ed. |
 | `AST04-S05` | Staged Loader | out-of-artifact | `—` | The defining condition is that the package pulled by the referenced `requirements.txt` is malicious, and that package is resolved off-artifact at install time. The staging structure is visible; the payload is not. |
-| `AST04-S06` | JSON Prototype Pollution | static-detectable | `detect_json_injection()` — `json.loads` each `.json` file and walk the parsed tree for the key names `__proto__`, `constructor`, `prototype` at any depth. Malformed JSON is skipped. | Both halves are in the package: the polluting key in the manifest and the unsafe recursive-merge call site in bundled JavaScript. The detector implements the key half only — there is no scan of bundled `.js` for a recursive merge — so it flags the precondition the whitepaper is explicit is not sufficient on its own ("`JSON.parse` itself only creates an own property"). Partial coverage of a scenario the registry tiers fully decidable. |
-| `AST04-S07` | TOML / Config Injection | static-detectable | `detect_toml_injection()` — `tomllib.loads` each `.toml` file and flag any top-level key outside `{name, description, version, settings, permissions, metadata}`. | The overriding keys and the precedence-violating tables are literal structure in a shipped config file; a schema-plus-allowlist check over the parsed config decides it. Coverage is partial and in one specific way: the duplicate-table override named in the registry reason (a second `[permissions]` table) makes `tomllib` raise `TOMLDecodeError`, which the function swallows with `continue`, so the duplicate-table shape is skipped rather than flagged. The implemented check catches unexpected *new* top-level tables, not redefinitions of expected ones. |
+| `AST04-S06` | JSON Prototype Pollution | static-detectable | `detect_json_injection()` — `json.loads` each `.json` file and walk the parsed tree for the key names `__proto__`, `constructor`, `prototype` at any depth. An in-package recursive merge (a `for (… in …)` loop assigning `target[key] = …` in bundled `.js`/`.ts`) is reported in the evidence as corroboration, and is deliberately **not** required. Malformed JSON is skipped. | Both halves are in the package in the whitepaper's example, but the whitepaper puts the exploiting merge in "Node.js runtimes that perform the merge" — which may be the host. Requiring an in-package merge site would therefore miss the common shape: a skill that ships only the poisoned `manifest.json`. The polluting key in shipped metadata is the package-side defining condition, and it has no legitimate purpose in a skill manifest. |
+| `AST04-S07` | TOML / Config Injection | static-detectable | `detect_toml_injection()` — scan the config **text** for a redefined single-bracket `[table]` header (a `[[array_of_tables]]` legitimately repeats and does not fire), then `tomllib.loads` and flag any top-level key outside `{name, description, version, settings, permissions, metadata}`. | The overriding keys and the precedence-violating tables are literal structure in a shipped config file; a schema-plus-allowlist check over it decides them. The text scan runs *before* the parse on purpose: `tomllib` raises `TOMLDecodeError` on a redefined table, and parsing first meant the raise swallowed the very shape the scenario names. |
+
+Re-derive the ids, titles and tiers in this table from the authority at rank 2,
+so a reader can check the table rather than believe it:
+
+```
+python3 -c "import yaml; [print(s['id'], '|', s['title'], '|', s['tier']) for s in yaml.safe_load(open('scenarios/registry.yaml'))['scenarios'] if s['category']=='AST04']"
+```
 
 ## Detector checks that are not whitepaper scenarios
 
-`skills/AST04/scripts/detector.py` declares four scenario ids. Three map onto registry
+`skills/AST04/scripts/detector.py` declares six scenario ids. Five map onto registry
 scenarios; one does not.
 
-| Detector scenario id | Maps to | Basis |
-| --- | --- | --- |
-| `AST04-yaml-injection` | `AST04-S04` | Named scenario. |
-| `AST04-json-injection` | `AST04-S06` | Named scenario. |
-| `AST04-toml-injection` | `AST04-S07` | Named scenario. |
-| `AST04-invisible-unicode-smuggling` | *no named AST04 scenario* | Category precondition, not a scenario. It derives from AST04's preventive-mitigation list ("flag suspicious patterns … specifically ASCII smuggling, base64 payloads, and zero-width characters invisible to human reviewers") and from the ClawHub/Snyk `toxicskills-goof` evidence bullet. The registry files the closest *named* scenario under AST08 (`AST08-S02`, Obfuscated Instruction), and the scan logic is shared with AST08 via `detectors/scaffold.py::detect_invisible_unicode_smuggling`. It must never be counted as coverage of an AST04 scenario, and it has no fixture pair. |
+| Detector scenario id | Maps to | `CHECK_COVERAGE` | Basis |
+| --- | --- | --- | --- |
+| `AST04-permission-understating` | `AST04-S02` | `full` | Named scenario, which the registry independently tiers `static-detectable`. |
+| `AST04-risk-tier-spoofing` | `AST04-S03` | `full` | Named scenario, which the registry independently tiers `static-detectable`. |
+| `AST04-yaml-injection` | `AST04-S04` | `full` | Named scenario, which the registry independently tiers `static-detectable`. |
+| `AST04-json-injection` | `AST04-S06` | `full` | Named scenario, which the registry independently tiers `static-detectable`. |
+| `AST04-toml-injection` | `AST04-S07` | `full` | Named scenario, which the registry independently tiers `static-detectable`. |
+| `AST04-invisible-unicode-smuggling` | *no named AST04 scenario* | `category-precondition` | Category precondition, not a scenario. It derives from AST04's preventive-mitigation list ("flag suspicious patterns … specifically ASCII smuggling, base64 payloads, and zero-width characters invisible to human reviewers") and from the ClawHub/Snyk `toxicskills-goof` evidence bullet. The registry files the closest *named* scenario under AST08 (`AST08-S02`, Obfuscated Instruction), and the scan logic is shared with AST08 via `detectors/scaffold.py::detect_invisible_unicode_smuggling`. It must never be counted as coverage of an AST04 scenario, and it has no fixture pair. Because of it, the module's `F1_SCOPE` is `mixed-proxy` even though every corpus-labeled check is `covers: full`. |
+
+The two `f1_scope` fields answer different questions and are both correct: the module's
+`F1_SCOPE` is computed over every check the module ships (five `full` plus one
+`category-precondition` = `mixed-proxy`), while `fixtures/manifest.yaml`'s AST04
+`f1_scope` is computed over the checks the *corpus labels* (five `full` =
+`scenario-level`). The unicode check has no fixture pair, so it enters no published
+number.
 
 ## Declared and uncovered
 
@@ -116,30 +132,37 @@ AST04's F1 denominator — `AST04-S02`, `AST04-S03`, `AST04-S04`, `AST04-S06`,
 and never folded in; `AST04-S05` (out-of-artifact) is reported as declared-and-uncovered
 above and never appears in the corpus at all. This matches the implementation:
 `detectors/engine.py::run_category` scores only `Tier.STATIC_DETECTABLE` cases and
-returns `agent_judgable` and `declared_uncovered` as separate tuples, and
-`detectors/scaffold.py::f1_report` intersects each fixture's expected set with the
-module's `STATIC_DETECTABLE` before counting.
+returns `agent_judgable` and `declared_uncovered` as separate tuples.
 
-**What is actually measurable today.** Of those five, the fixture corpus labels three
-(`AST04-S04`, `AST04-S06`, `AST04-S07`, all at `covers: full` in
-`fixtures/manifest.yaml`). `AST04-S02` and `AST04-S03` are the declared coverage debt —
-they are in the denominator's *scope* but have neither a detector check nor a fixture
-pair, so no F1 computed today speaks to them. Any published AST04 F1 must be reported
-alongside that two-scenario gap, or it silently narrows the denominator to the three
-scenarios the corpus happens to cover.
+**What is actually measurable today: all five.** Each has a labeled vulnerable/clean
+fixture pair at `covers: full`, and each pair is scored over its own two cases by
+`detectors/fixture_loader.py::run_corpus`, which loads a fixture directory exactly the
+way `cli/lib/bridge.py` loads a candidate under audit. Per-pair scoring is deliberate: a
+check that fired on everything would take a false positive on its own clean case rather
+than disappearing into a category-wide average.
 
-**Publication status.** `fixtures/manifest.yaml` records `published_f1: pending-detector`
-for AST04, and that is accurate: no loader in this repo converts a fixture `SKILL.md`
-into the `{"manifest": …, "files": …}` mapping the detector consumes. Constructed
-directly as `{"files": {"SKILL.md": <bytes>}, "manifest": {}}`, all four AST04 checks
-return `detected=False` on all six fixtures — vulnerable and clean alike — because the
-YAML check scans `.py` files, the JSON check scans `.json` files, and the TOML check
-scans `.toml` files, while every fixture is a single `SKILL.md` carrying its payload as
-frontmatter text. AST04 therefore has a **wiring gap, not a detection result**. The
-honest report until that gap closes is `pending-detector`, not a number.
+Measured (`python3 detectors/fixture_loader.py AST04`):
 
-AST04 does publish an F1 in principle — its static-detectable tier is non-empty, so the
-never-pad rule that silences AST05 and AST09 does not apply here.
+| Corpus check | Detector check | Registry scenario | TP | FP | FN | TN | F1 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `AST04-S1` | `AST04-yaml-injection` | `AST04-S04` | 1 | 0 | 0 | 1 | 1.00 |
+| `AST04-S2` | `AST04-json-injection` | `AST04-S06` | 1 | 0 | 0 | 1 | 1.00 |
+| `AST04-S3` | `AST04-toml-injection` | `AST04-S07` | 1 | 0 | 0 | 1 | 1.00 |
+| `AST04-S4` | `AST04-permission-understating` | `AST04-S02` | 1 | 0 | 0 | 1 | 1.00 |
+| `AST04-S5` | `AST04-risk-tier-spoofing` | `AST04-S03` | 1 | 0 | 0 | 1 | 1.00 |
+
+**Publication status.** `fixtures/manifest.yaml` records
+`published_f1: "scenario-level 1.00 (n=10)"`. Read it with the caveat it deserves: ten
+cases is the gate-4 floor, not statistical power, and every case was authored by the
+same hand that wrote the check it scores. What the number does establish is the property
+whose absence blocked publication — each check separates its vulnerable case from its
+clean case, and no check fires on any clean fixture in the category. The clean cases are
+built to make that non-trivial: `C4` ships the same unsafe recursive merge as `V3`, `C8`
+makes the same `curl` calls as `V7`, and `C10` holds the same destructive shell-plus-write
+scope as `V9` and differs only in declaring it honestly.
+
+AST04 does publish an F1 — its static-detectable tier is non-empty, so the never-pad rule
+that silences AST05 and AST09 does not apply here.
 
 ## Corpus entitlement and actual count
 
@@ -148,18 +171,17 @@ never-pad rule that silences AST05 and AST09 does not apply here.
 | Registry scenarios in AST04 | 7 | `scenarios/registry.yaml` |
 | Registry static-detectable | 5 | `AST04-S02`, `S03`, `S04`, `S06`, `S07` |
 | Entitlement at full registry coverage — `max(6, 2 × 5)` | **10** | `cases_at_full_static_coverage` |
-| Labeled detectable checks in the corpus | 3 | `AST04-S1`, `AST04-S2`, `AST04-S3` in `fixtures/manifest.yaml` |
-| Declared expected cases — `max(6, 2 × 3)` | **6** | `declared_expected_cases` |
-| Fixture files actually present under `fixtures/AST04/` | **6** | 3 vulnerable + 3 clean, class-balanced |
+| Labeled detectable checks in the corpus | 5 | `AST04-S1` … `AST04-S5` in `fixtures/manifest.yaml` |
+| Declared expected cases — `max(6, 2 × 5)` | **10** | `declared_expected_cases` |
+| Fixture files actually present under `fixtures/AST04/` | **10** | 5 vulnerable + 5 clean, class-balanced |
 
-The corpus satisfies the locked gate-4 formula against what it labels (6 = max(6, 2×3))
-and is four cases short of the 10 that full coverage of the registry's static tier would
-demand. The shortfall is exactly the two unlabeled scenarios `AST04-S02` and
-`AST04-S03`, which `fixtures/manifest.yaml` lists under `uncovered_static_detectable`.
-No case was padded to reach any number: every one of the six is bound to a scenario the
-registry independently tiers static-detectable.
+The corpus satisfies the locked gate-4 formula and is at full coverage of the registry's
+static tier: `uncovered_static_detectable` is now empty. No case was padded to reach any
+number — every one of the ten is bound to a scenario the registry independently tiers
+static-detectable, and the two categories the whitepaper leaves undecidable are absent
+by tier rather than by omission.
 
-Present on disk, all six matching the manifest's declared paths:
+Present on disk, all ten matching the manifest's declared paths:
 
 ```
 fixtures/AST04/V1-yaml-frontmatter-injection/SKILL.md   vulnerable  -> AST04-S04
@@ -168,31 +190,54 @@ fixtures/AST04/V3-json-metadata-injection/SKILL.md      vulnerable  -> AST04-S06
 fixtures/AST04/C4-json-metadata-injection/SKILL.md      clean       -> AST04-S06
 fixtures/AST04/V5-toml-metadata-injection/SKILL.md      vulnerable  -> AST04-S07
 fixtures/AST04/C6-toml-metadata-injection/SKILL.md      clean       -> AST04-S07
+fixtures/AST04/V7-permission-understating/SKILL.md      vulnerable  -> AST04-S02
+fixtures/AST04/C8-permission-understating/SKILL.md      clean       -> AST04-S02
+fixtures/AST04/V9-risk-tier-spoofing/SKILL.md           vulnerable  -> AST04-S03
+fixtures/AST04/C10-risk-tier-spoofing/SKILL.md          clean       -> AST04-S03
 ```
+
+Each directory is a package, not a single file. The three pre-existing pairs carried
+their payload as a *string inside SKILL.md frontmatter* — a `frontmatter_raw:` block
+scalar holding a quoted `!!python/object` tag, a bare JSON object pasted between the
+frontmatter fences, a duplicate TOML table in the same place. None of those is a file any
+scan reads, and none would execute in any loader. They were rewritten as real packages
+(`metadata.yaml` + `scripts/loader.py`, `manifest.json` + `scripts/merge.js`,
+`config.toml`), which is a fixture-authorship correction and is recorded as such in
+`fixtures/manifest.yaml`'s per-check `reason` fields.
 
 ## Reconciliation debt
 
-Open items a reviewer should expect to see closed before AST04 publishes a number.
-Recording them here is the point of the artifact; none of them is silently absorbed.
+Open items a reviewer should expect to see closed before AST04's number is treated as
+more than a floor. Recording them here is the point of the artifact.
 
-1. **No fixture loader.** Nothing maps `fixtures/AST04/*/SKILL.md` onto the detector's
-   `pkg` shape. Until it exists, AST04's F1 is `pending-detector`.
-2. **Two static-detectable scenarios have no check.** `AST04-S02` (Permission
-   Understating) and `AST04-S03` (Risk Tier Spoofing). `AST04-S03`'s derivation already
-   exists at `validators/usf.py::derive_risk_tier` and is simply not wired in.
-3. **Two implemented checks cover their scenario partially.** `AST04-S06` matches the
-   polluting key but not the unsafe recursive merge the whitepaper says is required for
-   exploitation; `AST04-S07` cannot see the duplicate-table override because `tomllib`
-   raises before the allowlist runs.
-4. **One detector check maps to no AST04 scenario.** `AST04-invisible-unicode-smuggling`
-   is a category precondition. It must not be counted toward AST04 coverage, and it
-   currently has no fixture pair.
+1. **Ten cases is the floor, not power.** Every check is scored over exactly one
+   vulnerable and one clean case. That is enough to prove discrimination and nowhere near
+   enough to estimate a rate. Adding cases means adding labeled checks under the gate-4
+   formula, so growth has to come from new scenario coverage, not from padding.
+2. **The fixtures and the checks share an author.** The corpus cannot detect a blind spot
+   that both the check and its fixture were written around. An adversarial corpus authored
+   against the checks — not with them — is the missing instrument.
+3. **`AST04-S06` is decided on the polluting key alone.** The merge site is reported when
+   the package ships one, and a package that ships neither key nor merge is indistinguishable
+   from one whose host performs the merge safely. This is argued in the scenario table
+   rather than treated as settled.
+4. **`AST04-S02` needs a literal destination.** An egress call site whose URL is assembled
+   at runtime (`base + path`) carries no host for the manifest to be checked against and is
+   not flagged. Constant-folding a bounded expression would extend the check; it is not
+   implemented.
+5. **One detector check maps to no AST04 scenario.** `AST04-invisible-unicode-smuggling`
+   is a category precondition, must not be counted toward AST04 coverage, and has no
+   fixture pair.
 
 ## Change control
 
 The tiering above is bound to `tier_lock_hash`
-`16a47c857a31fd6ac2bc7e441933b1232023f3b964727100cf3d8c8e9c9283ba`
-(`validators/tier_lock.py`). Moving any AST04 scenario between tiers invalidates every
-fixture case labeled under the old tier, changes the hash, and requires the category's
-corpus to be re-labeled and its judge run repeated before an F1 may be republished
-(ADR-0004, S-011).
+`59f45799d2b1b4522f230694615b3d283d91c6c436373f14f7fa5be025b808f0`
+(`validators/tier_lock.py`). It was recomputed when `AST04-S4` and `AST04-S5` were added
+to the corpus: the lock hashes this category's whole `<id>:<tier>` set, so labeling two
+new checks moves it even though no existing scenario changed tier. The registry-side lock
+`registry_tier_lock` is unchanged, because `scenarios/registry.yaml` did not change.
+
+Moving any AST04 scenario between tiers invalidates every fixture case labeled under the
+old tier, changes the hash again, and requires the category's corpus to be re-labeled and
+its judge run repeated before an F1 may be republished (ADR-0004, S-011).

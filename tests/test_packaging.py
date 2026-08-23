@@ -143,6 +143,32 @@ def test_marketplace_description_carries_the_non_endorsement_disclaimer(marketpl
     assert "endorsement" in description
 
 
+def test_marketplace_display_name_itself_marks_the_independence(marketplace):
+    """The NAME, not only the description, has to carry the disclaimer.
+
+    A plugin picker renders the display name and routinely truncates or drops
+    the description, so at the one moment that matters — the click that
+    installs — "OWASP Agentic Skills Top 10 …" unqualified reads as an
+    OWASP-published artifact. That is the AST04 brand-impersonation shape this
+    repository exists to flag, committed by the repository itself.
+    """
+    name = marketplace["name"]
+    assert "OWASP" in name, "the name may name the standard it implements"
+    assert name.lower().startswith("unofficial"), (
+        f"marketplace.json's display name must lead with its independence, got {name!r}"
+    )
+
+
+def test_marketplace_is_a_flat_skill_index_not_a_plugin_bundle(marketplace):
+    """docs/architecture.md and README.md both describe it this way; if it ever
+    grows a plugin/bundle/commands declaration, those pages become wrong."""
+    for invented in ("plugins", "commands", "bundles", "hooks", "mcpServers"):
+        assert invented not in marketplace, (
+            f"marketplace.json now declares {invented!r}; README.md and docs/architecture.md "
+            "describe it as a flat skill index and must be updated together"
+        )
+
+
 # --------------------------------------------------------------- eval.yml (CI)
 
 

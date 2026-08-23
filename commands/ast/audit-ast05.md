@@ -3,9 +3,9 @@ name: audit-ast05
 description: >-
   Audit one candidate skill package against OWASP AST05 - Untrusted External Instructions
   alone, using the ast05-untrusted-external-instructions skill's decision rules and the
-  frozen per-scenario detectability contract in skills/AST05/coverage-matrix.md. Runs the 2
-  static-detectable check(s) this category implements, then reports the tiering gap the run
-  did not close.
+  frozen per-scenario detectability contract in skills/AST05/coverage-matrix.md. Runs the 5
+  mechanical check(s) this category implements - every one of them an artifact signal, none
+  of them coverage of a named scenario - then reports the tiering gap the run did not close.
 nl_triggers:
   - "skill fetches a remote runbook"
   - "rug pull on a referenced document"
@@ -53,11 +53,20 @@ reads at runtime is AST05.
 
 ## Checks this command runs
 
-| Check id | Tier | Fires when |
-| --- | --- | --- |
-| `AST05-unrestricted-network-fetch` | static-detectable | `network.policy == "allow-all"` — no host the skill fetches from is out of bounds |
-| `AST05-wildcard-domain-allowlist` | static-detectable | the allow-list is nominally set but carries a wildcard entry, which is default-allow wearing a default-deny costume |
-| `AST05-injected-instruction-compliance` | agent-judgable | *not implemented as code* — deciding that fetched text was *followed as instruction* rather than *used as data* is a reading of behaviour, not of bytes |
+`Tier` is the mechanism tier (`SCENARIO_TIERS`): is the check decidable from bytes?
+`Covers` is the separate question (`CHECK_COVERAGE`): does deciding it cover a named
+whitepaper scenario? For AST05 the answer to the second is **never** — the registry tiers
+none of its six scenarios static-detectable — which is why every published number here is
+scoped `artifact-signal-only`.
+
+| Check id | Tier | Covers | Fires when |
+| --- | --- | --- | --- |
+| `AST05-fetched-content-instruction-sink` | static-detectable | artifact-signal-only | a bundled script concatenates fetched document text into an instruction string with no boundary marker between data and directive |
+| `AST05-remote-response-executed` | static-detectable | artifact-signal-only | a network response body reaches `eval`/`exec`/`compile`, a shell, or an unsafe deserializer |
+| `AST05-absent-instruction-boundary` | static-detectable | artifact-signal-only | the package's own decision rules consume upstream content without re-establishing an instruction-versus-data boundary |
+| `AST05-unrestricted-network-fetch` | static-detectable | artifact-signal-only | `network.policy == "allow-all"`, `network: true`, or a network block bounding no host set — no host the skill fetches from is out of bounds |
+| `AST05-wildcard-domain-allowlist` | static-detectable | artifact-signal-only | the allow-list is nominally set but carries a wildcard or bare-TLD entry, which is default-allow wearing a default-deny costume |
+| `AST05-injected-instruction-compliance` | agent-judgable | — | *not implemented as code* — deciding that fetched text was *followed as instruction* rather than *used as data* is a reading of behaviour, not of bytes |
 
 Check ids are the detector's own, not registry scenario ids (`AST05-S01`, `AST05-S02`, …).
 Which registry scenario each check maps to — and how honestly it measures that scenario,
@@ -107,33 +116,51 @@ EOF
 PACKAGE:  ./invoice-helper
 CATEGORY: AST05 - Untrusted External Instructions
 
+CHECK:    AST05-fetched-content-instruction-sink
+VERDICT:  DETECTED
+EVIDENCE: scripts/setup.py:41 concatenates a fetched body into an instruction string
+TIER:     static-detectable   COVERS: artifact-signal-only
+
+CHECK:    AST05-remote-response-executed
+VERDICT:  CLEAN
+EVIDENCE: no network response body reaches an executable sink
+TIER:     static-detectable   COVERS: artifact-signal-only
+
+CHECK:    AST05-absent-instruction-boundary
+VERDICT:  CLEAN
+EVIDENCE: prose re-establishes the data/instruction boundary before use
+TIER:     static-detectable   COVERS: artifact-signal-only
+
 CHECK:    AST05-unrestricted-network-fetch
 VERDICT:  DETECTED
 EVIDENCE: network.policy=allow-all
-TIER:     static-detectable
+TIER:     static-detectable   COVERS: artifact-signal-only
 
 CHECK:    AST05-wildcard-domain-allowlist
 VERDICT:  CLEAN
 EVIDENCE: not in allow-list mode
-TIER:     static-detectable
+TIER:     static-detectable   COVERS: artifact-signal-only
 
-CHECKS RUN:  2 detector check(s) at the static-detectable tier, 1 DETECTED
+CHECKS RUN:  5 detector check(s), 2 DETECTED — 0 of them covering a named scenario
 REGISTRY:    6 named scenario(s): 0 static-detectable, 1 agent-judgable, 5 out-of-artifact
 NOT DECIDED: 1 agent-judgable scenario needs a judge, not this run
 NOT DECIDED: 5 out-of-artifact scenarios are not decidable from one package
-F1:          not published (pending-detector)
+F1:          artifact-signal-only 1.00 (n=6) — NOT scenario coverage; see the caveat below
              status=proxy-covered, scope=artifact-signal-only, corpus=6 case(s)
 ```
 
 The coverage footer is not decoration. A DETECTED-free run of this command means
-"none of the 2 implemented checks fired", never "AST05 is clean".
+"none of the 5 implemented checks fired", never "AST05 is clean".
 
 ## Coverage caveat
 
 The sharpest reconciliation finding in the repo. The registry tiers NONE of AST05's six
 named scenarios static-detectable, so every case in this corpus measures an artifact signal,
-never a named scenario. Any F1 published here must be labeled `artifact-signal-only` or it
-overclaims.
+never a named scenario. The F1 this category publishes is therefore labeled
+`artifact-signal-only 1.00 (n=6)` and is **not** comparable with a `scenario-level` number
+from another category; quoting it as AST05 coverage is the overclaim the label exists to
+block. `tests/test_coverage_matrix.py` fails if `published_f1` here ever says
+`scenario-level`.
 
 ## Related
 

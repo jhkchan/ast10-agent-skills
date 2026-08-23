@@ -19,12 +19,21 @@ the defect.
 | Whitepaper body | OWASP Agentic Skills Top 10, §8 "AST07 - Update Drift", pp. 37–39; the three Attack Scenarios sub-headings are on p. 38 |
 | Detector | `skills/AST07/scripts/detector.py` |
 | Corpus labelling | `fixtures/manifest.yaml`, category `AST07` (`tier_lock_hash: d57441e6771d6e62845b3cec9efbea906b6e4b09bd309d0723d06225323b84c7`) |
-| Fixture files on disk | `fixtures/AST07/` |
+| Fixture files on disk | none — `fixtures/AST07/` was deleted (see [Corpus entitlement](#corpus-entitlement-versus-what-is-on-disk)) |
 | Sizing and never-pad rules | `features/owasp-ast10-agent-skills/spec.md` gate-4, S-003, S-007 |
 
 AST07 is one of the two categories where the whitepaper's table of contents and its body
 agree on the scenario count: three, in both. Nothing was recovered or lost in extraction
 here (contrast AST08, where the body names one scenario the TOC omits).
+
+**Authority chain.** The whitepaper's own "Attack Scenarios" body for AST07 outranks
+everything here on the enumeration itself — how many scenarios exist, and their titles
+verbatim. `scenarios/registry.yaml` is authoritative on tier; this file reproduces its
+tiering and may not diverge from it. This file is authoritative on the F1 denominator,
+the corpus accounting and the coverage debt. `fixtures/manifest.yaml` is authoritative on
+which fixture cases exist and what they are labeled against. The `SCENARIO_TIERS` dict
+inside `skills/AST07/scripts/detector.py` is implementation and is subordinate to all of
+them.
 
 ## Scenario table
 
@@ -36,7 +45,7 @@ Legend for the detector column:
 
 | Scenario id | Whitepaper title | Tier | What the detector actually checks | Written reason for the tier |
 | --- | --- | --- | --- | --- |
-| `AST07-S01` | Malicious Update | `out-of-artifact` | — | "Update" is a relation between two versions and "compromised account" is registry-side state. A single package cannot show that it differs maliciously from a predecessor it does not contain. |
+| `AST07-S01` | Malicious Update | `out-of-artifact` | — | "Update" is a relation between two versions and "compromised account" is registry-side state. A single package cannot show that it differs maliciously from a predecessor it does not contain. Signal-symmetry ruling: the absent pinning below IS decidable by inspecting the package alone and skills/AST01/scripts/detector.py's AST01-content-hash-missing computes it, but a hash-pinned skill can still be maliciously updated once the operator accepts the new hash, so that check is declared covers: artifact-signal-only and never coverage of this scenario. |
 | `AST07-S02` | Rollback Attack | `out-of-artifact` | — | Requires the release timeline — version ordering and prior content hashes — plus knowledge of which prior version was vulnerable. None of that is in a single artifact snapshot. |
 | `AST07-S03` | Hot-Reload Abuse | `out-of-artifact` | — | Requires runtime reload-event history from the host process and the directory's permissions on the deployed host. The package at rest is identical before and after the swap. |
 
@@ -52,7 +61,7 @@ scenario, so it is not in the same position.
 
 `detector.py` ships `DETECTORS = {}` — zero detector functions — and
 `STATIC_DETECTABLE == set()`. Calling `f1_report()` returns
-`{"status": "declared-and-uncovered", "f1": None}` (verified by running the module;
+`{"status": "declared-and-uncovered", "f1": None, "scope": "none"}` (verified by running the module;
 asserted by `skills/AST07/scripts/test_ast07_detector.py::test_s007_empty_tier_never_manufactures_an_f1`).
 
 The engine refuses to score this category by accident as well as by design: passing any
@@ -60,25 +69,37 @@ AST07 scenario into `detectors.engine.run_category` as a fixture raises
 `OutOfArtifactFixtureError` rather than silently scoring it (verified:
 `out-of-artifact scenario(s) present in fixture corpus for category 'AST07': ['AST07-S01']`).
 
-### Known defect in the detector module's own declaration
+### Resolved: the detector module's declaration is now the registry's
 
-`detector.py`'s `SCENARIO_TIERS` names only two scenarios, under local ids that are not
-registry ids:
+`detector.py`'s `SCENARIO_TIERS` used to name only two scenarios, under local ids that are
+not registry ids (`AST07-rollback-attack`, `AST07-hot-reload-abuse`), with `AST07-S01`
+Malicious Update absent entirely. **Consequence for the published F1 was none** — all three
+scenarios are out-of-artifact, so the static-detectable set is empty under either
+enumeration. **Consequence for the audit was real**: a reader checking the detector module
+alone would have concluded AST07 has two scenarios.
+
+It now reads:
 
 ```
-"AST07-rollback-attack": "out-of-artifact"
-"AST07-hot-reload-abuse": "out-of-artifact"
+"AST07-S01": "out-of-artifact",  # Malicious Update
+"AST07-S02": "out-of-artifact",  # Rollback Attack
+"AST07-S03": "out-of-artifact",  # Hot-Reload Abuse
 ```
 
-`AST07-S01` Malicious Update has no entry at all. The module predates
-`scenarios/registry.yaml` (its own docstring says so) and was written against the two
-scenarios `plan.md` happened to name. **Consequence for the published F1: none** — all
-three scenarios are out-of-artifact, so the static-detectable set is empty under either
-enumeration and the category publishes no number either way. **Consequence for the audit:
-real** — a reader checking the detector module alone would conclude AST07 has two
-scenarios. This matrix, not `SCENARIO_TIERS`, is the complete list. The fix is to re-key
-`SCENARIO_TIERS` to the three registry ids; it does not move a tier, so it does not trip
-the S-011 tier lock or require a corpus re-label.
+The re-key moved no tier, so it did not trip the S-011 tier lock or require a corpus
+re-label. `skills/AST07/scripts/test_ast07_detector.py` now asserts the table by equality
+against `scenarios/registry.yaml`'s own AST07 tiers, so the module cannot drop a scenario
+again without failing.
+
+`CHECK_COVERAGE` in the same module is `{}` and `F1_SCOPE` is `none`: no mechanical check
+ships here, so there is nothing whose coverage could be claimed.
+
+Re-derive the ids, titles and tiers in this table from the authority at rank 2,
+so a reader can check the table rather than believe it:
+
+```
+python3 -c "import yaml; [print(s['id'], '|', s['title'], '|', s['tier']) for s in yaml.safe_load(open('scenarios/registry.yaml'))['scenarios'] if s['category']=='AST07']"
+```
 
 ## Declared and uncovered
 
@@ -119,8 +140,16 @@ what lets an update land unverified."* That is an enabling precondition, not the
 A skill can be perfectly hash-pinned and still be maliciously updated once the operator
 accepts the new hash; a skill can be unpinned for years and never receive a malicious
 update. Under `scenarios/registry.yaml`'s `defining_condition_rule` an artifact signal
-"is never counted as coverage of the scenario" — see the corpus section below, where three
-of the six files sitting in `fixtures/AST07/` are exactly such signals.
+"is never counted as coverage of the scenario".
+
+The registry now says the other half out loud too, under its signal-symmetry rule:
+`artifact_signal_decidable: package-decidable`, and `artifact_signal_checks:
+[AST01-content-hash-missing]`. The absence IS one field read — nothing about the
+out-of-artifact tier ever claimed otherwise, and the tier does not become a licence to
+pretend the package shows nothing. The shipped check that reads it declares
+`covers: artifact-signal-only` in `skills/AST01/scripts/detector.py`'s `CHECK_COVERAGE`, so
+it can never be published as coverage of this scenario. Same predicate, same ruling, in
+both files.
 
 ### `AST07-S02` — Rollback Attack
 
@@ -231,7 +260,7 @@ that would decide it. A reader can check that list against the whitepaper in a m
 | Literal reading of `max(6, 2 x detectable)` | 6 | arithmetic only |
 | **Entitlement actually in force** | **0** | the never-pad rule overrides the floor when the detectable tier is empty |
 | Cases admitted to the corpus | 0 | `fixtures/manifest.yaml` `AST07.cases: []` |
-| Fixture files present under `fixtures/AST07/` | **6** | `find fixtures/AST07 -type f` |
+| Fixture files present under `fixtures/AST07/` | **0** | the directory was deleted; `find fixtures/AST07 -type f` finds nothing to walk |
 
 **The floor does not apply to an empty tier.** `max(6, 2 x 0) = 6` is arithmetically true
 and operationally wrong: the `MIN_FLOOR = 6` exists to stop a category with one or two
@@ -242,36 +271,36 @@ category with nothing to detect. The implemented rule branches on the empty tier
 — and the manifest declares `declared_expected_cases: 0`. AST07's entitlement is zero
 cases.
 
-**The six files on disk are not the corpus.** They predate the registry reconciliation and
-are unreferenced by `fixtures/manifest.yaml`, which lists `cases: []` for AST07. They are
-labeled with *local* ids that collide visually with registry ids while meaning something
-else entirely — a trap for anyone reading the fixture frontmatter without the registry
-open:
+**Resolved: the six files that used to sit on disk are deleted.** They predated the
+registry reconciliation, were unreferenced by `fixtures/manifest.yaml` (`cases: []`), and
+were labeled with *local* ids that collided visually with registry ids while meaning
+something else entirely — a trap for anyone reading the fixture frontmatter without the
+registry open:
 
-| File pair | Local id in frontmatter | What the pair actually varies | Nearest registry relation |
+| Deleted pair | Local id in frontmatter | What the pair varied | Nearest registry relation |
 | --- | --- | --- | --- |
 | `V1-missing-signed-content-hash`, `C2-missing-signed-content-hash` | `AST07-S1` | `signed_content_hash` present vs. `null` | The **artifact signal** declared on `AST07-S01`, not the scenario |
 | `V3-unpinned-update-channel`, `C4-unpinned-update-channel` | `AST07-S2` | `update_source` pinned to `@v1.4.2` vs. `@latest` | The **artifact signal** declared on `AST07-S02`, not the scenario |
-| `V5-absent-version-field`, `C6-absent-version-field` | `AST07-S3` | `version` present vs. `null` | No registry relation at all. `AST07-S03` declares `artifact_signal: null`. This pair derives from the mitigation "maintain an inventory of installed skills with version, hash, and last-verified timestamp" |
+| `V5-absent-version-field`, `C6-absent-version-field` | `AST07-S3` | `version` present vs. `null` | No registry relation at all. `AST07-S03` declares `artifact_signal: null`. The pair derived from the mitigation "maintain an inventory of installed skills with version, hash, and last-verified timestamp" |
 
-Read the collision carefully: local `AST07-S3` is "absent semantic version field" while
-registry `AST07-S03` is "Hot-Reload Abuse". They share no content. Three of the six files
-therefore proxy an enabling precondition (which the registry's `defining_condition_rule`
-forbids counting as coverage), and two of them proxy nothing named at all.
+Note the collision: local `AST07-S3` was "absent semantic version field" while registry
+`AST07-S03` is Hot-Reload Abuse. They share no content.
 
-Two options are open and both are honest; neither may be taken silently:
+**Why deletion rather than re-labeling.** Both options were open and both were honest, and
+the deciding argument is the never-pad rule read forward rather than backward. Admitting
+them as an `artifact-signal-only` corpus would have moved AST07 from
+`declared-and-uncovered` / `published_f1: null` to `proxy-covered` — a new published claim
+for the category the whitepaper is clearest about being temporal, bought with fixtures that
+decide none of its three scenarios. And the signals themselves are not lost: the
+package-decidable half of AST07-S01's signal is already implemented as a named
+artifact-signal check with its own non-coverage declaration
+(`skills/AST01/scripts/detector.py`'s `AST01-content-hash-missing`,
+`covers: artifact-signal-only`), which is where a corpus for it would have to be filed if
+one is ever authored. Leaving six labeled files on disk for a category that publishes
+nothing was the one option that served no reader.
 
-1. **Delete them**, on the grounds that a category with a zero-case entitlement should not
-   ship fixture files at all.
-2. **Keep them and re-label them** as an explicitly-named artifact-signal corpus —
-   `covers: artifact-signal-only` for the first two pairs, `covers: category-precondition`
-   with a stated `derivation` for the third — admitted to `fixtures/manifest.yaml` under a
-   scope that is *not* AST07's F1. Any check built on them measures pin discipline, which
-   is a real and useful control (`SKILL.md` decision rule 1), and must be reported under
-   that name.
-
-What is not open: admitting them as `AST07-S01`/`S02`/`S03` cases. `detectors/engine.py`
-enforces this mechanically — such a fixture raises `OutOfArtifactFixtureError`.
+What was never open: admitting them as `AST07-S01`/`S02`/`S03` cases. `detectors/engine.py`
+enforces that mechanically — such a fixture raises `OutOfArtifactFixtureError`.
 
 ## Changing a tier in this file
 

@@ -8,22 +8,25 @@ description: "Detect and triage OWASP AST07 Update Drift — skills installed wi
 Pattern: Knowledge. The decision rule this category turns on: a version string is an
 attacker-controlled claim, not a security property — "v1.0.1" looks like a patch and
 can just as easily carry a new payload, because nothing about a semver bump is
-cryptographically meaningful on its own. Mechanism (pin-vs-range detection, hash
-verification) lives in `scripts/`; frozen scenario tiers live in
-`coverage-matrix.md`.
+cryptographically meaningful on its own. `scripts/` ships **no detector** for this
+category and the section below explains why that is the finished state; frozen scenario
+tiers live in `coverage-matrix.md`.
 
 ## Why patch lag and blind auto-update are the same root cause read two ways
 
-The whitepaper frames Update Drift as amplified by two factors specific to skills:
-individual installers without enterprise patch management, and update mechanisms that
-apply upstream changes with no verification step. These sound like opposite failure
-modes (too slow to patch vs. too eager to patch) but share one root cause — the
-absence of a *verified* target version to converge on. SecurityScorecard's Feb 2026
-study found 35.4% of scanned OpenClaw deployments vulnerable to RCE at publication,
-evidence of the slow-patch failure; a compromised maintainer account pushing v2.0 with
-a payload that auto-updating agents receive silently is the fast-patch failure. Fixing
-either without the other (rate-limiting updates without adding verification, or adding
-verification without a freshness requirement) leaves the category open.
+Update Drift presents as two opposite complaints — deployments too slow to patch, and
+agents too eager to apply whatever upstream published — and teams treat them as a
+trade-off to be tuned between. They are not opposite; they are one missing thing seen
+from two sides: **there is no verified target version to converge on.** Slow-patch
+deployments have nothing authoritative to converge *to*; eager-update deployments
+converge to whatever the registry currently serves, which is the same absence with the
+sign flipped.
+
+The practical consequence is a rejection rule for proposed fixes. Rate-limiting or
+staging updates without adding a verification step just lengthens the window on the
+slow side. Adding signature verification without a freshness requirement leaves a
+verified-but-ancient artifact looking healthy forever. A remediation that moves only one
+of the two has not closed anything — check both halves before accepting one.
 
 ## Decision rules
 
@@ -73,6 +76,31 @@ verification without a freshness requirement) leaves the category open.
   update is an AST08 process gap (scanning only runs at initial install) that lets a
   newly-introduced AST07 vulnerability go undetected — the missing re-scan trigger is
   AST08's finding, not a duplicate AST07 finding.
+
+## This category ships zero detectors, and that is the result
+
+All three AST07 scenarios — Malicious Update, Rollback Attack, Hot-Reload Abuse — are
+tiered out-of-artifact, so the static-detectable tier is empty and the module ships an
+empty detector map. Two things about that are worth more than the rules above, because
+they are where honest coverage accounting is usually lost.
+
+**The tempting move is to promote a precondition into coverage, and it is precisely
+wrong.** Two preconditions *are* decidable from one package: whether a content hash is
+declared at all, and whether the pin is a hash or a mutable range. The registry records
+them as `artifact_signal` for AST07-S01 and AST07-S02, and AST01's content-hash check
+already reads the first. Filing either under an AST07 scenario id would produce a
+coverage table that looks complete and a number that measures nothing — a hash-pinned
+skill can still be maliciously updated the moment an operator accepts the new hash, and
+an unpinned one may never receive a malicious update at all. The signal is real; the
+inference from signal to scenario is not.
+
+**An empty column must publish no F1 rather than a manufactured one.** With no scenario
+in the tier there is no denominator, so this category reports `declared-and-uncovered`
+and a corpus of zero. That is a measurement refusal, and it is guarded in both
+directions by tests that pin the module's detector map to its static-detectable set and
+that set to the registry: if a tier is ever promoted, the pair fails loudly in the same
+change and a detector is owed. When you read this category's report, the empty cell is
+the finding — do not fill it.
 
 ## Scope and out-of-artifact boundary — read this before tiering
 

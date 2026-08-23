@@ -7,11 +7,22 @@
 # A category whose detectable tier is empty publishes no F1 and is reported
 # declared-and-uncovered rather than padded to manufacture a number (S-003).
 #
-# tier_lock_hash binds each category's fixture labeling to the scenario tiering it was
-# labeled against (sha256 over sorted "scenario_id:tier" pairs across BOTH the
-# detectable_scenarios and out_of_artifact_scenarios lists). If a scenario's tier is later
-# reclassified, recomputing this hash no longer matches the stored value, which flags the
-# category for re-labeling and a judge re-run before its F1 can be republished (S-011).
+# TWO TIER LOCKS (S-011). Both are checked by validators/tier_lock.py and by CI.
+#
+#   tier_lock_hash       corpus-internal. sha256 over sorted "scenario_id:tier" pairs
+#                        across BOTH the detectable_scenarios and out_of_artifact_scenarios
+#                        lists below. Catches an edit to THIS file.
+#   registry_tier_lock   corpus-to-authority. The same hash construction over
+#                        scenarios/registry.yaml's own scenarios for the category. Catches
+#                        an edit to the AUTHORITY. It was added after a tier-doctrine review
+#                        showed the CLI hashed only this file's embedded copy of the
+#                        tiering, so flipping AST01-S10's tier in the authoritative registry
+#                        left `python3 validators/tier_lock.py fixtures/manifest.yaml`
+#                        printing "OK" and exiting 0. The per-category coverage-matrix.md
+#                        files quote the same value.
+#
+# Either hash failing to recompute flags the category for re-labeling and a judge re-run
+# before its F1 can be republished.
 #
 # ---------------------------------------------------------------------------------------
 # PROVENANCE — RECONCILED AGAINST scenarios/registry.yaml (T-3.1a)
@@ -48,22 +59,68 @@
 #   * AST03 — two of three checks demoted to artifact-signal-only (the scenarios they
 #     proxy are agent-judgable and out-of-artifact respectively). status -> proxy-covered.
 #   * AST06 — one of three checks demoted to artifact-signal-only. status -> proxy-covered.
-#   * AST08 — the single labeled check maps to NO named AST08 scenario; it derives from the
-#     category's mitigations. Declared covers: category-precondition, status ->
-#     proxy-covered. All four of AST08's static-detectable named scenarios are uncovered.
+#   * AST08 — the single labeled check (AST08-S1, "no scan-attestation field") mapped to NO
+#     named AST08 scenario and its six fixtures were three byte-identical vulnerable copies
+#     and three byte-identical clean ones varying one frontmatter field that no detector
+#     read. It is REPLACED, not demoted: the corpus is re-keyed to the four scenarios the
+#     registry tiers static-detectable (AST08-S02, S04, S07, S08), each with its own
+#     vulnerable/clean pair and its own detector function, at covers: full. status
+#     proxy-covered -> covered, f1_scope category-precondition -> scenario-level,
+#     declared_expected_cases 6 -> max(6, 2 x 4) = 8. The replaced check is not preserved
+#     alongside: it labeled a precondition, not a scenario, and keeping it would have put
+#     the entitlement at 10 for one field read. See skills/AST08/coverage-matrix.md.
 #   * AST01 — the three checks map cleanly, but two of them to scenarios the registry files
 #     under OTHER categories (AST08-S02 obfuscation, AST02-S03 config-file hijacking). The
 #     link is recorded rather than reassigned; the fixtures are unchanged.
-#   * AST04 — the only category whose corpus and the registry agreed outright.
+#   * AST04 — the corpus and the registry agreed on tier outright, but the corpus covered
+#     only three of the registry's five static-detectable scenarios and its three pairs
+#     carried their payloads as SKILL.md frontmatter strings no detector reads. It is
+#     EXTENDED, not re-tiered: AST04-S4 (Permission Understating -> AST04-S02) and
+#     AST04-S5 (Risk Tier Spoofing -> AST04-S03) are added at covers: full, the three
+#     existing pairs are rewritten as real multi-file packages, and
+#     declared_expected_cases moves 6 -> max(6, 2 x 5) = 10. uncovered_static_detectable
+#     is now empty. tier_lock_hash recomputed; registry_tier_lock unchanged.
+#   * AST03 (second pass) — the AST03-S1 pair claimed covers: full over AST03-S03 Identity
+#     File Backdoors while varying a `/secrets/**` write glob that never named an identity
+#     file. The FIXTURE was wrong, not the tier: both files were rewritten to request a
+#     SOUL.md / MEMORY.md write and the directories renamed accordingly.
 #
 # CORPUS-SIZE FORMULA. Unchanged and still satisfied: declared_expected_cases =
 # max(min_floor, 2 * count(detectable_scenarios)) over the checks this corpus actually
 # labels, and every category still matches it. No detectable count changed, so no declared
 # expected size moved. What the reconciliation DID change is the visible debt: the registry
-# names 20 static-detectable scenarios across the ten categories and this corpus covers 8
-# of them at covers: full. Each category's registry_coverage block records
+# names 20 static-detectable scenarios across the ten categories and the count this corpus
+# covers at covers: full is the one the per-category blocks below add up to — it moves as
+# detectors land and is deliberately not restated as a frozen number here. Each category's
+# registry_coverage block records
 # cases_at_full_static_coverage — the corpus size the formula would demand at full registry
-# coverage — alongside its uncovered_static_detectable list. No fixture files were removed.
+# coverage — alongside its uncovered_static_detectable list.
+#
+# ---------------------------------------------------------------------------------------
+# ORPHAN-CORPUS RESOLUTION (tier-doctrine integrity review)
+# ---------------------------------------------------------------------------------------
+# fixtures/AST02/ and fixtures/AST07/ each held six labeled vulnerable/clean files that this
+# manifest declared as zero cases. Both categories have an empty labeled detectable tier and
+# publish no F1, so the corpora measured nothing and could not be reported.
+#
+# They are DELETED, and the reason is the signal-symmetry ruling recorded in
+# scenarios/registry.yaml. AST07's six encoded exactly the artifact_signals the registry
+# declares for AST07-S01 and AST07-S02 — absent signed content hash, unpinned update
+# channel — plus one pair (absent version field) that proxies nothing named at all. Those
+# signals ARE package-decidable, and that is precisely why they cannot become AST07 cases:
+# the registry's defining_condition_rule bars an artifact_signal from counting as coverage,
+# and S-003 bars a fixture bound to an out-of-artifact scenario outright. AST02's six were
+# the same shape: a typosquat pair proxying an AST01 scenario the registry tiers
+# agent-judgable, a pin-posture pair proxying AST02-S02's artifact_signal, and a
+# lockfile-hash pair mapping to no named scenario.
+#
+# Keeping them would have meant either padding two categories that publish nothing —
+# forbidden — or shipping labeled corpora that no manifest entry declares and no report can
+# cite. Where a check on those signals is genuinely worth having it already exists as a
+# named artifact-signal check with its own non-coverage declaration
+# (skills/AST01/scripts/detector.py's AST01-content-hash-missing, covers:
+# artifact-signal-only), which is where such a corpus would have to be filed if one is ever
+# authored.
 
 min_floor: 6
 formula: "max(min_floor, 2 * count(detectable_scenarios))"
@@ -73,107 +130,208 @@ registry_scenario_count: 62
 categories:
   AST01:
     name: "Malicious Skills"
-    tier_lock_hash: "41ab0facbcd32f2d5e385cd5bbcf15a40328162e8391fc717c2b7821510aa3ad"
+    # Re-keyed to scenarios/registry.yaml's canonical ids and exact whitepaper titles. The
+    # corpus previously carried three checks under a private `AST01-S1/S2/S3` namespace that
+    # no detector consumed; every labeled check is now a registry id, carries the detector
+    # function that decides it, and is scored by that function over these bytes.
+    tier_lock_hash: "b54f4c9cfae41c4e5e19215f5358d4093f7c40a06ea6d622ec11bc9f7139ae42"
+    registry_tier_lock: "3f15f67d3b0e085cc109a7247063d7d79a0a784a8bb2aefb5db1bc2284d906fb"
     status: covered
     f1_scope: scenario-level
-    published_f1: "pending-detector"
+    # Recomputed by skills/AST01/scripts/test_ast01_detector.py from this corpus on every
+    # run, so the number cannot drift from the bytes it was measured over. Read it for what
+    # it is: 16 hand-authored cases whose author also wrote the detector. It measures that
+    # each check decides its scenario's defining condition and clears a deliberately
+    # near-miss control -- not field performance against skills in the wild.
+    published_f1: "scenario-level 1.000 (8 labeled checks, n=16)"
     registry_coverage:
       registry_scenarios: 11
       registry_static_detectable: 7
       registry_agent_judgable: 3
       registry_out_of_artifact: 1
       cases_at_full_static_coverage: 14
-      labeled_detectable_checks: 3
-      declared_expected_cases: 6
-      cases_present: 6
+      labeled_detectable_checks: 8
+      declared_expected_cases: 16
+      cases_present: 16
       uncovered_static_detectable:
-        - AST01-S02
-        - AST01-S05
-        - AST01-S06
-        - AST01-S08
-        - AST01-S09
-        - AST01-S11
+        []
       note: >-
-        Two of the three labeled checks are drawn from registry scenarios the whitepaper
-        files under other categories (AST08-S02, AST02-S03). Recorded, not reassigned:
-        the fixtures measure a real static property either way, but AST01's own named
-        static-detectable surface is 6/7 uncovered.
+        All seven of AST01's registry static-detectable scenarios are now labeled and
+        implemented. The corpus carries an eighth check -- AST08-S02 Obfuscated Instruction
+        -- because the encoded-blob-into-an-execution-sink shape is a property of an AST01
+        skill package's own bundled script even though the whitepaper files the scenario
+        under AST08. Recorded, not reassigned, which is why the corpus (16 cases) exceeds
+        the 14 that AST01's own seven scenarios entitle it to.
     detectable_scenarios:
-      - id: AST01-S1
-        name: "Obfuscated malicious payload in script"
+      - id: AST01-S02
+        name: "Social Engineering Prerequisites"
         tier: static-detectable
-        registry_ids: [AST08-S02]
+        registry_ids: [AST01-S02]
         covers: full
-        reason: "A base64/hex-encoded shell payload decoded and exec'd at load or run time is a fixed byte pattern a static scanner can flag by decoding and matching against known dangerous shell primitives. Registry parent AST08-S02 (Obfuscated Instruction) is tiered static-detectable for the same reason: the encoded blob is in the package's bytes and decode-then-rescan is deterministic."
-      - id: AST01-S2
-        name: "Destructive postinstall hook"
+        detector_check: AST01-social-engineering-prerequisites
+        reason: "Both halves of the scenario are in the package's prose: an instruction to run a remote-fetch-piped-to-shell command, and the host it points at. The pair varies only the host's presence in permissions.network.allow, so a detector matching the pipe-to-shell syntax alone scores 0.5 on it."
+      - id: AST01-S05
+        name: "SOUL.md Persistence"
         tier: static-detectable
-        registry_ids: [AST02-S03]
+        registry_ids: [AST01-S05]
         covers: full
-        reason: "A declared postinstall/setup script performing destructive filesystem operations (e.g. recursive delete of $HOME) disguised as environment cleanup is a static command-pattern match against the manifest's declared lifecycle hooks. Registry parent AST02-S03 (Config-File Hijacking) covers exactly this: execution instructions in a shipped config file that trigger automatically at project open."
-      - id: AST01-S3
-        name: "Covert exfiltration endpoint"
+        detector_check: AST01-soul-md-persistence
+        reason: "A write to the agent identity file, decided from a declared write scope that survives deny_write-wins evaluation or from a bundled script opening that path for write. The clean half performs the identical append against the skill's own notes file."
+      - id: AST01-S06
+        name: "Memory Poisoning"
+        tier: static-detectable
+        registry_ids: [AST01-S06]
+        covers: full
+        detector_check: AST01-memory-poisoning
+        reason: "The same mechanism against the memory file, exercised through the declaration route: the vulnerable half grants write to MEMORY.md with the floor beneath it silent on that path, and the clean half declares the identical grant with the floor covering it, so USF's most-specific-wins rule decides the pair."
+      - id: AST01-S08
+        name: "Identity Cloning and Impersonation"
+        tier: static-detectable
+        registry_ids: [AST01-S08]
+        covers: full
+        detector_check: AST01-identity-clone-exfiltration
+        reason: "A read of an identity artifact plus the outbound send that follows it, in one bundled script. Both halves of the pair post to the same DECLARED host, so the pair isolates the conjunction and cannot be passed by an egress check."
+      - id: AST01-S09
+        name: "WebSocket Hijacking"
+        tier: static-detectable
+        registry_ids: [AST01-S09]
+        covers: full
+        detector_check: AST01-websocket-c2
+        reason: "A WebSocket-scheme client against a host absent from the declared allowlist. The clean half opens the identical channel to a declared host, so a scheme match alone scores 0.5."
+      - id: AST01-S10
+        name: "Data Exfiltration"
         tier: static-detectable
         registry_ids: [AST01-S10]
         covers: full
-        reason: "A hardcoded HTTP endpoint in a script that POSTs local file contents outside any declared network policy is detectable by diffing egress calls in source against the manifest's declared allow-list. Registry parent AST01-S10 (Data Exfiltration) is tiered static-detectable on that same code-versus-manifest diff."
+        detector_check: AST01-undeclared-egress
+        reason: "An egress destination hardcoded in a bundled script and absent from the manifest's declared allowlist -- the in-package diff between what the code does and what the manifest promises. The clean half is the same read and the same post to a declared host: only the declaration changed."
+      - id: AST01-S11
+        name: "Hidden Prompt Injection in Skill Output"
+        tier: static-detectable
+        registry_ids: [AST01-S11]
+        covers: full
+        detector_check: AST01-hidden-output-injection
+        reason: "A concealment carrier inside the content the skill returns. Scoped to output templates rather than to the package at large, which is what keeps it distinct from AST04/AST08's carrier scan; the clean half ships the same output contract with no carrier."
+      - id: AST08-S02
+        name: "Obfuscated Instruction"
+        tier: static-detectable
+        registry_ids: [AST08-S02]
+        covers: full
+        detector_check: AST01-obfuscated-payload-exec
+        reason: "An encoded blob decoded into an execution sink, with a bounded decode-then-rescan of the payload. Filed under AST08 by the whitepaper and decided here from an AST01 package's own bundled script; the link is recorded, not reassigned. The clean half decodes the identical construct and writes it to a file, so matching base64 alone scores 0.5."
     out_of_artifact_scenarios:
       []
     cases:
       - id: AST01-V1
-        scenario_id: AST01-S1
+        scenario_id: AST08-S02
         label: vulnerable
-        path: fixtures/AST01/V1-obfuscated-payload/SKILL.md
+        path: fixtures/AST01/V1-obfuscated-payload-exec/SKILL.md
       - id: AST01-C2
-        scenario_id: AST01-S1
+        scenario_id: AST08-S02
         label: clean
-        path: fixtures/AST01/C2-obfuscated-payload/SKILL.md
+        path: fixtures/AST01/C2-obfuscated-payload-exec/SKILL.md
       - id: AST01-V3
-        scenario_id: AST01-S2
+        scenario_id: AST01-S02
         label: vulnerable
-        path: fixtures/AST01/V3-destructive-postinstall/SKILL.md
+        path: fixtures/AST01/V3-social-engineering-prereq/SKILL.md
       - id: AST01-C4
-        scenario_id: AST01-S2
+        scenario_id: AST01-S02
         label: clean
-        path: fixtures/AST01/C4-destructive-postinstall/SKILL.md
+        path: fixtures/AST01/C4-social-engineering-prereq/SKILL.md
       - id: AST01-V5
-        scenario_id: AST01-S3
+        scenario_id: AST01-S05
         label: vulnerable
-        path: fixtures/AST01/V5-exfiltration-endpoint/SKILL.md
+        path: fixtures/AST01/V5-soul-md-persistence/SKILL.md
       - id: AST01-C6
-        scenario_id: AST01-S3
+        scenario_id: AST01-S05
         label: clean
-        path: fixtures/AST01/C6-exfiltration-endpoint/SKILL.md
+        path: fixtures/AST01/C6-soul-md-persistence/SKILL.md
+      - id: AST01-V7
+        scenario_id: AST01-S06
+        label: vulnerable
+        path: fixtures/AST01/V7-memory-poisoning/SKILL.md
+      - id: AST01-C8
+        scenario_id: AST01-S06
+        label: clean
+        path: fixtures/AST01/C8-memory-poisoning/SKILL.md
+      - id: AST01-V9
+        scenario_id: AST01-S08
+        label: vulnerable
+        path: fixtures/AST01/V9-identity-clone-exfiltration/SKILL.md
+      - id: AST01-C10
+        scenario_id: AST01-S08
+        label: clean
+        path: fixtures/AST01/C10-identity-clone-exfiltration/SKILL.md
+      - id: AST01-V11
+        scenario_id: AST01-S09
+        label: vulnerable
+        path: fixtures/AST01/V11-websocket-c2/SKILL.md
+      - id: AST01-C12
+        scenario_id: AST01-S09
+        label: clean
+        path: fixtures/AST01/C12-websocket-c2/SKILL.md
+      - id: AST01-V13
+        scenario_id: AST01-S10
+        label: vulnerable
+        path: fixtures/AST01/V13-undeclared-egress/SKILL.md
+      - id: AST01-C14
+        scenario_id: AST01-S10
+        label: clean
+        path: fixtures/AST01/C14-undeclared-egress/SKILL.md
+      - id: AST01-V15
+        scenario_id: AST01-S11
+        label: vulnerable
+        path: fixtures/AST01/V15-hidden-output-injection/SKILL.md
+      - id: AST01-C16
+        scenario_id: AST01-S11
+        label: clean
+        path: fixtures/AST01/C16-hidden-output-injection/SKILL.md
 
   AST02:
     name: "Supply Chain Compromise"
     # Re-keyed to scenarios/registry.yaml's canonical ids and exact whitepaper titles, and
     # expanded from one out-of-artifact declaration to all three the registry names. The
-    # earlier reconciliation to skills/AST02/scripts/detector.py's SCENARIO_TIERS still
-    # holds — the detector declares no static detectors and this corpus labels none — but
-    # the registry, not the detector, is now the source of tiering.
-    tier_lock_hash: "0bd180cfad7c8e71d4ad15b23cd1afd265298423f1a91f9292387e5f194062ec"
-    status: declared-and-uncovered
-    f1_scope: none
-    published_f1: null
+    # category's ONE static-detectable scenario (AST02-S03) is now labeled and implemented
+    # here rather than booked to AST01's corpus, which is where it previously sat: the pair
+    # that carried it varied a `postinstall` value and never exercised the project-open
+    # trigger that is the scenario's defining condition. That pair is gone; these six cases
+    # exercise the three surfaces the whitepaper names (hooks, MCP settings, environment
+    # overrides) with the trigger intact.
+    tier_lock_hash: "a5f7bcfdeb219c2a30da4e7cb492933bb33ec67390fea7117a36045e0793622c"
+    registry_tier_lock: "a5f7bcfdeb219c2a30da4e7cb492933bb33ec67390fea7117a36045e0793622c"
+    status: covered
+    f1_scope: scenario-level
+    # Recomputed from this corpus by skills/AST02/scripts/test_ast02_detector.py. Six
+    # hand-authored cases, each clean half a deliberate near-miss of its vulnerable half:
+    # the same settings file with no execution path, the same `env` block with variables
+    # that steer nothing, the same task command with no folder-open trigger.
+    published_f1: "scenario-level 1.000 (AST02-S03, n=6)"
     registry_coverage:
       registry_scenarios: 4
       registry_static_detectable: 1
       registry_agent_judgable: 0
       registry_out_of_artifact: 3
       cases_at_full_static_coverage: 6
-      labeled_detectable_checks: 0
-      declared_expected_cases: 0
-      cases_present: 0
+      labeled_detectable_checks: 1
+      declared_expected_cases: 6
+      cases_present: 6
       uncovered_static_detectable:
         []
       note: >-
-        AST02's one static-detectable scenario (AST02-S03 Config-File Hijacking) is already
-        exercised at covers: full by AST01's destructive-postinstall pair, so it is not
-        listed as uncovered. AST02 itself publishes no F1: the three scenarios it would
-        have to label are all out-of-artifact.
+        One labeled check for the category's one static-detectable scenario. The other
+        three scenarios are out-of-artifact and are published as such below rather than
+        proxied: for two of them the registry records no artifact_signal at all, and the
+        third (AST02-S02's pin posture) is a proxy the never-pad rule forbids labeling as
+        AST02 coverage. Three quarters of this category's named attack surface is still
+        not decidable from one package, and that has not changed.
     detectable_scenarios:
-      []
+      - id: AST02-S03
+        name: "Config-File Hijacking"
+        tier: static-detectable
+        registry_ids: [AST02-S03]
+        covers: full
+        detector_check: AST02-config-file-hijacking
+        reason: "A command-bearing value under a key the host auto-executes at project open, inside a config file that ships with the package. The three vulnerable cases are the three surfaces the whitepaper names -- a SessionStart hook command, an ANTHROPIC_BASE_URL override, and an editor task declared runOn: folderOpen -- and each clean case is the same file and the same command with only the auto-execution trigger removed, so a command-string grep scores 0.5 on this corpus."
     out_of_artifact_scenarios:
       - id: AST02-S01
         name: "Registry Flooding"
@@ -194,14 +352,42 @@ categories:
         covers: full
         reason: "Registry-side account-compromise detection depends on registry auth logs and session history maintained outside the artifact; a release signed with the legitimate key after a takeover is byte-indistinguishable from an honest one, so no in-artifact signal exists (scenarios/registry.yaml AST02-S04; skills/AST02/scripts/detector.py SCENARIO_TIERS agrees)."
     cases:
-      []
+      - id: AST02-V1
+        scenario_id: AST02-S03
+        label: vulnerable
+        path: fixtures/AST02/V1-hook-command-on-session-start/SKILL.md
+      - id: AST02-C2
+        scenario_id: AST02-S03
+        label: clean
+        path: fixtures/AST02/C2-hook-command-on-session-start/SKILL.md
+      - id: AST02-V3
+        scenario_id: AST02-S03
+        label: vulnerable
+        path: fixtures/AST02/V3-control-plane-env-override/SKILL.md
+      - id: AST02-C4
+        scenario_id: AST02-S03
+        label: clean
+        path: fixtures/AST02/C4-control-plane-env-override/SKILL.md
+      - id: AST02-V5
+        scenario_id: AST02-S03
+        label: vulnerable
+        path: fixtures/AST02/V5-folder-open-task/SKILL.md
+      - id: AST02-C6
+        scenario_id: AST02-S03
+        label: clean
+        path: fixtures/AST02/C6-folder-open-task/SKILL.md
 
   AST03:
     name: "Over-Privileged Skills"
     tier_lock_hash: "c7090f29a229e96da46014b3b1606a0adaed6ea01a9a32f87e7340edfc54062e"
+    registry_tier_lock: "e54b26ff23820840a724cc4ac9db658c8cadb92422b3c3eee06d05138c7ce59d"
     status: proxy-covered
     f1_scope: mixed-proxy
-    published_f1: "pending-detector"
+    # Two figures, never one. AST03's corpus mixes one covers: full pair with two
+    # proxy pairs, and averaging the six cases would report 1-of-5 named-scenario
+    # coverage as though it were category coverage. Reproduce with
+    # `python3 detectors/fixture_loader.py AST03`.
+    published_f1: "scenario-level 1.00 (AST03-S03, n=2); artifact-signal-only 1.00 (n=4)"
     registry_coverage:
       registry_scenarios: 5
       registry_static_detectable: 1
@@ -217,37 +403,48 @@ categories:
         Only one of the three labeled checks measures a named scenario (AST03-S03 Identity
         File Backdoors). The other two measure artifact_signals for an agent-judgable
         scenario (AST03-S01) and an out-of-artifact one (AST06-S02), so two thirds of this
-        category's F1 is proxy F1 and must be reported as such.
+        category's F1 is proxy F1 and must be reported as such. FIXTURE CORRECTION (detector
+        wiring): the AST03-S1 pair previously varied an `allow_write: ["/secrets/**"]` glob
+        and claimed covers: full over AST03-S03 Identity File Backdoors on the strength of
+        being "generalised ... from identity files to a sensitive-path list". It did not
+        encode the scenario — AST03-S03's defining condition names SOUL.md / MEMORY.md /
+        AGENTS.md and the pair never mentioned them — so the two files were rewritten to
+        request an identity-file write, and the directories renamed from
+        `*-prod-secrets-write-scope` to `*-identity-file-write-grant`. The claim was wrong,
+        not the tier.
     detectable_scenarios:
       - id: AST03-S1
-        name: "Production-secrets write scope"
+        name: "Identity-file write grant"
         tier: static-detectable
         registry_ids: [AST03-S03]
         covers: full
-        reason: "The manifest's allow_write policy granting a path pattern matching production secrets storage (e.g. '/secrets/**', '.env.production') is a static glob match against a known-sensitive-path list. Registry parent AST03-S03 (Identity File Backdoors) is tiered static-detectable on the identical structural check, generalised here from identity files to a sensitive-path list."
+        detector_check: AST03-identity-file-write-grant
+        reason: "A declared write permission that reaches SOUL.md, MEMORY.md or AGENTS.md and is not shadowed by deny_write is registry scenario AST03-S03's defining condition verbatim, and USF's most-specific-wins precedence makes it decidable from the manifest alone. The vulnerable case names two identity files in `write` while declaring a deny_write floor that omits them — the shape a length-only deny_write check passes; the clean case declares a non-identity write and pins all three identity files in deny_write, so the pair varies reach, not the presence of a write scope."
       - id: AST03-S2
-        name: "Undeclared shell-exec permission"
+        name: "Unrestricted shell grant alongside unbounded egress"
         tier: static-detectable
         registry_ids: [AST03-S01]
         covers: artifact-signal-only
-        reason: "Unrestricted shell-execution permission requested with no corresponding use case in the skill's declared description is a static cross-check between the permissions block and the description text. It is NOT coverage of registry scenario AST03-S01, which the registry tiers agent-judgable because 'far beyond what it needs' is a purpose-versus-scope judgement; this pair measures that scenario's declared artifact_signal only."
+        detector_check: AST03-shell-network-privilege-combo
+        reason: "An execution primitive together with an unbounded outbound channel, with the stated function ('formats markdown tables') held fixed across the pair. It is NOT coverage of registry scenario AST03-S01, which the registry tiers agent-judgable because 'far beyond what it needs' is a purpose-versus-scope judgement; this pair measures that scenario's declared artifact_signal only. Cross-fire is expected and honest: the vulnerable case also satisfies AST03-wildcard-network-egress, because it genuinely declares blanket egress. Each check is scored only over its own labeled pair (detectors/fixture_loader.py), so the two are never blended."
       - id: AST03-S3
         name: "Wildcard network egress"
         tier: static-detectable
         registry_ids: [AST06-S02]
         covers: artifact-signal-only
-        reason: "A network policy allow-list containing a wildcard host ('*') instead of an enumerated allow-list is a static structural check on the manifest field. It is NOT coverage of registry scenario AST06-S02 (Network Pivot), which the registry tiers out-of-artifact because the pivot depends on the host's sandbox and co-located services; this pair measures that scenario's declared artifact_signal only."
+        detector_check: AST03-wildcard-network-egress
+        reason: "A network allowlist containing a wildcard host ('*') instead of an enumerated host list is a static structural check on the manifest field, and AST03's own mitigation asks for exactly that shape ('adopt network allowlists scoped to specific domains, not a binary network: true/false'). It is NOT coverage of registry scenario AST06-S02 (Network Pivot), which the registry tiers out-of-artifact because the pivot depends on the host's sandbox and co-located services; this pair measures that scenario's declared artifact_signal only. Shell stays closed in both cases so the conjunctive combo check cannot fire on either."
     out_of_artifact_scenarios:
       []
     cases:
       - id: AST03-V1
         scenario_id: AST03-S1
         label: vulnerable
-        path: fixtures/AST03/V1-prod-secrets-write-scope/SKILL.md
+        path: fixtures/AST03/V1-identity-file-write-grant/SKILL.md
       - id: AST03-C2
         scenario_id: AST03-S1
         label: clean
-        path: fixtures/AST03/C2-prod-secrets-write-scope/SKILL.md
+        path: fixtures/AST03/C2-identity-file-write-grant/SKILL.md
       - id: AST03-V3
         scenario_id: AST03-S2
         label: vulnerable
@@ -267,47 +464,74 @@ categories:
 
   AST04:
     name: "Insecure Metadata"
-    tier_lock_hash: "16a47c857a31fd6ac2bc7e441933b1232023f3b964727100cf3d8c8e9c9283ba"
+    # Recomputed when AST04-S4 and AST04-S5 were labeled: the lock is a hash over
+    # this category's whole "<id>:<tier>" set, so adding two checks moves it. No
+    # existing scenario changed tier, and registry_tier_lock is untouched because
+    # scenarios/registry.yaml did not change.
+    tier_lock_hash: "59f45799d2b1b4522f230694615b3d283d91c6c436373f14f7fa5be025b808f0"
+    registry_tier_lock: "44028b8605b8b37e5a6b9c6cf63d1be908f7d85c81f6d84855913df2ec8012e0"
     status: covered
     f1_scope: scenario-level
-    published_f1: "pending-detector"
+    # Measured, not asserted. Reproduce with `python3 detectors/fixture_loader.py AST04`.
+    published_f1: "scenario-level 1.00 (n=10)"
     registry_coverage:
       registry_scenarios: 7
       registry_static_detectable: 5
       registry_agent_judgable: 1
       registry_out_of_artifact: 1
       cases_at_full_static_coverage: 10
-      labeled_detectable_checks: 3
-      declared_expected_cases: 6
-      cases_present: 6
+      labeled_detectable_checks: 5
+      declared_expected_cases: 10
+      cases_present: 10
       uncovered_static_detectable:
-        - AST04-S02
-        - AST04-S03
+        []
       note: >-
-        The only category whose corpus and the registry agreed outright: all three labeled
-        checks map one-to-one onto registry scenarios the registry independently tiers
-        static-detectable. Two named static-detectable scenarios remain unlabeled
-        (Permission Understating, Risk Tier Spoofing); labeling them would raise this
-        category's expected corpus from 6 to 10.
+        AST04 is now at full registry coverage of its static-detectable tier: all five
+        labeled checks map one-to-one onto registry scenarios the registry independently
+        tiers static-detectable, and the corpus is the 10 cases the gate-4 formula demands
+        at that coverage. The two previously unlabeled scenarios (AST04-S02 Permission
+        Understating, AST04-S03 Risk Tier Spoofing) gained a fixture pair and a detector
+        check in the same change; the three pre-existing pairs were rewritten as real
+        multi-file packages because their payloads had been carried as SKILL.md frontmatter
+        strings that no detector reads — the corpus and the detectors had never met.
+        AST04-S01 (agent-judgable) and AST04-S05 (out-of-artifact) remain outside the
+        corpus by tier, not by omission.
     detectable_scenarios:
       - id: AST04-S1
-        name: "YAML frontmatter injection"
+        name: "YAML code execution"
         tier: static-detectable
         registry_ids: [AST04-S04]
         covers: full
-        reason: "SKILL.md YAML frontmatter containing an unescaped anchor/merge or an '!!python/object' tag enabling arbitrary object construction on load is a static parse-time check distinct from JSON/TOML variants (spec.md S-005). Registry parent AST04-S04 (YAML Code Execution) is tiered static-detectable on the same literal-tag plus loader-opt-in match."
+        detector_check: AST04-yaml-injection
+        reason: "Registry parent AST04-S04 (YAML Code Execution) is tiered static-detectable on the literal-tag plus loader-opt-in match, and the pair carries both halves: the vulnerable package ships a metadata.yaml whose value is an '!!python/object/apply' tag and a scripts/loader.py that calls the legacy bare yaml.load(); the clean package ships the same two files with a plain scalar and yaml.safe_load(). FIXTURE CORRECTION: the previous pair carried its payload as a `frontmatter_raw` block scalar inside SKILL.md — a quoted string that no loader would ever construct and no detector read — so it did not encode the scenario."
       - id: AST04-S2
-        name: "JSON metadata injection"
+        name: "JSON prototype pollution"
         tier: static-detectable
         registry_ids: [AST04-S06]
         covers: full
-        reason: "A JSON-format manifest sidecar embedding a '__proto__' prototype-pollution key or an executable expression value is a static key-name/value-shape check distinct from the YAML and TOML variants (spec.md S-005). Registry parent AST04-S06 (JSON Prototype Pollution) is tiered static-detectable on the same key-plus-call-site match."
+        detector_check: AST04-json-injection
+        reason: "Registry parent AST04-S06 (JSON Prototype Pollution) is tiered static-detectable on the polluting key plus the merge call site. Both packages ship a byte-identical scripts/merge.js performing the unsafe recursive merge; only manifest.json differs, so the pair isolates the key rather than the merge — and the clean case proves a shipped recursive merge is not by itself the finding. FIXTURE CORRECTION: the previous pair embedded a bare JSON object inside SKILL.md frontmatter, which is neither valid frontmatter nor a file any JSON scan would parse."
       - id: AST04-S3
-        name: "TOML metadata injection"
+        name: "TOML config injection"
         tier: static-detectable
         registry_ids: [AST04-S07]
         covers: full
-        reason: "A TOML-format manifest sidecar redefining a trusted top-level table via a duplicate table header (e.g. a second '[permissions]' table overriding the declared one) is a static duplicate-table-key check distinct from the YAML and JSON variants (spec.md S-005). Registry parent AST04-S07 (TOML / Config Injection) is tiered static-detectable on the same unvalidated-key-override check."
+        detector_check: AST04-toml-injection
+        reason: "Registry parent AST04-S07 (TOML / Config Injection) is tiered static-detectable on unvalidated key overrides in a shipped config file. The vulnerable package's config.toml defines [permissions] twice — the precedence violation the whitepaper names — and the clean one defines each table once. FIXTURE CORRECTION: the previous pair put the duplicate table inside SKILL.md frontmatter, where tomllib never saw it; the payload is now a real config.toml."
+      - id: AST04-S4
+        name: "Permission understating"
+        tier: static-detectable
+        registry_ids: [AST04-S02]
+        covers: full
+        detector_check: AST04-permission-understating
+        reason: "Registry parent AST04-S02 (Permission Understating) is tiered static-detectable because 'both sides of the contradiction ship together: the declared permission in the manifest and the egress call site in the bundled script'. Both packages declare the same one-host allowlist and ship the same egress primitive (curl); only the destination host differs, so the pair varies the declared-versus-observed mismatch and nothing else. NEW PAIR: this scenario was listed under uncovered_static_detectable until this change."
+      - id: AST04-S5
+        name: "Risk tier spoofing"
+        tier: static-detectable
+        registry_ids: [AST04-S03]
+        covers: full
+        detector_check: AST04-risk-tier-spoofing
+        reason: "The whitepaper's own mitigation states the check — 'cross-reference risk_tier declarations against the permission manifest scope' — and validators/usf.py::derive_risk_tier is this repository's canonical derivation of that floor. The two packages carry a byte-identical shell-plus-write permission block deriving to L3; the vulnerable one self-classifies L0 and the clean one L3, so the declared tier is the only variable and 'clean' explicitly does not mean 'low privilege'. NEW PAIR: this scenario was listed under uncovered_static_detectable until this change."
     out_of_artifact_scenarios:
       []
     cases:
@@ -335,13 +559,30 @@ categories:
         scenario_id: AST04-S3
         label: clean
         path: fixtures/AST04/C6-toml-metadata-injection/SKILL.md
+      - id: AST04-V7
+        scenario_id: AST04-S4
+        label: vulnerable
+        path: fixtures/AST04/V7-permission-understating/SKILL.md
+      - id: AST04-C8
+        scenario_id: AST04-S4
+        label: clean
+        path: fixtures/AST04/C8-permission-understating/SKILL.md
+      - id: AST04-V9
+        scenario_id: AST04-S5
+        label: vulnerable
+        path: fixtures/AST04/V9-risk-tier-spoofing/SKILL.md
+      - id: AST04-C10
+        scenario_id: AST04-S5
+        label: clean
+        path: fixtures/AST04/C10-risk-tier-spoofing/SKILL.md
 
   AST05:
     name: "Untrusted External Instructions"
     tier_lock_hash: "3dc23889393d91e314c4eb3c52186cc807d00fd3c4f5ce0d9a05c03736753365"
+    registry_tier_lock: "05af9e99803682143eb1c4a9ae7f05aa0a61e37fbc7e424f632d4daa0a37925b"
     status: proxy-covered
     f1_scope: artifact-signal-only
-    published_f1: "pending-detector"
+    published_f1: "artifact-signal-only 1.00 (n=6)"
     registry_coverage:
       registry_scenarios: 6
       registry_static_detectable: 0
@@ -367,18 +608,21 @@ categories:
         tier: static-detectable
         registry_ids: [AST05-S01, AST05-S05]
         covers: artifact-signal-only
+        detector_check: AST05-fetched-content-instruction-sink
         reason: "A script that fetches remote content and appends it directly to the instruction/prompt path with no delimiter or provenance tag is a static data-flow check from a fetch call to the instruction sink. It is NOT coverage of AST05-S01 (Author Rug-Pull, out-of-artifact: the edit happens on a remote server after review) or AST05-S05 (agent-judgable); it measures the artifact_signal both scenarios declare — an unpinned external instruction reference routed into a sink with no boundary."
       - id: AST05-S2
         name: "Eval of remote response body"
         tier: static-detectable
         registry_ids: [AST05-S05]
         covers: artifact-signal-only
+        detector_check: AST05-remote-response-executed
         reason: "A script that evaluates or exec's a third-party API response body directly as code is a static call-site match on eval/exec fed by a network response. It is NOT coverage of AST05-S05, which the registry tiers agent-judgable because the malicious document arrives at runtime and judging boundary adequacy is semantic; this pair measures that scenario's declared artifact_signal — fetched content routed into an executable sink."
       - id: AST05-S3
         name: "Absent instruction-boundary marker"
         tier: static-detectable
         registry_ids: [AST05-S04, AST05-S05]
         covers: artifact-signal-only
+        detector_check: AST05-absent-instruction-boundary
         reason: "Decision-rule text with no explicit boundary marker separating trusted operator instructions from untrusted tool/web output is a static presence/absence check for a declared delimiter convention. It is NOT coverage of AST05-S04 (Relay-Node Amplification, out-of-artifact: injection resistance is the minimum over the backbone models on the chain's path) or AST05-S05; it measures the artifact_signal both declare."
     out_of_artifact_scenarios:
       []
@@ -411,9 +655,10 @@ categories:
   AST06:
     name: "Weak Isolation"
     tier_lock_hash: "d22946d405b961a25da7194c868288f384bc8035d4555112acd49a5421ae30e3"
+    registry_tier_lock: "5198a755492f24427722e037ff9f725020981919961137d6365c736c76ab015a"
     status: proxy-covered
     f1_scope: mixed-proxy
-    published_f1: "pending-detector"
+    published_f1: "scenario-level 1.00 (AST06-S01, n=4); artifact-signal-only 1.00 (n=2)"
     registry_coverage:
       registry_scenarios: 5
       registry_static_detectable: 1
@@ -437,18 +682,33 @@ categories:
         tier: static-detectable
         registry_ids: [AST06-S01]
         covers: full
+        detector_check: AST06-root-write-scope
         reason: "An empty deny_write policy or an allow_write scope including filesystem root ('/') is a static structural check on the manifest's write-policy field. Registry parent AST06-S01 (Host Escape) is tiered static-detectable on exactly this: a declared or coded write reaching host persistence locations outside the skill's own tree."
       - id: AST06-S2
-        name: "Unrestricted sudo permission"
+        name: "Privilege-escalated host persistence"
         tier: static-detectable
         registry_ids: [AST06-S01]
         covers: full
-        reason: "A shell-permission block granting unrestricted sudo/root escalation with no scoped command allow-list is a static check on the shell-permission field shape. Registry parent AST06-S01 (Host Escape) is tiered static-detectable on the same shell-exec-to-host-persistence surface."
+        detector_check: AST06-host-persistence-write
+        # RE-AUTHORED (detector-implementation pass). This pair previously carried the
+        # name "Unrestricted sudo permission" and a reason describing "a static check on
+        # the shell-permission field shape". Neither fixture contained a shell permission
+        # block, a script, or a host escape -- only a frontmatter marker string
+        # (`shell_permission: "sudo *"`), so nothing in it encoded AST06-S01 while it was
+        # labeled covers: full against it. The pair now encodes the whitepaper's Host
+        # Escape scenario directly: the vulnerable member shells out under sudo to copy a
+        # launch daemon into /Library/LaunchDaemons and register it with launchctl; the
+        # clean member needs the same privilege for `sudo apt-get --version` and writes
+        # only inside its own sandbox. The declared shell posture differs too (unbounded
+        # vs. an apt-get allow-list), which is what the previous name pointed at, but the
+        # labeled discriminator is now the persistence call site.
+        reason: "A shell-exec call site in a bundled script whose target is a host persistence location outside the skill's own tree -- a launchd daemon directory here, a cron table or systemd unit elsewhere. This is the first disjunct of registry parent AST06-S01 (Host Escape) verbatim: the whitepaper's scenario text is a malicious skill executing a shell command to plant a job that persists beyond skill uninstall."
       - id: AST06-S3
         name: "Shared unscoped credential namespace"
         tier: static-detectable
         registry_ids: [AST06-S05]
         covers: artifact-signal-only
+        detector_check: AST06-unscoped-shared-state-write
         reason: "A skill declaring no isolated credential namespace and instead reading from the global unscoped environment is a static check for a missing scoped-secrets declaration field. It is NOT coverage of AST06-S05 (Cross-Agent Workspace Contamination), which the registry tiers out-of-artifact because sharing is decided by deployment topology; this pair measures that scenario's declared artifact_signal only."
     out_of_artifact_scenarios:
       []
@@ -482,9 +742,14 @@ categories:
     name: "Update Drift"
     # Re-keyed to scenarios/registry.yaml's canonical ids and exact whitepaper titles, and
     # expanded from two out-of-artifact declarations to all three the registry names
-    # (Malicious Update was missing). Tiers agreed with both the registry and
-    # skills/AST07/scripts/detector.py's SCENARIO_TIERS; only completeness changed.
+    # (Malicious Update was missing here, and was also missing from
+    # skills/AST07/scripts/detector.py's SCENARIO_TIERS until that table was re-keyed onto
+    # the same three registry ids). Tiers agreed everywhere; only completeness changed.
+    # The two hashes below coincide because this category's entries ARE the registry's
+    # three scenarios at the registry's tiers -- they are still two locks over two files,
+    # and validators/tier_lock.py checks both.
     tier_lock_hash: "d57441e6771d6e62845b3cec9efbea906b6e4b09bd309d0723d06225323b84c7"
+    registry_tier_lock: "d57441e6771d6e62845b3cec9efbea906b6e4b09bd309d0723d06225323b84c7"
     status: declared-and-uncovered
     f1_scope: none
     published_f1: null
@@ -501,7 +766,11 @@ categories:
         []
       note: >-
         Every AST07 scenario is temporal — it compares two versions or observes a reload
-        event. No F1 is publishable for this category at any corpus size.
+        event. No F1 is publishable for this category at any corpus size. The six orphaned
+        fixture files that used to sit under fixtures/AST07/ encoded exactly the
+        artifact_signals the registry declares for AST07-S01 and AST07-S02 and were
+        deleted; see ORPHAN-CORPUS RESOLUTION in this file's header. The directory is gone,
+        not emptied.
     detectable_scenarios:
       []
     out_of_artifact_scenarios:
@@ -528,69 +797,119 @@ categories:
 
   AST08:
     name: "Poor Scanning"
-    tier_lock_hash: "3a70c4332c9d0794e248baf728cb65715f9e0b6956dab506927f8b8f7d11526b"
-    status: proxy-covered
-    f1_scope: category-precondition
-    published_f1: "pending-detector"
+    # Re-keyed from the local id AST08-S1 (a scan-attestation precondition that mapped to
+    # no named scenario, and whose six byte-identical fixtures no detector ever read) to
+    # the four scenarios scenarios/registry.yaml tiers static-detectable. Replaced rather
+    # than deleted, because unlike AST02's and AST07's orphaned corpora this category's
+    # detectable tier is NOT empty. See this file's header and
+    # skills/AST08/coverage-matrix.md for the replacement record.
+    tier_lock_hash: "08ea76d31a710007ab28c9d14480159426cd9e98c46f08950ceb22a8aa82dbd3"
+    registry_tier_lock: "af92586258aab8dc8d163a72cabd8c60ac65758b6615c5429a76e5cdf0e95daf"
+    status: covered
+    f1_scope: scenario-level
+    published_f1: "scenario-level 1.00 (4 scenario checks, n=8)"
     registry_coverage:
       registry_scenarios: 8
       registry_static_detectable: 4
       registry_agent_judgable: 2
       registry_out_of_artifact: 2
       cases_at_full_static_coverage: 8
-      labeled_detectable_checks: 1
-      declared_expected_cases: 6
-      cases_present: 6
+      labeled_detectable_checks: 4
+      declared_expected_cases: 8
+      cases_present: 8
       uncovered_static_detectable:
-        - AST08-S04
-        - AST08-S07
-        - AST08-S08
+        []
       note: >-
-        The single labeled check maps to no named AST08 scenario at all — it derives from
-        the category's preventive mitigations. Meanwhile the registry finds four
-        static-detectable named scenarios here (obfuscated instruction, context-dependent
-        malice / logic bombs, scanner host compromise, bytecode cache poisoning); one is
-        exercised from AST01's corpus and three are unlabeled. Labeling all four would
-        raise this category's expected corpus from 6 to 8.
+        All four static-detectable AST08 scenarios are now labeled and covered by a
+        detector function in skills/AST08/scripts/detector.py, so the corpus is the full
+        max(6, 2 x 4) = 8. The 1.0 is measured over eight hand-authored packages by this
+        repository's own authors and is a floor on nothing: it says the four rules
+        separate the corpus they were built against, not that they resist an adaptive
+        adversary. AST08's own mitigations require a bypass rate under white-box access
+        beside any detection rate, and none is claimed here.
     detectable_scenarios:
-      - id: AST08-S1
-        name: "No scan-attestation field"
+      - id: AST08-S02
+        name: "Obfuscated Instruction"
         tier: static-detectable
-        registry_ids: []
-        covers: category-precondition
-        derivation: >-
-          Derived from AST08's Preventive Mitigations ("Require every scan to emit a
-          machine-readable coverage record..."; "Continuously re-scan installed skills as
-          scanner models improve") and from the Universal Skill Format's scan-status field,
-          not from any of AST08's eight named attack scenarios.
-        reason: "A manifest carrying no scan-attestation or SECURITY.md reference field indicating the skill underwent any pre-publish security scan is a static required-field check; it is the one AST08 signal visible in the artifact itself that the registry does not attach to a named scenario. The registry's own static-detectable AST08 scenarios (AST08-S02, S04, S07, S08) are a different, unlabeled surface; AST08-S01 and AST08-S03 are agent-judgable and AST08-S05/S06 out-of-artifact."
+        registry_ids: [AST08-S02]
+        covers: full
+        detector_check: AST08-S02
+        reason: "The encoded blob ships in the package's bytes, so decoding candidate encodings iteratively under an explicit depth and size bound and re-running the rule set over every decoded layer and over the normalized view decides the scenario itself (scenarios/registry.yaml AST08-S02; skills/AST08/scripts/detector.py detect_obfuscated_instruction). The pair discriminates on whether a payload was HIDDEN, not on whether a carrier is present: the clean package carries a base64 PNG and an in-the-clear `curl ... | sh` and is correctly not convicted."
+      - id: AST08-S04
+        name: "Context-Dependent Malice"
+        tier: static-detectable
+        registry_ids: [AST08-S04]
+        covers: full
+        detector_check: AST08-S04
+        reason: "The logic bomb ships with the package: an environment-identity guard (hostname, username, date comparison, file-existence probe, env-var equality) wrapping a dangerous branch is a control-flow shape decided from the parse tree without executing anything (scenarios/registry.yaml AST08-S04; skills/AST08/scripts/detector.py detect_context_dependent_malice). The clean package holds both halves separately — an OS-portability branch and an unconditional subprocess call — which is what makes it the right negative."
+      - id: AST08-S07
+        name: "Scanner Host Compromise and Resource Exhaustion"
+        tier: static-detectable
+        registry_ids: [AST08-S07]
+        covers: full
+        detector_check: AST08-S07
+        reason: "Every vector the whitepaper lists is a measurable property of the files as they sit on disk — padding runs, archive nesting depth, declared compression ratio, member count, members escaping the extraction root, symlinks escaping the scan root, non-regular files — and the limits are enforced before any parsing (scenarios/registry.yaml AST08-S07; skills/AST08/scripts/detector.py detect_scanner_host_hazard). The clean package ships a real archive and a real symlink and trips nothing."
+      - id: AST08-S08
+        name: "Bytecode Cache Poisoning"
+        tier: static-detectable
+        registry_ids: [AST08-S08]
+        covers: full
+        detector_check: AST08-S08
+        reason: "Both the .pyc and the source ship in the package, so source-to-bytecode provenance is arithmetic over its contents: a sourceless .pyc, an unchecked hash-based .pyc, or a header whose recorded source hash or size contradicts the adjacent source (scenarios/registry.yaml AST08-S08; skills/AST08/scripts/detector.py detect_bytecode_cache_poisoning). The clean package ships a checked hash-based .pyc that matches its source, so the pair discriminates on provenance rather than on the presence of bytecode."
     out_of_artifact_scenarios:
-      []
+      - id: AST08-S05
+        name: "Model-Dependent Injection Resistance"
+        tier: out-of-artifact
+        registry_ids: [AST08-S05]
+        covers: full
+        reason: "Injection resistance is a behavioural property of the runtime model, not of the skill's bytes; the exploitable and non-exploitable deployments are byte-identical and every gate passes in both (scenarios/registry.yaml AST08-S05, quoting the whitepaper)."
+      - id: AST08-S06
+        name: "Scanner-Target Evasion"
+        tier: out-of-artifact
+        registry_ids: [AST08-S06]
+        covers: full
+        reason: "The defining condition is a fact about how the artifact was produced — that it was iterated offline against a specific scanner's rules and guard prompt — and no package can testify to its own authoring process (scenarios/registry.yaml AST08-S06)."
     cases:
       - id: AST08-V1
-        scenario_id: AST08-S1
+        scenario_id: AST08-S02
         label: vulnerable
-        path: fixtures/AST08/V1-no-scan-attestation/SKILL.md
+        path: fixtures/AST08/V1-obfuscated-instruction/SKILL.md
+        package: fixtures/AST08/V1-obfuscated-instruction
       - id: AST08-V2
-        scenario_id: AST08-S1
+        scenario_id: AST08-S04
         label: vulnerable
-        path: fixtures/AST08/V2-no-scan-attestation/SKILL.md
+        path: fixtures/AST08/V2-context-dependent-malice/SKILL.md
+        package: fixtures/AST08/V2-context-dependent-malice
       - id: AST08-V3
-        scenario_id: AST08-S1
+        scenario_id: AST08-S07
         label: vulnerable
-        path: fixtures/AST08/V3-no-scan-attestation/SKILL.md
-      - id: AST08-C4
-        scenario_id: AST08-S1
-        label: clean
-        path: fixtures/AST08/C4-no-scan-attestation/SKILL.md
+        path: fixtures/AST08/V3-scanner-host-hazard/SKILL.md
+        package: fixtures/AST08/V3-scanner-host-hazard
+      - id: AST08-V4
+        scenario_id: AST08-S08
+        label: vulnerable
+        path: fixtures/AST08/V4-bytecode-cache-poisoning/SKILL.md
+        package: fixtures/AST08/V4-bytecode-cache-poisoning
       - id: AST08-C5
-        scenario_id: AST08-S1
+        scenario_id: AST08-S02
         label: clean
-        path: fixtures/AST08/C5-no-scan-attestation/SKILL.md
+        path: fixtures/AST08/C5-obfuscated-instruction/SKILL.md
+        package: fixtures/AST08/C5-obfuscated-instruction
       - id: AST08-C6
-        scenario_id: AST08-S1
+        scenario_id: AST08-S04
         label: clean
-        path: fixtures/AST08/C6-no-scan-attestation/SKILL.md
+        path: fixtures/AST08/C6-context-dependent-malice/SKILL.md
+        package: fixtures/AST08/C6-context-dependent-malice
+      - id: AST08-C7
+        scenario_id: AST08-S07
+        label: clean
+        path: fixtures/AST08/C7-scanner-host-hazard/SKILL.md
+        package: fixtures/AST08/C7-scanner-host-hazard
+      - id: AST08-C8
+        scenario_id: AST08-S08
+        label: clean
+        path: fixtures/AST08/C8-bytecode-cache-poisoning/SKILL.md
+        package: fixtures/AST08/C8-bytecode-cache-poisoning
 
   AST09:
     name: "No Governance"
@@ -598,6 +917,7 @@ categories:
     # expanded from three out-of-artifact declarations to all seven the registry names.
     # Tiers agreed; only completeness changed.
     tier_lock_hash: "d00ac953cdec9d37cf5d19e389772d067080cc2859bf54de715ee3f3ab8081bc"
+    registry_tier_lock: "d00ac953cdec9d37cf5d19e389772d067080cc2859bf54de715ee3f3ab8081bc"
     status: declared-and-uncovered
     f1_scope: none
     published_f1: null
@@ -669,31 +989,48 @@ categories:
     # Re-keyed to scenarios/registry.yaml's canonical ids and exact whitepaper titles, and
     # expanded from two out-of-artifact declarations to all five the registry names. The
     # sixth scenario (AST10-S06 Silent Supply Chain Injection) is tiered static-detectable
-    # by the registry and is recorded as uncovered rather than declared out-of-artifact.
-    tier_lock_hash: "dba555f29ccb40833c5da0a5a20093477eeb7613d6fa72524079716200e05e25"
-    status: declared-and-uncovered
-    f1_scope: none
-    published_f1: null
+    # by the registry, and as of the detector work it is LABELED AND COVERED: six hand-built
+    # cases, a shipped decode-and-rescan check, and a measured F1. tier_lock_hash therefore
+    # moved (dba555f2... -> 42cb24ed...) because the entry list now carries AST10-S06 at
+    # static-detectable; it is now identical to registry_tier_lock, which is the point — the
+    # corpus mirrors the registry's tiering for this category exactly.
+    tier_lock_hash: "42cb24ed85f5305ab26a57d54aec3361fc7b74d02155254342fd221b821bd4ae"
+    registry_tier_lock: "42cb24ed85f5305ab26a57d54aec3361fc7b74d02155254342fd221b821bd4ae"
+    status: covered
+    f1_scope: scenario-level
+    published_f1: 1.0
     registry_coverage:
       registry_scenarios: 6
       registry_static_detectable: 1
       registry_agent_judgable: 0
       registry_out_of_artifact: 5
       cases_at_full_static_coverage: 6
-      labeled_detectable_checks: 0
-      declared_expected_cases: 0
-      cases_present: 0
+      labeled_detectable_checks: 1
+      declared_expected_cases: 6
+      cases_present: 6
       uncovered_static_detectable:
-        - AST10-S06
+        []
       note: >-
-        Reconciliation moved this category off "nothing here is detectable". AST10-S06
-        (Silent Supply Chain Injection) names an encoded script block — a byte pattern in
-        the package — so the registry tiers it static-detectable. It is unlabeled, so AST10
-        still publishes no F1, but it is now declared-and-uncovered with a known gap rather
-        than declared-and-undetectable. Labeling it would set this category's expected
-        corpus to 6.
+        This category's single static-detectable scenario is covered at covers: full by
+        skills/AST10/scripts/detector.py, which decodes the package's encoded blobs and
+        evaluates the DECODED content layer — the whitepaper's own AST10 mitigation ("build
+        platform-agnostic skill scanners that evaluate the content layer independently of
+        the runtime"). published_f1 is the measured value over the six labeled cases, and
+        skills/AST10/scripts/test_ast10_detector.py re-derives it from the corpus so it
+        cannot be hand-written. Read it for exactly what it is: 3/3 precision and 3/3 recall
+        on a hand-built corpus whose three CLEAN cases each carry a real encoded blob (a
+        base64 PNG, a base64 JSON config block, a gzip-under-base64 policy document, and the
+        USF hex content_hash and signature fields). It measures that the check separates
+        payload from encoding across those six packages; it is not a generalisation claim
+        about registries in the wild.
     detectable_scenarios:
-      []
+      - id: AST10-S06
+        name: "Silent Supply Chain Injection"
+        tier: static-detectable
+        registry_ids: [AST10-S06]
+        covers: full
+        detector_check: AST10-S06
+        reason: "The scenario is a payload hidden inside an encoded script block that executes once imported 'without structural validation'. The shipped check performs exactly that structural validation over the package's own bytes: it decodes base64, bare-hex, \\xNN-escape and percent-encoded blobs (plus one gzip/zlib layer beneath them and one further encoding layer) and matches the DECODED content layer against payload behaviour, and separately flags a decoded literal reaching an execution sink. It needs no second manifest, no registry state and no runtime, so it decides the scenario itself rather than a precondition for it (scenarios/registry.yaml AST10-S06)."
     out_of_artifact_scenarios:
       - id: AST10-S01
         name: "Security Property Loss in Translation"
@@ -725,5 +1062,31 @@ categories:
         registry_ids: [AST10-S05]
         covers: full
         reason: "The escalation is entirely a property of the target platform's default-permission model; the package's own declarations are unchanged and, read alone, look safe (scenarios/registry.yaml AST10-S05)."
+    # Six cases = max(min_floor 6, 2 x 1 detectable scenario), class-balanced 3/3, paired
+    # V/C by mechanism. Every CLEAN case carries a real encoded blob: the corpus is built so
+    # that "does this package contain base64" scores 0.5, not 1.0.
     cases:
-      []
+      - id: AST10-V1
+        scenario_id: AST10-S06
+        label: vulnerable
+        path: fixtures/AST10/V1-encoded-shell-payload/SKILL.md
+      - id: AST10-C2
+        scenario_id: AST10-S06
+        label: clean
+        path: fixtures/AST10/C2-encoded-shell-payload/SKILL.md
+      - id: AST10-V3
+        scenario_id: AST10-S06
+        label: vulnerable
+        path: fixtures/AST10/V3-hex-escaped-payload/SKILL.md
+      - id: AST10-C4
+        scenario_id: AST10-S06
+        label: clean
+        path: fixtures/AST10/C4-hex-escaped-payload/SKILL.md
+      - id: AST10-V5
+        scenario_id: AST10-S06
+        label: vulnerable
+        path: fixtures/AST10/V5-gzip-archive-payload/SKILL.md
+      - id: AST10-C6
+        scenario_id: AST10-S06
+        label: clean
+        path: fixtures/AST10/C6-gzip-archive-payload/SKILL.md

@@ -3,8 +3,9 @@ name: audit-ast08
 description: >-
   Audit one candidate skill package against OWASP AST08 - Poor Scanning alone, using the
   ast08-poor-scanning skill's decision rules and the frozen per-scenario detectability
-  contract in skills/AST08/coverage-matrix.md. Runs the 1 static-detectable check(s) this
-  category implements, then reports the tiering gap the run did not close.
+  contract in skills/AST08/coverage-matrix.md. Runs the 4 static-detectable check(s) this
+  category implements — one per registry scenario the whitepaper's AST08 section makes
+  decidable from a package — then reports what the run did not decide.
 nl_triggers:
   - "the scanner missed it"
   - "natural language bypass"
@@ -53,13 +54,21 @@ split one finding across both.
 
 | Check id | Tier | Fires when |
 | --- | --- | --- |
-| `AST08-invisible-unicode-smuggling` | static-detectable | zero-width, bidi-override and word-joiner code points are present in the package's files or manifest description — content that must be canonicalized before any pattern match is meaningful |
-| `AST08-scan-evasion-narrative` | agent-judgable | *not implemented as code* — deciding that prose is *written to evade a scanner* rather than merely verbose is a reading of intent |
+| `AST08-S02` | static-detectable | a detection rule matches a view the raw bytes hid — the normalized view (invisibles stripped, NFKC folded) matching more often than the raw bytes, a decoded layer of an embedded encoding within the depth-4 / 1 MiB bound, or a zero-width run that decodes to text. Never the mere presence of an encoded blob |
+| `AST08-S04` | static-detectable | a branch keyed to *which environment is running it* — hostname, username, uid, an env-var comparison, a date comparison, a file-existence or debugger probe — wraps a call that executes, sends, or destroys. Neither half fires alone, and OS-portability branches are excluded by design |
+| `AST08-S07` | static-detectable | the package exceeds a declared scan bound: file count, per-file size, a padding run, archive nesting depth, member count, declared decompression ratio, an archive member escaping the extraction root, a symlink escaping the scan root, or a non-regular file |
+| `AST08-S08` | static-detectable | a `.pyc` ships whose provenance cannot be tied to shipped source: sourceless, unchecked hash-based, or a header whose recorded source hash or size contradicts the adjacent `.py` |
 
-Check ids are the detector's own, not registry scenario ids (`AST08-S01`, `AST08-S02`, …).
-Which registry scenario each check maps to — and how honestly it measures that scenario,
-versus measuring an enabling artifact signal — is recorded in `fixtures/manifest.yaml`'s
-`covers:` field and expanded by `/ast:check-coverage AST08`.
+Check ids ARE the registry's scenario ids here, because each check decides that scenario's
+defining condition; `fixtures/manifest.yaml` records all four as `covers: full`. Two of
+AST08's eight scenarios (`AST08-S01` Natural-Language Bypass, `AST08-S03` Scanner
+Impersonation) are agent-judgable and are not implemented as code — deciding that prose is
+*written to evade a scanner* rather than merely verbose is a reading of intent — and two
+(`AST08-S05`, `AST08-S06`) are not decidable from one package at all.
+`/ast:check-coverage AST08` expands every row.
+
+An `INCOMPLETE:` prefix on a finding's evidence is not a payload: it means a bound or a
+parser stopped the scan, which per this category's own rule is never a clean verdict.
 
 ## Arguments
 
@@ -104,31 +113,53 @@ EOF
 PACKAGE:  ./invoice-helper
 CATEGORY: AST08 - Poor Scanning
 
-CHECK:    AST08-invisible-unicode-smuggling
-VERDICT:  CLEAN
-EVIDENCE: no invisible Unicode control code points found
+CHECK:    AST08-S02  Obfuscated Instruction
+VERDICT:  DETECTED
+EVIDENCE: SKILL.md: base64 blob at decode depth 1 decodes to a layer matching rule
+          'remote-fetch-piped-to-shell'; reported against the raw artifact with the
+          decoded view retained as evidence
 TIER:     static-detectable
 
-CHECKS RUN:  1 detector check(s) at the static-detectable tier, 0 DETECTED
+CHECK:    AST08-S04  Context-Dependent Malice
+VERDICT:  CLEAN
+EVIDENCE: no environment-keyed guard wraps a dangerous branch
+TIER:     static-detectable
+
+CHECK:    AST08-S07  Scanner Host Compromise and Resource Exhaustion
+VERDICT:  CLEAN
+EVIDENCE: within every declared bound: <=500 entries, <=2097152 bytes/file, no padding
+          run over 1000, archive depth <=1, ratio <=100:1, no escaping symlink, no
+          special file
+TIER:     static-detectable
+
+CHECK:    AST08-S08  Bytecode Cache Poisoning
+VERDICT:  CLEAN
+EVIDENCE: every shipped .pyc corresponds to shipped source
+TIER:     static-detectable
+
+CHECKS RUN:  4 detector check(s) at the static-detectable tier, 1 DETECTED
 REGISTRY:    8 named scenario(s): 4 static-detectable, 2 agent-judgable, 2 out-of-artifact
-UNCOVERED:   3 static-detectable scenarios with no labeled fixture:
-             AST08-S04, AST08-S07, AST08-S08
+UNCOVERED:   0 static-detectable scenarios with no detector
 NOT DECIDED: 2 agent-judgable scenarios need a judge, not this run
 NOT DECIDED: 2 out-of-artifact scenarios are not decidable from one package
-F1:          not published (pending-detector)
-             status=proxy-covered, scope=category-precondition, corpus=6 case(s)
+F1:          scenario-level 1.00 (4 scenario checks, n=8)
+             status=covered, corpus=8 case(s), hand-authored — not a false-positive rate
 ```
 
 The coverage footer is not decoration. A DETECTED-free run of this command means
-"the 1 implemented check did not fire", never "AST08 is clean".
+"the 4 implemented checks did not fire", never "AST08 is clean" — half this category's
+named scenarios are decided by a judge or not decidable from a package at all.
 
 ## Coverage caveat
 
-The single labeled check maps to no named AST08 scenario at all — it derives from the
-category's preventive mitigations. Meanwhile the registry finds four static-detectable named
-scenarios here (obfuscated instruction, context-dependent malice / logic bombs, scanner host
-compromise, bytecode cache poisoning); one is exercised from AST01's corpus and three are
-unlabeled. Labeling all four would raise this category's expected corpus from 6 to 8.
+All four static-detectable scenarios are implemented and labeled, and the category publishes
+`scenario-level 1.00 (4 scenario checks, n=8)`. Read that number with this category's own
+scepticism: n=8 is the smallest corpus the sizing rule permits for four checks, it was
+authored by the same people who wrote the rules, and it is therefore **not** a
+false-positive rate — AST08's own mitigations require one measured against a benign corpus
+of real, widely installed skills, and no such corpus is used here. Nor is it a bypass rate:
+every rule is public, so the adversary holds the scanner, and each check has a knowable
+evasion. `skills/AST08/coverage-matrix.md` states each one.
 
 ## Related
 

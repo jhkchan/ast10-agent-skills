@@ -214,7 +214,10 @@ function readDetectorDeclaration(skillDir) {
   const tierBody = pyDictBody(source, "SCENARIO_TIERS");
   if (tierBody) {
     for (const line of tierBody.split("\n")) {
-      const entry = line.match(/^\s*"([^"]+)"\s*:\s*"([^"]+)"\s*,?\s*$/);
+      // A trailing `# comment` is allowed: AST07's table annotates each
+      // registry id with its whitepaper title, and dropping those entries
+      // silently would under-report the category's tier counts.
+      const entry = line.match(/^\s*"([^"]+)"\s*:\s*"([^"]+)"\s*,?\s*(?:#.*)?$/);
       if (entry) tiers[entry[1]] = entry[2];
     }
   }

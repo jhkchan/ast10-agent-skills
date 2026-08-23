@@ -1,0 +1,1389 @@
+{
+  "generated_by": "eval/generate_f1_report.py",
+  "threshold": 0.8,
+  "rules": [
+    "Each category is scored and gated on its own; no suite-wide average is computed.",
+    "scenarios/registry.yaml is authoritative on tier; an empty static-detectable tier publishes no F1 and is recorded declared-and-uncovered.",
+    "A check declaring covers: artifact-signal-only is scored into its own block and is never counted as coverage of the scenario it sits beside.",
+    "Every number is measured over this repository's own hand-authored fixtures and is not a generalisation claim."
+  ],
+  "corpus_formula": "max(min_floor, 2 * count(detectable_scenarios))",
+  "categories": [
+    {
+      "category": "AST01",
+      "name": "Malicious Skills",
+      "status": "pass",
+      "threshold": 0.8,
+      "f1_scope": "scenario-level",
+      "corpus_status": "covered",
+      "registry": {
+        "scenarios": 11,
+        "static_detectable": [
+          "AST01-S02",
+          "AST01-S05",
+          "AST01-S06",
+          "AST01-S08",
+          "AST01-S09",
+          "AST01-S10",
+          "AST01-S11"
+        ],
+        "agent_judgable": [
+          "AST01-S01",
+          "AST01-S03",
+          "AST01-S04"
+        ],
+        "out_of_artifact": [
+          "AST01-S07"
+        ]
+      },
+      "corpus": {
+        "labeled_detectable_checks": 8,
+        "cases": 16,
+        "formula_minimum": 16,
+        "meets_formula": true,
+        "class_balance": {
+          "vulnerable": 8,
+          "clean": 8
+        }
+      },
+      "scenario_level": {
+        "checks": [
+          "AST01-S02",
+          "AST01-S05",
+          "AST01-S06",
+          "AST01-S08",
+          "AST01-S09",
+          "AST01-S10",
+          "AST01-S11",
+          "AST08-S02"
+        ],
+        "cases": 16,
+        "true_positives": 8,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 8,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "artifact_signal_only": null,
+      "any_check_firing_on_a_clean_case": {
+        "clean_cases": 8,
+        "firings": []
+      },
+      "checks": [
+        {
+          "corpus_check": "AST01-S02",
+          "detector_check": "AST01-social-engineering-prerequisites",
+          "covers": "full",
+          "registry_ids": [
+            "AST01-S02"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST01-V3",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST01-C4",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST01-S05",
+          "detector_check": "AST01-soul-md-persistence",
+          "covers": "full",
+          "registry_ids": [
+            "AST01-S05"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST01-V5",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST01-C6",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST01-S06",
+          "detector_check": "AST01-memory-poisoning",
+          "covers": "full",
+          "registry_ids": [
+            "AST01-S06"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST01-V7",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST01-C8",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST01-S08",
+          "detector_check": "AST01-identity-clone-exfiltration",
+          "covers": "full",
+          "registry_ids": [
+            "AST01-S08"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST01-V9",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST01-C10",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST01-S09",
+          "detector_check": "AST01-websocket-c2",
+          "covers": "full",
+          "registry_ids": [
+            "AST01-S09"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST01-V11",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST01-C12",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST01-S10",
+          "detector_check": "AST01-undeclared-egress",
+          "covers": "full",
+          "registry_ids": [
+            "AST01-S10"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST01-V13",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST01-C14",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST01-S11",
+          "detector_check": "AST01-hidden-output-injection",
+          "covers": "full",
+          "registry_ids": [
+            "AST01-S11"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST01-V15",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST01-C16",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST08-S02",
+          "detector_check": "AST01-obfuscated-payload-exec",
+          "covers": "full",
+          "registry_ids": [
+            "AST08-S02"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST01-V1",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST01-C2",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        }
+      ],
+      "note": "All seven of AST01's registry static-detectable scenarios are now labeled and implemented. The corpus carries an eighth check -- AST08-S02 Obfuscated Instruction -- because the encoded-blob-into-an-execution-sink shape is a property of an AST01 skill package's own bundled script even though the whitepaper files the scenario under AST08. Recorded, not reassigned, which is why the corpus (16 cases) exceeds the 14 that AST01's own seven scenarios entitle it to."
+    },
+    {
+      "category": "AST02",
+      "name": "Supply Chain Compromise",
+      "status": "pass",
+      "threshold": 0.8,
+      "f1_scope": "scenario-level",
+      "corpus_status": "covered",
+      "registry": {
+        "scenarios": 4,
+        "static_detectable": [
+          "AST02-S03"
+        ],
+        "agent_judgable": [],
+        "out_of_artifact": [
+          "AST02-S01",
+          "AST02-S02",
+          "AST02-S04"
+        ]
+      },
+      "corpus": {
+        "labeled_detectable_checks": 1,
+        "cases": 6,
+        "formula_minimum": 6,
+        "meets_formula": true,
+        "class_balance": {
+          "vulnerable": 3,
+          "clean": 3
+        }
+      },
+      "scenario_level": {
+        "checks": [
+          "AST02-S03"
+        ],
+        "cases": 6,
+        "true_positives": 3,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "artifact_signal_only": null,
+      "any_check_firing_on_a_clean_case": {
+        "clean_cases": 3,
+        "firings": []
+      },
+      "checks": [
+        {
+          "corpus_check": "AST02-S03",
+          "detector_check": "AST02-config-file-hijacking",
+          "covers": "full",
+          "registry_ids": [
+            "AST02-S03"
+          ],
+          "true_positives": 3,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 3,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST02-V1",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST02-C2",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            },
+            {
+              "case": "AST02-V3",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST02-C4",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            },
+            {
+              "case": "AST02-V5",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST02-C6",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        }
+      ],
+      "note": "One labeled check for the category's one static-detectable scenario. The other three scenarios are out-of-artifact and are published as such below rather than proxied: for two of them the registry records no artifact_signal at all, and the third (AST02-S02's pin posture) is a proxy the never-pad rule forbids labeling as AST02 coverage. Three quarters of this category's named attack surface is still not decidable from one package, and that has not changed."
+    },
+    {
+      "category": "AST03",
+      "name": "Over-Privileged Skills",
+      "status": "pass",
+      "threshold": 0.8,
+      "f1_scope": "mixed-proxy",
+      "corpus_status": "proxy-covered",
+      "registry": {
+        "scenarios": 5,
+        "static_detectable": [
+          "AST03-S03"
+        ],
+        "agent_judgable": [
+          "AST03-S01"
+        ],
+        "out_of_artifact": [
+          "AST03-S02",
+          "AST03-S04",
+          "AST03-S05"
+        ]
+      },
+      "corpus": {
+        "labeled_detectable_checks": 3,
+        "cases": 6,
+        "formula_minimum": 6,
+        "meets_formula": true,
+        "class_balance": {
+          "vulnerable": 3,
+          "clean": 3
+        }
+      },
+      "scenario_level": {
+        "checks": [
+          "AST03-S1"
+        ],
+        "cases": 2,
+        "true_positives": 1,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "artifact_signal_only": {
+        "checks": [
+          "AST03-S2",
+          "AST03-S3"
+        ],
+        "cases": 4,
+        "true_positives": 2,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "any_check_firing_on_a_clean_case": {
+        "clean_cases": 3,
+        "firings": []
+      },
+      "checks": [
+        {
+          "corpus_check": "AST03-S1",
+          "detector_check": "AST03-identity-file-write-grant",
+          "covers": "full",
+          "registry_ids": [
+            "AST03-S03"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST03-V1",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST03-C2",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST03-S2",
+          "detector_check": "AST03-shell-network-privilege-combo",
+          "covers": "artifact-signal-only",
+          "registry_ids": [
+            "AST03-S01"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST03-V3",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST03-C4",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST03-S3",
+          "detector_check": "AST03-wildcard-network-egress",
+          "covers": "artifact-signal-only",
+          "registry_ids": [
+            "AST06-S02"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST03-V5",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST03-C6",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        }
+      ],
+      "note": "Only one of the three labeled checks measures a named scenario (AST03-S03 Identity File Backdoors). The other two measure artifact_signals for an agent-judgable scenario (AST03-S01) and an out-of-artifact one (AST06-S02), so two thirds of this category's F1 is proxy F1 and must be reported as such. FIXTURE CORRECTION (detector wiring): the AST03-S1 pair previously varied an `allow_write: [\"/secrets/**\"]` glob and claimed covers: full over AST03-S03 Identity File Backdoors on the strength of being \"generalised ... from identity files to a sensitive-path list\". It did not encode the scenario \u2014 AST03-S03's defining condition names SOUL.md / MEMORY.md / AGENTS.md and the pair never mentioned them \u2014 so the two files were rewritten to request an identity-file write, and the directories renamed from `*-prod-secrets-write-scope` to `*-identity-file-write-grant`. The claim was wrong, not the tier."
+    },
+    {
+      "category": "AST04",
+      "name": "Insecure Metadata",
+      "status": "pass",
+      "threshold": 0.8,
+      "f1_scope": "scenario-level",
+      "corpus_status": "covered",
+      "registry": {
+        "scenarios": 7,
+        "static_detectable": [
+          "AST04-S02",
+          "AST04-S03",
+          "AST04-S04",
+          "AST04-S06",
+          "AST04-S07"
+        ],
+        "agent_judgable": [
+          "AST04-S01"
+        ],
+        "out_of_artifact": [
+          "AST04-S05"
+        ]
+      },
+      "corpus": {
+        "labeled_detectable_checks": 5,
+        "cases": 10,
+        "formula_minimum": 10,
+        "meets_formula": true,
+        "class_balance": {
+          "vulnerable": 5,
+          "clean": 5
+        }
+      },
+      "scenario_level": {
+        "checks": [
+          "AST04-S1",
+          "AST04-S2",
+          "AST04-S3",
+          "AST04-S4",
+          "AST04-S5"
+        ],
+        "cases": 10,
+        "true_positives": 5,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "artifact_signal_only": null,
+      "any_check_firing_on_a_clean_case": {
+        "clean_cases": 5,
+        "firings": []
+      },
+      "checks": [
+        {
+          "corpus_check": "AST04-S1",
+          "detector_check": "AST04-yaml-injection",
+          "covers": "full",
+          "registry_ids": [
+            "AST04-S04"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST04-V1",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST04-C2",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST04-S2",
+          "detector_check": "AST04-json-injection",
+          "covers": "full",
+          "registry_ids": [
+            "AST04-S06"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST04-V3",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST04-C4",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST04-S3",
+          "detector_check": "AST04-toml-injection",
+          "covers": "full",
+          "registry_ids": [
+            "AST04-S07"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST04-V5",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST04-C6",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST04-S4",
+          "detector_check": "AST04-permission-understating",
+          "covers": "full",
+          "registry_ids": [
+            "AST04-S02"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST04-V7",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST04-C8",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST04-S5",
+          "detector_check": "AST04-risk-tier-spoofing",
+          "covers": "full",
+          "registry_ids": [
+            "AST04-S03"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST04-V9",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST04-C10",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        }
+      ],
+      "note": "AST04 is now at full registry coverage of its static-detectable tier: all five labeled checks map one-to-one onto registry scenarios the registry independently tiers static-detectable, and the corpus is the 10 cases the gate-4 formula demands at that coverage. The two previously unlabeled scenarios (AST04-S02 Permission Understating, AST04-S03 Risk Tier Spoofing) gained a fixture pair and a detector check in the same change; the three pre-existing pairs were rewritten as real multi-file packages because their payloads had been carried as SKILL.md frontmatter strings that no detector reads \u2014 the corpus and the detectors had never met. AST04-S01 (agent-judgable) and AST04-S05 (out-of-artifact) remain outside the corpus by tier, not by omission."
+    },
+    {
+      "category": "AST05",
+      "name": "Untrusted External Instructions",
+      "status": "declared-and-uncovered",
+      "threshold": 0.8,
+      "f1_scope": "artifact-signal-only",
+      "corpus_status": "proxy-covered",
+      "registry": {
+        "scenarios": 6,
+        "static_detectable": [],
+        "agent_judgable": [
+          "AST05-S05"
+        ],
+        "out_of_artifact": [
+          "AST05-S01",
+          "AST05-S02",
+          "AST05-S03",
+          "AST05-S04",
+          "AST05-S06"
+        ]
+      },
+      "corpus": {
+        "labeled_detectable_checks": 3,
+        "cases": 6,
+        "formula_minimum": 6,
+        "meets_formula": true,
+        "class_balance": {
+          "vulnerable": 3,
+          "clean": 3
+        }
+      },
+      "scenario_level": null,
+      "artifact_signal_only": {
+        "checks": [
+          "AST05-S1",
+          "AST05-S2",
+          "AST05-S3"
+        ],
+        "cases": 6,
+        "true_positives": 3,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "any_check_firing_on_a_clean_case": {
+        "clean_cases": 3,
+        "firings": []
+      },
+      "checks": [
+        {
+          "corpus_check": "AST05-S1",
+          "detector_check": "AST05-fetched-content-instruction-sink",
+          "covers": "artifact-signal-only",
+          "registry_ids": [
+            "AST05-S01",
+            "AST05-S05"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST05-V1",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST05-C2",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST05-S2",
+          "detector_check": "AST05-remote-response-executed",
+          "covers": "artifact-signal-only",
+          "registry_ids": [
+            "AST05-S05"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST05-V3",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST05-C4",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST05-S3",
+          "detector_check": "AST05-absent-instruction-boundary",
+          "covers": "artifact-signal-only",
+          "registry_ids": [
+            "AST05-S04",
+            "AST05-S05"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST05-V5",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST05-C6",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        }
+      ],
+      "note": "The sharpest reconciliation finding. The registry tiers NONE of AST05's six named scenarios static-detectable: rug-pull needs the remote document at two points in time, bait-and-switch needs multiple fetch vantage points, chaining needs the chain followed, relay amplification needs the pipeline's per-node backbone models, DoS needs a runtime budget, and document-embedded instructions are agent-judgable. Every case in this corpus therefore measures an artifact_signal, never a named scenario. Any F1 published here must be labeled artifact-signal-only or it overclaims."
+    },
+    {
+      "category": "AST06",
+      "name": "Weak Isolation",
+      "status": "pass",
+      "threshold": 0.8,
+      "f1_scope": "mixed-proxy",
+      "corpus_status": "proxy-covered",
+      "registry": {
+        "scenarios": 5,
+        "static_detectable": [
+          "AST06-S01"
+        ],
+        "agent_judgable": [],
+        "out_of_artifact": [
+          "AST06-S02",
+          "AST06-S03",
+          "AST06-S04",
+          "AST06-S05"
+        ]
+      },
+      "corpus": {
+        "labeled_detectable_checks": 3,
+        "cases": 6,
+        "formula_minimum": 6,
+        "meets_formula": true,
+        "class_balance": {
+          "vulnerable": 3,
+          "clean": 3
+        }
+      },
+      "scenario_level": {
+        "checks": [
+          "AST06-S1",
+          "AST06-S2"
+        ],
+        "cases": 4,
+        "true_positives": 2,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "artifact_signal_only": {
+        "checks": [
+          "AST06-S3"
+        ],
+        "cases": 2,
+        "true_positives": 1,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "any_check_firing_on_a_clean_case": {
+        "clean_cases": 3,
+        "firings": []
+      },
+      "checks": [
+        {
+          "corpus_check": "AST06-S1",
+          "detector_check": "AST06-root-write-scope",
+          "covers": "full",
+          "registry_ids": [
+            "AST06-S01"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST06-V1",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST06-C2",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST06-S2",
+          "detector_check": "AST06-host-persistence-write",
+          "covers": "full",
+          "registry_ids": [
+            "AST06-S01"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST06-V3",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST06-C4",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST06-S3",
+          "detector_check": "AST06-unscoped-shared-state-write",
+          "covers": "artifact-signal-only",
+          "registry_ids": [
+            "AST06-S05"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST06-V5",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST06-C6",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        }
+      ],
+      "note": "Two checks measure the category's one static-detectable scenario (AST06-S01 Host Escape) from two angles \u2014 write scope reaching filesystem root, and unrestricted privilege escalation. The third is an artifact_signal proxy for AST06-S05, which is out-of-artifact because whether two agents share writable state is a deployment fact."
+    },
+    {
+      "category": "AST07",
+      "name": "Update Drift",
+      "status": "declared-and-uncovered",
+      "threshold": 0.8,
+      "f1_scope": "none",
+      "corpus_status": "declared-and-uncovered",
+      "registry": {
+        "scenarios": 3,
+        "static_detectable": [],
+        "agent_judgable": [],
+        "out_of_artifact": [
+          "AST07-S01",
+          "AST07-S02",
+          "AST07-S03"
+        ]
+      },
+      "corpus": {
+        "labeled_detectable_checks": 0,
+        "cases": 0,
+        "formula_minimum": 0,
+        "meets_formula": true,
+        "class_balance": {
+          "vulnerable": 0,
+          "clean": 0
+        }
+      },
+      "scenario_level": null,
+      "artifact_signal_only": null,
+      "any_check_firing_on_a_clean_case": {
+        "clean_cases": 0,
+        "firings": []
+      },
+      "checks": [],
+      "note": "Every AST07 scenario is temporal \u2014 it compares two versions or observes a reload event. No F1 is publishable for this category at any corpus size. The six orphaned fixture files that used to sit under fixtures/AST07/ encoded exactly the artifact_signals the registry declares for AST07-S01 and AST07-S02 and were deleted; see ORPHAN-CORPUS RESOLUTION in this file's header. The directory is gone, not emptied."
+    },
+    {
+      "category": "AST08",
+      "name": "Poor Scanning",
+      "status": "pass",
+      "threshold": 0.8,
+      "f1_scope": "scenario-level",
+      "corpus_status": "covered",
+      "registry": {
+        "scenarios": 8,
+        "static_detectable": [
+          "AST08-S02",
+          "AST08-S04",
+          "AST08-S07",
+          "AST08-S08"
+        ],
+        "agent_judgable": [
+          "AST08-S01",
+          "AST08-S03"
+        ],
+        "out_of_artifact": [
+          "AST08-S05",
+          "AST08-S06"
+        ]
+      },
+      "corpus": {
+        "labeled_detectable_checks": 4,
+        "cases": 8,
+        "formula_minimum": 8,
+        "meets_formula": true,
+        "class_balance": {
+          "vulnerable": 4,
+          "clean": 4
+        }
+      },
+      "scenario_level": {
+        "checks": [
+          "AST08-S02",
+          "AST08-S04",
+          "AST08-S07",
+          "AST08-S08"
+        ],
+        "cases": 8,
+        "true_positives": 4,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "artifact_signal_only": null,
+      "any_check_firing_on_a_clean_case": {
+        "clean_cases": 4,
+        "firings": []
+      },
+      "checks": [
+        {
+          "corpus_check": "AST08-S02",
+          "detector_check": "AST08-S02",
+          "covers": "full",
+          "registry_ids": [
+            "AST08-S02"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST08-V1",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST08-C5",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST08-S04",
+          "detector_check": "AST08-S04",
+          "covers": "full",
+          "registry_ids": [
+            "AST08-S04"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST08-V2",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST08-C6",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST08-S07",
+          "detector_check": "AST08-S07",
+          "covers": "full",
+          "registry_ids": [
+            "AST08-S07"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST08-V3",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST08-C7",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        },
+        {
+          "corpus_check": "AST08-S08",
+          "detector_check": "AST08-S08",
+          "covers": "full",
+          "registry_ids": [
+            "AST08-S08"
+          ],
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 1,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST08-V4",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST08-C8",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        }
+      ],
+      "note": "All four static-detectable AST08 scenarios are now labeled and covered by a detector function in skills/AST08/scripts/detector.py, so the corpus is the full max(6, 2 x 4) = 8. The 1.0 is measured over eight hand-authored packages by this repository's own authors and is a floor on nothing: it says the four rules separate the corpus they were built against, not that they resist an adaptive adversary. AST08's own mitigations require a bypass rate under white-box access beside any detection rate, and none is claimed here."
+    },
+    {
+      "category": "AST09",
+      "name": "No Governance",
+      "status": "declared-and-uncovered",
+      "threshold": 0.8,
+      "f1_scope": "none",
+      "corpus_status": "declared-and-uncovered",
+      "registry": {
+        "scenarios": 7,
+        "static_detectable": [],
+        "agent_judgable": [],
+        "out_of_artifact": [
+          "AST09-S01",
+          "AST09-S02",
+          "AST09-S03",
+          "AST09-S04",
+          "AST09-S05",
+          "AST09-S06",
+          "AST09-S07"
+        ]
+      },
+      "corpus": {
+        "labeled_detectable_checks": 0,
+        "cases": 0,
+        "formula_minimum": 0,
+        "meets_formula": true,
+        "class_balance": {
+          "vulnerable": 0,
+          "clean": 0
+        }
+      },
+      "scenario_level": null,
+      "artifact_signal_only": null,
+      "any_check_firing_on_a_clean_case": {
+        "clean_cases": 0,
+        "firings": []
+      },
+      "checks": [],
+      "note": "The only category where all seven named scenarios are out-of-artifact. Every one turns on organisational process, inventory state, or pipeline topology. No F1 is publishable for this category at any corpus size."
+    },
+    {
+      "category": "AST10",
+      "name": "Cross-Platform Reuse",
+      "status": "pass",
+      "threshold": 0.8,
+      "f1_scope": "scenario-level",
+      "corpus_status": "covered",
+      "registry": {
+        "scenarios": 6,
+        "static_detectable": [
+          "AST10-S06"
+        ],
+        "agent_judgable": [],
+        "out_of_artifact": [
+          "AST10-S01",
+          "AST10-S02",
+          "AST10-S03",
+          "AST10-S04",
+          "AST10-S05"
+        ]
+      },
+      "corpus": {
+        "labeled_detectable_checks": 1,
+        "cases": 6,
+        "formula_minimum": 6,
+        "meets_formula": true,
+        "class_balance": {
+          "vulnerable": 3,
+          "clean": 3
+        }
+      },
+      "scenario_level": {
+        "checks": [
+          "AST10-S06"
+        ],
+        "cases": 6,
+        "true_positives": 3,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "artifact_signal_only": null,
+      "any_check_firing_on_a_clean_case": {
+        "clean_cases": 3,
+        "firings": []
+      },
+      "checks": [
+        {
+          "corpus_check": "AST10-S06",
+          "detector_check": "AST10-S06",
+          "covers": "full",
+          "registry_ids": [
+            "AST10-S06"
+          ],
+          "true_positives": 3,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 3,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "discriminates": true,
+          "case_verdicts": [
+            {
+              "case": "AST10-V1",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST10-C2",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            },
+            {
+              "case": "AST10-V3",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST10-C4",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            },
+            {
+              "case": "AST10-V5",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST10-C6",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            }
+          ]
+        }
+      ],
+      "note": "This category's single static-detectable scenario is covered at covers: full by skills/AST10/scripts/detector.py, which decodes the package's encoded blobs and evaluates the DECODED content layer \u2014 the whitepaper's own AST10 mitigation (\"build platform-agnostic skill scanners that evaluate the content layer independently of the runtime\"). published_f1 is the measured value over the six labeled cases, and skills/AST10/scripts/test_ast10_detector.py re-derives it from the corpus so it cannot be hand-written. Read it for exactly what it is: 3/3 precision and 3/3 recall on a hand-built corpus whose three CLEAN cases each carry a real encoded blob (a base64 PNG, a base64 JSON config block, a gzip-under-base64 policy document, and the USF hex content_hash and signature fields). It measures that the check separates payload from encoding across those six packages; it is not a generalisation claim about registries in the wild."
+    }
+  ]
+}

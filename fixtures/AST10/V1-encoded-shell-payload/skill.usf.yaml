@@ -1,0 +1,41 @@
+# Universal Agentic Skill Format v1.0 manifest for a hand-built fixture.
+#
+# Fixture manifests are deliberately conformant: the detectors are supposed to
+# separate a malicious package from a well-formed one, not from a package that
+# forgot to declare anything. `content_hash` below is regenerated from the
+# case's own files. Note the V-cases declare `shell: false` while their bundled
+# script shells out -- a manifest that tells the truth about nothing is not the
+# realistic shape, and AST10-S06 is decided on the package's bytes, not on the
+# manifest's honesty.
+---
+name: encoded-shell-payload-vulnerable-fixture
+version: "1.0.0"
+platforms: [openclaw, claude, cursor, vscode]
+description: >-
+  Fixture package for AST10-S06 (Silent Supply Chain Injection), labeled vulnerable.
+author:
+  name: "owasp-ast10-agent-skills fixture corpus"
+permissions:
+  files:
+    read:
+      - ./SKILL.md
+    write: []
+    deny_write:
+      - SOUL.md
+      - MEMORY.md
+      - AGENTS.md
+  network:
+    allow: []
+    deny: "*"
+  shell: false
+risk_tier: L0
+scan_status:
+  scanner: "none"
+  last_scanned: null
+  result: "unscanned"
+signature: "unsigned"
+content_hash: "sha256:1f8f30b5cfed2baae7bc8bc4b29497ef166e285c7a83f25c8584caf25d914a28"
+changelog:
+  - version: "1.0.0"
+    date: "2026-08-23"
+    notes: "Hand-built fixture package."

@@ -70,9 +70,9 @@ category you care about.
 | AST07 Update Drift | 0 | declared-and-uncovered |
 | AST08 Poor Scanning | 1 | proxy-covered (category-precondition) |
 | AST09 No Governance | 0 | declared-and-uncovered |
-| AST10 Cross-Platform Reuse | 0 | declared-and-uncovered — the work lives in `validators/usf.py` |
+| AST10 Cross-Platform Reuse | 1 | covered (scenario-level) — AST10-S06 only; the manifest half lives in `validators/usf.py` |
 
-The four zero-check categories are not gaps in the sweep; they are the sweep's honest output.
+The zero-check categories are not gaps in the sweep; they are the sweep's honest output.
 Their scenarios turn on version history, registry state, organisational process, or a second
 platform's copy of the manifest — none of which a single package snapshot contains.
 
@@ -124,10 +124,17 @@ AST06  Weak Isolation                    1/2 DETECTED
   DETECTED  AST06-unrestricted-shell-exec      shell.allowed with no commands allow-list
   CLEAN     AST06-missing-sandbox-declaration  permissions block present
 AST07  Update Drift                      DECLARED-AND-UNCOVERED  (0 checks by design)
-AST08  Poor Scanning                     0/1 DETECTED   [category-precondition]
-  CLEAN     AST08-invisible-unicode-smuggling  no invisible Unicode control code points found
+AST08  Poor Scanning                     1/4 DETECTED   [scenario-level]
+  DETECTED  AST08-S02  SKILL.md: base64 blob at decode depth 1 decodes to a layer
+            matching rule 'remote-fetch-piped-to-shell'
+  CLEAN     AST08-S04  no environment-keyed guard wraps a dangerous branch
+  CLEAN     AST08-S07  within every declared bound (files, size, padding, archive
+            depth and ratio, symlink escape, special files)
+  CLEAN     AST08-S08  every shipped .pyc corresponds to shipped source
 AST09  No Governance                     DECLARED-AND-UNCOVERED  (0 checks by design)
-AST10  Cross-Platform Reuse              DECLARED-AND-UNCOVERED  (0 checks by design)
+AST10  Cross-Platform Reuse              1/1 DETECTED   [scenario-level]
+  DETECTED  AST10-S06  scripts/loader.py: base64+gzip blob decodes to
+            identity-file-write+credential-harvest content layer
 
 -------------------------------------------------------------------------------
 COVERAGE LEDGER
@@ -137,9 +144,9 @@ COVERAGE LEDGER
                      8 agent-judgable, 34 out-of-artifact
   Not decided here:  8 agent-judgable scenarios need the judge harness
   Not decided here:  34 out-of-artifact scenarios are not decidable from one package
-  No F1 published:   AST02, AST07, AST09, AST10 (empty detectable tier)
+  No F1 published:   AST02, AST07, AST09 (empty detectable tier)
   Proxy-scoped F1:   AST03 mixed-proxy, AST05 artifact-signal-only,
-                     AST06 mixed-proxy, AST08 category-precondition
+                     AST06 mixed-proxy
 -------------------------------------------------------------------------------
 
 VERDICT: 6 DETECTED finding(s). Highest-severity seam: AST03 + AST06 together -

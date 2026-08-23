@@ -15,7 +15,7 @@ The whitepaper enumerates attack scenarios. `scenarios/registry.yaml` records ev
 them with a **detectability tier** and a written reason. Each category's
 `coverage-matrix.md` turns that tiering into an F1 contract — what this package claims to
 decide, what it refuses to claim, and the corpus arithmetic behind the number. `fixtures/`
-holds the class-balanced evidence, `scripts/detector.py` holds the checks, `SKILL.md`
+holds the class-balanced evidence, `skills/<AST>/scripts/detector.py` holds the checks, `SKILL.md`
 holds the knowledge an agent needs to use them, and `skill.usf.yaml` declares what the
 package is allowed to touch. The judge matrix scores the `SKILL.md` bodies against a
 pinned rubric; `scripts/ship_floor.py` decides whether the result ships.
@@ -38,6 +38,17 @@ thing in the repository. When two artifacts disagree, the lower rank is a bug.
 A detector module may carry its own interim `SCENARIO_TIERS` table. Where that table and
 the registry differ, **the registry governs** and the divergence is itemised under the
 matrix's "Coverage debt" section rather than being quietly reconciled.
+
+`SCENARIO_TIERS` answers only "is this check mechanical?". A second table in the same
+module, `CHECK_COVERAGE`, answers the separate question "does it decide a named
+scenario?", using `fixtures/manifest.yaml`'s own vocabulary — `full`,
+`artifact-signal-only`, `category-precondition`. Collapsing the two is how the same
+predicate came to be ruled `static-detectable` where it let a detector claim coverage and
+`artifact_signal`-only where counting it would have obliged someone to build one. The
+registry closes the other side of that with `artifact_signal_decidable` and
+`artifact_signal_checks`; `tests/test_tier_doctrine_symmetry.py` fails if either file
+moves without the other, and `f1_report` returns the module's `F1_SCOPE` beside every
+number so a proxy F1 cannot be quoted as scenario coverage.
 
 ---
 
@@ -121,10 +132,23 @@ escalation. And `scan_status.result: "unscanned"` is declared rather than omitte
 absent scan status is indistinguishable from one stripped during a port, which is the
 AST10 failure itself.
 
-`content_hash` covers the shipped surface defined by `scripts/content_hash.py`
-(`SKILL.md`, `references/*.md`, `scripts/*.py`, `evals/evals.json`). `skill.usf.yaml`
-itself is outside that surface — that is what stops the hash from depending on the field
-that carries it.
+`content_hash` covers the shipped surface defined by `scripts/content_hash.py`'s
+`SURFACE_GLOBS` (`SKILL.md`, `references/*.md`, `scripts/*.py`, `evals/evals.json`).
+`skill.usf.yaml` itself is outside that surface — that is what stops the hash from
+depending on the field that carries it.
+
+Two of those four patterns match **no file in this repository**: no skill ships a
+`references/` directory or an `evals/evals.json`, so every stamped `content_hash` here is
+a digest over `SKILL.md` plus `scripts/*.py` and nothing else. The patterns are kept
+anyway, and `scripts/content_hash.py` splits them out as `POPULATED_SURFACE_GLOBS` /
+`UNPOPULATED_SURFACE_GLOBS` so the split is a value a test can read rather than a comment
+a reader has to trust: the day a skill adds one of those files it must enter the hash
+without anyone remembering to widen the tuple, because a surface definition that silently
+stops covering a shipped file is the AST10 metadata-loss shape.
+`tests/scripts/test_content_hash.py::test_unpopulated_surface_globs_are_still_unpopulated`
+fails if that stops being true, and
+`test_shipped_content_hash_is_reproducible_from_the_populated_globs_alone` re-derives
+every skill's digest from `SKILL.md` + `scripts/*.py` alone to prove the claim.
 
 ### `skills/<AST>/scripts/detector.py` — the mechanism
 
@@ -152,6 +176,41 @@ Shared machinery lives in `detectors/`:
 - `detectors/f1_reporter.py` — builds the per-category verdict rows, each decided on that
   category alone. There is no suite-wide pass/fail that a strong category could carry a
   weak one through.
+- `detectors/corpus.py` — the join between `fixtures/manifest.yaml`'s labeled cases and
+  the detector functions. It reads a case directory into the `{"manifest", "files"}`
+  package shape (everything except `skill.usf.yaml`, which is the manifest, not package
+  content) and resolves each labeled check's `detector_check` field to the function that
+  decides it. Before it existed the corpus and the detectors used different id namespaces
+  and nothing read the fixtures, which is why every category published
+  `pending-detector`. A `clean` case expects **nothing** to fire, not merely that its own
+  check stays silent — a check firing on a clean case is a false positive whichever check
+  it is.
+- `detectors/fixture_loader.py` — the runnable half of that join. It loads a fixture
+  directory the way `cli/lib/bridge.py` loads a candidate under audit, including the
+  bridge's own `SURFACE_SCOPED` rule (AST01's content-hash checks are specified over the
+  declared shipped surface, so feeding them the wider scan view would report a mismatch on
+  every well-formed fixture — a false positive manufactured by the harness), and attaches
+  the byte views a detector asks for by shipping its own `load_package_dir`. AST08 is the
+  only module that does: a `.pyc` header and a zip central directory are not decoded text
+  and its two host-hazard scenarios are decided from exactly those bytes.
+
+### `eval/generate_f1_report.py` and `scripts/dogfood.py --markdown` — the published measurements
+
+Two generated, committed documents, each regenerated-and-compared by the test suite so a
+number in the repository can never be older than the corpus it describes:
+
+- [`f1-report.md`](f1-report.md) / `eval/f1-report.json` — every category's measured
+  precision, recall and F1, each individual case verdict included so a reader can
+  re-derive any published figure by hand. The gate verdict is computed by
+  `detectors/f1_reporter.py` from the `covers: full` checks alone; `artifact-signal-only`
+  checks are scored into their own block and never supply the gate figure. The report also
+  carries a **clean-leakage** column — how many of a category's clean packages had *any*
+  check in its module fire on them, including checks the case was not labeled against,
+  which the per-check confusion matrix structurally cannot see.
+- [`dogfood-report.md`](dogfood-report.md) — every firing of every detector over this
+  repository's own eleven packages, waived or not, with each waiver's written reason, plus
+  a re-run through the bridge's wider scan view so the claim that scanning
+  `skill.usf.yaml` as text finds nothing extra is measured rather than assumed.
 
 ### `fixtures/` — the evidence
 
@@ -163,10 +222,21 @@ category the `detectable_scenarios` (with `registry_ids` and a `covers` value), 
 
 The never-pad rule is enforced here, not just described: a category with an empty labeled
 detectable tier records `cases: []`, `published_f1: null`, `status:
-declared-and-uncovered`. Four of ten categories are in that state today, and the arithmetic
-floor of six cases does **not** override it — `max(6, 2 × 0) = 6` is true and irrelevant,
-because the floor exists to stop a category with two detectable scenarios publishing an F1
-off a two-case corpus, not to require six cases for a category with nothing to detect.
+declared-and-uncovered`. **Two of ten categories are in that state today — AST07 and
+AST09** — and the arithmetic floor of six cases does **not** override it: `max(6, 2 × 0) =
+6` is true and irrelevant, because the floor exists to stop a category with two detectable
+scenarios publishing an F1 off a two-case corpus, not to require six cases for a category
+with nothing to detect.
+
+A third shape sits between the two and is easy to misread as coverage. AST05 has zero
+static-detectable scenarios in the registry, yet ships checks and a six-case corpus. What
+it publishes is `f1_scope: artifact-signal-only` — a measurement of five signal checks
+that decide *preconditions*, none of which covers a named AST05 scenario. That is not the
+never-pad rule being bent; it is the rule working, because the number travels with a scope
+label that forbids quoting it as scenario coverage.
+`tests/test_coverage_matrix.py::test_ast05_publishes_no_scenario_level_number_because_its_detectable_tier_is_empty`
+asserts AST05's `published_f1` says `artifact-signal-only` and never says
+`scenario-level`.
 
 ### The judge matrix — `adapters/`, `scripts/judge_harness.py`, `scripts/ship_floor.py`
 
@@ -214,9 +284,17 @@ The ship rule itself — mean ≥ 108, mean − σ ≥ 105, per-dimension floors
 
 The CLI reads the repository's own manifests for every number it prints, so it cannot
 report a coverage state the manifests disagree with, and `route` delegates to the advisory
-skill's own `triage.py` rather than keeping a second copy of the decision tree. The
-marketplace manifest declares two plugins over the same `skills/` tree: `ast-detectors`
-and `ast-advisory`.
+skill's own `triage.py` rather than keeping a second copy of the decision tree.
+
+`.claude-plugin/marketplace.json` is a **flat index of the eleven skills** — top-level
+identity fields plus one `{name, description}` entry per skill, keyed on the SKILL.md
+frontmatter `name` a runtime routes on. It declares no plugins, no bundles and no
+`commands/` payload, and nothing installs *from* it: `tests/test_packaging.py` checks it
+against `skills/` in both directions, which makes it safe to script an install loop
+against, and the install itself is `cli/ast10.py install` or a `cp -r`. Its top-level
+`name` leads with **"Unofficial"** because a plugin picker renders the name and often
+drops the description, and the moment of installation is exactly where "OWASP Agentic
+Skills Top 10" without a qualifier reads as an OWASP-published artifact.
 
 ---
 

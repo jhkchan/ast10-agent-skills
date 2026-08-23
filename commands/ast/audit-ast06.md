@@ -3,8 +3,9 @@ name: audit-ast06
 description: >-
   Audit one candidate skill package against OWASP AST06 - Weak Isolation alone, using the
   ast06-weak-isolation skill's decision rules and the frozen per-scenario detectability
-  contract in skills/AST06/coverage-matrix.md. Runs the 2 static-detectable check(s) this
-  category implements, then reports the tiering gap the run did not close.
+  contract in skills/AST06/coverage-matrix.md. Runs the 5 mechanical check(s) this category
+  implements - two covering AST06-S01, three not covering any named scenario - then reports
+  the tiering gap the run did not close.
 nl_triggers:
   - "is this skill sandboxed"
   - "runs with full host access"
@@ -49,11 +50,19 @@ AST10 is a boundary that existed on the source platform and did not survive the 
 
 ## Checks this command runs
 
-| Check id | Tier | Fires when |
-| --- | --- | --- |
-| `AST06-unrestricted-shell-exec` | static-detectable | shell is allowed with no `commands` allow-list — the skill can run anything the host user can |
-| `AST06-missing-sandbox-declaration` | static-detectable | there is no `permissions` block at all, so no isolation posture is declared and the runtime default decides |
-| `AST06-cross-skill-data-leak` | agent-judgable | *not implemented as code* — whether two skills share writable state is a deployment fact the package cannot assert |
+`Tier` is the mechanism tier (`SCENARIO_TIERS`): is the check decidable from bytes?
+`Covers` is the separate question (`CHECK_COVERAGE`): does deciding it cover a named
+whitepaper scenario? Only the first two do, and they decide the two disjuncts of the same
+scenario — AST06-S01 Host Escape — which is why the published F1 is `mixed-proxy`.
+
+| Check id | Tier | Covers | Fires when |
+| --- | --- | --- | --- |
+| `AST06-host-persistence-write` | static-detectable | AST06-S01 (full) | a bundled script shell-execs, or writes a file, into a host-persistence path outside the package |
+| `AST06-root-write-scope` | static-detectable | AST06-S01 (full) | a declared write scope reaches the filesystem root or the home directory, or explicitly names a host path |
+| `AST06-unrestricted-shell-exec` | static-detectable | category-precondition | shell is allowed with no bounding `commands` allow-list (a wildcard entry does not bound) — the skill can run anything the host user can |
+| `AST06-unscoped-shared-state-write` | static-detectable | artifact-signal-only | declared writes to shared workspace, memory or credential paths with no agent-scoped namespace (AST06-S05's signal, not AST06-S05) |
+| `AST06-missing-sandbox-declaration` | static-detectable | artifact-signal-only | there is no `permissions` block at all, or it is empty, so no isolation posture is declared and the runtime default decides |
+| `AST06-cross-skill-data-leak` | out-of-artifact | — | *not implemented as code, and not implementable* — whether two skills share writable state is a deployment fact the package cannot assert |
 
 Check ids are the detector's own, not registry scenario ids (`AST06-S01`, `AST06-S02`, …).
 Which registry scenario each check maps to — and how honestly it measures that scenario,
@@ -103,25 +112,40 @@ EOF
 PACKAGE:  ./invoice-helper
 CATEGORY: AST06 - Weak Isolation
 
+CHECK:    AST06-host-persistence-write
+VERDICT:  CLEAN
+EVIDENCE: no bundled script writes or execs into a host-persistence path
+TIER:     static-detectable   COVERS: AST06-S01 (full)
+
+CHECK:    AST06-root-write-scope
+VERDICT:  CLEAN
+EVIDENCE: declared write scope is bounded to the package directory
+TIER:     static-detectable   COVERS: AST06-S01 (full)
+
 CHECK:    AST06-unrestricted-shell-exec
 VERDICT:  DETECTED
 EVIDENCE: shell.allowed with no commands allow-list
-TIER:     static-detectable
+TIER:     static-detectable   COVERS: category-precondition
+
+CHECK:    AST06-unscoped-shared-state-write
+VERDICT:  CLEAN
+EVIDENCE: no declared write into a shared, un-namespaced path
+TIER:     static-detectable   COVERS: artifact-signal-only
 
 CHECK:    AST06-missing-sandbox-declaration
 VERDICT:  CLEAN
 EVIDENCE: permissions block present
-TIER:     static-detectable
+TIER:     static-detectable   COVERS: artifact-signal-only
 
-CHECKS RUN:  2 detector check(s) at the static-detectable tier, 1 DETECTED
+CHECKS RUN:  5 detector check(s), 1 DETECTED — 0 of them covering a named scenario
 REGISTRY:    5 named scenario(s): 1 static-detectable, 0 agent-judgable, 4 out-of-artifact
 NOT DECIDED: 4 out-of-artifact scenarios are not decidable from one package
-F1:          not published (pending-detector)
+F1:          scenario-level 1.00 (AST06-S01, n=4); artifact-signal-only 1.00 (n=2)
              status=proxy-covered, scope=mixed-proxy, corpus=6 case(s)
 ```
 
 The coverage footer is not decoration. A DETECTED-free run of this command means
-"none of the 2 implemented checks fired", never "AST06 is clean".
+"none of the 5 implemented checks fired", never "AST06 is clean".
 
 ## Coverage caveat
 
