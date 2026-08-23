@@ -8,21 +8,32 @@ This repository is an independent community implementation. It is **not** an off
 OWASP project and carries no OWASP endorsement — see [`../README.md`](../README.md) and
 [`../NOTICE`](../NOTICE).
 
-> ## ⛔ No judged run recorded yet
+> ## Judged run recorded — 2026-08-23
 >
-> `eval/scorecards/` is empty. **Every number in the results table below is a
-> placeholder**, not a measurement, and no skill in this repository has been judged,
-> graded, or cleared to ship.
+> **11 skills × 3 rounds × 6 providers = 198 independent judgments.** Every number in the
+> results table is measured, and every verdict is recomputed from that scorecard's own
+> `aggregate.judgments` rather than copied from a stored field.
 >
-> This page publishes the instrument before the reading: the rubric, the ship rule, the
-> provider roster, and the unavailable providers with their recorded reasons. Publishing
-> the rubric first is what makes a later score checkable rather than merely asserted —
-> and it makes the *absence* of a score visible instead of implied.
+> **No skill currently clears the ship rule.** Four grade A on the total (`AST04` 111.1,
+> `AST08` 109.6, `AST07` 109.2, `AST10` 108.6) and seven grade B; all eleven are BLOCKED,
+> most of them by the `mean − σ ≥ 105` lower bound rather than by their mean.
 >
-> Regenerate this page's results table after a run with:
+> **Read the lower bound with care.** `ship_floor.py` was calibrated where "the pooled
+> per-judgment sigma is 3.3 points". Across this six-provider panel sigma is 6.6–10.3,
+> because the judges differ by *systematic calibration bias*, not noise: measured over 33
+> judgments each, `qwen3-235b` runs +12.2 against the pooled mean and `nova-pro` −7.9, a
+> 20.1-point spread, while any single judge repeats itself within 1–2 points across rounds.
+> `mean − σ` therefore penalises panel *diversity* rather than skill *quality* — adding a
+> judge makes the gate harder even when the skill is unchanged. The rule is reported here
+> exactly as locked; it has **not** been retuned after seeing these results, because
+> changing a bar to clear it is the one move that would make every number on this page
+> worthless. Any change belongs in a recorded decision, applied to a fresh run.
+>
+> Regenerate the results table after a run with:
 >
 > ```bash
-> python3 eval/generate_dashboard.py
+> python3 eval/run_judge_matrix.py --rounds 3   # writes eval/scorecards/*.json
+> python3 eval/generate_dashboard.py            # rewrites the table below
 > ```
 
 ---
@@ -148,12 +159,21 @@ during a round is excluded from that round's pool with a timestamped audit entry
 ## Results
 
 <!-- BEGIN:results -->
-**No judged run recorded yet.** `eval/scorecards/` contains no scorecard files. Every row
-below is a placeholder showing the shape of a recorded result — not a measurement, not a
-grade, and not a claim that any skill has been evaluated.
+**11 of 11 skills judged; 0 clear the ship rule.** Verdicts and grades below are recomputed from each scorecard's own `aggregate.judgments` by `ship_floor.aggregate_verdict`; stored verdicts are never copied. Unjudged skills keep their placeholder row rather than dropping out of the table.
 
 | Skill | Rounds | Mean | Mean − σ | Lowest dim (floor) | Grade | Verdict |
 | --- | ---: | ---: | ---: | --- | --- | --- |
+| `AST01` | 18 | 106.3 | 99.1 | `D5` 12.4/13 ⚠ | B | BLOCKED — dimension means below floor: D5, D6, D8 |
+| `AST02` | 18 | 106.2 | 98.7 | `D5` 12.5/13 ⚠ | B | BLOCKED — dimension means below floor: D5, D6, D8 |
+| `AST03` | 18 | 107.7 | 100.4 | `D5` 13.1/13 | B | BLOCKED — pooled mean 107.7 < target 108 |
+| `AST04` | 18 | 111.1 | 104.5 | `D5` 13.4/13 | A | BLOCKED — lower bound (mean - stdev) 104.5 < 105 — mean 111.1 is within noise (sigma 6.57) of failing badly |
+| `AST05` | 18 | 106.4 | 96.1 | `D6` 12.7/13 ⚠ | B | BLOCKED — dimension means below floor: D5, D6, D8 |
+| `AST06` | 18 | 106.3 | 98 | `D5` 12.6/13 ⚠ | B | BLOCKED — dimension means below floor: D5, D6, D8 |
+| `AST07` | 18 | 109.2 | 100.3 | `D8` 12.9/13 ⚠ | A | BLOCKED — dimension means below floor: D8 |
+| `AST08` | 18 | 109.6 | 101.1 | `D5` 13.3/13 | A | BLOCKED — lower bound (mean - stdev) 101.1 < 105 — mean 109.6 is within noise (sigma 8.46) of failing badly |
+| `AST09` | 18 | 107.3 | 99.1 | `D8` 12.6/13 ⚠ | B | BLOCKED — dimension means below floor: D5, D8 |
+| `AST10` | 18 | 108.6 | 100.9 | `D5` 13.1/13 | A | BLOCKED — lower bound (mean - stdev) 100.9 < 105 — mean 108.6 is within noise (sigma 7.66) of failing badly |
+| `advisory` | 18 | 103.3 | 94.1 | `D1` 16.2/17 ⚠ | B | BLOCKED — dimension means below floor: D1, D3, D5, D6 |
 | `ast01-malicious-skills` | — | — | — | — | — | NOT YET JUDGED |
 | `ast02-supply-chain-compromise` | — | — | — | — | — | NOT YET JUDGED |
 | `ast03-over-privileged-skills` | — | — | — | — | — | NOT YET JUDGED |
@@ -164,7 +184,6 @@ grade, and not a claim that any skill has been evaluated.
 | `ast08-poor-scanning` | — | — | — | — | — | NOT YET JUDGED |
 | `ast09-no-governance` | — | — | — | — | — | NOT YET JUDGED |
 | `ast10-cross-platform-reuse` | — | — | — | — | — | NOT YET JUDGED |
-| `advisory` | — | — | — | — | — | NOT YET JUDGED |
 <!-- END:results -->
 
 The `advisory` skill is judged on **guidance relevance and reasoning quality** — whether
