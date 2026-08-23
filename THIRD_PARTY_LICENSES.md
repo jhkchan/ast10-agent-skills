@@ -1,7 +1,47 @@
 # Third-Party Licenses
 
-This document catalogues the third-party source vendored into
-`owasp-ast10-agent-skills`. The vendoring choice is recorded in spec.md
+This repository ships under the [Apache License, Version 2.0](LICENSE),
+Copyright 2026 Jacky Chan. This document catalogues everything in it that
+someone else owns.
+
+| # | Component | Kind | License | Holder |
+| --- | --- | --- | --- | --- |
+| 0 | OWASP Agentic Skills Top 10 whitepaper | source material | see below | OWASP project + contributors |
+| 1 | `scripts/ship_floor.py`, `scripts/content_hash.py`, `scripts/eval_counts.py` | vendored copy, commit-pinned | Apache-2.0 | 2026 Votee AI |
+| 2 | skill-judge 8-dimension rubric | pinned by SHA, not vendored | MIT | (c) 2026 Leonardo Flores |
+| 3 | `PyYAML`, `jsonschema`, `cryptography` | installed dependency | MIT / MIT / Apache-2.0 OR BSD-3-Clause | upstream |
+
+## Source material — the OWASP Agentic Skills Top 10 whitepaper
+
+The whitepaper is not a dependency of this repository; it is the **source
+material** the whole repository implements. Recorded here so the provenance
+sits with the other attributions rather than only in prose:
+
+| What | Where it lands in this repo |
+| --- | --- |
+| The AST01–AST10 taxonomy and category definitions | `skills/AST01/`..`skills/AST10/` |
+| The named attack scenarios and their verbatim titles | `scenarios/registry.yaml` (62 scenarios), each category's `coverage-matrix.md` |
+| The "Which AST Does My Finding Belong To?" decision tree | `skills/advisory/scripts/triage.py` |
+| The Universal Skill Format (USF) v1.0 proposal | `schemas/usf-v1.schema.json`, `validators/usf.py`, every `skills/*/skill.usf.yaml` |
+
+Credit for all of the above belongs to the OWASP Agentic Skills Top 10 project
+and its contributors; **Ken Huang (DistributedApps.ai) is the project leader**
+and originated the taxonomy. Scenario titles are reproduced verbatim for
+identification and traceability — `tests/test_coverage_matrix*.py` fails on a
+paraphrase, because a renamed scenario is an untraceable one.
+
+**This repository is not an OWASP project** and carries no OWASP endorsement,
+review, or affiliation, despite its name. Its maintainer is a credited entry in
+the whitepaper's "Reviewers and Contributors" table — contributor credit on the
+publication, not authorship of it and not leadership of the project. Where this
+repository and the whitepaper disagree, the whitepaper is authoritative.
+"OWASP" is a trademark of the OWASP Foundation, used descriptively here to
+identify the standard being implemented. See `NOTICE` and the README
+disclaimer.
+
+## Vendoring rationale
+
+The vendoring choice is recorded in spec.md
 gate-3 ("Vendor a standalone copy of `ship_floor.py`, `content_hash.py`,
 `eval_counts.py` into `scripts/` ... No live dependency on another repo") and
 its rationale in plan.md's "Risky code touchpoints" (T-2.2): the pooled
@@ -13,8 +53,8 @@ visible re-vendor.
 ## License-compatibility policy
 
 This repo is a provider-agnostic GitHub publication (spec.md contract) and
-follows the same compatibility policy as its vendoring source,
-`REDACTED-SIBLING-REPO`:
+follows the same compatibility policy as its vendoring source (the
+upstream eval-harness repository named in `NOTICE`'s attribution block):
 
 Acceptable license families:
 
@@ -28,16 +68,19 @@ Commons Clause, CC-BY-NC.
 ## Vendored files (`scripts/`)
 
 `scripts/ship_floor.py`, `scripts/content_hash.py` and `scripts/eval_counts.py`
-are standalone copies of the same-named files from
-[REDACTED-SIBLING-REPO](https://example.invalid/redacted-sibling-repo)
-(Apache License, Version 2.0; Copyright 2026 Votee AI). No live dependency —
-each file is a plain-copy snapshot living in this repo's own `scripts/`.
+are standalone copies of the same-named files from an upstream eval-harness
+repository (Apache License, Version 2.0; Copyright 2026 Votee AI). Its slug is
+not reproduced here — this project does not name sibling agent-skill
+repositories in committed files, and Apache-2.0 section 4 attribution is
+satisfied by the copyright holder, license and pinned commit recorded below.
+No live dependency — each file is a plain-copy snapshot living in this repo's
+own `scripts/`.
 
 | Path | Upstream | Copyright | License | Vendored at commit |
 | --- | --- | --- | --- | --- |
-| `scripts/ship_floor.py` | `REDACTED-SIBLING-REPO` `scripts/ship_floor.py` | 2026 Votee AI | Apache-2.0 | `34ac48d680323ce4b5302c8a756db6327984b59e` |
-| `scripts/content_hash.py` | `REDACTED-SIBLING-REPO` `scripts/content_hash.py` | 2026 Votee AI | Apache-2.0 | `34ac48d680323ce4b5302c8a756db6327984b59e` |
-| `scripts/eval_counts.py` | `REDACTED-SIBLING-REPO` `scripts/eval_counts.py` | 2026 Votee AI | Apache-2.0 | `34ac48d680323ce4b5302c8a756db6327984b59e` |
+| `scripts/ship_floor.py` | upstream `scripts/ship_floor.py` | 2026 Votee AI | Apache-2.0 | `34ac48d680323ce4b5302c8a756db6327984b59e` |
+| `scripts/content_hash.py` | upstream `scripts/content_hash.py` | 2026 Votee AI | Apache-2.0 | `34ac48d680323ce4b5302c8a756db6327984b59e` |
+| `scripts/eval_counts.py` | upstream `scripts/eval_counts.py` | 2026 Votee AI | Apache-2.0 | `34ac48d680323ce4b5302c8a756db6327984b59e` |
 
 Upstream publishes no semver tags as of the vendored commit (`git describe
 --tags` returns no names); the commit SHA above is the pin, per plan.md T-2.2
@@ -50,7 +93,7 @@ Upstream publishes no semver tags as of the vendored commit (`git describe
   note pointing here).
 - `eval_counts.py` — `MIN_EVALS`, `MIN_NEGATIVE_EVALS`, `is_negative_eval()`
   and its regex are copied unmodified. `EVAL_COUNTS` is **not** copied: it is
-  keyed upstream by `REDACTED-SIBLING-REPO`' own skill directory names,
+  keyed upstream by that repository's own skill directory names,
   which do not exist in this repo. It starts as an empty dict here, to be
   populated by T-3.x once this repo's own `AST01`.."AST10"` + advisory skills
   are authored — same contract (keyed by skill directory name), no data.
@@ -61,7 +104,7 @@ Upstream publishes no semver tags as of the vendored commit (`git describe
   `aggregate_verdict()`, `verdict_of()`, `_is_invalidated()`, `binding_block()`
   are all byte-identical to upstream. Upstream's `A_MINUS`/`MANDATED` skill-name
   sets and the delivery-floor check in `main()` were **dropped**: those name
-  `REDACTED-SIBLING-REPO`' own skill roster and are not part of the
+  that repository's own skill roster and are not part of the
   formula — this repo's spec/plan define no equivalent "mandated area"
   concept. `main()` here is a thin, repo-local driver over the same
   `aggregate_verdict()` rule, reading `OWASP_AST10_ROOT` (was `MMAS_ROOT`
@@ -70,24 +113,66 @@ Upstream publishes no semver tags as of the vendored commit (`git describe
 All three files are Apache-2.0, the same license family as this repo, so no
 compatibility review is required for the copy itself.
 
-## Rubric pin (not yet vendored as a tree)
+## Installed Python dependencies (not vendored)
 
-`ship_floor.py`'s `RUBRIC_SHA` constant pins the same skill-judge rubric
-version (`3027f20f3181758385a1bb8c022d4041dfb4de84`) that
-`REDACTED-SIBLING-REPO` vendors at `vendor/skill-judge/` from
-[softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit)
-(`skills/skill-judge`, MIT, (c) 2026 Leonardo Flores) — spec.md's contract:
-"scored ... against the pinned 8-dimension skill-judge rubric." This repo
-does not yet vendor its own copy of the rubric tree itself (out of T-2.2's
-scope); `RUBRIC_SHA` only pins which version any recorded `scores.json`
-`aggregate.rubric_sha` must match. Vendoring `vendor/skill-judge/` here,
-mirroring the pattern above, is tracked as follow-up work, not silently
-assumed done.
+These are imported, not copied. They are listed here because the policy above
+requires review before any new dependency is introduced, and because a
+dependency that nothing records is the AST02 shape this repo is about.
+
+| Package | Used by | License | Why |
+| --- | --- | --- | --- |
+| `PyYAML` | `validators/usf.py`, `fixtures/`, several test modules | MIT | Manifest and fixture loading. Loaded via `SafeLoader` only — `UnsafeLoader` on a skill manifest is code execution (AST04). |
+| `jsonschema` | `validators/usf.py` | MIT | Draft 2020-12 structural pass over `schemas/usf-v1.schema.json`. Imported defensively: the semantic half of the validator runs without it and raises `SchemaUnavailableError` rather than silently skipping the structural checks. |
+| `cryptography` | `validators/usf.py` (optional) | Apache-2.0 OR BSD-3-Clause | ed25519 verification of a signed USF manifest. Imported lazily inside `verify_signature()`; every other code path works without it, and an unverifiable signature raises rather than returning "valid". |
+
+All three are inside the acceptable license families above, so no compatibility
+review is outstanding.
+
+## Rubric pin — skill-judge (not vendored as a tree)
+
+| Field | Value |
+| --- | --- |
+| Work | skill-judge, the 8-dimension agent-skill grading rubric (`skills/skill-judge`) |
+| Upstream | [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) |
+| Copyright | (c) 2026 Leonardo Flores |
+| License | MIT |
+| Pinned at | `3027f20f3181758385a1bb8c022d4041dfb4de84` |
+| Where the pin lives | `scripts/ship_floor.py`, constant `RUBRIC_SHA` |
+| Enforced by | `ship_floor.py` rejects any recorded `aggregate.rubric_sha` that differs |
+
+The rubric is the substance behind this repo's ship gate: the per-dimension
+floors `FLOORS` enumerates (`D1:17, D2:13, D3:13, D4:13, D5:13, D6:13, D7:8,
+D8:13`) are that rubric's dimensions, and spec.md's contract is that skills are
+"scored ... against the pinned 8-dimension skill-judge rubric." It is
+attributed here in full even though only its identifying hash is embedded.
+
+**No copy of the rubric text ships in this repository.** `RUBRIC_SHA`
+constrains *which version* a recorded `scores.json` may claim to have been
+judged against; it does not reproduce the rubric. The upstream eval-harness
+repository this project vendors its scoring pipeline from does carry a
+`vendor/skill-judge/` tree, which is how the SHA is known. Vendoring an
+equivalent tree here — with the MIT license text alongside it, as MIT requires
+of a copy — is tracked as follow-up work and is not silently assumed done. Until
+then, a reader who wants the rubric text goes to the upstream above.
+
+softaworks/agent-toolkit does not endorse and is not affiliated with this
+repository.
 
 ## Audit metadata
 
-- **Audit date:** 2026-08-21
+- **Audit date:** 2026-08-23 (supersedes the 2026-08-21 T-2.2 pass; scope
+  widened from the vendored files alone to every third-party component,
+  including the source-material and rubric attributions)
 - **Scope:** `scripts/ship_floor.py`, `scripts/content_hash.py`,
-  `scripts/eval_counts.py` (T-2.2)
-- **Scan result:** PASS — both license families present (Apache-2.0 vendored
-  code; this repo's own license posture) are mutually compatible
+  `scripts/eval_counts.py` (vendored); the skill-judge `RUBRIC_SHA` pin; the
+  OWASP Agentic Skills Top 10 whitepaper as source material; `PyYAML`,
+  `jsonschema`, `cryptography` as installed dependencies
+- **This repo's license:** Apache-2.0 (root `LICENSE`, Copyright 2026 Jacky
+  Chan) — present and asserted, no longer pending
+- **Scan result:** PASS — every license family present (Apache-2.0 for the
+  vendored pipeline and this repo; MIT for the pinned rubric and two
+  dependencies; Apache-2.0 OR BSD-3-Clause for `cryptography`) sits inside the
+  acceptable set above and is mutually compatible. No copyleft component is
+  present, so no reciprocal obligation attaches.
+- **Outstanding:** the skill-judge rubric tree is pinned but not vendored (see
+  above). This is a completeness gap in the audit, recorded rather than closed.

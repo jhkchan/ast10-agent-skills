@@ -60,9 +60,7 @@ def test_file_outside_surface_globs_does_not_affect_hash(tmp_path):
     # coverage-matrix.md is a real shipped artifact (spec.md "Behavior" #3)
     # but is NOT part of this hash's surface — it is covered by the separate
     # tier-lock hash (T-1.5), not by content_sha256.
-    (tmp_path / "AST01" / "coverage-matrix.md").write_text(
-        "| scenario | tier | reason |"
-    )
+    (tmp_path / "AST01" / "coverage-matrix.md").write_text("| scenario | tier | reason |")
 
     assert content_sha256(tmp_path / "AST01") == before
 

@@ -16,7 +16,7 @@ def test_floors_match_upstream_vendored_values():
 
 
 def test_eval_counts_starts_empty_pending_t3x_skill_authoring():
-    # Not REDACTED-SIBLING-REPO' skill names — this repo has none yet.
+    # Not the upstream eval-harness repository's skill names — this repo has none yet.
     assert EVAL_COUNTS == {}
 
 
@@ -33,18 +33,8 @@ def test_negative_infix_name_is_negative():
 
 
 def test_refusal_expected_output_is_negative():
-    assert (
-        is_negative_eval(
-            {"name": "clean", "expected_output": "No — this manifest is safe."}
-        )
-        is True
-    )
+    assert is_negative_eval({"name": "clean", "expected_output": "No — this manifest is safe."}) is True
 
 
 def test_ordinary_eval_is_not_negative():
-    assert (
-        is_negative_eval(
-            {"name": "detect-deny-write-bypass", "expected_output": "Flag AST04."}
-        )
-        is False
-    )
+    assert is_negative_eval({"name": "detect-deny-write-bypass", "expected_output": "Flag AST04."}) is False

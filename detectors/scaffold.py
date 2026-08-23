@@ -38,9 +38,7 @@ def static_detectable(scenario_tiers: dict[str, str]) -> set[str]:
     return {s for s, tier in scenario_tiers.items() if tier == "static-detectable"}
 
 
-def run_all(
-    detectors: dict[str, Callable[[dict], Finding]], pkg: dict
-) -> list[Finding]:
+def run_all(detectors: dict[str, Callable[[dict], Finding]], pkg: dict) -> list[Finding]:
     return [fn(pkg) for fn in detectors.values()]
 
 
@@ -72,9 +70,7 @@ def f1_report(
     # detected must never default to a "perfect" 1.0 score.
     precision = tp / (tp + fp) if (tp + fp) else 0.0
     recall = tp / (tp + fn) if (tp + fn) else 0.0
-    f1 = (
-        (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
-    )
+    f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
     return {
         "status": "measured",
         "f1": f1,
@@ -92,9 +88,7 @@ def f1_report(
 # Explicit \uXXXX escapes on purpose: embedding the literal invisible glyphs
 # in this file's own source would be exactly the smuggling risk this
 # detector exists to catch, and would be silently unreadable in any diff.
-INVISIBLE_UNICODE_RE = re.compile(
-    "[\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]"
-)
+INVISIBLE_UNICODE_RE = re.compile("[\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]")
 
 
 def detect_invisible_unicode_smuggling(pkg: dict, scenario_id: str) -> Finding:

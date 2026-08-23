@@ -15,9 +15,7 @@ _spec.loader.exec_module(detector)
 
 
 def test_s001_detector_registry_matches_declared_detectable_tier():
-    declared_detectable = {
-        s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"
-    }
+    declared_detectable = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"}
     assert set(detector.DETECTORS.keys()) == declared_detectable == set()
 
 

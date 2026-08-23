@@ -15,16 +15,12 @@ _spec.loader.exec_module(detector)
 
 
 def test_s001_detector_registry_matches_declared_detectable_tier():
-    declared_detectable = {
-        s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"
-    }
+    declared_detectable = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"}
     assert set(detector.DETECTORS.keys()) == declared_detectable == set()
 
 
 def test_s003_both_scenarios_declared_out_of_artifact_with_reason():
-    assert (
-        detector.SCENARIO_TIERS["AST10-cross-registry-arbitrage"] == "out-of-artifact"
-    )
+    assert detector.SCENARIO_TIERS["AST10-cross-registry-arbitrage"] == "out-of-artifact"
     assert detector.SCENARIO_TIERS["AST10-multi-platform-campaign"] == "out-of-artifact"
 
 

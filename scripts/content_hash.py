@@ -1,6 +1,6 @@
 """Shared sha256 helper for a skill's shipped surface.
 
-Vendored, standalone, from `REDACTED-SIBLING-REPO` (Apache-2.0) — spec.md
+Vendored, standalone, from the upstream eval-harness repository (Apache-2.0) — spec.md
 gate-3: "Vendor a standalone copy of ship_floor.py, content_hash.py,
 eval_counts.py into scripts/ ... No live dependency on another repo." See
 THIRD_PARTY_LICENSES.md and NOTICE for the pinned upstream commit and drift

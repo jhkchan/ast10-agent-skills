@@ -286,9 +286,55 @@ _RULES = [
 ]
 
 _NO_MATCH_GUIDANCE = (
-    "No decision-tree branch matched this finding; escalate for manual "
-    "triage rather than guessing a category."
+    "No decision-tree branch matched this finding; escalate for manual triage rather than guessing a category."
 )
+
+# The four branches the whitepaper's own tree numbers, with the question each
+# one asks. Everything else is an extended rule in the same style, derived
+# from that category's Description / Attack Scenarios language rather than
+# from a numbered branch -- the distinction is recorded, never blurred, so a
+# reader can tell a literal branch from an extension of the tree.
+TREE_BRANCHES: dict[str, tuple[int, str]] = {
+    "AST01": (1, "the skill itself is malicious at publish time"),
+    "AST02": (2, "how the skill reached the registry or pipeline"),
+    "AST04": (3, "the SKILL.md / manifest metadata itself"),
+    "AST08": (4, "a scanner or reviewer control failed"),
+}
+
+RULE_COUNT = len(_RULES)
+
+
+def matched_rules(finding: str) -> list[dict]:
+    """Every rule that matched, in decision-tree order, with its matched phrase.
+
+    Element 0 is the primary root cause; the rest are contributing control
+    failures (branch 5), never a second primary -- the same ordering
+    :func:`triage` reports, from the same single pass, so the two can never
+    disagree.
+
+    Exposed because a routing decision has to be auditable, not merely
+    correct: a caller (cli/bin/cli.js `route`) can print WHICH rule fired and
+    on WHICH phrase, instead of asking the reader to trust a category label.
+    """
+    text = finding.lower()
+    matches: list[dict] = []
+    for order, (ast_id, category, phrases, guidance) in enumerate(_RULES, start=1):
+        hit = next((phrase for phrase in phrases if phrase in text), None)
+        if hit is None:
+            continue
+        branch, question = TREE_BRANCHES.get(ast_id, (None, None))
+        matches.append(
+            {
+                "ast_id": ast_id,
+                "category": category,
+                "matched_phrase": hit,
+                "rule_order": order,
+                "branch": branch,
+                "basis": question or f"extended rule — {category}'s own whitepaper category language",
+                "guidance": guidance,
+            }
+        )
+    return matches
 
 
 def triage(finding: str) -> dict:
@@ -299,34 +345,37 @@ def triage(finding: str) -> dict:
     branch 5 - recorded as contributing control failures, never split into
     a second primary).
     """
-    text = finding.lower()
-    matches = [rule for rule in _RULES if any(phrase in text for phrase in rule[2])]
+    matches = matched_rules(finding)
 
     if not matches:
         return {
             "ast_id": None,
             "category": None,
             "guidance": _NO_MATCH_GUIDANCE,
-            "reasoning": (
-                "No whitepaper-grounded phrase from any AST01-AST10 rule "
-                "matched the finding text."
-            ),
+            "reasoning": ("No whitepaper-grounded phrase from any AST01-AST10 rule matched the finding text."),
             "contributing": [],
+            "matched_phrase": None,
+            "branch": None,
         }
 
-    primary_ast, primary_category, _phrases, primary_guidance = matches[0]
-    contributing = [ast_id for ast_id, *_ in matches[1:]]
+    primary = matches[0]
+    primary_ast = primary["ast_id"]
+    primary_category = primary["category"]
 
     return {
         "ast_id": primary_ast,
         "category": primary_category,
-        "guidance": primary_guidance,
+        "guidance": primary["guidance"],
         "reasoning": (
             f"Routed to {primary_ast} ({primary_category}) as the primary "
             "root cause per the decision tree's rule order; "
             f"{len(matches)} total rule(s) matched."
         ),
-        "contributing": contributing,
+        "contributing": [match["ast_id"] for match in matches[1:]],
+        # Why it routed here, not just where -- the phrase that fired and the
+        # whitepaper branch it belongs to (None for the six extended rules).
+        "matched_phrase": primary["matched_phrase"],
+        "branch": primary["branch"],
     }
 
 

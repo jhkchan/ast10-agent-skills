@@ -1,0 +1,35 @@
+# Lint + format contract for this repository.
+#
+# Pinned in a config file rather than passed as CI flags on purpose. The
+# workflow runs bare `ruff check .` and `ruff format --check .`, so what CI
+# enforces is exactly what a contributor gets from typing the same two commands
+# locally — no second, invisible copy of the rule set living in a YAML `args:`
+# line that can drift from the one in a contributor's editor.
+#
+# 120, not the default 88: the detector modules and their docstrings carry
+# whitepaper scenario names and evidence strings that do not survive an
+# 88-column fold without being reworded, and rewording a detector's own
+# evidence string to satisfy a formatter is how a scan loses its meaning.
+
+line-length = 120
+target-version = "py311"
+
+exclude = [
+    ".git",
+    ".ruff_cache",
+    ".pytest_cache",
+    "__pycache__",
+    ".omc",
+    "node_modules",
+    # Workflow scaffolding for the build of this repo, not shipped source.
+    "features",
+]
+
+[lint]
+# E  pycodestyle errors (includes E501 at the line-length above)
+# F  pyflakes — undefined names, unused imports, unused locals
+# I  isort — one import ordering, enforced rather than agreed
+select = ["E", "F", "I"]
+
+[format]
+docstring-code-format = false

@@ -26,10 +26,9 @@ from __future__ import annotations
 
 from typing import Callable
 
-from detectors.scaffold import Finding
+from detectors.scaffold import Finding, static_detectable
 from detectors.scaffold import f1_report as _f1_report
 from detectors.scaffold import run_all as _run_all
-from detectors.scaffold import static_detectable
 
 SCENARIO_TIERS: dict[str, str] = {
     "AST09-orphaned-skill": "out-of-artifact",

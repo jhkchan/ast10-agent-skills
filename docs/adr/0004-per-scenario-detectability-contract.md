@@ -107,8 +107,28 @@ The only design that can plausibly reach F1 >= 0.80 on natural-language scenario
 describe. Rejected because detection becomes non-deterministic and non-CI-runnable, and
 per-category F1 costs at least four model rounds times ten categories times corpus in paid calls.
 
+## Amendment — 2026-08-23 (T-3.1a): the count is 62, not 58
+
+This record's Context and Consequences sections say the whitepaper names 58 attack scenarios. That
+figure came from the document's table of contents. `scenarios/registry.yaml` extracts the scenarios
+from the body of each category's "Attack Scenarios" section instead and finds **62**: four are body
+sub-headings the table of contents omits — AST03 "Low-Privilege Skill Invokes a High-Privilege
+Skill", AST05 "Malicious Instructions Embedded in Documents", AST05 "Denial-of-Service (DoS)
+through Malicious Skills", and AST08 "Scanner Host Compromise and Resource Exhaustion".
+
+Read every "58" above as 62. Nothing else in the decision changes: the tiering doctrine, the
+tier-lock tripwire, and the never-pad rule all hold, and each of the four newly counted scenarios
+is tiered in the registry like any other. The registry is now authoritative on tier;
+`fixtures/manifest.yaml` links its labeled checks back to registry ids and is tested against them
+in `tests/test_scenario_registry.py`.
+
+Of the 62, the registry tiers 20 static-detectable, 8 agent-judgable, and 34 out-of-artifact — so
+roughly two thirds of the whitepaper's named attack surface is not decidable from a single skill
+package, which is a stronger version of the same claim this ADR was written to make.
+
 ## References
 
+- `scenarios/registry.yaml` — the authoritative per-scenario registry this contract governs.
 - `features/owasp-ast10-agent-skills/spec.md` — Gate 02 decision `gate-1` and the originating
   "Proposed ADRs" draft this record accepts.
 - `features/owasp-ast10-agent-skills/plan.md` — T-1.1 (tier-lock ADR authoring), T-1.5 (tier-lock

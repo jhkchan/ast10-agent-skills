@@ -1,0 +1,78 @@
+# config/dogfood_waivers.yml — recorded exceptions for `scripts/dogfood.py`.
+#
+# The dogfood job runs every detector this repo ships over every skill package
+# this repo ships and fails on any finding. A finding listed here is one this
+# project has looked at and decided is a false positive on its own source, with
+# the reason written down. Nothing is suppressed silently.
+#
+# Contract (enforced by scripts/dogfood.py and tests/test_dogfood.py):
+#
+#   * All four fields are required. `reason` is what makes the exception
+#     reviewable; `evidence_contains` pins the waiver to the exact file it was
+#     written for, so it can never absorb a different, real finding of the same
+#     scenario in the same skill later.
+#   * A waiver that matches nothing FAILS the dogfood job. Delete a waiver when
+#     the finding it covers stops firing — a suppression list that only ever
+#     grows is the AST09 "we have logs" failure in miniature.
+#   * Waiving is the last resort, not the first. Prefer fixing the finding.
+#     Rewording a detector's own evidence string so it stops matching its own
+#     scan is not a fix — it is the AST08 scanner-evasion pattern turned inward.
+#
+# Every entry below is the same shape of false positive: a detector that scans
+# a package's shipped `scripts/*.py` surface for a signature, matching the
+# source that defines that signature or the unit-test corpus that exercises it.
+# The alternative — excluding the detectors' own scripts from the dogfooded
+# surface — would make the dogfooded file set diverge from the one the manifest
+# `content_hash` covers, trading five recorded exceptions for a silent blind
+# spot across the whole scripts/ tree.
+
+waivers:
+  - skill: AST04
+    scenario: AST04-yaml-injection
+    evidence_contains: "scripts/detector.py: yaml.unsafe_load() call"
+    reason: >-
+      Self-match on the detector's own evidence string. skills/AST04/scripts/
+      detector.py line ~71 formats the message "…: yaml.unsafe_load() call",
+      and that literal is what its own _YAML_UNSAFE_LOAD_CALL_RE matches.
+      Confirmed by reading the file: the module never calls into PyYAML at all
+      — it pattern-matches source text and does not import yaml. Kept as a
+      waiver rather than reworded, because editing
+      a message purely to escape a scan is the evasion behaviour AST08 exists
+      to flag.
+
+  - skill: AST04
+    scenario: AST04-invisible-unicode-smuggling
+    evidence_contains: "scripts/test_ast04_detector.py"
+    reason: >-
+      Test corpus. skills/AST04/scripts/test_ast04_detector.py embeds U+200B
+      and U+202E as the positive fixtures for detect_invisible_unicode_
+      smuggling(); a Unicode-smuggling detector cannot be tested without the
+      code points it detects. The smuggled characters are confined to the test
+      module's fixture literals and reach no shipped prose.
+
+  - skill: AST04
+    scenario: AST08-invisible-unicode-smuggling
+    evidence_contains: "scripts/test_ast04_detector.py"
+    reason: >-
+      Same file and same fixture literals as the AST04 waiver above. AST04 and
+      AST08 share one implementation (detectors/scaffold.detect_invisible_
+      unicode_smuggling) and differ only in the scenario id they report, so the
+      same test corpus is found twice under two ids. Recorded twice on purpose:
+      one waiver silencing both ids would also silence a genuine AST08 finding
+      in this package.
+
+  - skill: AST08
+    scenario: AST04-invisible-unicode-smuggling
+    evidence_contains: "scripts/test_ast08_detector.py"
+    reason: >-
+      Test corpus. skills/AST08/scripts/test_ast08_detector.py embeds U+200B,
+      U+202E and U+FEFF as its positive fixtures, for the same reason AST04's
+      test module does. Found under AST04's scenario id because AST04's
+      detector scans every package, not only its own.
+
+  - skill: AST08
+    scenario: AST08-invisible-unicode-smuggling
+    evidence_contains: "scripts/test_ast08_detector.py"
+    reason: >-
+      The same test corpus reported under its own category's scenario id — the
+      detector correctly finding the fixtures written to make it fire.

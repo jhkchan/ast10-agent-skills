@@ -20,10 +20,7 @@ def _matrix_ast09() -> list[CoverageEntry]:
             scenario_id="AST09-orphaned-skill",
             category="AST09",
             tier=Tier.OUT_OF_ARTIFACT,
-            reason=(
-                "requires version history and release metadata maintained "
-                "outside the artifact"
-            ),
+            reason=("requires version history and release metadata maintained outside the artifact"),
         ),
         CoverageEntry(
             scenario_id="AST09-stale-manifest-pin",
@@ -84,18 +81,14 @@ def test_unregistered_scenario_id_raises_rather_than_shrinking_denominator():
         FixtureCase("typo", "AST09-stale-manifets-pin", "AST09", True, {}),
     ]
 
-    with pytest.raises(
-        UnregisteredScenarioFixtureError, match="AST09-stale-manifets-pin"
-    ):
+    with pytest.raises(UnregisteredScenarioFixtureError, match="AST09-stale-manifets-pin"):
         run_category("AST09", matrix, fixtures, _stale_pin_detector)
 
 
 def test_declared_detectable_tier_empty_yields_no_f1():
     """gate-4: a category with an empty static-detectable tier publishes no F1."""
     matrix = [
-        CoverageEntry(
-            "AST09-orphaned-skill", "AST09", Tier.OUT_OF_ARTIFACT, "process property"
-        ),
+        CoverageEntry("AST09-orphaned-skill", "AST09", Tier.OUT_OF_ARTIFACT, "process property"),
         CoverageEntry(
             "AST09-regulatory-exposure",
             "AST09",

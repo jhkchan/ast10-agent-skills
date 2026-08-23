@@ -28,10 +28,9 @@ from __future__ import annotations
 import hashlib
 from typing import Callable
 
-from detectors.scaffold import Finding
+from detectors.scaffold import Finding, static_detectable
 from detectors.scaffold import f1_report as _f1_report
 from detectors.scaffold import run_all as _run_all
-from detectors.scaffold import static_detectable
 
 SCENARIO_TIERS: dict[str, str] = {
     "AST01-content-hash-missing": "static-detectable",
@@ -68,11 +67,7 @@ def _package_digest(pkg: dict) -> str:
 def detect_content_hash_missing(pkg: dict) -> Finding:
     declared = (pkg.get("manifest", {}).get("content_hash") or {}).get("value")
     detected = not declared
-    evidence = (
-        "manifest.content_hash.value is unset"
-        if detected
-        else "content_hash.value present"
-    )
+    evidence = "manifest.content_hash.value is unset" if detected else "content_hash.value present"
     return Finding("AST01-content-hash-missing", detected, evidence)
 
 
@@ -81,16 +76,10 @@ def detect_content_hash_mismatch(pkg: dict) -> Finding:
     declared = (manifest.get("content_hash") or {}).get("value")
     if not declared:
         # No hash to compare against -- that gap is content-hash-missing's job.
-        return Finding(
-            "AST01-content-hash-mismatch", False, "no declared hash to compare"
-        )
+        return Finding("AST01-content-hash-mismatch", False, "no declared hash to compare")
     actual = _package_digest(pkg)
     detected = actual != declared
-    evidence = (
-        f"declared={declared} actual={actual}"
-        if detected
-        else "hash matches package content"
-    )
+    evidence = f"declared={declared} actual={actual}" if detected else "hash matches package content"
     return Finding("AST01-content-hash-mismatch", detected, evidence)
 
 

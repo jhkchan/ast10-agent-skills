@@ -1,12 +1,12 @@
 """Shared eval-count floor and negative-eval heuristic.
 
-Vendored, standalone, from `REDACTED-SIBLING-REPO` (Apache-2.0) — spec.md
+Vendored, standalone, from the upstream eval-harness repository (Apache-2.0) — spec.md
 gate-3. See THIRD_PARTY_LICENSES.md and NOTICE for the pinned upstream commit
 and drift policy.
 
 `MIN_EVALS`, `MIN_NEGATIVE_EVALS` and `is_negative_eval()` are the generic
 heuristic, unchanged from upstream. `EVAL_COUNTS` is repo-specific — upstream
-keys it by REDACTED-SIBLING-REPO' own skill directory names, which do not
+keys it by the upstream eval-harness repository's own skill directory names, which do not
 exist here. It starts empty and is populated by T-3.x as this repo's ten AST
 skills (`AST01`.."AST10") plus the advisory skill are authored, keyed by skill
 DIRECTORY name (== frontmatter `name`), mirroring upstream's contract exactly.

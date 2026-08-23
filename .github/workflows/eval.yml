@@ -1,0 +1,145 @@
+# CI eval workflow — ASSERTION-ONLY on every PR.
+#
+# The split, and why it is the split:
+#
+#   * CI runs the deterministic layer — pytest, ruff, the USF manifest
+#     validator, the S-011 tier-lock drift check, and the dogfood pass where
+#     this repo's own detectors are pointed at this repo's own skills. Every
+#     one of these is reproducible from the checkout alone.
+#
+#   * The LLM-judge layer (scripts/judge_harness.py -> scripts/ship_floor.py,
+#     the pooled Grade-A gate) is LOCAL / MAINTAINER-ONLY and deliberately
+#     absent here. It needs Bedrock credentials, a local `claude` CLI, and a
+#     z.ai key; NO cloud credentials are configured for this workflow and none
+#     should be. The maintainer runs the judge locally and commits the
+#     resulting scorecard artifacts, so a reviewer diffs recorded scores rather
+#     than trusting an unreproducible CI run. config/audit.yml carries the
+#     declare-or-skip record of which providers were reachable for each round.
+#
+# A green run here therefore means "every assertion this repo can make without
+# a model held", not "the skills scored Grade-A". Those are different claims
+# and this workflow keeps them apart on purpose.
+#
+# The marketplace-manifest drift check is not a step here: it lives in
+# tests/test_packaging.py, which the pytest step already runs. One
+# implementation, not a CI copy that can drift from the test.
+
+name: Eval
+
+on:
+  pull_request:
+    paths:
+      - 'skills/**'
+      - 'detectors/**'
+      - 'validators/**'
+      - 'scripts/**'
+      - 'adapters/**'
+      - 'cli/**'
+      - 'fixtures/**'
+      - 'scenarios/**'
+      - 'schemas/**'
+      - 'config/**'
+      - 'tests/**'
+      - '.claude-plugin/**'
+      - '.github/workflows/eval.yml'
+      # tests/test_packaging.py asserts on the licensing and attribution set,
+      # so an edit to one of these files has to be able to trigger the run
+      # that checks it.
+      - 'LICENSE'
+      - 'NOTICE'
+      - 'THIRD_PARTY_LICENSES.md'
+      - 'CONTRIBUTING.md'
+      - 'CODEOWNERS'
+      - '.gitignore'
+      # The lint/format contract itself. An edit here changes what the ruff
+      # steps enforce, so it has to be able to trigger the run that enforces it.
+      - 'ruff.toml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel stale runs on the same PR to keep solo-maintainer CI lean.
+concurrency:
+  group: eval-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+# Read-only. Nothing in this workflow writes to the repo, and no secret is
+# referenced anywhere in it — that absence is the maintainer-only judge split,
+# expressed as a permission rather than a promise.
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  assertion:
+    name: Assertion-layer eval
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install runner dependencies
+        # `cryptography` is optional at runtime (validators/usf.py imports it
+        # lazily) but is installed here on purpose: tests/test_usf.py guards
+        # the ed25519 signature path with pytest.importorskip, so omitting the
+        # package would make that test SKIP silently rather than fail loudly.
+        run: pip install pytest pyyaml jsonschema cryptography
+
+      - name: pytest (no model invocation)
+        run: python -m pytest -q
+
+      - name: ruff check
+        uses: astral-sh/ruff-action@v3
+        with:
+          # Pinned so a new ruff release cannot turn a green PR red on its own.
+          version: 0.14.13
+          # No rule selection and no --line-length here: `ruff.toml` carries the
+          # whole contract, so CI enforces exactly what a contributor gets from
+          # typing `ruff check .` locally.
+          args: check .
+
+      - name: ruff format --check
+        uses: astral-sh/ruff-action@v3
+        with:
+          version: 0.14.13
+          # --diff, not a bare --check: a formatting failure should show the
+          # reviewer the reformat it wants, not just the filenames.
+          args: format --check --diff .
+
+      - name: USF manifest validation
+        # Every shipped skill must carry a schema-valid Universal Skill Format
+        # manifest. Not --strict: the unsigned / no-DID warnings are the
+        # honest, declared posture of this repo (see any skill.usf.yaml), not
+        # defects to be suppressed.
+        run: python validators/usf.py skills/*/skill.usf.yaml
+
+      - name: Tier-lock drift check (S-011)
+        # A category's F1 is only valid for the scenario tiering its fixtures
+        # were labeled against. A reclassified tier invalidates that corpus,
+        # and this step is what makes the invalidation loud instead of silent.
+        run: python validators/tier_lock.py fixtures/manifest.yaml
+
+  dogfood:
+    name: Dogfood — own detectors over own skills
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install runner dependencies
+        run: pip install pyyaml
+
+      - name: Run this repo's detectors over this repo's skills/
+        # Fails on any finding not recorded in config/dogfood_waivers.yml with
+        # a written reason, and equally on any waiver that no longer matches a
+        # finding. A skill-security repo whose own packages have never been
+        # through its own detectors is asserting an untested capability.
+        run: python scripts/dogfood.py

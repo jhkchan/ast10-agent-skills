@@ -31,9 +31,7 @@ def _clean_package(files: dict[str, str]) -> dict:
 
 def test_s001_detector_registry_matches_declared_detectable_tier():
     """No orphan detector, no unimplemented declared-detectable scenario."""
-    declared_detectable = {
-        s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"
-    }
+    declared_detectable = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"}
     assert set(detector.DETECTORS.keys()) == declared_detectable
     # agent-judgable scenarios must NOT have a detector function (out of this tier's scope).
     assert "AST01-obfuscated-payload-intent" not in detector.DETECTORS
@@ -75,9 +73,7 @@ def test_s007_f1_at_least_080_on_declared_detectable_tier():
         # vulnerable: hash present but package tampered after signing
         (
             {
-                "manifest": {
-                    "content_hash": {"algorithm": "sha256", "value": "0" * 64}
-                },
+                "manifest": {"content_hash": {"algorithm": "sha256", "value": "0" * 64}},
                 "files": {"SKILL.md": "# tampered"},
             },
             {"AST01-content-hash-mismatch"},

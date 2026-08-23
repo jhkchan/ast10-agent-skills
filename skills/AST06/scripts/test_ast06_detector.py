@@ -15,9 +15,7 @@ _spec.loader.exec_module(detector)
 
 
 def test_s001_detector_registry_matches_declared_detectable_tier():
-    declared_detectable = {
-        s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"
-    }
+    declared_detectable = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"}
     assert set(detector.DETECTORS.keys()) == declared_detectable
     assert "AST06-cross-skill-data-leak" not in detector.DETECTORS
 
@@ -29,9 +27,7 @@ def test_unrestricted_shell_exec_flags_no_command_allowlist():
 
 def test_unrestricted_shell_exec_clear_with_command_allowlist():
     pkg = {
-        "manifest": {
-            "permissions": {"shell": {"allowed": True, "commands": ["git", "npm"]}}
-        },
+        "manifest": {"permissions": {"shell": {"allowed": True, "commands": ["git", "npm"]}}},
         "files": {},
     }
     assert detector.detect_unrestricted_shell_exec(pkg).detected is False
@@ -58,11 +54,7 @@ def test_s007_f1_at_least_080_on_declared_detectable_tier():
         ({"manifest": {}}, {"AST06-missing-sandbox-declaration"}),
         ({"manifest": {"permissions": None}}, {"AST06-missing-sandbox-declaration"}),
         (
-            {
-                "manifest": {
-                    "permissions": {"shell": {"allowed": True, "commands": ["git"]}}
-                }
-            },
+            {"manifest": {"permissions": {"shell": {"allowed": True, "commands": ["git"]}}}},
             set(),
         ),
         ({"manifest": {"permissions": {"shell": {"allowed": False}}}}, set()),

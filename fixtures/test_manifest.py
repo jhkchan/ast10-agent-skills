@@ -106,9 +106,7 @@ def test_ast09_orphaned_skill_is_declared_out_of_artifact_and_uncovered(manifest
 def test_every_scenario_has_a_written_reason(manifest, category):
     cat = manifest["categories"][category]
     for s in cat["detectable_scenarios"] + cat.get("out_of_artifact_scenarios", []):
-        assert s.get("reason", "").strip(), (
-            f"{category} scenario {s['id']} missing a written reason"
-        )
+        assert s.get("reason", "").strip(), f"{category} scenario {s['id']} missing a written reason"
         assert s["tier"] in {"static-detectable", "agent-judgable", "out-of-artifact"}
 
 
@@ -117,9 +115,7 @@ def test_case_fixture_files_exist_on_disk(manifest, category):
     cat = manifest["categories"][category]
     for case in cat["cases"]:
         case_path = REPO_ROOT / case["path"]
-        assert case_path.exists(), (
-            f"{category} case {case['id']} declares missing path {case_path}"
-        )
+        assert case_path.exists(), f"{category} case {case['id']} declares missing path {case_path}"
         assert case_path.stat().st_size > 0
 
 
@@ -127,9 +123,7 @@ def test_case_fixture_files_exist_on_disk(manifest, category):
 def test_tier_lock_hash_round_trips(manifest, category):
     """S-011 precondition: the manifest's stored hash matches a fresh recompute at rest."""
     cat = manifest["categories"][category]
-    all_scenarios = cat["detectable_scenarios"] + cat.get(
-        "out_of_artifact_scenarios", []
-    )
+    all_scenarios = cat["detectable_scenarios"] + cat.get("out_of_artifact_scenarios", [])
     ok, reason = check_tier_lock(all_scenarios, cat["tier_lock_hash"])
     assert ok, reason
 
@@ -159,8 +153,6 @@ def test_tier_reclassification_after_labeling_trips_the_lock(manifest):
     mutated[0]["tier"] = "agent-judgable"
 
     ok_after, reason = check_tier_lock(mutated, locked_hash)
-    assert ok_after is False, (
-        "reclassifying a tier must trip the lock, not pass silently"
-    )
+    assert ok_after is False, "reclassifying a tier must trip the lock, not pass silently"
     assert reclassified_id in reason
     assert "re-labeling" in reason and "re-run" in reason

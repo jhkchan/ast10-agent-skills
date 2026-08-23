@@ -94,9 +94,7 @@ def test_run_judge_excludes_crashed_provider_with_audit_trail(tmp_path):
 
     adapters = [
         _FakeAdapter("claude-cli", scores=_full_scores(18)),
-        _FakeAdapter(
-            "openai-compatible", error=TimeoutError("provider timed out after 60s")
-        ),
+        _FakeAdapter("openai-compatible", error=TimeoutError("provider timed out after 60s")),
     ]
 
     result = run_judge(skill_file, adapters, output_path=output_path)

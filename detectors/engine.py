@@ -101,9 +101,7 @@ def run_category(
     """
     tier_by_scenario = {entry.scenario_id: entry.tier for entry in coverage_matrix}
 
-    unregistered_hits = sorted(
-        {f.scenario_id for f in fixtures if f.scenario_id not in tier_by_scenario}
-    )
+    unregistered_hits = sorted({f.scenario_id for f in fixtures if f.scenario_id not in tier_by_scenario})
     if unregistered_hits:
         raise UnregisteredScenarioFixtureError(
             "fixture(s) reference scenario_id(s) absent from the coverage "
@@ -111,38 +109,19 @@ def run_category(
         )
 
     out_of_artifact_hits = sorted(
-        {
-            f.scenario_id
-            for f in fixtures
-            if tier_by_scenario.get(f.scenario_id) is Tier.OUT_OF_ARTIFACT
-        }
+        {f.scenario_id for f in fixtures if tier_by_scenario.get(f.scenario_id) is Tier.OUT_OF_ARTIFACT}
     )
     if out_of_artifact_hits:
         raise OutOfArtifactFixtureError(
-            "out-of-artifact scenario(s) present in fixture corpus for "
-            f"category {category!r}: {out_of_artifact_hits}"
+            f"out-of-artifact scenario(s) present in fixture corpus for category {category!r}: {out_of_artifact_hits}"
         )
 
-    scored = [
-        f
-        for f in fixtures
-        if tier_by_scenario.get(f.scenario_id) is Tier.STATIC_DETECTABLE
-    ]
+    scored = [f for f in fixtures if tier_by_scenario.get(f.scenario_id) is Tier.STATIC_DETECTABLE]
 
     declared_uncovered = tuple(
-        sorted(
-            entry.scenario_id
-            for entry in coverage_matrix
-            if entry.tier is Tier.OUT_OF_ARTIFACT
-        )
+        sorted(entry.scenario_id for entry in coverage_matrix if entry.tier is Tier.OUT_OF_ARTIFACT)
     )
-    agent_judgable = tuple(
-        sorted(
-            entry.scenario_id
-            for entry in coverage_matrix
-            if entry.tier is Tier.AGENT_JUDGABLE
-        )
-    )
+    agent_judgable = tuple(sorted(entry.scenario_id for entry in coverage_matrix if entry.tier is Tier.AGENT_JUDGABLE))
 
     tp = fp = fn = tn = 0
     for case in scored:
@@ -161,11 +140,7 @@ def run_category(
     else:
         precision = tp / (tp + fp) if (tp + fp) else 0.0
         recall = tp / (tp + fn) if (tp + fn) else 0.0
-        f1 = (
-            2 * precision * recall / (precision + recall)
-            if (precision + recall)
-            else 0.0
-        )
+        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
 
     return CategoryResult(
         category=category,

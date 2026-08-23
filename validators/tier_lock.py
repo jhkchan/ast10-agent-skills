@@ -18,6 +18,9 @@ module -- can check the tier lock before a category's F1 row is published.
 from __future__ import annotations
 
 import hashlib
+from pathlib import Path
+
+DEFAULT_MANIFEST = Path(__file__).resolve().parent.parent / "fixtures" / "manifest.yaml"
 
 
 def tier_lock_hash(scenarios: list[dict]) -> str:
@@ -56,10 +59,53 @@ def check_manifest_tier_locks(manifest: dict) -> list[str]:
     """
     violations: list[str] = []
     for category, cat in manifest.get("categories", {}).items():
-        scenarios = list(cat.get("detectable_scenarios", [])) + list(
-            cat.get("out_of_artifact_scenarios", [])
-        )
+        scenarios = list(cat.get("detectable_scenarios", [])) + list(cat.get("out_of_artifact_scenarios", []))
         ok, reason = check_tier_lock(scenarios, cat.get("tier_lock_hash", ""))
         if not ok:
             violations.append(f"{category}: {reason}")
     return violations
+
+
+def main(argv: list[str] | None = None) -> int:
+    """CLI drift check, so CI runs the same S-011 tripwire the tests do.
+
+    `check_manifest_tier_locks` was reachable only from Python. Continuous
+    integration needs a command, and a tripwire that only fires inside a test
+    module is one refactor away from firing nowhere.
+    """
+    import argparse
+
+    import yaml
+
+    parser = argparse.ArgumentParser(
+        prog="validators/tier_lock.py",
+        description=("Check every category's stored tier_lock_hash against its current scenario tiering (S-011)."),
+    )
+    parser.add_argument(
+        "manifest",
+        nargs="?",
+        default=str(DEFAULT_MANIFEST),
+        help="fixtures/manifest.yaml (default: this repo's)",
+    )
+    args = parser.parse_args(argv)
+
+    path = Path(args.manifest)
+    with path.open(encoding="utf-8") as fh:
+        manifest = yaml.safe_load(fh) or {}
+
+    violations = check_manifest_tier_locks(manifest)
+    categories = manifest.get("categories", {})
+    if violations:
+        for violation in violations:
+            print(f"{path}: TIER-LOCK DRIFT: {violation}")
+        print(
+            f"{path}: FAIL — {len(violations)} of {len(categories)} categories "
+            "must be re-labeled and re-judged before their F1 is republished"
+        )
+        return 1
+    print(f"{path}: OK — {len(categories)} category tier-lock(s) intact")
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover
+    raise SystemExit(main())

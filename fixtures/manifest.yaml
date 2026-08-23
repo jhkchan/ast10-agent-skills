@@ -13,34 +13,110 @@
 # reclassified, recomputing this hash no longer matches the stored value, which flags the
 # category for re-labeling and a judge re-run before its F1 can be republished (S-011).
 #
-# NOTE (provenance): the authoritative 58-scenario coverage matrix is T-3.1 and has not yet
-# been authored in this repo. The detectable_scenarios / out_of_artifact_scenarios lists
-# below are the minimal per-category tier declaration this fixture-labeling task depends
-# on, scoped to what T-4.1 needs to label a corpus; they must be reconciled with T-3.1's
-# matrices before Gate 02 sign-off, per plan.md's tier-lock rule.
+# ---------------------------------------------------------------------------------------
+# PROVENANCE — RECONCILED AGAINST scenarios/registry.yaml (T-3.1a)
+# ---------------------------------------------------------------------------------------
+# scenarios/registry.yaml is now authoritative on tier. It enumerates all 62 attack
+# scenarios named in the whitepaper's ten "Attack Scenarios" sections — not the 58 this
+# file's earlier provenance note assumed; four scenarios appear as body sub-headings the
+# document's own table of contents omits.
+#
+# Every scenario entry below now declares:
+#   registry_ids  the registry scenario(s) it is drawn from (empty only for
+#                 covers: category-precondition, which must then state a `derivation`).
+#   covers        how honestly the fixture pair measures those scenarios:
+#                   full                  — the registry tiers every linked scenario
+#                                           static-detectable, so the corpus measures the
+#                                           scenario itself.
+#                   artifact-signal-only  — the registry does NOT tier the linked scenario
+#                                           static-detectable; the corpus measures that
+#                                           scenario's declared `artifact_signal` (an
+#                                           enabling precondition) and MUST NOT be reported
+#                                           as coverage of the scenario.
+#                   category-precondition — the check derives from the category's preventive
+#                                           mitigations rather than from any named scenario.
+#
+# Reconciliation outcomes (registry won in every case):
+#   * AST02 / AST07 / AST09 / AST10 — the out-of-artifact declarations were partial. They
+#     are re-keyed to canonical registry ids and exact whitepaper titles and expanded to
+#     every out-of-artifact scenario the registry names for the category (AST02 1 -> 3,
+#     AST07 2 -> 3, AST09 3 -> 7, AST10 2 -> 5). Tiers agreed; only completeness changed.
+#   * AST05 — the registry tiers NONE of AST05's six named scenarios static-detectable.
+#     The three labeled checks are re-declared covers: artifact-signal-only: this corpus
+#     measures unpinned-reference / missing-boundary detection, NOT rug-pull,
+#     bait-and-switch, chaining, or relay amplification. status covered -> proxy-covered.
+#   * AST03 — two of three checks demoted to artifact-signal-only (the scenarios they
+#     proxy are agent-judgable and out-of-artifact respectively). status -> proxy-covered.
+#   * AST06 — one of three checks demoted to artifact-signal-only. status -> proxy-covered.
+#   * AST08 — the single labeled check maps to NO named AST08 scenario; it derives from the
+#     category's mitigations. Declared covers: category-precondition, status ->
+#     proxy-covered. All four of AST08's static-detectable named scenarios are uncovered.
+#   * AST01 — the three checks map cleanly, but two of them to scenarios the registry files
+#     under OTHER categories (AST08-S02 obfuscation, AST02-S03 config-file hijacking). The
+#     link is recorded rather than reassigned; the fixtures are unchanged.
+#   * AST04 — the only category whose corpus and the registry agreed outright.
+#
+# CORPUS-SIZE FORMULA. Unchanged and still satisfied: declared_expected_cases =
+# max(min_floor, 2 * count(detectable_scenarios)) over the checks this corpus actually
+# labels, and every category still matches it. No detectable count changed, so no declared
+# expected size moved. What the reconciliation DID change is the visible debt: the registry
+# names 20 static-detectable scenarios across the ten categories and this corpus covers 8
+# of them at covers: full. Each category's registry_coverage block records
+# cases_at_full_static_coverage — the corpus size the formula would demand at full registry
+# coverage — alongside its uncovered_static_detectable list. No fixture files were removed.
 
 min_floor: 6
 formula: "max(min_floor, 2 * count(detectable_scenarios))"
+registry: "scenarios/registry.yaml"
+registry_scenario_count: 62
 
 categories:
   AST01:
     name: "Malicious Skills"
     tier_lock_hash: "41ab0facbcd32f2d5e385cd5bbcf15a40328162e8391fc717c2b7821510aa3ad"
     status: covered
+    f1_scope: scenario-level
     published_f1: "pending-detector"
+    registry_coverage:
+      registry_scenarios: 11
+      registry_static_detectable: 7
+      registry_agent_judgable: 3
+      registry_out_of_artifact: 1
+      cases_at_full_static_coverage: 14
+      labeled_detectable_checks: 3
+      declared_expected_cases: 6
+      cases_present: 6
+      uncovered_static_detectable:
+        - AST01-S02
+        - AST01-S05
+        - AST01-S06
+        - AST01-S08
+        - AST01-S09
+        - AST01-S11
+      note: >-
+        Two of the three labeled checks are drawn from registry scenarios the whitepaper
+        files under other categories (AST08-S02, AST02-S03). Recorded, not reassigned:
+        the fixtures measure a real static property either way, but AST01's own named
+        static-detectable surface is 6/7 uncovered.
     detectable_scenarios:
       - id: AST01-S1
         name: "Obfuscated malicious payload in script"
         tier: static-detectable
-        reason: "A base64/hex-encoded shell payload decoded and exec'd at load or run time is a fixed byte pattern a static scanner can flag by decoding and matching against known dangerous shell primitives."
+        registry_ids: [AST08-S02]
+        covers: full
+        reason: "A base64/hex-encoded shell payload decoded and exec'd at load or run time is a fixed byte pattern a static scanner can flag by decoding and matching against known dangerous shell primitives. Registry parent AST08-S02 (Obfuscated Instruction) is tiered static-detectable for the same reason: the encoded blob is in the package's bytes and decode-then-rescan is deterministic."
       - id: AST01-S2
         name: "Destructive postinstall hook"
         tier: static-detectable
-        reason: "A declared postinstall/setup script performing destructive filesystem operations (e.g. recursive delete of $HOME) disguised as environment cleanup is a static command-pattern match against the manifest's declared lifecycle hooks."
+        registry_ids: [AST02-S03]
+        covers: full
+        reason: "A declared postinstall/setup script performing destructive filesystem operations (e.g. recursive delete of $HOME) disguised as environment cleanup is a static command-pattern match against the manifest's declared lifecycle hooks. Registry parent AST02-S03 (Config-File Hijacking) covers exactly this: execution instructions in a shipped config file that trigger automatically at project open."
       - id: AST01-S3
         name: "Covert exfiltration endpoint"
         tier: static-detectable
-        reason: "A hardcoded HTTP endpoint in a script that POSTs local file contents outside any declared network policy is detectable by diffing egress calls in source against the manifest's declared allow-list."
+        registry_ids: [AST01-S10]
+        covers: full
+        reason: "A hardcoded HTTP endpoint in a script that POSTs local file contents outside any declared network policy is detectable by diffing egress calls in source against the manifest's declared allow-list. Registry parent AST01-S10 (Data Exfiltration) is tiered static-detectable on that same code-versus-manifest diff."
     out_of_artifact_scenarios:
       []
     cases:
@@ -71,43 +147,96 @@ categories:
 
   AST02:
     name: "Supply Chain Compromise"
-    # Reconciled to skills/AST02/scripts/detector.py's SCENARIO_TIERS (code-review
-    # finding: correctness, HIGH -- this block previously declared three
-    # static-detectable scenarios with six labeled cases while the shipped
-    # detector declares the category's only scenario out-of-artifact with zero
-    # detectors). The detector's SCENARIO_TIERS is the single source of tiering;
-    # this manifest must not hand-author a second, divergent one.
-    tier_lock_hash: "ae53cdd73d6c8a13c7e9f9888d1e6c78c6928dead5a0118f08dcde3d1573e4ba"
+    # Re-keyed to scenarios/registry.yaml's canonical ids and exact whitepaper titles, and
+    # expanded from one out-of-artifact declaration to all three the registry names. The
+    # earlier reconciliation to skills/AST02/scripts/detector.py's SCENARIO_TIERS still
+    # holds — the detector declares no static detectors and this corpus labels none — but
+    # the registry, not the detector, is now the source of tiering.
+    tier_lock_hash: "0bd180cfad7c8e71d4ad15b23cd1afd265298423f1a91f9292387e5f194062ec"
     status: declared-and-uncovered
+    f1_scope: none
     published_f1: null
+    registry_coverage:
+      registry_scenarios: 4
+      registry_static_detectable: 1
+      registry_agent_judgable: 0
+      registry_out_of_artifact: 3
+      cases_at_full_static_coverage: 6
+      labeled_detectable_checks: 0
+      declared_expected_cases: 0
+      cases_present: 0
+      uncovered_static_detectable:
+        []
+      note: >-
+        AST02's one static-detectable scenario (AST02-S03 Config-File Hijacking) is already
+        exercised at covers: full by AST01's destructive-postinstall pair, so it is not
+        listed as uncovered. AST02 itself publishes no F1: the three scenarios it would
+        have to label are all out-of-artifact.
     detectable_scenarios:
       []
     out_of_artifact_scenarios:
-      - id: AST02-maintainer-account-takeover
-        name: "Maintainer account takeover"
+      - id: AST02-S01
+        name: "Registry Flooding"
         tier: out-of-artifact
-        reason: "Registry-side account-compromise detection depends on registry auth logs and session history maintained outside the artifact; no in-artifact signal exists (skills/AST02/scripts/detector.py SCENARIO_TIERS)."
+        registry_ids: [AST02-S01]
+        covers: full
+        reason: "Coordinated bulk publication is a property of the registry's corpus over time; one package is indistinguishable from one member of a flood and from one honest publication (scenarios/registry.yaml AST02-S01)."
+      - id: AST02-S02
+        name: "Dependency Confusion"
+        tier: out-of-artifact
+        registry_ids: [AST02-S02]
+        covers: full
+        reason: "The defining condition is which package the resolver selects at install time, which needs the resolution namespace and the registry's contents. The lockfile's pinning posture is only an artifact_signal, not the scenario (scenarios/registry.yaml AST02-S02)."
+      - id: AST02-S04
+        name: "Maintainer Account Takeover"
+        tier: out-of-artifact
+        registry_ids: [AST02-S04]
+        covers: full
+        reason: "Registry-side account-compromise detection depends on registry auth logs and session history maintained outside the artifact; a release signed with the legitimate key after a takeover is byte-indistinguishable from an honest one, so no in-artifact signal exists (scenarios/registry.yaml AST02-S04; skills/AST02/scripts/detector.py SCENARIO_TIERS agrees)."
     cases:
       []
 
   AST03:
     name: "Over-Privileged Skills"
     tier_lock_hash: "c7090f29a229e96da46014b3b1606a0adaed6ea01a9a32f87e7340edfc54062e"
-    status: covered
+    status: proxy-covered
+    f1_scope: mixed-proxy
     published_f1: "pending-detector"
+    registry_coverage:
+      registry_scenarios: 5
+      registry_static_detectable: 1
+      registry_agent_judgable: 1
+      registry_out_of_artifact: 3
+      cases_at_full_static_coverage: 6
+      labeled_detectable_checks: 3
+      declared_expected_cases: 6
+      cases_present: 6
+      uncovered_static_detectable:
+        []
+      note: >-
+        Only one of the three labeled checks measures a named scenario (AST03-S03 Identity
+        File Backdoors). The other two measure artifact_signals for an agent-judgable
+        scenario (AST03-S01) and an out-of-artifact one (AST06-S02), so two thirds of this
+        category's F1 is proxy F1 and must be reported as such.
     detectable_scenarios:
       - id: AST03-S1
         name: "Production-secrets write scope"
         tier: static-detectable
-        reason: "The manifest's allow_write policy granting a path pattern matching production secrets storage (e.g. '/secrets/**', '.env.production') is a static glob match against a known-sensitive-path list."
+        registry_ids: [AST03-S03]
+        covers: full
+        reason: "The manifest's allow_write policy granting a path pattern matching production secrets storage (e.g. '/secrets/**', '.env.production') is a static glob match against a known-sensitive-path list. Registry parent AST03-S03 (Identity File Backdoors) is tiered static-detectable on the identical structural check, generalised here from identity files to a sensitive-path list."
       - id: AST03-S2
         name: "Undeclared shell-exec permission"
         tier: static-detectable
-        reason: "Unrestricted shell-execution permission requested with no corresponding use case in the skill's declared description is a static cross-check between the permissions block and the description text."
+        registry_ids: [AST03-S01]
+        covers: artifact-signal-only
+        reason: "Unrestricted shell-execution permission requested with no corresponding use case in the skill's declared description is a static cross-check between the permissions block and the description text. It is NOT coverage of registry scenario AST03-S01, which the registry tiers agent-judgable because 'far beyond what it needs' is a purpose-versus-scope judgement; this pair measures that scenario's declared artifact_signal only."
       - id: AST03-S3
         name: "Wildcard network egress"
         tier: static-detectable
-        reason: "A network policy allow-list containing a wildcard host ('*') instead of an enumerated allow-list is a static structural check on the manifest field."
+        registry_ids: [AST06-S02]
+        covers: artifact-signal-only
+        reason: "A network policy allow-list containing a wildcard host ('*') instead of an enumerated allow-list is a static structural check on the manifest field. It is NOT coverage of registry scenario AST06-S02 (Network Pivot), which the registry tiers out-of-artifact because the pivot depends on the host's sandbox and co-located services; this pair measures that scenario's declared artifact_signal only."
     out_of_artifact_scenarios:
       []
     cases:
@@ -140,20 +269,45 @@ categories:
     name: "Insecure Metadata"
     tier_lock_hash: "16a47c857a31fd6ac2bc7e441933b1232023f3b964727100cf3d8c8e9c9283ba"
     status: covered
+    f1_scope: scenario-level
     published_f1: "pending-detector"
+    registry_coverage:
+      registry_scenarios: 7
+      registry_static_detectable: 5
+      registry_agent_judgable: 1
+      registry_out_of_artifact: 1
+      cases_at_full_static_coverage: 10
+      labeled_detectable_checks: 3
+      declared_expected_cases: 6
+      cases_present: 6
+      uncovered_static_detectable:
+        - AST04-S02
+        - AST04-S03
+      note: >-
+        The only category whose corpus and the registry agreed outright: all three labeled
+        checks map one-to-one onto registry scenarios the registry independently tiers
+        static-detectable. Two named static-detectable scenarios remain unlabeled
+        (Permission Understating, Risk Tier Spoofing); labeling them would raise this
+        category's expected corpus from 6 to 10.
     detectable_scenarios:
       - id: AST04-S1
         name: "YAML frontmatter injection"
         tier: static-detectable
-        reason: "SKILL.md YAML frontmatter containing an unescaped anchor/merge or an '!!python/object' tag enabling arbitrary object construction on load is a static parse-time check distinct from JSON/TOML variants (spec.md S-005)."
+        registry_ids: [AST04-S04]
+        covers: full
+        reason: "SKILL.md YAML frontmatter containing an unescaped anchor/merge or an '!!python/object' tag enabling arbitrary object construction on load is a static parse-time check distinct from JSON/TOML variants (spec.md S-005). Registry parent AST04-S04 (YAML Code Execution) is tiered static-detectable on the same literal-tag plus loader-opt-in match."
       - id: AST04-S2
         name: "JSON metadata injection"
         tier: static-detectable
-        reason: "A JSON-format manifest sidecar embedding a '__proto__' prototype-pollution key or an executable expression value is a static key-name/value-shape check distinct from the YAML and TOML variants (spec.md S-005)."
+        registry_ids: [AST04-S06]
+        covers: full
+        reason: "A JSON-format manifest sidecar embedding a '__proto__' prototype-pollution key or an executable expression value is a static key-name/value-shape check distinct from the YAML and TOML variants (spec.md S-005). Registry parent AST04-S06 (JSON Prototype Pollution) is tiered static-detectable on the same key-plus-call-site match."
       - id: AST04-S3
         name: "TOML metadata injection"
         tier: static-detectable
-        reason: "A TOML-format manifest sidecar redefining a trusted top-level table via a duplicate table header (e.g. a second '[permissions]' table overriding the declared one) is a static duplicate-table-key check distinct from the YAML and JSON variants (spec.md S-005)."
+        registry_ids: [AST04-S07]
+        covers: full
+        reason: "A TOML-format manifest sidecar redefining a trusted top-level table via a duplicate table header (e.g. a second '[permissions]' table overriding the declared one) is a static duplicate-table-key check distinct from the YAML and JSON variants (spec.md S-005). Registry parent AST04-S07 (TOML / Config Injection) is tiered static-detectable on the same unvalidated-key-override check."
     out_of_artifact_scenarios:
       []
     cases:
@@ -185,21 +339,47 @@ categories:
   AST05:
     name: "Untrusted External Instructions"
     tier_lock_hash: "3dc23889393d91e314c4eb3c52186cc807d00fd3c4f5ce0d9a05c03736753365"
-    status: covered
+    status: proxy-covered
+    f1_scope: artifact-signal-only
     published_f1: "pending-detector"
+    registry_coverage:
+      registry_scenarios: 6
+      registry_static_detectable: 0
+      registry_agent_judgable: 1
+      registry_out_of_artifact: 5
+      cases_at_full_static_coverage: null
+      labeled_detectable_checks: 3
+      declared_expected_cases: 6
+      cases_present: 6
+      uncovered_static_detectable:
+        []
+      note: >-
+        The sharpest reconciliation finding. The registry tiers NONE of AST05's six named
+        scenarios static-detectable: rug-pull needs the remote document at two points in
+        time, bait-and-switch needs multiple fetch vantage points, chaining needs the chain
+        followed, relay amplification needs the pipeline's per-node backbone models, DoS
+        needs a runtime budget, and document-embedded instructions are agent-judgable. Every
+        case in this corpus therefore measures an artifact_signal, never a named scenario.
+        Any F1 published here must be labeled artifact-signal-only or it overclaims.
     detectable_scenarios:
       - id: AST05-S1
         name: "Unsanitized fetched instructions"
         tier: static-detectable
-        reason: "A script that fetches remote content and appends it directly to the instruction/prompt path with no delimiter or provenance tag is a static data-flow check from a fetch call to the instruction sink."
+        registry_ids: [AST05-S01, AST05-S05]
+        covers: artifact-signal-only
+        reason: "A script that fetches remote content and appends it directly to the instruction/prompt path with no delimiter or provenance tag is a static data-flow check from a fetch call to the instruction sink. It is NOT coverage of AST05-S01 (Author Rug-Pull, out-of-artifact: the edit happens on a remote server after review) or AST05-S05 (agent-judgable); it measures the artifact_signal both scenarios declare — an unpinned external instruction reference routed into a sink with no boundary."
       - id: AST05-S2
         name: "Eval of remote response body"
         tier: static-detectable
-        reason: "A script that evaluates or exec's a third-party API response body directly as code is a static call-site match on eval/exec fed by a network response."
+        registry_ids: [AST05-S05]
+        covers: artifact-signal-only
+        reason: "A script that evaluates or exec's a third-party API response body directly as code is a static call-site match on eval/exec fed by a network response. It is NOT coverage of AST05-S05, which the registry tiers agent-judgable because the malicious document arrives at runtime and judging boundary adequacy is semantic; this pair measures that scenario's declared artifact_signal — fetched content routed into an executable sink."
       - id: AST05-S3
         name: "Absent instruction-boundary marker"
         tier: static-detectable
-        reason: "Decision-rule text with no explicit boundary marker separating trusted operator instructions from untrusted tool/web output is a static presence/absence check for a declared delimiter convention."
+        registry_ids: [AST05-S04, AST05-S05]
+        covers: artifact-signal-only
+        reason: "Decision-rule text with no explicit boundary marker separating trusted operator instructions from untrusted tool/web output is a static presence/absence check for a declared delimiter convention. It is NOT coverage of AST05-S04 (Relay-Node Amplification, out-of-artifact: injection resistance is the minimum over the backbone models on the chain's path) or AST05-S05; it measures the artifact_signal both declare."
     out_of_artifact_scenarios:
       []
     cases:
@@ -231,21 +411,45 @@ categories:
   AST06:
     name: "Weak Isolation"
     tier_lock_hash: "d22946d405b961a25da7194c868288f384bc8035d4555112acd49a5421ae30e3"
-    status: covered
+    status: proxy-covered
+    f1_scope: mixed-proxy
     published_f1: "pending-detector"
+    registry_coverage:
+      registry_scenarios: 5
+      registry_static_detectable: 1
+      registry_agent_judgable: 0
+      registry_out_of_artifact: 4
+      cases_at_full_static_coverage: 6
+      labeled_detectable_checks: 3
+      declared_expected_cases: 6
+      cases_present: 6
+      uncovered_static_detectable:
+        []
+      note: >-
+        Two checks measure the category's one static-detectable scenario (AST06-S01 Host
+        Escape) from two angles — write scope reaching filesystem root, and unrestricted
+        privilege escalation. The third is an artifact_signal proxy for AST06-S05, which is
+        out-of-artifact because whether two agents share writable state is a deployment
+        fact.
     detectable_scenarios:
       - id: AST06-S1
         name: "Filesystem-root write scope"
         tier: static-detectable
-        reason: "An empty deny_write policy or an allow_write scope including filesystem root ('/') is a static structural check on the manifest's write-policy field."
+        registry_ids: [AST06-S01]
+        covers: full
+        reason: "An empty deny_write policy or an allow_write scope including filesystem root ('/') is a static structural check on the manifest's write-policy field. Registry parent AST06-S01 (Host Escape) is tiered static-detectable on exactly this: a declared or coded write reaching host persistence locations outside the skill's own tree."
       - id: AST06-S2
         name: "Unrestricted sudo permission"
         tier: static-detectable
-        reason: "A shell-permission block granting unrestricted sudo/root escalation with no scoped command allow-list is a static check on the shell-permission field shape."
+        registry_ids: [AST06-S01]
+        covers: full
+        reason: "A shell-permission block granting unrestricted sudo/root escalation with no scoped command allow-list is a static check on the shell-permission field shape. Registry parent AST06-S01 (Host Escape) is tiered static-detectable on the same shell-exec-to-host-persistence surface."
       - id: AST06-S3
         name: "Shared unscoped credential namespace"
         tier: static-detectable
-        reason: "A skill declaring no isolated credential namespace and instead reading from the global unscoped environment is a static check for a missing scoped-secrets declaration field."
+        registry_ids: [AST06-S05]
+        covers: artifact-signal-only
+        reason: "A skill declaring no isolated credential namespace and instead reading from the global unscoped environment is a static check for a missing scoped-secrets declaration field. It is NOT coverage of AST06-S05 (Cross-Agent Workspace Contamination), which the registry tiers out-of-artifact because sharing is decided by deployment topology; this pair measures that scenario's declared artifact_signal only."
     out_of_artifact_scenarios:
       []
     cases:
@@ -276,37 +480,90 @@ categories:
 
   AST07:
     name: "Update Drift"
-    # Reconciled to skills/AST07/scripts/detector.py's SCENARIO_TIERS (code-review
-    # finding: correctness, HIGH -- see the identical AST02 note above; the
-    # shipped detector declares both named scenarios out-of-artifact with zero
-    # detectors, so this manifest must not hand-author a divergent tiering).
-    tier_lock_hash: "7a5735db9ca8d9d5f827a5260d8abc602ec4594ff620e5d17280ab517e30495a"
+    # Re-keyed to scenarios/registry.yaml's canonical ids and exact whitepaper titles, and
+    # expanded from two out-of-artifact declarations to all three the registry names
+    # (Malicious Update was missing). Tiers agreed with both the registry and
+    # skills/AST07/scripts/detector.py's SCENARIO_TIERS; only completeness changed.
+    tier_lock_hash: "d57441e6771d6e62845b3cec9efbea906b6e4b09bd309d0723d06225323b84c7"
     status: declared-and-uncovered
+    f1_scope: none
     published_f1: null
+    registry_coverage:
+      registry_scenarios: 3
+      registry_static_detectable: 0
+      registry_agent_judgable: 0
+      registry_out_of_artifact: 3
+      cases_at_full_static_coverage: null
+      labeled_detectable_checks: 0
+      declared_expected_cases: 0
+      cases_present: 0
+      uncovered_static_detectable:
+        []
+      note: >-
+        Every AST07 scenario is temporal — it compares two versions or observes a reload
+        event. No F1 is publishable for this category at any corpus size.
     detectable_scenarios:
       []
     out_of_artifact_scenarios:
-      - id: AST07-rollback-attack
-        name: "Rollback attack"
+      - id: AST07-S01
+        name: "Malicious Update"
         tier: out-of-artifact
-        reason: "Detecting a downgrade to a prior vulnerable version requires release-history metadata (version timeline, prior hashes) maintained outside a single artifact snapshot; no in-artifact signal exists (skills/AST07/scripts/detector.py SCENARIO_TIERS)."
-      - id: AST07-hot-reload-abuse
-        name: "Hot-reload abuse"
+        registry_ids: [AST07-S01]
+        covers: full
+        reason: "An update is a relation between two versions and the compromise behind it is registry-side account state; one package cannot show that it differs maliciously from a predecessor it does not contain (scenarios/registry.yaml AST07-S01)."
+      - id: AST07-S02
+        name: "Rollback Attack"
         tier: out-of-artifact
-        reason: "Detecting an in-place code swap after install requires runtime reload-event history from the host process, not the artifact itself; no in-artifact signal exists (skills/AST07/scripts/detector.py SCENARIO_TIERS)."
+        registry_ids: [AST07-S02]
+        covers: full
+        reason: "Detecting a downgrade to a prior vulnerable version requires release-history metadata (version timeline, prior hashes) maintained outside a single artifact snapshot; no in-artifact signal exists (scenarios/registry.yaml AST07-S02; skills/AST07/scripts/detector.py SCENARIO_TIERS agrees)."
+      - id: AST07-S03
+        name: "Hot-Reload Abuse"
+        tier: out-of-artifact
+        registry_ids: [AST07-S03]
+        covers: full
+        reason: "Detecting an in-place code swap after install requires runtime reload-event history from the host process, not the artifact itself; the package at rest is identical before and after the swap (scenarios/registry.yaml AST07-S03; skills/AST07/scripts/detector.py SCENARIO_TIERS agrees)."
     cases:
       []
 
   AST08:
     name: "Poor Scanning"
     tier_lock_hash: "3a70c4332c9d0794e248baf728cb65715f9e0b6956dab506927f8b8f7d11526b"
-    status: covered
+    status: proxy-covered
+    f1_scope: category-precondition
     published_f1: "pending-detector"
+    registry_coverage:
+      registry_scenarios: 8
+      registry_static_detectable: 4
+      registry_agent_judgable: 2
+      registry_out_of_artifact: 2
+      cases_at_full_static_coverage: 8
+      labeled_detectable_checks: 1
+      declared_expected_cases: 6
+      cases_present: 6
+      uncovered_static_detectable:
+        - AST08-S04
+        - AST08-S07
+        - AST08-S08
+      note: >-
+        The single labeled check maps to no named AST08 scenario at all — it derives from
+        the category's preventive mitigations. Meanwhile the registry finds four
+        static-detectable named scenarios here (obfuscated instruction, context-dependent
+        malice / logic bombs, scanner host compromise, bytecode cache poisoning); one is
+        exercised from AST01's corpus and three are unlabeled. Labeling all four would
+        raise this category's expected corpus from 6 to 8.
     detectable_scenarios:
       - id: AST08-S1
         name: "No scan-attestation field"
         tier: static-detectable
-        reason: "A manifest carrying no scan-attestation or SECURITY.md reference field indicating the skill underwent any pre-publish security scan is a static required-field check; it is the one AST08 signal visible in the artifact itself. The remaining AST08 scenarios (scan-tool efficacy, reviewer diligence) are natural-language and judged agent-judgable per spec.md's Rejected-C rationale, not static-detectable."
+        registry_ids: []
+        covers: category-precondition
+        derivation: >-
+          Derived from AST08's Preventive Mitigations ("Require every scan to emit a
+          machine-readable coverage record..."; "Continuously re-scan installed skills as
+          scanner models improve") and from the Universal Skill Format's scan-status field,
+          not from any of AST08's eight named attack scenarios.
+        reason: "A manifest carrying no scan-attestation or SECURITY.md reference field indicating the skill underwent any pre-publish security scan is a static required-field check; it is the one AST08 signal visible in the artifact itself that the registry does not attach to a named scenario. The registry's own static-detectable AST08 scenarios (AST08-S02, S04, S07, S08) are a different, unlabeled surface; AST08-S01 and AST08-S03 are agent-judgable and AST08-S05/S06 out-of-artifact."
     out_of_artifact_scenarios:
       []
     cases:
@@ -337,42 +594,136 @@ categories:
 
   AST09:
     name: "No Governance"
-    tier_lock_hash: "9d6e4bcff9530029f3146342784a56624912dd197ec48e786f26e02480b098fe"
+    # Re-keyed to scenarios/registry.yaml's canonical ids and exact whitepaper titles, and
+    # expanded from three out-of-artifact declarations to all seven the registry names.
+    # Tiers agreed; only completeness changed.
+    tier_lock_hash: "d00ac953cdec9d37cf5d19e389772d067080cc2859bf54de715ee3f3ab8081bc"
     status: declared-and-uncovered
+    f1_scope: none
     published_f1: null
+    registry_coverage:
+      registry_scenarios: 7
+      registry_static_detectable: 0
+      registry_agent_judgable: 0
+      registry_out_of_artifact: 7
+      cases_at_full_static_coverage: null
+      labeled_detectable_checks: 0
+      declared_expected_cases: 0
+      cases_present: 0
+      uncovered_static_detectable:
+        []
+      note: >-
+        The only category where all seven named scenarios are out-of-artifact. Every one
+        turns on organisational process, inventory state, or pipeline topology. No F1 is
+        publishable for this category at any corpus size.
     detectable_scenarios:
       []
     out_of_artifact_scenarios:
-      - id: AST09-S1
-        name: "Orphaned Skill"
-        tier: out-of-artifact
-        reason: "An agent receiving no updates for 6+ months while still in active use is a process property, not an artifact property; the skill package itself carries no signal (spec.md S-003, exact scenario)."
-      - id: AST09-S2
-        name: "Regulatory Exposure"
-        tier: out-of-artifact
-        reason: "Regulatory-exposure status depends on the deploying organization's compliance posture and jurisdiction, maintained outside the artifact; no in-artifact signal exists."
-      - id: AST09-S3
+      - id: AST09-S01
         name: "Undetected Compromise"
         tier: out-of-artifact
-        reason: "Whether a compromise has gone undetected depends on an organization's monitoring and incident-response process, not on any field present in the skill package."
+        registry_ids: [AST09-S01]
+        covers: full
+        reason: "Whether a compromise has gone undetected depends on an organization's monitoring and incident-response process, not on any field present in the skill package; the same artifact is caught instantly where an inventory exists (scenarios/registry.yaml AST09-S01)."
+      - id: AST09-S02
+        name: "Unapproved Malicious Skill"
+        tier: out-of-artifact
+        registry_ids: [AST09-S02]
+        covers: full
+        reason: "Approval status is a property of the installing organization's workflow; a package carries no record of whether anyone reviewed it (scenarios/registry.yaml AST09-S02)."
+      - id: AST09-S03
+        name: "Orphaned Skill"
+        tier: out-of-artifact
+        registry_ids: [AST09-S03]
+        covers: full
+        reason: "A skill left active with a departed developer's credentials and no deprovisioning process is a process property, not an artifact property; the skill package itself carries no signal (spec.md S-003, exact scenario; scenarios/registry.yaml AST09-S03)."
+      - id: AST09-S04
+        name: "Regulatory Exposure"
+        tier: out-of-artifact
+        registry_ids: [AST09-S04]
+        covers: full
+        reason: "Regulatory-exposure status depends on the deploying organization's data classification, compliance posture, and jurisdiction, all maintained outside the artifact; no in-artifact signal exists (scenarios/registry.yaml AST09-S04)."
+      - id: AST09-S05
+        name: "Unreachable Skill"
+        tier: out-of-artifact
+        registry_ids: [AST09-S05]
+        covers: full
+        reason: "The whitepaper forecloses artifact analysis outright — 'there is no host to scan and no local package manifest to read'. The scenario is the absence of an obtainable artifact (scenarios/registry.yaml AST09-S05)."
+      - id: AST09-S06
+        name: "Cascading Agent Compromise"
+        tier: out-of-artifact
+        registry_ids: [AST09-S06]
+        covers: full
+        reason: "Propagation depends on the multi-agent pipeline's topology and on where human checkpoints sit — organizational and deployment facts spanning many packages (scenarios/registry.yaml AST09-S06)."
+      - id: AST09-S07
+        name: "Manipulated Trust Signals"
+        tier: out-of-artifact
+        registry_ids: [AST09-S07]
+        covers: full
+        reason: "Farmed stars and install counts are registry-side and platform-side state; a package cannot show that the reputation attached to it was manufactured (scenarios/registry.yaml AST09-S07)."
     cases:
       []
 
   AST10:
     name: "Cross-Platform Reuse"
-    tier_lock_hash: "bb981d8ea2f4cdaca2b5e636debafd46390d58f32fe82e8c83d5bf466443b120"
+    # Re-keyed to scenarios/registry.yaml's canonical ids and exact whitepaper titles, and
+    # expanded from two out-of-artifact declarations to all five the registry names. The
+    # sixth scenario (AST10-S06 Silent Supply Chain Injection) is tiered static-detectable
+    # by the registry and is recorded as uncovered rather than declared out-of-artifact.
+    tier_lock_hash: "dba555f29ccb40833c5da0a5a20093477eeb7613d6fa72524079716200e05e25"
     status: declared-and-uncovered
+    f1_scope: none
     published_f1: null
+    registry_coverage:
+      registry_scenarios: 6
+      registry_static_detectable: 1
+      registry_agent_judgable: 0
+      registry_out_of_artifact: 5
+      cases_at_full_static_coverage: 6
+      labeled_detectable_checks: 0
+      declared_expected_cases: 0
+      cases_present: 0
+      uncovered_static_detectable:
+        - AST10-S06
+      note: >-
+        Reconciliation moved this category off "nothing here is detectable". AST10-S06
+        (Silent Supply Chain Injection) names an encoded script block — a byte pattern in
+        the package — so the registry tiers it static-detectable. It is unlabeled, so AST10
+        still publishes no F1, but it is now declared-and-uncovered with a known gap rather
+        than declared-and-undetectable. Labeling it would set this category's expected
+        corpus to 6.
     detectable_scenarios:
       []
     out_of_artifact_scenarios:
-      - id: AST10-S1
-        name: "Cross-registry arbitrage"
+      - id: AST10-S01
+        name: "Security Property Loss in Translation"
         tier: out-of-artifact
-        reason: "Detecting the same skill republished with different permissions across registries requires a cross-registry corpus outside any single artifact; no in-artifact signal exists."
-      - id: AST10-S2
-        name: "Multi-platform campaign"
+        registry_ids: [AST10-S01]
+        covers: full
+        reason: "Loss is a relation between a source manifest and a ported target manifest plus the target platform's schema; the whitepaper's own metadata loss simulator takes two manifests as input (scenarios/registry.yaml AST10-S01)."
+      - id: AST10-S02
+        name: "Cross-Registry Arbitrage"
         tier: out-of-artifact
-        reason: "Detecting a coordinated campaign spanning multiple platforms requires cross-platform telemetry outside any single artifact; no in-artifact signal exists."
+        registry_ids: [AST10-S02]
+        covers: full
+        reason: "Detecting the same skill republished with different scan posture and install counts across registries requires a cross-registry corpus outside any single artifact; no in-artifact signal exists (scenarios/registry.yaml AST10-S02)."
+      - id: AST10-S03
+        name: "Multi-Platform Campaign"
+        tier: out-of-artifact
+        registry_ids: [AST10-S03]
+        covers: full
+        reason: "Detecting a coordinated campaign spanning multiple platforms requires cross-platform telemetry and a timeline outside any single artifact; one package looks like a lone publication (scenarios/registry.yaml AST10-S03)."
+      - id: AST10-S04
+        name: "Manifest Stripping"
+        tier: out-of-artifact
+        registry_ids: [AST10-S04]
+        covers: full
+        reason: "Deciding that metadata was stripped needs the pre-port manifest to compare against; a ported package with no permission block is indistinguishable from one that never declared any (scenarios/registry.yaml AST10-S04)."
+      - id: AST10-S05
+        name: "Implicit Privilege Escalation"
+        tier: out-of-artifact
+        registry_ids: [AST10-S05]
+        covers: full
+        reason: "The escalation is entirely a property of the target platform's default-permission model; the package's own declarations are unchanged and, read alone, look safe (scenarios/registry.yaml AST10-S05)."
     cases:
       []

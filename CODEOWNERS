@@ -1,0 +1,40 @@
+# Code owners for owasp-ast10-agent-skills.
+#
+# GitHub reads this file from the repository root (also valid at .github/ or
+# docs/). Every path below requires review from the listed owner before merge
+# when branch protection has "Require review from Code Owners" enabled.
+#
+# Solo-maintained. The catch-all covers everything; the entries after it are
+# not narrower ownership but a written record of which surfaces are
+# load-bearing enough that a change to them is never routine.
+
+*                           @jhkchan
+
+# --- claims about detection quality ---------------------------------------
+# A coverage matrix, a scenario tier, or a fixture label is what every F1 in
+# this repo means. Changing one silently re-scopes a published number.
+/scenarios/                 @jhkchan
+/fixtures/                  @jhkchan
+/skills/*/coverage-matrix.md @jhkchan
+/validators/tier_lock.py    @jhkchan
+/docs/adr/                  @jhkchan
+
+# --- the vendored scoring pipeline ----------------------------------------
+# ship_floor.py / content_hash.py / eval_counts.py are pinned copies of
+# upstream Apache-2.0 source (see NOTICE, THIRD_PARTY_LICENSES.md). Editing
+# the formula in place instead of re-vendoring breaks the drift audit.
+/scripts/ship_floor.py      @jhkchan
+/scripts/content_hash.py    @jhkchan
+/scripts/eval_counts.py     @jhkchan
+/NOTICE                     @jhkchan
+/THIRD_PARTY_LICENSES.md    @jhkchan
+/LICENSE                    @jhkchan
+
+# --- packaging, CI, and the attribution posture ---------------------------
+# The non-endorsement disclaimer is a correctness property of this repo, not
+# boilerplate: the repository name says OWASP and the project is not one.
+/.github/                   @jhkchan
+/.claude-plugin/            @jhkchan
+/README.md                  @jhkchan
+/CONTRIBUTING.md            @jhkchan
+/config/dogfood_waivers.yml @jhkchan

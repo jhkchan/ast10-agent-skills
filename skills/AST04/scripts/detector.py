@@ -33,13 +33,12 @@ import re
 import tomllib
 from typing import Callable
 
-from detectors.scaffold import Finding
+from detectors.scaffold import Finding, static_detectable
 from detectors.scaffold import (
     detect_invisible_unicode_smuggling as _shared_invisible_unicode,
 )
 from detectors.scaffold import f1_report as _f1_report
 from detectors.scaffold import run_all as _run_all
-from detectors.scaffold import static_detectable
 
 SCENARIO_TIERS: dict[str, str] = {
     "AST04-yaml-injection": "static-detectable",
@@ -67,13 +66,9 @@ _YAML_LOAD_CALL_WINDOW = 200  # chars scanned after `yaml.load(` for a Loader= k
 def detect_yaml_injection(pkg: dict) -> Finding:
     for path, content in _files_with_suffix(pkg, ".py").items():
         if _YAML_UNSAFE_LOAD_CALL_RE.search(content):
-            return Finding(
-                "AST04-yaml-injection", True, f"{path}: yaml.unsafe_load() call"
-            )
+            return Finding("AST04-yaml-injection", True, f"{path}: yaml.unsafe_load() call")
         if _YAML_UNSAFE_LOADER_CLASS_RE.search(content):
-            return Finding(
-                "AST04-yaml-injection", True, f"{path}: Loader=yaml.UnsafeLoader"
-            )
+            return Finding("AST04-yaml-injection", True, f"{path}: Loader=yaml.UnsafeLoader")
         for match in _YAML_LOAD_CALL_RE.finditer(content):
             window = content[match.start() : match.start() + _YAML_LOAD_CALL_WINDOW]
             if "SafeLoader" not in window:
@@ -82,9 +77,7 @@ def detect_yaml_injection(pkg: dict) -> Finding:
                     True,
                     f"{path}: yaml.load() with no explicit Loader=yaml.SafeLoader",
                 )
-    return Finding(
-        "AST04-yaml-injection", False, "no unsafe YAML deserialization API usage found"
-    )
+    return Finding("AST04-yaml-injection", False, "no unsafe YAML deserialization API usage found")
 
 
 # --- AST04-json-injection: prototype-pollution key names --------------------
@@ -149,9 +142,7 @@ def detect_toml_injection(pkg: dict) -> Finding:
                 True,
                 f"{path}: unexpected top-level key(s) {sorted(unexpected)}",
             )
-    return Finding(
-        "AST04-toml-injection", False, "no unexpected top-level TOML keys found"
-    )
+    return Finding("AST04-toml-injection", False, "no unexpected top-level TOML keys found")
 
 
 # --- AST04-invisible-unicode-smuggling --------------------------------------

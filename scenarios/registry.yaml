@@ -1,0 +1,1019 @@
+# scenarios/registry.yaml — AUTHORITATIVE per-scenario registry (T-3.1a).
+#
+# Every attack scenario named in the OWASP Agentic Skills Top 10 whitepaper's
+# ten "Attack Scenarios" sections, extracted from the published text rather
+# than from any prior estimate. The count is 62, not the 58 that
+# fixtures/manifest.yaml's provenance note previously assumed: four scenarios
+# appear as body sub-headings that the document's own table of contents omits
+# (AST03 "Low-Privilege Skill Invokes a High-Privilege Skill", AST05
+# "Malicious Instructions Embedded in Documents", AST05 "Denial-of-Service
+# (DoS) through Malicious Skills", AST08 "Scanner Host Compromise and
+# Resource Exhaustion"). Titles below are the whitepaper's, verbatim.
+#
+# THIS FILE IS AUTHORITATIVE ON TIER. fixtures/manifest.yaml links each of its
+# labeled fixture checks back to the scenario ids here and must agree; where
+# the two disagreed, this file won.
+#
+# ---------------------------------------------------------------------------
+# TIER DOCTRINE
+# ---------------------------------------------------------------------------
+# static-detectable
+#   A deterministic rule over the skill package's own bytes and structure
+#   (SKILL.md, frontmatter, bundled scripts, lockfiles, the USF manifest)
+#   decides the scenario's DEFINING condition. No prose intent-reading, no
+#   state from outside the package.
+#
+# agent-judgable
+#   All the evidence is in the package, but deciding it needs semantic
+#   judgement of prose, naming, or stated purpose. In-artifact, not
+#   mechanically decidable.
+#
+# out-of-artifact
+#   NOT decidable from one package. The defining condition lives in version
+#   history, remotely hosted content, another package, the host runtime, the
+#   registry's own state, or an organisation's process. Publishing an F1 for
+#   these would measure the fixture author's imagination, not a detector.
+#
+# THE DEFINING-CONDITION RULE (the reason this registry is conservative)
+#   A scenario is static-detectable only if the package decides the scenario
+#   ITSELF. Where the package can only show an enabling PRECONDITION while the
+#   defining event happens elsewhere, the scenario stays out-of-artifact and
+#   the precondition is recorded in `artifact_signal` — explicitly labeled a
+#   partial proxy, never promoted to coverage of the scenario. `artifact_signal`
+#   is what fixtures/manifest.yaml is permitted to label a corpus against under
+#   `covers: artifact-signal-only`, and such a corpus never claims to measure
+#   the named scenario.
+#
+# Tally: 62 scenarios — 20 static-detectable, 8 agent-judgable, 34
+# out-of-artifact. Two thirds of the whitepaper's named attack surface is not
+# decidable from a single skill package. That is the honest number.
+
+version: 1
+
+source:
+  document: "OWASP Agentic Skills Top 10 (AST01-AST10)"
+  extraction: >-
+    pdftotext -layout of the published whitepaper; scenarios read from the body
+    of each category's "Attack Scenarios" section, cross-checked against the
+    document's table of contents.
+  note: >-
+    This repository is not an official OWASP project and carries no OWASP
+    endorsement. See NOTICE.
+
+tiers:
+  - static-detectable
+  - agent-judgable
+  - out-of-artifact
+
+tier_doctrine:
+  static-detectable: >-
+    A deterministic rule over the skill package's own bytes and structure
+    decides the scenario's defining condition.
+  agent-judgable: >-
+    The evidence is in the package but the decision requires semantic
+    judgement of prose, naming, or stated purpose.
+  out-of-artifact: >-
+    The defining condition is not decidable from one package: it needs version
+    history, remotely hosted content, another package, the host runtime,
+    registry-side state, or organisational process.
+  defining_condition_rule: >-
+    A scenario is static-detectable only when the package decides the scenario
+    itself. A package that shows only an enabling precondition leaves the
+    scenario out-of-artifact; the precondition is recorded as artifact_signal
+    and is never counted as coverage of the scenario.
+
+counts:
+  total: 62
+  by_tier:
+    static-detectable: 20
+    agent-judgable: 8
+    out-of-artifact: 34
+
+categories:
+  AST01: {name: "Malicious Skills", scenario_count: 11}
+  AST02: {name: "Supply Chain Compromise", scenario_count: 4}
+  AST03: {name: "Over-Privileged Skills", scenario_count: 5}
+  AST04: {name: "Insecure Metadata", scenario_count: 7}
+  AST05: {name: "Untrusted External Instructions", scenario_count: 6}
+  AST06: {name: "Weak Isolation", scenario_count: 5}
+  AST07: {name: "Update Drift", scenario_count: 3}
+  AST08: {name: "Poor Scanning", scenario_count: 8}
+  AST09: {name: "No Governance", scenario_count: 7}
+  AST10: {name: "Cross-Platform Reuse", scenario_count: 6}
+
+scenarios:
+
+  # =========================================================================
+  # AST01 — Malicious Skills (11)
+  # =========================================================================
+  - id: AST01-S01
+    category: AST01
+    title: "Typosquatting"
+    description: >-
+      A malicious skill pulls a misspelled dependency that looks legitimate
+      (google-workspace vs. gogle-workspace, clawhud vs. clawhub).
+    tier: agent-judgable
+    reason: >-
+      The dependency names are in the package's lockfile and manifest, but
+      deciding that a name is a deliberate near-miss of a legitimate one is a
+      semantic similarity judgement against world knowledge of what the
+      legitimate name is. A deterministic rule would need an external
+      legitimate-name and popularity corpus, which the package does not carry.
+
+  - id: AST01-S02
+    category: AST01
+    title: "Social Engineering Prerequisites"
+    description: >-
+      A SKILL.md "Prerequisites" section instructs users to copy-paste terminal
+      commands that install "helper tools" from attacker-controlled domains.
+    tier: static-detectable
+    reason: >-
+      Both halves are in SKILL.md: the install instruction and the host it
+      points at. A rule matching a remote-fetch-piped-to-shell command
+      (curl|bash, iwr|iex) whose destination host is absent from the USF
+      network allowlist decides it without reading intent.
+
+  - id: AST01-S03
+    category: AST01
+    title: "Instruction Override"
+    description: >-
+      Malicious skill manifests use prompt injection to hijack the agent's core
+      directives, forcing the model to ignore safety guidelines and obey the
+      attacker's hidden instructions.
+    tier: agent-judgable
+    reason: >-
+      The injected directives are in-artifact prose, but deciding that a
+      sentence supersedes the agent's system directives rather than describing
+      the skill's own task is a semantic reading. Literal "ignore previous
+      instructions" strings are only a weak proxy for the scenario.
+
+  - id: AST01-S04
+    category: AST01
+    title: "ClickFix Prompts"
+    description: >-
+      Fake "setup required" dialogs that coerce users into running malicious
+      scripts.
+    tier: agent-judgable
+    reason: >-
+      The fabricated dialog text is in the package, but deciding that a
+      setup-required instruction is coercive theatre rather than genuine
+      installation guidance requires reading the intent behind the framing.
+
+  - id: AST01-S05
+    category: AST01
+    title: "SOUL.md Persistence"
+    description: >-
+      Malicious skills write backdoor instructions into the agent's identity
+      file, surviving skill uninstall.
+    tier: static-detectable
+    reason: >-
+      A write to the agent identity file is a path match: a declared
+      permissions.files.write entry naming SOUL.md, an absent
+      deny_write: SOUL.md, or a bundled script opening that path for write.
+      All three are structural facts of the package.
+
+  - id: AST01-S06
+    category: AST01
+    title: "Memory Poisoning"
+    description: >-
+      Skills that inject malicious context into MEMORY.md, causing the agent to
+      execute attacker commands in future sessions.
+    tier: static-detectable
+    reason: >-
+      Same mechanism as SOUL.md persistence against a different path: a
+      declared write scope covering MEMORY.md, or a bundled script writing to
+      it, is decidable from the package alone.
+
+  - id: AST01-S07
+    category: AST01
+    title: "Cognitive Degradation and Agent Drift"
+    description: >-
+      A skill degrades the host agent over many turns — flooding the context
+      window, starving the planner, entrenching hallucinated memory — through
+      the QSAF six-stage chain, with no single write looking malicious.
+    tier: out-of-artifact
+    reason: >-
+      The whitepaper states the case itself: the failure "only appears after
+      repeated runtime invocation" and "evades the one-time scanning and
+      manifest review that AST08 and AST04 rely on". Deciding it needs
+      multi-session runtime telemetry — context growth, retry counts, drift
+      across turns — that no package snapshot carries.
+    artifact_signal: >-
+      Unbounded retry or loop constructs and absent output-size budgets in
+      bundled scripts. A weak proxy: benign skills exhibit the same shapes.
+
+  - id: AST01-S08
+    category: AST01
+    title: "Identity Cloning and Impersonation"
+    description: >-
+      A malicious skill reads and exfiltrates the agent's identity artifacts —
+      SOUL.md, MEMORY.md, persona definitions, configuration — so an attacker
+      can replicate its behavioural state elsewhere.
+    tier: static-detectable
+    reason: >-
+      Both halves are in the package: the read of a known identity artifact
+      path in a bundled script or declared read scope, and the outbound send
+      that follows it. A read-path match plus an egress call site decides it.
+
+  - id: AST01-S09
+    category: AST01
+    title: "WebSocket Hijacking"
+    description: >-
+      Skills that establish persistent WebSocket connections to attacker C2
+      servers, enabling real-time command execution.
+    tier: static-detectable
+    reason: >-
+      A ws:// or wss:// client opened by a bundled script against a host absent
+      from the USF network allowlist is a scheme-and-host match over the
+      package's own source.
+
+  - id: AST01-S10
+    category: AST01
+    title: "Data Exfiltration"
+    description: >-
+      A malicious skill reads sensitive documents, email, source code,
+      credentials, or customer records and sends copies to an external service
+      before returning an apparently legitimate result.
+    tier: static-detectable
+    reason: >-
+      An egress destination hardcoded in a bundled script and absent from the
+      manifest's declared allowlist is an in-package diff between what the
+      code does and what the manifest promises. No runtime observation needed.
+
+  - id: AST01-S11
+    category: AST01
+    title: "Hidden Prompt Injection in Skill Output"
+    description: >-
+      A malicious skill embeds concealed or obfuscated instructions in its
+      returned content so downstream model nodes act on them as commands.
+    tier: static-detectable
+    reason: >-
+      The concealment channel is byte-level and in-artifact: zero-width and
+      bidirectional control characters, ASCII smuggling, and base64 blobs
+      inside the package's output templates are decidable without judgement.
+      Plain-prose override text belongs to AST01-S03 instead.
+
+  # =========================================================================
+  # AST02 — Supply Chain Compromise (4)
+  # =========================================================================
+  - id: AST02-S01
+    category: AST02
+    title: "Registry Flooding"
+    description: >-
+      Coordinated upload of hundreds of malicious skills to crowd out
+      legitimate alternatives.
+    tier: out-of-artifact
+    reason: >-
+      "Coordinated" and "hundreds" are properties of the registry's publication
+      corpus over time. A single package is indistinguishable from one member
+      of a flood and from one honest publication.
+    artifact_signal: null
+
+  - id: AST02-S02
+    category: AST02
+    title: "Dependency Confusion"
+    description: >-
+      Poison a nested dependency rather than the top-level skill, bypassing
+      surface-level scans.
+    tier: out-of-artifact
+    reason: >-
+      The defining condition is that the resolver selects an attacker's package
+      in place of the intended nested one. Deciding it needs the resolution
+      namespace and the registry's contents at install time — neither is in the
+      package.
+    artifact_signal: >-
+      Transitive dependencies declared as version ranges rather than immutable
+      sha256: pins, which is the precondition the whitepaper's own mitigation
+      ("Pin all nested dependencies to immutable hashes") targets, and is a
+      decidable lockfile property.
+
+  - id: AST02-S03
+    category: AST02
+    title: "Config-File Hijacking"
+    description: >-
+      Embed execution instructions in repository config files (hooks, MCP
+      settings, environment overrides) that trigger at project open.
+    tier: static-detectable
+    reason: >-
+      Those config files ship inside the package. A command-bearing value under
+      a key the host auto-executes at project open (a hook entry,
+      .claude/settings.json, an ANTHROPIC_BASE_URL override) is a structural
+      key-and-value match.
+
+  - id: AST02-S04
+    category: AST02
+    title: "Maintainer Account Takeover"
+    description: >-
+      Compromise a trusted skill author's account and push a backdoored
+      version.
+    tier: out-of-artifact
+    reason: >-
+      Requires registry-side authentication and session state — auth logs,
+      signing-key provenance, publication history. A post-takeover release
+      signed with the legitimate key is byte-indistinguishable from an honest
+      one, so no in-package signal exists at all.
+    artifact_signal: null
+
+  # =========================================================================
+  # AST03 — Over-Privileged Skills (5)
+  # =========================================================================
+  - id: AST03-S01
+    category: AST03
+    title: "Weather Assistant Data Exfiltration"
+    description: >-
+      A "weather assistant" skill reads ~/.clawdbot/.env — all API keys — far
+      beyond what a weather API needs.
+    tier: agent-judgable
+    reason: >-
+      Both the declared read scope and the stated description are in the
+      package, but the scenario turns on "far beyond what it needs", which is a
+      purpose-versus-scope judgement no fixed rule settles: the same read scope
+      is legitimate for a credential-management skill.
+    artifact_signal: >-
+      A declared read or exec scope naming credential stores, or unrestricted
+      shell, alongside a narrow stated function — a structural proxy for the
+      mismatch, not the mismatch itself.
+
+  - id: AST03-S02
+    category: AST03
+    title: "Database Admin Wipe"
+    description: >-
+      A manage_database skill provisioned with admin credentials is tricked via
+      prompt injection into wiping production data.
+    tier: out-of-artifact
+    reason: >-
+      The defining event is a runtime trick: an injected instruction arriving
+      in input the package does not contain, acted on by a host runtime that
+      evaluates permissions at the tool-call level. Neither the payload nor the
+      runtime is in the package.
+    artifact_signal: >-
+      An unscoped administrative credential grant carrying destructive
+      capability with no per-action confirmation declared in the manifest.
+
+  - id: AST03-S03
+    category: AST03
+    title: "Identity File Backdoors"
+    description: >-
+      A skill requesting write access to SOUL.md and MEMORY.md installs
+      persistent behavioural backdoors.
+    tier: static-detectable
+    reason: >-
+      The request is the artifact: a declared write permission naming SOUL.md,
+      MEMORY.md, or AGENTS.md — or the absence of the USF deny_write entries
+      for them — is a pure structural check on the manifest.
+
+  - id: AST03-S04
+    category: AST03
+    title: "Logic-layer Injection of Privileged Actions (LPCI)"
+    description: >-
+      A skill receives external input — user data, retrieved memory, another
+      tool's output — carrying embedded instructions, and the runtime's
+      tool-call-level permission model lets the model perform a privileged
+      action autonomously.
+    tier: out-of-artifact
+    reason: >-
+      The payload arrives at runtime in input the package never holds, and the
+      escalation depends on the host runtime's permission-evaluation
+      granularity. LAAF validates this empirically by executing against a live
+      runtime, which is precisely what a package snapshot cannot substitute
+      for.
+    artifact_signal: >-
+      Bundled code that routes external input or tool output into a privileged
+      action path with no provenance tag or instruction-versus-data boundary.
+
+  - id: AST03-S05
+    category: AST03
+    title: "Low-Privilege Skill Invokes a High-Privilege Skill"
+    description: >-
+      An attacker causes a lower-privilege skill to submit a crafted request to
+      a privileged skill, which treats the caller as trusted and becomes a
+      confused deputy.
+    tier: out-of-artifact
+    reason: >-
+      The scenario spans two packages plus the host's inter-skill trust
+      configuration. Nothing in either package alone shows the delegation edge
+      or whether the host verifies the original caller.
+    artifact_signal: >-
+      A privileged skill that declares no caller-authorization requirement for
+      delegated invocations — visible in one package, but insufficient to
+      decide the scenario.
+
+  # =========================================================================
+  # AST04 — Insecure Metadata (7)
+  # =========================================================================
+  - id: AST04-S01
+    category: AST04
+    title: "Brand Impersonation"
+    description: >-
+      Publish google-workspace-integration before Google does, capturing
+      traffic from users searching for the official skill.
+    tier: agent-judgable
+    reason: >-
+      The name, author, and description fields are in the package, but deciding
+      that they imply an official vendor relationship the author does not have
+      is a semantic judgement. A deterministic rule needs a trademark and
+      vendor-namespace corpus the package does not carry.
+
+  - id: AST04-S02
+    category: AST04
+    title: "Permission Understating"
+    description: >-
+      Declare network: false in metadata while the underlying script calls curl
+      to an external endpoint.
+    tier: static-detectable
+    reason: >-
+      Both sides of the contradiction ship together: the declared permission in
+      the manifest and the egress call site in the bundled script. A
+      declared-versus-observed cross-check decides it outright.
+
+  - id: AST04-S03
+    category: AST04
+    title: "Risk Tier Spoofing"
+    description: >-
+      Self-classify as risk_tier: L0 (safe) while embedding destructive
+      operations.
+    tier: static-detectable
+    reason: >-
+      The whitepaper's own mitigation states the check: "cross-reference
+      risk_tier declarations against the permission manifest scope". The
+      declared tier and the scope it contradicts are both fields of the same
+      package.
+
+  - id: AST04-S04
+    category: AST04
+    title: "YAML Code Execution"
+    description: >-
+      SKILL.md frontmatter contains !!python/object/apply:os.system [...],
+      executing if the loader opts into UnsafeLoader (or FullLoader before
+      PyYAML 5.1).
+    tier: static-detectable
+    reason: >-
+      The dangerous tag is a literal byte sequence in the frontmatter, and the
+      loader opt-in (yaml.unsafe_load, Loader=yaml.UnsafeLoader, bare
+      yaml.load) is a call site in the bundled code. Both are parse-time facts.
+
+  - id: AST04-S05
+    category: AST04
+    title: "Staged Loader"
+    description: >-
+      SKILL.md passes a surface scan; a referenced requirements.txt pulls a
+      malicious package that executes at install time.
+    tier: out-of-artifact
+    reason: >-
+      The defining condition is that the pulled package is malicious, and that
+      package is resolved off-artifact at install time. The staging structure
+      is visible; the payload — the thing that makes it an attack — is not.
+    artifact_signal: >-
+      A SKILL.md referencing an install-time-executing dependency file
+      (requirements.txt, package.json with a postinstall, setup.py) whose
+      resolved contents are not shipped in the package.
+
+  - id: AST04-S06
+    category: AST04
+    title: "JSON Prototype Pollution"
+    description: >-
+      manifest.json contains a __proto__ key which, after an unsafe recursive
+      merge into a shared config object, poisons the prototype for every object
+      in the Node.js runtime performing the merge.
+    tier: static-detectable
+    reason: >-
+      Both halves are in the package: the polluting key name in the manifest
+      and the unsafe recursive-merge call site in the bundled JavaScript. Key
+      match plus call-site match.
+
+  - id: AST04-S07
+    category: AST04
+    title: "TOML / Config Injection"
+    description: >-
+      Alternative config formats have no code-execution construct; the risk is
+      unvalidated key overrides injecting unexpected properties into the skill
+      runner's configuration namespace when precedence rules are not enforced.
+    tier: static-detectable
+    reason: >-
+      The overriding keys and the duplicate or precedence-violating tables are
+      literal structure in a config file that ships with the package. A schema
+      and allowlist check over the parsed config decides it.
+
+  # =========================================================================
+  # AST05 — Untrusted External Instructions (6)
+  # =========================================================================
+  - id: AST05-S01
+    category: AST05
+    title: "Author Rug-Pull"
+    description: >-
+      A benign skill points the agent at documentation the author controls; it
+      passes review, and once trusted the author edits the referenced document
+      to inject new instructions.
+    tier: out-of-artifact
+    reason: >-
+      The defining event is an edit to remotely hosted content after review.
+      Deciding it requires the referenced document at two points in time; the
+      package is byte-identical before and after the rug-pull.
+    artifact_signal: >-
+      An external instruction reference carried with no pinned content hash —
+      the precondition the whitepaper's "record a content hash ... re-verify it
+      on every load" mitigation targets.
+
+  - id: AST05-S02
+    category: AST05
+    title: "Reviewer Bait-and-Switch"
+    description: >-
+      The referenced URL serves clean documentation to reviewers, scanners, and
+      crawlers (keyed on IP, user-agent, or timing) but malicious instructions
+      to live agent runs.
+    tier: out-of-artifact
+    reason: >-
+      Deciding it requires fetching the reference from multiple vantage points
+      at multiple times and diffing the responses. The package is identical in
+      the reviewed case and the exploited case; only the server differs.
+    artifact_signal: null
+
+  - id: AST05-S03
+    category: AST05
+    title: "Transitive Reference Chaining"
+    description: >-
+      The referenced document tells the agent to read still more external
+      resources, so the attacker need only control a link buried deep in the
+      chain, past where review stopped.
+    tier: out-of-artifact
+    reason: >-
+      Everything after the first hop lives on remote servers. The package shows
+      one reference; the chain's depth, destinations, and content are only
+      discoverable by fetching and following.
+    artifact_signal: >-
+      References that are neither enumerated nor pinned transitively, leaving
+      the chain unbounded from the package's point of view.
+
+  - id: AST05-S04
+    category: AST05
+    title: "Relay-Node Amplification"
+    description: >-
+      In a chained pipeline each node may run on a different backbone model; an
+      injected instruction survives at whichever relay reads upstream output as
+      instruction rather than data.
+    tier: out-of-artifact
+    reason: >-
+      The whitepaper states the property directly: "a chain's injection
+      resistance is the minimum over the backbone models on its path", and
+      "certifying the endpoints does not certify the chain". That is deployment
+      topology and per-node model assignment, not package content.
+    artifact_signal: >-
+      Decision rules that consume upstream skill output without re-establishing
+      an instruction-versus-data boundary at the hop.
+
+  - id: AST05-S05
+    category: AST05
+    title: "Malicious Instructions Embedded in Documents"
+    description: >-
+      A document-processing skill analyzes an externally supplied PDF, Word
+      document, spreadsheet, or Markdown file containing hidden text, metadata,
+      comments, or white-coloured text instructing the agent to act.
+    tier: agent-judgable
+    reason: >-
+      The malicious document is supplied at runtime and is not in the package,
+      but the whitepaper's stated cause is: "the skill fails to distinguish
+      document content from executable instructions". That failure is the
+      skill's own handling — prose in SKILL.md and code in the bundle — and
+      judging whether the boundary it establishes is adequate is semantic.
+    artifact_signal: >-
+      Bundled document or response handling that concatenates extracted content
+      into an instruction or executable sink with no provenance tag or boundary
+      delimiter.
+
+  - id: AST05-S06
+    category: AST05
+    title: "Denial-of-Service (DoS) through Malicious Skills"
+    description: >-
+      A malicious skill intentionally consumes excessive computation, memory,
+      API requests, or LLM tokens, overloading the agent or the shared
+      infrastructure around it.
+    tier: out-of-artifact
+    reason: >-
+      "Excessive" is measured against a runtime budget and a shared
+      infrastructure the package knows nothing about. The same loop is
+      efficient on one deployment and exhausting on another.
+    artifact_signal: >-
+      Unbounded loops or retries and absent rate, token, or timeout budgets in
+      bundled scripts.
+
+  # =========================================================================
+  # AST06 — Weak Isolation (5)
+  # =========================================================================
+  - id: AST06-S01
+    category: AST06
+    title: "Host Escape"
+    description: >-
+      A malicious skill executes os.system() to plant a cron job on the host,
+      persisting beyond skill uninstall.
+    tier: static-detectable
+    reason: >-
+      The escape is written into the bundled script: a shell-exec call site
+      writing to a host persistence location (crontab, systemd unit, shell rc,
+      launch agent) outside the skill's own tree, or a declared write scope
+      reaching filesystem root. Both are structural facts of the package.
+
+  - id: AST06-S02
+    category: AST06
+    title: "Network Pivot"
+    description: >-
+      An agent with no network sandbox egresses to an attacker C2 and
+      exfiltrates credentials from other co-located services.
+    tier: out-of-artifact
+    reason: >-
+      The scenario turns on the host having no network sandbox and on which
+      services are co-located — deployment facts. The same package is contained
+      on a sandboxed host and pivots on an unsandboxed one.
+    artifact_signal: >-
+      A manifest declaring network: true or policy: allow-all rather than a
+      domain allowlist, which the whitepaper's "domain allowlists, not a binary
+      network: true/false" mitigation targets.
+
+  - id: AST06-S03
+    category: AST06
+    title: "Skill Shadowing"
+    description: >-
+      OpenClaw's three-tier precedence (workspace > managed > bundled) lets an
+      attacker who plants a skill in a workspace folder shadow legitimate
+      built-in functionality, active immediately via hot-reload.
+    tier: out-of-artifact
+    reason: >-
+      Shadowing is a name collision resolved against the host's installed-skill
+      set and precedence configuration. One package cannot know which name it
+      collides with, or that it wins.
+    artifact_signal: null
+
+  - id: AST06-S04
+    category: AST06
+    title: "Localhost Attack Surface"
+    description: >-
+      A locally-bound agent WebSocket is reachable from any browser tab; a
+      malicious site brute-forces the session token.
+    tier: out-of-artifact
+    reason: >-
+      The exposed surface is the agent host's own control interface, not any
+      skill package. No skill artifact carries the binding, the auth policy, or
+      the rate limit that decide this.
+    artifact_signal: >-
+      A bundled script that binds a listening socket without authentication —
+      a related but distinct exposure from the host control interface the
+      scenario names.
+
+  - id: AST06-S05
+    category: AST06
+    title: "Cross-Agent Workspace Contamination"
+    description: >-
+      When agents or sessions share writable workspace, memory, configuration,
+      shell, or browser state, one agent can alter content another agent later
+      treats as trusted.
+    tier: out-of-artifact
+    reason: >-
+      Sharing is a deployment topology property: whether two agents are pointed
+      at the same writable state is decided outside every package involved.
+    artifact_signal: >-
+      Declared writes to shared workspace, memory, or credential paths with no
+      agent-scoped namespace — the precondition, not the contamination.
+
+  # =========================================================================
+  # AST07 — Update Drift (3)
+  # =========================================================================
+  - id: AST07-S01
+    category: AST07
+    title: "Malicious Update"
+    description: >-
+      A trusted skill author's account is compromised and the attacker pushes
+      v2.0 with a payload; auto-updating agents receive it silently.
+    tier: out-of-artifact
+    reason: >-
+      "Update" is a relation between two versions and "compromised account" is
+      registry-side state. A single package cannot show that it differs
+      maliciously from a predecessor it does not contain.
+    artifact_signal: >-
+      Absent signature or content-hash pinning, which is what lets an update
+      land unverified.
+
+  - id: AST07-S02
+    category: AST07
+    title: "Rollback Attack"
+    description: >-
+      An attacker forces a downgrade to a known-vulnerable version via
+      dependency resolution manipulation.
+    tier: out-of-artifact
+    reason: >-
+      Requires the release timeline — version ordering and prior content hashes
+      — plus knowledge of which prior version was vulnerable. None of that is
+      in a single artifact snapshot.
+    artifact_signal: >-
+      Version ranges rather than immutable pins in the dependency
+      specification.
+
+  - id: AST07-S03
+    category: AST07
+    title: "Hot-Reload Abuse"
+    description: >-
+      The skill directory is writable; an attacker modifies SKILL.md mid-session
+      and the agent picks up changes without restart.
+    tier: out-of-artifact
+    reason: >-
+      Requires runtime reload-event history from the host process and the
+      directory's permissions on the deployed host. The package at rest is
+      identical before and after the swap.
+    artifact_signal: null
+
+  # =========================================================================
+  # AST08 — Poor Scanning (8)
+  # =========================================================================
+  - id: AST08-S01
+    category: AST08
+    title: "Natural-Language Bypass"
+    description: >-
+      Malicious intent expressed entirely in prose; no code, no regex match.
+    tier: agent-judgable
+    reason: >-
+      The scenario is defined by the absence of any static signal — that is its
+      whole point. The prose is in the package, so it is in-artifact, but only
+      semantic judgement can decide it.
+
+  - id: AST08-S02
+    category: AST08
+    title: "Obfuscated Instruction"
+    description: >-
+      Payload hidden in a base64 comment block, decoded at runtime by the LLM.
+    tier: static-detectable
+    reason: >-
+      The encoded blob is in the package's bytes. Decoding candidate encodings
+      and re-running the detection rules over the decoded view is deterministic
+      — the whitepaper's own "run every detection rule over the normalized view
+      as well as the raw bytes" mitigation.
+
+  - id: AST08-S03
+    category: AST08
+    title: "Scanner Impersonation"
+    description: >-
+      A malicious skill presents as a "security scanner", creating false
+      confidence while exfiltrating data.
+    tier: agent-judgable
+    reason: >-
+      The self-presentation is prose in the package, and judging that it
+      manufactures unearned trust is semantic. The exfiltration half is
+      separately static (AST01-S10); the impersonation half is not.
+
+  - id: AST08-S04
+    category: AST08
+    title: "Context-Dependent Malice"
+    description: >-
+      A skill behaves safely in test environments and activates its malicious
+      path only when specific runtime conditions (user, file presence, date)
+      are met.
+    tier: static-detectable
+    reason: >-
+      The logic bomb ships with the package: an environment-keyed guard
+      (hostname, username, date comparison, file-existence probe) wrapping a
+      dangerous branch is a control-flow shape a static rule matches, without
+      ever running the code.
+
+  - id: AST08-S05
+    category: AST08
+    title: "Model-Dependent Injection Resistance"
+    description: >-
+      A skill approved under one backbone model is later executed by a host
+      configured with a weaker model, on which the identical tool-output
+      injection now succeeds.
+    tier: out-of-artifact
+    reason: >-
+      The whitepaper is explicit: "The artifact never changed, and every gate
+      still passes ... injection resistance is a behavioral property of the
+      runtime model rather than of the skill's bytes." There is nothing in the
+      package to detect.
+    artifact_signal: null
+
+  - id: AST08-S06
+    category: AST08
+    title: "Scanner-Target Evasion"
+    description: >-
+      Because the scanner is a known static target, an adversary runs it
+      locally and iterates the skill against its rules and guard prompt offline
+      until it passes.
+    tier: out-of-artifact
+    reason: >-
+      The defining condition is a property of the adversary's process and of a
+      specific scanner's ruleset — that this artifact was tuned against that
+      scanner. No package can testify to how it was produced. As the whitepaper
+      puts it, a published detection rate is measured against an adversary who
+      does not yet hold the scanner while the deployed one does.
+    artifact_signal: >-
+      Context-padding, unopened archive or binary containers, and
+      scanner-directed prose — each individually static (AST08-S02, S07, S08)
+      but none evidence that tuning occurred.
+
+  - id: AST08-S07
+    category: AST08
+    title: "Scanner Host Compromise and Resource Exhaustion"
+    description: >-
+      A malicious skill attacks the scanner itself through recursive archives,
+      decompression bombs, oversized inputs, parser exploits, symlink escapes,
+      special files, or crafted multimodal content.
+    tier: static-detectable
+    reason: >-
+      Every listed vector is a measurable property of the files in the package:
+      archive nesting depth, compression ratio, file count, symlink targets
+      escaping the scan root, and non-regular file types. Deterministic limits
+      decide it before any parsing happens.
+
+  - id: AST08-S08
+    category: AST08
+    title: "Bytecode Cache Poisoning"
+    description: >-
+      A skill hides behavior in a poisoned or sourceless .pyc that Python's
+      import machinery selects while reviewers and scanners inspect only the
+      corresponding source.
+    tier: static-detectable
+    reason: >-
+      Both the .pyc and the source ship in the package. A sourceless .pyc, or a
+      .pyc whose disassembly does not correspond to its adjacent source, is a
+      source-to-bytecode provenance comparison over package contents.
+
+  # =========================================================================
+  # AST09 — No Governance (7)
+  # =========================================================================
+  - id: AST09-S01
+    category: AST09
+    title: "Undetected Compromise"
+    description: >-
+      A malicious skill installed by one developer affects the entire shared
+      agent workspace; no alert fires because no inventory exists.
+    tier: out-of-artifact
+    reason: >-
+      "No alert fires because no inventory exists" is a statement about the
+      organisation's monitoring, not about any package. The same artifact is
+      detected instantly at an org that keeps an inventory.
+    artifact_signal: null
+
+  - id: AST09-S02
+    category: AST09
+    title: "Unapproved Malicious Skill"
+    description: >-
+      An employee installs a skill from an open registry or community forum;
+      it is never reviewed because the organisation lacks an approval workflow.
+    tier: out-of-artifact
+    reason: >-
+      Approval status is a property of the installing organisation's process.
+      A package carries no record of whether anyone reviewed it.
+    artifact_signal: null
+
+  - id: AST09-S03
+    category: AST09
+    title: "Orphaned Skill"
+    description: >-
+      A developer leaves the organisation and the skill they installed remains
+      active with their credentials, with no deprovisioning process.
+    tier: out-of-artifact
+    reason: >-
+      Employment status and credential lifecycle are HR and IAM state. Nothing
+      in the skill package changes when its installer leaves.
+    artifact_signal: null
+
+  - id: AST09-S04
+    category: AST09
+    title: "Regulatory Exposure"
+    description: >-
+      Regulated data (PII, PHI) is processed by an unreviewed skill with no
+      audit trail for compliance reporting.
+    tier: out-of-artifact
+    reason: >-
+      Whether the data a skill touches is regulated depends on the deploying
+      organisation's data classification and jurisdiction, both maintained
+      outside the artifact.
+    artifact_signal: null
+
+  - id: AST09-S05
+    category: AST09
+    title: "Unreachable Skill"
+    description: >-
+      A skill deployed inside a managed SaaS copilot whose endpoints and
+      registries the security team does not administer never enters any
+      inventory, approval queue, or revocation list — shadow AI inside a
+      sanctioned platform.
+    tier: out-of-artifact
+    reason: >-
+      The whitepaper's own framing forecloses artifact analysis: "there is no
+      host to scan and no local package manifest to read". The scenario is the
+      absence of an obtainable artifact.
+    artifact_signal: null
+
+  - id: AST09-S06
+    category: AST09
+    title: "Cascading Agent Compromise"
+    description: >-
+      A multi-agent pipeline means a compromised upstream skill propagates
+      malicious instructions downstream with no human checkpoint.
+    tier: out-of-artifact
+    reason: >-
+      Propagation depends on the pipeline's topology and on where human
+      checkpoints sit — organisational and deployment facts spanning many
+      packages.
+    artifact_signal: null
+
+  - id: AST09-S07
+    category: AST09
+    title: "Manipulated Trust Signals"
+    description: >-
+      An adversary farms GitHub stars, install counts, or other metrics so
+      agents selecting skills by reputation choose the malicious one.
+    tier: out-of-artifact
+    reason: >-
+      Stars and install counts are registry-side and platform-side state. A
+      package cannot show that the reputation attached to it was farmed.
+    artifact_signal: null
+
+  # =========================================================================
+  # AST10 — Cross-Platform Reuse (6)
+  # =========================================================================
+  - id: AST10-S01
+    category: AST10
+    title: "Security Property Loss in Translation"
+    description: >-
+      A skill with risk_tier: L3 (destructive) is ported to a platform that
+      does not support risk_tier and the warning is silently dropped.
+    tier: out-of-artifact
+    reason: >-
+      "Loss" is a relation between a source manifest and a ported target
+      manifest, plus the target platform's schema. The whitepaper's own tooling
+      confirms it: the metadata loss simulator takes two manifests as input.
+    artifact_signal: >-
+      A package declaring security properties in fields the target format does
+      not carry — decidable only once the target schema is supplied alongside
+      it.
+
+  - id: AST10-S02
+    category: AST10
+    title: "Cross-Registry Arbitrage"
+    description: >-
+      An attacker publishes a skill on a lightly scanned registry (skills.sh)
+      and promotes it to a more trusted registry, leveraging the installation
+      count as a false trust signal.
+    tier: out-of-artifact
+    reason: >-
+      Requires a cross-registry corpus: the same skill's presence, scan
+      posture, and install counts on two or more registries. A single package
+      shows none of that.
+    artifact_signal: null
+
+  - id: AST10-S03
+    category: AST10
+    title: "Multi-Platform Campaign"
+    description: >-
+      The same malicious payload is deployed across four platforms
+      simultaneously; each platform's security team is unaware of the others'
+      incidents.
+    tier: out-of-artifact
+    reason: >-
+      "Simultaneously across four platforms" is a cross-platform corpus and
+      timeline property. One package is one campaign member and looks like a
+      lone publication.
+    artifact_signal: null
+
+  - id: AST10-S04
+    category: AST10
+    title: "Manifest Stripping"
+    description: >-
+      Moving skills between environments (OpenClaw, Claude Code, Cursor, VS
+      Code) often drops explicit permission metadata, leaving downstream
+      runtimes blind to original constraints.
+    tier: out-of-artifact
+    reason: >-
+      Deciding that metadata was stripped needs the pre-port manifest to
+      compare against. A ported package with no permission block is
+      indistinguishable from one that never declared any.
+    artifact_signal: >-
+      Absent permission or risk metadata in a package whose format supports it
+      — the same signal AST06's missing-sandbox-declaration check reads, and
+      equally unable to attribute the absence to porting.
+
+  - id: AST10-S05
+    category: AST10
+    title: "Implicit Privilege Escalation"
+    description: >-
+      A skill scoped safely with strict network and file limits on a source
+      platform inherits broad default access rights on a less restrictive
+      target platform.
+    tier: out-of-artifact
+    reason: >-
+      The escalation is entirely a property of the target platform's
+      default-permission model. The package's own declarations are unchanged
+      and, read alone, look safe.
+    artifact_signal: >-
+      Reliance on platform defaults instead of explicitly declared scopes.
+
+  - id: AST10-S06
+    category: AST10
+    title: "Silent Supply Chain Injection"
+    description: >-
+      Malicious payloads hidden inside encoded script blocks execute at agent
+      speed once imported into a new ecosystem without structural validation.
+    tier: static-detectable
+    reason: >-
+      The named vector is an encoded script block, which is a byte pattern in
+      the package. Decoding and re-scanning it is deterministic and platform
+      independent — which is exactly the whitepaper's "build platform-agnostic
+      skill scanners that evaluate the content layer independently of the
+      runtime" mitigation.

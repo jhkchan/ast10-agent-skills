@@ -111,4 +111,6 @@ do not infer a tier from this prose.
 Full attack-scenario catalog, real-world evidence (ClawHavoc campaign, USENIX Security
 2026 measurement study, Snyk ToxicSkills), and the complete preventive-mitigation list
 are the whitepaper's own AST01 section — treat this file as the delta on top of it, not
-a restatement of it. See `references/` for source excerpts once populated (T-3.3).
+a restatement of it. This package ships no `references/` directory: the source it would
+excerpt is the whitepaper, which is not redistributable here, so the pointer is to the
+publication rather than to a local copy of it.

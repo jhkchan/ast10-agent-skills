@@ -14,10 +14,9 @@ from __future__ import annotations
 
 from typing import Callable
 
-from detectors.scaffold import Finding
+from detectors.scaffold import Finding, static_detectable
 from detectors.scaffold import f1_report as _f1_report
 from detectors.scaffold import run_all as _run_all
-from detectors.scaffold import static_detectable
 
 SCENARIO_TIERS: dict[str, str] = {
     "AST06-unrestricted-shell-exec": "static-detectable",
@@ -38,9 +37,7 @@ def detect_unrestricted_shell_exec(pkg: dict) -> Finding:
     commands = shell.get("commands") or []
     detected = allowed and not commands
     evidence = (
-        "shell.allowed with no commands allow-list"
-        if detected
-        else f"shell.allowed={allowed} commands={commands}"
+        "shell.allowed with no commands allow-list" if detected else f"shell.allowed={allowed} commands={commands}"
     )
     return Finding("AST06-unrestricted-shell-exec", detected, evidence)
 
@@ -50,11 +47,7 @@ def detect_missing_sandbox_declaration(pkg: dict) -> Finding:
     distinct from a broad-but-present one (unrestricted-shell-exec)."""
     permissions = pkg.get("manifest", {}).get("permissions")
     detected = not permissions
-    evidence = (
-        "manifest.permissions is unset or empty"
-        if detected
-        else "permissions block present"
-    )
+    evidence = "manifest.permissions is unset or empty" if detected else "permissions block present"
     return Finding("AST06-missing-sandbox-declaration", detected, evidence)
 
 

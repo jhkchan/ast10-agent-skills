@@ -234,9 +234,7 @@ def test_main_reports_ok_for_a_compliant_repo(tmp_path, monkeypatch, capsys):
         "content_sha256": sha,
         "verdict": "SHIP",
     }
-    scores = {
-        "AST01": {"iter-1-live": live_block, "aggregate": _golden_agg(verdict="SHIP")}
-    }
+    scores = {"AST01": {"iter-1-live": live_block, "aggregate": _golden_agg(verdict="SHIP")}}
     (tmp_path / "scores.json").write_text(json.dumps(scores))
 
     monkeypatch.setattr(ship_floor, "ROOT", tmp_path)
@@ -247,9 +245,7 @@ def test_main_reports_ok_for_a_compliant_repo(tmp_path, monkeypatch, capsys):
     assert "OK: 1 skill(s) shipped." in out
 
 
-def test_main_fails_when_stored_verdict_disagrees_with_recompute(
-    tmp_path, monkeypatch, capsys
-):
+def test_main_fails_when_stored_verdict_disagrees_with_recompute(tmp_path, monkeypatch, capsys):
     skill_dir = tmp_path / "skills" / "AST01"
     (skill_dir / "references").mkdir(parents=True)
     (skill_dir / "scripts").mkdir(parents=True)

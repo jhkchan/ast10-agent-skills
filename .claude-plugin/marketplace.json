@@ -1,0 +1,54 @@
+{
+  "name": "OWASP Agentic Skills Top 10 Agent Skills",
+  "description": "Eleven agent skills operationalizing the OWASP Agentic Skills Top 10 (AST01-AST10) whitepaper: ten per-category triage skills plus an advisory router. Independent community implementation — NOT an OWASP project and carrying no OWASP endorsement.",
+  "version": "1.0.0",
+  "author": "Jacky Chan",
+  "license": "Apache-2.0",
+  "skill_count": 11,
+  "skills": [
+    {
+      "name": "advisory",
+      "description": "Routes a free-text agent-skill security finding to its primary AST01-AST10 category using the whitepaper's own decision tree, and returns category-specific remediation guidance."
+    },
+    {
+      "name": "ast01-malicious-skills",
+      "description": "Triages AST01 Malicious Skills: hidden payloads split across the code layer and the natural-language instruction layer of a SKILL.md and its dependency tree."
+    },
+    {
+      "name": "ast02-supply-chain-compromise",
+      "description": "Triages AST02 Supply Chain Compromise: registry flooding, dependency confusion in a skill's nested manifests, config-file hijacking, and maintainer-account takeover."
+    },
+    {
+      "name": "ast03-over-privileged-skills",
+      "description": "Triages AST03 Over-Privileged Skills: permission grants broader than the stated function, logic-layer prompt control injection, and confused-deputy chains."
+    },
+    {
+      "name": "ast04-insecure-metadata",
+      "description": "Triages AST04 Insecure Metadata: brand impersonation, permission-understating manifests, risk_tier spoofing, unsafe YAML/JSON/TOML deserialization, and invisible-Unicode smuggling."
+    },
+    {
+      "name": "ast05-untrusted-external-instructions",
+      "description": "Triages AST05 Untrusted External Instructions: fetched documentation followed as instruction rather than data, author rug-pull, reviewer bait-and-switch, and transitive reference chaining."
+    },
+    {
+      "name": "ast06-weak-isolation",
+      "description": "Triages AST06 Weak Isolation: skills running in the host agent's security context because sandboxing is optional or off by default, plus skill shadowing and localhost control surfaces."
+    },
+    {
+      "name": "ast07-update-drift",
+      "description": "Triages AST07 Update Drift: skills installed without immutable pinning, auto-update onto a malicious patch release, rollback attacks, and hot-reload abuse."
+    },
+    {
+      "name": "ast08-poor-scanning",
+      "description": "Triages AST08 Poor Scanning: natural-language-only malicious intent, shell-parsing evasion, invisible-Unicode smuggling, and false-positive discipline for skill scanners."
+    },
+    {
+      "name": "ast09-no-governance",
+      "description": "Triages AST09 No Governance: absent skill inventory and approval workflow, orphaned skills after offboarding, unscannable managed-SaaS skills, and bilateral-receipt audit logging."
+    },
+    {
+      "name": "ast10-cross-platform-reuse",
+      "description": "Triages AST10 Cross-Platform Reuse: security metadata silently dropped when a skill is ported between runtimes, cross-registry arbitrage, and Universal Skill Format validation."
+    }
+  ]
+}

@@ -1,0 +1,283 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:owasp-ast10-agent-skills:schemas:usf-v1",
+  "title": "Universal Agentic Skill Format v1.0",
+  "description": "Structural schema for the Universal Skill Format manifest proposed in the OWASP Agentic Skills Top 10 whitepaper, AST10 (Cross-Platform Reuse). This file constrains SHAPE only -- types, required keys, enumerations, and the syntax of the version/hash/signature fields. Permission SEMANTICS (default-deny network precedence, deny_write-wins-over-write, no wildcards in permissions.files, identity-file protection, and risk_tier validated against the declared permission set) are NOT expressible here and are enforced by validators/usf.py. A manifest that passes this schema is well-formed, not policy-conformant.",
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "platforms",
+    "description",
+    "author",
+    "permissions",
+    "risk_tier",
+    "signature",
+    "content_hash",
+    "changelog"
+  ],
+  "additionalProperties": false,
+  "patternProperties": {
+    "^x-[a-z0-9][a-z0-9-]*$": {
+      "description": "Vendor extension namespace. The format is a superset of platform-specific manifests, so a runtime may carry extra metadata -- but only under an explicit x- prefix. Every other unknown key is rejected: a typo such as `deny_writes` that silently drops identity-file protection is the exact manifest-stripping failure AST10 describes."
+    }
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "description": "Lowercase package identifier. Must match the platform-native skill name (for example the SKILL.md frontmatter `name`); validators/usf.py checks that cross-format agreement when given the skill directory."
+    },
+    "version": {
+      "$ref": "#/$defs/semver"
+    },
+    "platforms": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/platform"
+      },
+      "description": "Runtimes this package is declared compatible with. Adding one is a re-validation event, not an edit: AST10's premise is that security properties are lost in translation between runtimes."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "description": "Concise, honest statement of function."
+    },
+    "author": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^did:[a-z0-9]+:[A-Za-z0-9._%:-]+$",
+          "description": "Decentralized identity anchor. Optional, because a manifest that ships unsigned has no key to anchor; validators/usf.py warns when it is absent rather than accepting a DID that resolves to nothing."
+        },
+        "signing_key": {
+          "$ref": "#/$defs/ed25519_public_key"
+        }
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "required": ["files", "network", "shell"],
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "type": "object",
+          "required": ["read", "write", "deny_write"],
+          "additionalProperties": false,
+          "description": "All three lists are required even when empty. A declared-empty list and an absent list are the same thing to a permissive target runtime, which is precisely the AST10 implicit-privilege-escalation path; requiring the key forces the author to state the floor.",
+          "properties": {
+            "read": {
+              "$ref": "#/$defs/pathList"
+            },
+            "write": {
+              "$ref": "#/$defs/pathList"
+            },
+            "deny_write": {
+              "$ref": "#/$defs/pathList"
+            }
+          }
+        },
+        "network": {
+          "type": "object",
+          "required": ["allow"],
+          "additionalProperties": false,
+          "properties": {
+            "allow": {
+              "type": "array",
+              "uniqueItems": true,
+              "maxItems": 256,
+              "items": {
+                "$ref": "#/$defs/host"
+              },
+              "description": "Domain allowlist, not a boolean. An empty list means no egress at all -- it does not mean unrestricted."
+            },
+            "deny": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "description": "Kept for explicit auditability only. Evaluation is default-deny, so the sole meaningful value is the literal \"*\"; validators/usf.py rejects anything else, because treating deny as an override list inverts the precedence rule."
+            }
+          }
+        },
+        "shell": {
+          "type": "boolean",
+          "description": "Explicit shell access declaration. Never inferred."
+        },
+        "tools": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 128,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9_.-]*$"
+          }
+        }
+      }
+    },
+    "requires": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "binaries": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.+-]*$"
+          }
+        },
+        "min_runtime_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      }
+    },
+    "risk_tier": {
+      "enum": ["L0", "L1", "L2", "L3"],
+      "description": "L0=safe, L1=low, L2=elevated, L3=destructive. An untrusted author assertion: validators/usf.py independently derives a floor from the declared permission set and rejects under-declaration."
+    },
+    "scan_status": {
+      "type": "object",
+      "required": ["scanner", "result"],
+      "additionalProperties": false,
+      "properties": {
+        "scanner": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "last_scanned": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "result": {
+          "enum": ["pass", "fail", "warn", "unscanned"]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["result"],
+            "properties": {
+              "result": {
+                "const": "unscanned"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "last_scanned": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "required": ["last_scanned"],
+            "properties": {
+              "last_scanned": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "signature": {
+      "description": "ed25519 over the RFC 8785 (JCS) canonical JSON serialization of this manifest, excluding the `signature` field and including `content_hash`. The literal \"unsigned\" is a valid, explicit declaration -- validators/usf.py reports it as signature_state=\"unsigned\", a policy decision for the consumer, not a malformed manifest.",
+      "oneOf": [
+        {
+          "const": "unsigned"
+        },
+        {
+          "$ref": "#/$defs/ed25519_signature"
+        }
+      ]
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "sha256 over the complete skill package."
+    },
+    "changelog": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "required": ["version", "date", "notes"],
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "$ref": "#/$defs/semver"
+          },
+          "date": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+          },
+          "notes": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "maxLength": 256,
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-((?:0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    },
+    "platform": {
+      "enum": ["openclaw", "claude", "cursor", "codex", "vscode"],
+      "description": "Closed enumeration. A free-text or \"other\" platform value would reintroduce the normalization gap the format exists to close."
+    },
+    "pathList": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 256,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096
+      },
+      "description": "Explicit paths only. The no-wildcard and no-traversal rules are enforced semantically by validators/usf.py so the rejection carries a precise reason rather than a regex failure."
+    },
+    "host": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 253,
+      "description": "Bare lowercase hostname. Host-only matching: no scheme, no port, no path, no wildcard subdomains. Enforced semantically by validators/usf.py."
+    },
+    "ed25519_public_key": {
+      "type": "string",
+      "pattern": "^ed25519:[0-9a-f]{64}$"
+    },
+    "ed25519_signature": {
+      "type": "string",
+      "pattern": "^ed25519:[0-9a-f]{128}$"
+    }
+  }
+}

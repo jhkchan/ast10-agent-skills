@@ -9,7 +9,7 @@ audit-trail entry rather than aborting the run (spec.md S-008: "excludes
 that provider's judgment from the pooled computation with an audit-trail
 entry (timestamp, provider name, error message)").
 
-The prior-art seams this repo inherited (REDACTED-SIBLING-REPO'
+The prior-art seams this repo inherited (the upstream eval-harness repository's
 scripts/run_evals.py ``call_model`` and scripts/judge_skill.py
 ``run_judge``) are ``RuntimeError`` stubs, not working code -- this module
 is the fresh, live implementation spec.md's Assumptions section calls out
@@ -83,9 +83,7 @@ def _parse_scores(raw_text: str) -> dict[str, float]:
     """
     match = _JSON_OBJECT_RE.search(raw_text)
     if match is None:
-        raise JudgmentParseError(
-            f"no JSON object found in model response: {raw_text!r}"
-        )
+        raise JudgmentParseError(f"no JSON object found in model response: {raw_text!r}")
     try:
         payload = json.loads(match.group(0))
     except json.JSONDecodeError as exc:
@@ -94,15 +92,11 @@ def _parse_scores(raw_text: str) -> dict[str, float]:
     scores_payload = payload.get("scores", payload) if isinstance(payload, dict) else {}
     missing = [d for d in DIMENSIONS if d not in scores_payload]
     if missing:
-        raise JudgmentParseError(
-            f"model response missing dimension score(s): {missing}"
-        )
+        raise JudgmentParseError(f"model response missing dimension score(s): {missing}")
     return {d: float(scores_payload[d]) for d in DIMENSIONS}
 
 
-def call_model(
-    adapter: JudgeAdapter, prompt: str, *, timeout: float = 60.0
-) -> dict[str, Any]:
+def call_model(adapter: JudgeAdapter, prompt: str, *, timeout: float = 60.0) -> dict[str, Any]:
     """Invoke a single provider adapter and return its per-dimension judgment.
 
     Returns ``{"provider": ..., "scores": {"D1": ..., ..., "D8": ...},
@@ -134,9 +128,7 @@ def _pool(judgments: list[dict[str, Any]]) -> dict[str, Any] | None:
     """Mean-pool per-dimension scores across every surviving judgment."""
     if not judgments:
         return None
-    pooled_scores = {
-        d: sum(j["scores"][d] for j in judgments) / len(judgments) for d in DIMENSIONS
-    }
+    pooled_scores = {d: sum(j["scores"][d] for j in judgments) / len(judgments) for d in DIMENSIONS}
     return {
         "scores": pooled_scores,
         "total": sum(pooled_scores.values()),

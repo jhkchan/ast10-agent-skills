@@ -19,7 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = REPO_ROOT / "skills"
 
 # D5 progressive-disclosure body budget (vendor/skill-judge/SKILL.md:293-320 in the
-# REDACTED-SIBLING-REPO sibling repo): "Ideal: < 500 lines".
+# the upstream eval-harness repository sibling repo): "Ideal: < 500 lines".
 D5_LINE_BUDGET = 500
 
 # Mechanism must live in scripts/ and references/, never in SKILL.md prose
@@ -54,9 +54,7 @@ AST_IDS = sorted(REQUIRED_MARKERS.keys())
 
 def _split_frontmatter(text: str):
     """Return (frontmatter_dict, body_text) or raise AssertionError on malformed frontmatter."""
-    assert text.startswith(
-        "---\n"
-    ), "SKILL.md must open with YAML frontmatter delimited by ---"
+    assert text.startswith("---\n"), "SKILL.md must open with YAML frontmatter delimited by ---"
     end = text.find("\n---\n", 4)
     assert end != -1, "SKILL.md frontmatter is not closed with a second --- delimiter"
     raw_fm = text[4:end]
@@ -78,9 +76,9 @@ def test_frontmatter_has_name_and_description(ast_id):
     fm, _ = _split_frontmatter(path.read_text(encoding="utf-8"))
     assert fm.get("name"), f"{path} frontmatter missing non-empty 'name'"
     description = fm.get("description")
-    assert (
-        description and len(description) >= 40
-    ), f"{path} frontmatter 'description' must be a specific, non-placeholder string (>=40 chars)"
+    assert description and len(description) >= 40, (
+        f"{path} frontmatter 'description' must be a specific, non-placeholder string (>=40 chars)"
+    )
 
 
 @pytest.mark.parametrize("ast_id", AST_IDS)
@@ -89,8 +87,7 @@ def test_body_within_d5_line_budget(ast_id):
     _, body = _split_frontmatter(path.read_text(encoding="utf-8"))
     line_count = len(body.rstrip("\n").split("\n"))
     assert line_count <= D5_LINE_BUDGET, (
-        f"{path} body is {line_count} lines, exceeds the D5 progressive-disclosure "
-        f"budget of {D5_LINE_BUDGET} lines"
+        f"{path} body is {line_count} lines, exceeds the D5 progressive-disclosure budget of {D5_LINE_BUDGET} lines"
     )
 
 
@@ -98,9 +95,9 @@ def test_body_within_d5_line_budget(ast_id):
 def test_body_has_no_embedded_executable_detector_logic(ast_id):
     path = SKILLS_DIR / ast_id / "SKILL.md"
     _, body = _split_frontmatter(path.read_text(encoding="utf-8"))
-    assert not EXECUTABLE_FENCE_RE.search(
-        body
-    ), f"{path} embeds a python/py fenced code block; mechanism belongs in scripts/, not SKILL.md"
+    assert not EXECUTABLE_FENCE_RE.search(body), (
+        f"{path} embeds a python/py fenced code block; mechanism belongs in scripts/, not SKILL.md"
+    )
 
 
 @pytest.mark.parametrize("ast_id", AST_IDS)

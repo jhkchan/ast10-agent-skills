@@ -14,10 +14,9 @@ from __future__ import annotations
 
 from typing import Callable
 
-from detectors.scaffold import Finding
+from detectors.scaffold import Finding, static_detectable
 from detectors.scaffold import f1_report as _f1_report
 from detectors.scaffold import run_all as _run_all
-from detectors.scaffold import static_detectable
 
 SCENARIO_TIERS: dict[str, str] = {
     "AST05-unrestricted-network-fetch": "static-detectable",
@@ -39,9 +38,7 @@ def detect_unrestricted_network_fetch(pkg: dict) -> Finding:
     """`network.policy == "allow-all"` means no domain is out of bounds."""
     policy = _network(pkg).get("policy")
     detected = policy == "allow-all"
-    return Finding(
-        "AST05-unrestricted-network-fetch", detected, f"network.policy={policy}"
-    )
+    return Finding("AST05-unrestricted-network-fetch", detected, f"network.policy={policy}")
 
 
 def _is_overly_broad_wildcard(entry: str) -> bool:
@@ -49,9 +46,7 @@ def _is_overly_broad_wildcard(entry: str) -> bool:
         return True
     if entry.startswith("*."):
         suffix = entry[2:]
-        return (
-            suffix.count(".") < 1
-        )  # e.g. "*.com" -- a bare TLD wildcard, not a scoped subdomain
+        return suffix.count(".") < 1  # e.g. "*.com" -- a bare TLD wildcard, not a scoped subdomain
     return False
 
 
@@ -61,17 +56,11 @@ def detect_wildcard_domain_allowlist(pkg: dict) -> Finding:
     from `unrestricted-network-fetch`, which flags `policy == "allow-all"`."""
     network = _network(pkg)
     if network.get("policy") != "allow-list":
-        return Finding(
-            "AST05-wildcard-domain-allowlist", False, "not in allow-list mode"
-        )
+        return Finding("AST05-wildcard-domain-allowlist", False, "not in allow-list mode")
     allow = network.get("allow", []) or []
     broad = [entry for entry in allow if _is_overly_broad_wildcard(entry)]
     detected = bool(broad)
-    evidence = (
-        f"overly broad allow-list entries: {broad}"
-        if detected
-        else f"allow-list scoped: {allow}"
-    )
+    evidence = f"overly broad allow-list entries: {broad}" if detected else f"allow-list scoped: {allow}"
     return Finding("AST05-wildcard-domain-allowlist", detected, evidence)
 
 

@@ -15,9 +15,7 @@ _spec.loader.exec_module(detector)
 
 
 def test_s001_detector_registry_matches_declared_detectable_tier():
-    declared_detectable = {
-        s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"
-    }
+    declared_detectable = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"}
     assert set(detector.DETECTORS.keys()) == declared_detectable
     assert "AST05-injected-instruction-compliance" not in detector.DETECTORS
 
@@ -32,11 +30,7 @@ def test_unrestricted_network_fetch_flags_allow_all():
 
 def test_unrestricted_network_fetch_clear_on_allow_list():
     pkg = {
-        "manifest": {
-            "permissions": {
-                "network": {"policy": "allow-list", "allow": ["api.example.com"]}
-            }
-        },
+        "manifest": {"permissions": {"network": {"policy": "allow-list", "allow": ["api.example.com"]}}},
         "files": {},
     }
     assert detector.detect_unrestricted_network_fetch(pkg).detected is False
@@ -44,9 +38,7 @@ def test_unrestricted_network_fetch_clear_on_allow_list():
 
 def test_wildcard_allowlist_flags_bare_wildcard():
     pkg = {
-        "manifest": {
-            "permissions": {"network": {"policy": "allow-list", "allow": ["*"]}}
-        },
+        "manifest": {"permissions": {"network": {"policy": "allow-list", "allow": ["*"]}}},
         "files": {},
     }
     assert detector.detect_wildcard_domain_allowlist(pkg).detected is True
@@ -54,9 +46,7 @@ def test_wildcard_allowlist_flags_bare_wildcard():
 
 def test_wildcard_allowlist_flags_bare_tld_wildcard():
     pkg = {
-        "manifest": {
-            "permissions": {"network": {"policy": "allow-list", "allow": ["*.com"]}}
-        },
+        "manifest": {"permissions": {"network": {"policy": "allow-list", "allow": ["*.com"]}}},
         "files": {},
     }
     assert detector.detect_wildcard_domain_allowlist(pkg).detected is True
@@ -64,11 +54,7 @@ def test_wildcard_allowlist_flags_bare_tld_wildcard():
 
 def test_wildcard_allowlist_clear_on_scoped_subdomain_wildcard():
     pkg = {
-        "manifest": {
-            "permissions": {
-                "network": {"policy": "allow-list", "allow": ["*.example.com"]}
-            }
-        },
+        "manifest": {"permissions": {"network": {"policy": "allow-list", "allow": ["*.example.com"]}}},
         "files": {},
     }
     assert detector.detect_wildcard_domain_allowlist(pkg).detected is False
@@ -93,20 +79,14 @@ def test_s007_f1_at_least_080_on_declared_detectable_tier():
         ),
         (
             {
-                "manifest": {
-                    "permissions": {"network": {"policy": "allow-list", "allow": ["*"]}}
-                },
+                "manifest": {"permissions": {"network": {"policy": "allow-list", "allow": ["*"]}}},
                 "files": {},
             },
             {"AST05-wildcard-domain-allowlist"},
         ),
         (
             {
-                "manifest": {
-                    "permissions": {
-                        "network": {"policy": "allow-list", "allow": ["*.io"]}
-                    }
-                },
+                "manifest": {"permissions": {"network": {"policy": "allow-list", "allow": ["*.io"]}}},
                 "files": {},
             },
             {"AST05-wildcard-domain-allowlist"},

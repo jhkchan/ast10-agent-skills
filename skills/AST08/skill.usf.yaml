@@ -1,0 +1,87 @@
+# Universal Agentic Skill Format v1.0 manifest.
+#
+#   schema:    ../../schemas/usf-v1.schema.json
+#   validator: ../../validators/usf.py
+#   check:     python3 validators/usf.py skills/AST08/skill.usf.yaml
+#
+# Part of `owasp-ast10-agent-skills`, an independent community reference
+# implementation of the OWASP Agentic Skills Top 10 whitepaper's AST10 proposal.
+# This is NOT an OWASP project and carries no OWASP endorsement.
+---
+name: ast08-poor-scanning
+version: "1.0.0"
+
+# Declared only for the runtime this package is authored and tested against.
+# Adding a platform is a re-validation event, not an edit: AST10's premise is
+# that a skill's security properties are lost in translation between runtimes.
+platforms: [claude]
+
+description: >-
+  Read-only triage of OWASP AST08 Poor Scanning: classifies scanner coverage over a
+  skill package's evasion surface as PASS, FAIL or INCOMPLETE.
+
+author:
+  name: "owasp-ast10-agent-skills contributors"
+  # `identity` and `signing_key` are deliberately absent. This package ships
+  # unsigned (see `signature` below), and publishing a DID or a public key that
+  # anchors to nothing would manufacture exactly the false trust signal AST10
+  # warns about. The validator reports the gap as a warning; it is not hidden.
+
+permissions:
+  # Paths are relative to the skill package under review, which the host supplies
+  # as the working directory. Explicit paths only, no wildcards (USF v1.0).
+  files:
+    read:
+      - ./SKILL.md
+      - ./skill.usf.yaml
+    # The detector is pure: it returns findings and writes nothing.
+    write: []
+    deny_write:
+      # Kept even though `write` is empty. `write: []` is a property of this
+      # package; `deny_write` is a floor that has to survive a port to a runtime
+      # whose default is write-everything (AST10 implicit privilege escalation).
+      - SOUL.md
+      - MEMORY.md
+      - AGENTS.md
+  network:
+    # No egress. Default-deny with an empty allowlist means no host is reachable.
+    allow: []
+    # Redundant with the default-deny above, per the whitepaper; kept for
+    # explicit auditability so a reviewer sees an intent, not an omission.
+    deny: "*"
+  shell: false
+  tools:
+    - read_file
+
+requires:
+  # scripts/detector.py is pure Python; no other binary is invoked.
+  binaries: [python3]
+
+# Derived floor from the permissions above is also L0 (read-only, no egress,
+# no shell). The validator recomputes this rather than trusting the field.
+risk_tier: L0
+
+scan_status:
+  scanner: "none"
+  last_scanned: null
+  # Declared unscanned, never omitted: an absent scan_status is indistinguishable
+  # from one stripped during a port, which is the AST10 failure itself.
+  result: "unscanned"
+
+# Explicit unsigned placeholder. The validator reports signature_state="unsigned"
+# -- a policy decision for the consumer, not a malformed manifest. Once a key
+# exists, this becomes ed25519 over the RFC 8785 (JCS) canonical JSON
+# serialization of this manifest with `signature` removed and `content_hash` kept.
+signature: "unsigned"
+
+# sha256 over this skill's shipped surface as defined by scripts/content_hash.py
+# (SKILL.md, references/*.md, scripts/*.py, evals/evals.json). This file is
+# outside that surface, which is what stops the hash depending on the field that
+# carries it. Regenerate with:
+#   python3 validators/usf.py --update-content-hash skills/AST08/skill.usf.yaml
+content_hash: "sha256:92edb63f57bd2896cf95529d8d50816966f5a23eb00eca2280b86c13b278ec43"
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-08-23"
+    notes: "Initial Universal Skill Format manifest for the AST08 skill."

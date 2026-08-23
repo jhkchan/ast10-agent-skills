@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """scripts/ship_floor.py — the pooled Grade-A verdict rule (spec.md gate-2).
 
-Vendored, standalone, from `REDACTED-SIBLING-REPO` (Apache-2.0) — spec.md
+Vendored, standalone, from the upstream eval-harness repository (Apache-2.0) — spec.md
 gate-3: "Inherited ship_floor.py rule, NOT the literal median ... Vendor a
 standalone copy ... No live dependency on another repo." See
 THIRD_PARTY_LICENSES.md and NOTICE for the pinned upstream commit and drift
@@ -16,9 +16,9 @@ upstream: it is "the exact formula locked at Gate B half 1" (spec.md gate-2)
 and must not drift by so much as a comparison operator without a re-vendor.
 
 Dropped from upstream: the `A_MINUS`/`MANDATED` skill-name sets and the
-delivery-floor check in `main()` are REDACTED-SIBLING-REPO' own roll-up
+delivery-floor check in `main()` are the upstream eval-harness repository's own roll-up
 policy over ITS skill roster (skill names like
-"REDACTED-SIBLING-REPO-pretraining-loop-mechanics") — not part of the formula, not
+an upstream skill directory name) — not part of the formula, not
 meaningful for this repo's AST01-AST10 + advisory roster, and this repo's
 spec/plan define no equivalent "mandated area" concept. `main()` below is
 this repo's own thin driver over the same aggregate_verdict() rule. Reads
@@ -72,14 +72,12 @@ MIN_ROUNDS = 4  # below this a sample stdev is not worth computing
 AGG_METHOD = "multi-round-independent-pooled"
 # Pins the skill-judge rubric version scores must be judged against (spec.md
 # contract: "the pinned 8-dimension skill-judge rubric"). Same rubric,
-# same SHA, as REDACTED-SIBLING-REPO' vendor/skill-judge/ — see
+# same SHA, as the upstream eval-harness repository's vendor/skill-judge/ — see
 # THIRD_PARTY_LICENSES.md for the vendoring status of the rubric itself.
 RUBRIC_SHA = "3027f20f3181758385a1bb8c022d4041dfb4de84"
 DIM_KEYS = tuple(FLOORS)
 
-ROOT = pathlib.Path(
-    os.environ.get("OWASP_AST10_ROOT", pathlib.Path(__file__).resolve().parent.parent)
-)
+ROOT = pathlib.Path(os.environ.get("OWASP_AST10_ROOT", pathlib.Path(__file__).resolve().parent.parent))
 
 
 # Methods whose scores may BIND. Every entry runs the judge in a context
@@ -114,9 +112,7 @@ def pooled_stats(totals: list[int]) -> dict:
     what makes the stored values checkable rather than merely asserted.
     """
     if len(totals) < MIN_ROUNDS:
-        raise ValueError(
-            f"pooled stats need >= {MIN_ROUNDS} judgments, got {len(totals)}"
-        )
+        raise ValueError(f"pooled stats need >= {MIN_ROUNDS} judgments, got {len(totals)}")
     mean = round(statistics.fmean(totals), 1)
     stdev = round(statistics.stdev(totals), 2)
     return {
@@ -226,9 +222,7 @@ def _is_invalidated(blk: dict) -> bool:
     return True
 
 
-def binding_block(
-    skill: str, iters: dict, skills_dir: pathlib.Path | None = None
-) -> dict | None:
+def binding_block(skill: str, iters: dict, skills_dir: pathlib.Path | None = None) -> dict | None:
     """min(total) across live blocks at the CURRENT content hash. Not the last
     block, and never a lexicographic sort: iter-10 must outrank iter-9, and a
     re-roll must never raise a score.
@@ -275,15 +269,11 @@ def main() -> int:
         #    honest, because the aggregate is pooled out of them.
         blk = binding_block(skill, iters)
         if blk is None:
-            fail.append(
-                f"{skill}: no live judge block matches the current content hash — re-judge"
-            )
+            fail.append(f"{skill}: no live judge block matches the current content hash — re-judge")
         else:
             v, why = verdict_of(skill, blk)
             if blk.get("verdict") != v:
-                fail.append(
-                    f"{skill}: stored verdict '{blk.get('verdict')}' != recomputed '{v}' ({why or 'ok'})"
-                )
+                fail.append(f"{skill}: stored verdict '{blk.get('verdict')}' != recomputed '{v}' ({why or 'ok'})")
 
         # 2. Ship on the pooled distribution.
         agg = iters.get("aggregate")

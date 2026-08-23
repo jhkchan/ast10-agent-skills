@@ -39,9 +39,7 @@ def test_category_below_threshold_fails_independently_of_passing_sibling():
 
     assert by_category["AST04"].status == "fail"
     assert by_category["AST01"].status == "pass"
-    assert (
-        by_category["AST01"].f1 == 0.85
-    )  # sibling's score is untouched by the failure
+    assert by_category["AST01"].f1 == 0.85  # sibling's score is untouched by the failure
 
 
 def test_report_shows_per_category_breakdown_with_no_suite_wide_average():

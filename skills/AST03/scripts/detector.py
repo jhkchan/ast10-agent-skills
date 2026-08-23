@@ -22,10 +22,9 @@ from __future__ import annotations
 
 from typing import Callable
 
-from detectors.scaffold import Finding
+from detectors.scaffold import Finding, static_detectable
 from detectors.scaffold import f1_report as _f1_report
 from detectors.scaffold import run_all as _run_all
-from detectors.scaffold import static_detectable
 
 SCENARIO_TIERS: dict[str, str] = {
     "AST03-unbounded-write-scope": "static-detectable",
@@ -47,9 +46,7 @@ def detect_unbounded_write_scope(pkg: dict) -> Finding:
     deny_write = _permissions(pkg).get("deny_write")
     detected = not deny_write
     evidence = (
-        "permissions.deny_write is unset or empty"
-        if detected
-        else f"deny_write covers {len(deny_write)} path(s)"
+        "permissions.deny_write is unset or empty" if detected else f"deny_write covers {len(deny_write)} path(s)"
     )
     return Finding("AST03-unbounded-write-scope", detected, evidence)
 
