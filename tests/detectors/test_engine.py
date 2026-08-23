@@ -9,6 +9,7 @@ from detectors.engine import (
     FixtureCase,
     OutOfArtifactFixtureError,
     Tier,
+    UnregisteredScenarioFixtureError,
     run_category,
 )
 
@@ -70,6 +71,22 @@ def test_out_of_artifact_scenario_never_appears_in_fixture_corpus():
     fixtures = [FixtureCase("bad", "AST09-orphaned-skill", "AST09", True, {})]
 
     with pytest.raises(OutOfArtifactFixtureError):
+        run_category("AST09", matrix, fixtures, _stale_pin_detector)
+
+
+def test_unregistered_scenario_id_raises_rather_than_shrinking_denominator():
+    """code-review finding (correctness, MEDIUM): a fixture whose scenario_id
+    is absent from the coverage matrix entirely (typo or unregistered
+    scenario) must raise loudly, not silently drop out of the F1 denominator
+    via a `.get()` miss."""
+    matrix = _matrix_ast09()
+    fixtures = [
+        FixtureCase("typo", "AST09-stale-manifets-pin", "AST09", True, {}),
+    ]
+
+    with pytest.raises(
+        UnregisteredScenarioFixtureError, match="AST09-stale-manifets-pin"
+    ):
         run_category("AST09", matrix, fixtures, _stale_pin_detector)
 
 

@@ -22,34 +22,26 @@ therefore ships zero detector functions and reports
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Callable
+
+from detectors.scaffold import Finding
+from detectors.scaffold import f1_report as _f1_report
+from detectors.scaffold import run_all as _run_all
+from detectors.scaffold import static_detectable
 
 SCENARIO_TIERS: dict[str, str] = {
     "AST10-cross-registry-arbitrage": "out-of-artifact",
     "AST10-multi-platform-campaign": "out-of-artifact",
 }
 
-STATIC_DETECTABLE: set[str] = {
-    s for s, tier in SCENARIO_TIERS.items() if tier == "static-detectable"
-}
-
-
-@dataclass
-class Finding:
-    scenario: str
-    detected: bool
-    evidence: str = ""
-
+STATIC_DETECTABLE: set[str] = static_detectable(SCENARIO_TIERS)
 
 DETECTORS: dict[str, Callable[[dict], Finding]] = {}
 
 
 def run_all(pkg: dict) -> list[Finding]:
-    return [fn(pkg) for fn in DETECTORS.values()]
+    return _run_all(DETECTORS, pkg)
 
 
 def f1_report(fixtures: list[tuple[dict, set[str]]] | None = None) -> dict:
-    if not STATIC_DETECTABLE:
-        return {"status": "declared-and-uncovered", "f1": None}
-    return {"status": "measured", "f1": None}  # unreachable while the tier stays empty
+    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures)

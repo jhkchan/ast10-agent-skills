@@ -75,6 +75,13 @@ class OutOfArtifactFixtureError(ValueError):
     """Raised when a fixture case references an out-of-artifact scenario."""
 
 
+class UnregisteredScenarioFixtureError(ValueError):
+    """Raised when a fixture case references a scenario_id absent from the
+    coverage matrix entirely (typo or an unregistered scenario) -- this must
+    be loud, exactly like OutOfArtifactFixtureError, rather than silently
+    shrinking the F1 denominator by one fixture."""
+
+
 def run_category(
     category: str,
     coverage_matrix: list[CoverageEntry],
@@ -86,9 +93,22 @@ def run_category(
     Fixtures bound to scenarios tiered anything other than
     ``static-detectable`` do not enter the F1 denominator. A fixture bound to
     an ``out-of-artifact`` scenario is a contract violation and raises
-    :class:`OutOfArtifactFixtureError` immediately.
+    :class:`OutOfArtifactFixtureError` immediately. A fixture whose
+    scenario_id is absent from the coverage matrix altogether -- a typo or an
+    unregistered scenario -- is the same kind of contract violation and
+    raises :class:`UnregisteredScenarioFixtureError` immediately, rather than
+    silently dropping out of the denominator via a `.get()` miss.
     """
     tier_by_scenario = {entry.scenario_id: entry.tier for entry in coverage_matrix}
+
+    unregistered_hits = sorted(
+        {f.scenario_id for f in fixtures if f.scenario_id not in tier_by_scenario}
+    )
+    if unregistered_hits:
+        raise UnregisteredScenarioFixtureError(
+            "fixture(s) reference scenario_id(s) absent from the coverage "
+            f"matrix for category {category!r}: {unregistered_hits}"
+        )
 
     out_of_artifact_hits = sorted(
         {

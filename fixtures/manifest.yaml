@@ -71,52 +71,24 @@ categories:
 
   AST02:
     name: "Supply Chain Compromise"
-    tier_lock_hash: "23f4d86d77710d458f04dbbfd70cf14e2b14c0f96959ab773890c2235481b056"
-    status: covered
-    published_f1: "pending-detector"
+    # Reconciled to skills/AST02/scripts/detector.py's SCENARIO_TIERS (code-review
+    # finding: correctness, HIGH -- this block previously declared three
+    # static-detectable scenarios with six labeled cases while the shipped
+    # detector declares the category's only scenario out-of-artifact with zero
+    # detectors). The detector's SCENARIO_TIERS is the single source of tiering;
+    # this manifest must not hand-author a second, divergent one.
+    tier_lock_hash: "ae53cdd73d6c8a13c7e9f9888d1e6c78c6928dead5a0118f08dcde3d1573e4ba"
+    status: declared-and-uncovered
+    published_f1: null
     detectable_scenarios:
-      - id: AST02-S1
-        name: "Typosquatted dependency name"
-        tier: static-detectable
-        reason: "A dependency name at edit-distance 1 from a popular package (e.g. 'reqeusts' vs 'requests') is a static string-distance check against a known-package index."
-      - id: AST02-S2
-        name: "Unpinned wildcard dependency version"
-        tier: static-detectable
-        reason: "A dependency version pinned to an unbounded wildcard (e.g. '*' or '>=0') lets a compromised future release install silently; detectable by a static regex over the version-constraint field."
-      - id: AST02-S3
-        name: "Lockfile content-hash mismatch"
-        tier: static-detectable
-        reason: "The committed lockfile's recorded content hash not matching a recomputed hash of the referenced dependency archive is a static hash-comparison check."
+      []
     out_of_artifact_scenarios:
-      - id: AST02-S4
+      - id: AST02-maintainer-account-takeover
         name: "Maintainer account takeover"
         tier: out-of-artifact
-        reason: "Registry-side account-compromise detection depends on registry auth logs and session history maintained outside the artifact; no in-artifact signal exists."
+        reason: "Registry-side account-compromise detection depends on registry auth logs and session history maintained outside the artifact; no in-artifact signal exists (skills/AST02/scripts/detector.py SCENARIO_TIERS)."
     cases:
-      - id: AST02-V1
-        scenario_id: AST02-S1
-        label: vulnerable
-        path: fixtures/AST02/V1-typosquatted-dependency/SKILL.md
-      - id: AST02-C2
-        scenario_id: AST02-S1
-        label: clean
-        path: fixtures/AST02/C2-typosquatted-dependency/SKILL.md
-      - id: AST02-V3
-        scenario_id: AST02-S2
-        label: vulnerable
-        path: fixtures/AST02/V3-unpinned-wildcard-dependency/SKILL.md
-      - id: AST02-C4
-        scenario_id: AST02-S2
-        label: clean
-        path: fixtures/AST02/C4-unpinned-wildcard-dependency/SKILL.md
-      - id: AST02-V5
-        scenario_id: AST02-S3
-        label: vulnerable
-        path: fixtures/AST02/V5-lockfile-hash-mismatch/SKILL.md
-      - id: AST02-C6
-        scenario_id: AST02-S3
-        label: clean
-        path: fixtures/AST02/C6-lockfile-hash-mismatch/SKILL.md
+      []
 
   AST03:
     name: "Over-Privileged Skills"
@@ -304,56 +276,26 @@ categories:
 
   AST07:
     name: "Update Drift"
-    tier_lock_hash: "915a39231a0d4084d1b18f100a7b2036b422ee17ec5b8a9b7cc8379512f4d596"
-    status: covered
-    published_f1: "pending-detector"
+    # Reconciled to skills/AST07/scripts/detector.py's SCENARIO_TIERS (code-review
+    # finding: correctness, HIGH -- see the identical AST02 note above; the
+    # shipped detector declares both named scenarios out-of-artifact with zero
+    # detectors, so this manifest must not hand-author a divergent tiering).
+    tier_lock_hash: "7a5735db9ca8d9d5f827a5260d8abc602ec4594ff620e5d17280ab517e30495a"
+    status: declared-and-uncovered
+    published_f1: null
     detectable_scenarios:
-      - id: AST07-S1
-        name: "Missing signed content hash"
-        tier: static-detectable
-        reason: "A manifest omitting the signed content-hash field the Universal Skill Format requires for update-integrity verification is a static required-field check."
-      - id: AST07-S2
-        name: "Unpinned mutable update channel"
-        tier: static-detectable
-        reason: "An update source pointing at a mutable branch/tag (e.g. 'latest') rather than an immutable pinned release reference is a static regex check on the update-source field."
-      - id: AST07-S3
-        name: "Absent semantic version field"
-        tier: static-detectable
-        reason: "A manifest with no semantic-version field, making a future update undetectable as a version change by a consuming registry, is a static required-field check."
+      []
     out_of_artifact_scenarios:
-      - id: AST07-S4
+      - id: AST07-rollback-attack
         name: "Rollback attack"
         tier: out-of-artifact
-        reason: "Detecting a downgrade to a prior vulnerable version requires release-history metadata (version timeline, prior hashes) maintained outside a single artifact snapshot; no in-artifact signal exists."
-      - id: AST07-S5
+        reason: "Detecting a downgrade to a prior vulnerable version requires release-history metadata (version timeline, prior hashes) maintained outside a single artifact snapshot; no in-artifact signal exists (skills/AST07/scripts/detector.py SCENARIO_TIERS)."
+      - id: AST07-hot-reload-abuse
         name: "Hot-reload abuse"
         tier: out-of-artifact
-        reason: "Detecting an in-place code swap after install requires runtime reload-event history from the host process, not the artifact itself; no in-artifact signal exists."
+        reason: "Detecting an in-place code swap after install requires runtime reload-event history from the host process, not the artifact itself; no in-artifact signal exists (skills/AST07/scripts/detector.py SCENARIO_TIERS)."
     cases:
-      - id: AST07-V1
-        scenario_id: AST07-S1
-        label: vulnerable
-        path: fixtures/AST07/V1-missing-signed-content-hash/SKILL.md
-      - id: AST07-C2
-        scenario_id: AST07-S1
-        label: clean
-        path: fixtures/AST07/C2-missing-signed-content-hash/SKILL.md
-      - id: AST07-V3
-        scenario_id: AST07-S2
-        label: vulnerable
-        path: fixtures/AST07/V3-unpinned-update-channel/SKILL.md
-      - id: AST07-C4
-        scenario_id: AST07-S2
-        label: clean
-        path: fixtures/AST07/C4-unpinned-update-channel/SKILL.md
-      - id: AST07-V5
-        scenario_id: AST07-S3
-        label: vulnerable
-        path: fixtures/AST07/V5-absent-version-field/SKILL.md
-      - id: AST07-C6
-        scenario_id: AST07-S3
-        label: clean
-        path: fixtures/AST07/C6-absent-version-field/SKILL.md
+      []
 
   AST08:
     name: "Poor Scanning"

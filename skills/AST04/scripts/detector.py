@@ -31,8 +31,15 @@ from __future__ import annotations
 import json
 import re
 import tomllib
-from dataclasses import dataclass
 from typing import Callable
+
+from detectors.scaffold import Finding
+from detectors.scaffold import (
+    detect_invisible_unicode_smuggling as _shared_invisible_unicode,
+)
+from detectors.scaffold import f1_report as _f1_report
+from detectors.scaffold import run_all as _run_all
+from detectors.scaffold import static_detectable
 
 SCENARIO_TIERS: dict[str, str] = {
     "AST04-yaml-injection": "static-detectable",
@@ -41,16 +48,7 @@ SCENARIO_TIERS: dict[str, str] = {
     "AST04-invisible-unicode-smuggling": "static-detectable",
 }
 
-STATIC_DETECTABLE: set[str] = {
-    s for s, tier in SCENARIO_TIERS.items() if tier == "static-detectable"
-}
-
-
-@dataclass
-class Finding:
-    scenario: str
-    detected: bool
-    evidence: str = ""
+STATIC_DETECTABLE: set[str] = static_detectable(SCENARIO_TIERS)
 
 
 def _files_with_suffix(pkg: dict, *suffixes: str) -> dict[str, str]:
@@ -157,34 +155,12 @@ def detect_toml_injection(pkg: dict) -> Finding:
 
 
 # --- AST04-invisible-unicode-smuggling --------------------------------------
-# Zero-width spaces/joiners and bidi control code points -- the same class the
-# whitepaper extraction stripped 860 instances of from the source PDF.
-# Explicit \uXXXX escapes on purpose: embedding the literal invisible glyphs
-# in this file's own source would be exactly the smuggling risk this
-# detector exists to catch, and would be silently unreadable in any diff.
-_INVISIBLE_UNICODE_RE = re.compile(
-    "[\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]"
-)
-
-
+# Detection logic (regex + scan) lives in detectors.scaffold, shared verbatim
+# with AST08's own instance of the same control -- this module supplies only
+# its own scenario id (code-review finding: reuse, MEDIUM -- the scan was
+# previously duplicated verbatim in both modules).
 def detect_invisible_unicode_smuggling(pkg: dict) -> Finding:
-    manifest_text = pkg.get("manifest", {}).get("description", "") or ""
-    candidates = dict(pkg.get("files", {}))
-    candidates["<manifest.description>"] = manifest_text
-    for path, content in candidates.items():
-        hits = _INVISIBLE_UNICODE_RE.findall(content)
-        if hits:
-            codepoints = sorted({f"U+{ord(c):04X}" for c in hits})
-            return Finding(
-                "AST04-invisible-unicode-smuggling",
-                True,
-                f"{path}: {len(hits)} invisible code point(s) {codepoints}",
-            )
-    return Finding(
-        "AST04-invisible-unicode-smuggling",
-        False,
-        "no invisible Unicode control code points found",
-    )
+    return _shared_invisible_unicode(pkg, "AST04-invisible-unicode-smuggling")
 
 
 DETECTORS: dict[str, Callable[[dict], Finding]] = {
@@ -196,32 +172,8 @@ DETECTORS: dict[str, Callable[[dict], Finding]] = {
 
 
 def run_all(pkg: dict) -> list[Finding]:
-    return [fn(pkg) for fn in DETECTORS.values()]
+    return _run_all(DETECTORS, pkg)
 
 
 def f1_report(fixtures: list[tuple[dict, set[str]]]) -> dict:
-    if not STATIC_DETECTABLE:
-        return {"status": "declared-and-uncovered", "f1": None}
-
-    tp = fp = fn = 0
-    for pkg, expected in fixtures:
-        expected = expected & STATIC_DETECTABLE
-        detected = {f.scenario for f in run_all(pkg) if f.detected}
-        tp += len(detected & expected)
-        fp += len(detected - expected)
-        fn += len(expected - detected)
-
-    precision = tp / (tp + fp) if (tp + fp) else 1.0
-    recall = tp / (tp + fn) if (tp + fn) else 1.0
-    f1 = (
-        (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
-    )
-    return {
-        "status": "measured",
-        "f1": f1,
-        "precision": precision,
-        "recall": recall,
-        "tp": tp,
-        "fp": fp,
-        "fn": fn,
-    }
+    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures)

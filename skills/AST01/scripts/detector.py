@@ -26,8 +26,12 @@ A "skill package" is the minimal dict shape this module operates on:
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass
 from typing import Callable
+
+from detectors.scaffold import Finding
+from detectors.scaffold import f1_report as _f1_report
+from detectors.scaffold import run_all as _run_all
+from detectors.scaffold import static_detectable
 
 SCENARIO_TIERS: dict[str, str] = {
     "AST01-content-hash-missing": "static-detectable",
@@ -37,16 +41,7 @@ SCENARIO_TIERS: dict[str, str] = {
     "AST01-obfuscated-payload-intent": "agent-judgable",
 }
 
-STATIC_DETECTABLE: set[str] = {
-    s for s, tier in SCENARIO_TIERS.items() if tier == "static-detectable"
-}
-
-
-@dataclass
-class Finding:
-    scenario: str
-    detected: bool
-    evidence: str = ""
+STATIC_DETECTABLE: set[str] = static_detectable(SCENARIO_TIERS)
 
 
 def _package_digest(pkg: dict) -> str:
@@ -55,7 +50,11 @@ def _package_digest(pkg: dict) -> str:
     This is the "actual" side of the signed-content-hash comparison: the USF
     manifest declares an expected hash, and re-deriving it here the same way
     the signer must have is what makes a mismatch detectable rather than
-    merely asserted.
+    merely asserted. Framing matches scripts/content_hash.py's
+    content_sha256 exactly -- sorted relative path, NUL, bytes, no trailing
+    NUL after the content -- so a package hashed by this repo's own vendored
+    hasher never spuriously reports content-hash-mismatch against a detector
+    using different framing.
     """
     hasher = hashlib.sha256()
     files = pkg.get("files", {})
@@ -63,7 +62,6 @@ def _package_digest(pkg: dict) -> str:
         hasher.update(path.encode("utf-8"))
         hasher.update(b"\x00")
         hasher.update(files[path].encode("utf-8"))
-        hasher.update(b"\x00")
     return hasher.hexdigest()
 
 
@@ -103,38 +101,8 @@ DETECTORS: dict[str, Callable[[dict], Finding]] = {
 
 
 def run_all(pkg: dict) -> list[Finding]:
-    return [fn(pkg) for fn in DETECTORS.values()]
+    return _run_all(DETECTORS, pkg)
 
 
 def f1_report(fixtures: list[tuple[dict, set[str]]]) -> dict:
-    """Per-category F1 over the declared-detectable tier only (S-007, gate-4).
-
-    `fixtures` is a list of (package, expected_detected_scenario_ids) pairs.
-    A category whose declared-detectable tier is empty must never manufacture
-    a number (S-003 / gate-4); it reports "declared-and-uncovered" instead.
-    """
-    if not STATIC_DETECTABLE:
-        return {"status": "declared-and-uncovered", "f1": None}
-
-    tp = fp = fn = 0
-    for pkg, expected in fixtures:
-        expected = expected & STATIC_DETECTABLE
-        detected = {f.scenario for f in run_all(pkg) if f.detected}
-        tp += len(detected & expected)
-        fp += len(detected - expected)
-        fn += len(expected - detected)
-
-    precision = tp / (tp + fp) if (tp + fp) else 1.0
-    recall = tp / (tp + fn) if (tp + fn) else 1.0
-    f1 = (
-        (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
-    )
-    return {
-        "status": "measured",
-        "f1": f1,
-        "precision": precision,
-        "recall": recall,
-        "tp": tp,
-        "fp": fp,
-        "fn": fn,
-    }
+    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures)

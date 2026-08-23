@@ -20,8 +20,12 @@ Package shape (see AST01/scripts/detector.py for the full contract):
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Callable
+
+from detectors.scaffold import Finding
+from detectors.scaffold import f1_report as _f1_report
+from detectors.scaffold import run_all as _run_all
+from detectors.scaffold import static_detectable
 
 SCENARIO_TIERS: dict[str, str] = {
     "AST03-unbounded-write-scope": "static-detectable",
@@ -31,16 +35,7 @@ SCENARIO_TIERS: dict[str, str] = {
     "AST03-task-scope-mismatch": "agent-judgable",
 }
 
-STATIC_DETECTABLE: set[str] = {
-    s for s, tier in SCENARIO_TIERS.items() if tier == "static-detectable"
-}
-
-
-@dataclass
-class Finding:
-    scenario: str
-    detected: bool
-    evidence: str = ""
+STATIC_DETECTABLE: set[str] = static_detectable(SCENARIO_TIERS)
 
 
 def _permissions(pkg: dict) -> dict:
@@ -78,32 +73,8 @@ DETECTORS: dict[str, Callable[[dict], Finding]] = {
 
 
 def run_all(pkg: dict) -> list[Finding]:
-    return [fn(pkg) for fn in DETECTORS.values()]
+    return _run_all(DETECTORS, pkg)
 
 
 def f1_report(fixtures: list[tuple[dict, set[str]]]) -> dict:
-    if not STATIC_DETECTABLE:
-        return {"status": "declared-and-uncovered", "f1": None}
-
-    tp = fp = fn = 0
-    for pkg, expected in fixtures:
-        expected = expected & STATIC_DETECTABLE
-        detected = {f.scenario for f in run_all(pkg) if f.detected}
-        tp += len(detected & expected)
-        fp += len(detected - expected)
-        fn += len(expected - detected)
-
-    precision = tp / (tp + fp) if (tp + fp) else 1.0
-    recall = tp / (tp + fn) if (tp + fn) else 1.0
-    f1 = (
-        (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
-    )
-    return {
-        "status": "measured",
-        "f1": f1,
-        "precision": precision,
-        "recall": recall,
-        "tp": tp,
-        "fp": fp,
-        "fn": fn,
-    }
+    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures)

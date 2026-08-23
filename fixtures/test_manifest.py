@@ -13,11 +13,12 @@ Run with: pytest fixtures/test_manifest.py -v
 
 from __future__ import annotations
 
-import hashlib
 import pathlib
 
 import pytest
 import yaml
+
+from validators.tier_lock import check_tier_lock
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 FIXTURES_DIR = REPO_ROOT / "fixtures"
@@ -25,28 +26,6 @@ MANIFEST_PATH = FIXTURES_DIR / "manifest.yaml"
 
 CATEGORIES = [f"AST{i:02d}" for i in range(1, 11)]
 LABELS = {"vulnerable", "clean"}
-
-
-def tier_lock_hash(scenarios: list[dict]) -> str:
-    """Canonical content hash over a category's full scenario tiering.
-
-    Deterministic across key order: built from sorted "id:tier" pairs so any change to which
-    tier a scenario is classified under changes the hash (S-011's re-run tripwire).
-    """
-    canonical = "|".join(sorted(f"{s['id']}:{s['tier']}" for s in scenarios))
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
-
-
-def check_tier_lock(scenarios: list[dict], locked_hash: str) -> tuple[bool, str | None]:
-    """Return (ok, reason). ok=False means the corpus must be re-labeled and re-run (S-011)."""
-    current = tier_lock_hash(scenarios)
-    if current != locked_hash:
-        changed = [s["id"] for s in scenarios]
-        return False, (
-            f"tier-lock mismatch: scenario tiering changed since fixtures were labeled "
-            f"(affected candidates: {changed}); corpus requires re-labeling and a judge re-run"
-        )
-    return True, None
 
 
 @pytest.fixture(scope="module")

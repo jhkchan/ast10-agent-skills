@@ -41,12 +41,16 @@ class JudgeAdapter(Protocol):
 
     The real adapters (bedrock, claude-cli, anthropic-compatible, ...) are
     T-2.1's concern; this harness only depends on this minimal shape so it
-    can be exercised against fakes without a live provider.
+    can be exercised against fakes without a live provider. Matches
+    ``adapters.base.ProviderAdapter.judge(self, prompt: str) -> str`` --
+    every shipped adapter owns its own timeout via constructor config
+    (e.g. ``ClaudeCliAdapter(timeout_s=...)``), so this harness never passes
+    a ``timeout`` kwarg into ``judge()``.
     """
 
     name: str
 
-    def judge(self, prompt: str, *, timeout: float = 60.0) -> str: ...
+    def judge(self, prompt: str) -> str: ...
 
 
 class JudgmentParseError(ValueError):
@@ -108,8 +112,15 @@ def call_model(
     (timeout, RuntimeError, auth failure) propagates unchanged so
     ``run_judge`` can record the failure rather than this function
     silently swallowing it.
+
+    ``timeout`` is accepted for callers that want to document a per-round
+    budget, but is never forwarded into ``adapter.judge()``: every shipped
+    adapter (``adapters.base.ProviderAdapter``) declares ``judge(self,
+    prompt: str) -> str`` and owns its own timeout via constructor config
+    instead (``ClaudeCliAdapter(timeout_s=...)``, etc.) -- forwarding a
+    ``timeout=`` kwarg here made every live adapter raise ``TypeError``.
     """
-    raw = adapter.judge(prompt, timeout=timeout)
+    raw = adapter.judge(prompt)
     scores = _parse_scores(raw)
     return {
         "provider": adapter.name,
