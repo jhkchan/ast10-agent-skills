@@ -74,7 +74,14 @@ AGG_METHOD = "multi-round-independent-pooled"
 # contract: "the pinned 8-dimension skill-judge rubric"). Same rubric,
 # same SHA, as the upstream eval-harness repository's vendor/skill-judge/ — see
 # THIRD_PARTY_LICENSES.md for the vendoring status of the rubric itself.
+# RUBRIC_SHA is the upstream COMMIT id that last touched the rubric -- it is not a
+# content hash and cannot be recomputed from the file. It exists to name the exact
+# upstream revision. RUBRIC_CONTENT_SHA256 is the recomputable companion: it hashes
+# the vendored bytes at vendor/skill-judge/SKILL.md, so the pin is checkable from
+# inside this repo (tests/test_rubric_pin.py). See vendor/skill-judge/PROVENANCE.md.
 RUBRIC_SHA = "3027f20f3181758385a1bb8c022d4041dfb4de84"
+RUBRIC_CONTENT_SHA256 = "737ef3628f0e11353114c3bd05a1c9d0c448dbfec1ae85db839253cbe93198b6"
+RUBRIC_PATH = pathlib.Path(__file__).resolve().parent.parent / "vendor" / "skill-judge" / "SKILL.md"
 DIM_KEYS = tuple(FLOORS)
 
 ROOT = pathlib.Path(os.environ.get("OWASP_AST10_ROOT", pathlib.Path(__file__).resolve().parent.parent))

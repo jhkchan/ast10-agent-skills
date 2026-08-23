@@ -1,9 +1,14 @@
 # owasp-ast10-agent-skills
 
 The **OWASP Agentic Skills Top 10** (AST01–AST10) operationalised as eleven installable
-agent skills: ten per-category detector skills that audit a candidate skill package
-before you install it, plus one advisory skill that triages a free-text finding to its
-primary AST category using the whitepaper's own decision tree.
+agent skills: one per AST category plus an advisory skill that triages a free-text finding
+to its primary category using the whitepaper's own decision tree.
+
+**Eight of the ten category skills ship executable detectors** that audit a candidate skill
+package before you install it. **Two — `AST07` Update Drift and `AST09` No Governance — ship
+none, and cannot**: every one of their scenarios needs evidence that does not exist inside a
+single skill package (version history, organisational process). That is a published boundary,
+not a gap; the table below and each `coverage-matrix.md` say so scenario by scenario.
 
 Each skill is a knowledge package. `SKILL.md` carries the decision rules and the seams
 between adjacent categories; the mechanism lives in `scripts/` (and in an optional
