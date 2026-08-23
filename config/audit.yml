@@ -1,0 +1,51 @@
+# config/audit.yml — provider declare-or-skip audit trail (plan.md T-2.1).
+#
+# spec.md: "Unavailable providers are declared in config/audit.yml with a
+# recorded reason, never silently averaged as zero or dropped without
+# record."
+#
+# `providers` is the STATIC declaration: providers verified during Step 03
+# (build-notes.md, "Judge / target model matrix — VERIFIED LIVE",
+# 2026-08-21) that this repo does not implement as live adapters at all,
+# because there is nothing a runtime check could add beyond what is
+# already known. This reconciles spec.md's four-adapter prose (claude-cli,
+# bedrock, anthropic-compatible, openai-compatible) against the roster
+# plan.md T-2.1 actually implements — adapters/claude_cli.py,
+# adapters/bedrock.py (non-anthropic models only), and
+# adapters/anthropic_compatible.py. The entries below are the recorded
+# reasons the fourth adapter, and one Bedrock model family, are declared
+# unavailable instead of coded against (S-004).
+#
+# `runtime_entries` is APPEND-ONLY: adapters/base.py's record_unavailable()
+# and record_failure() append here — never edit or delete a prior entry —
+# when a live-checked adapter is skipped at roster-build time (S-004) or
+# crashes mid-round (S-008). Empty at authoring time; populated once the
+# harness (plan.md T-2.2/T-2.3) runs a judge round against this file's
+# default path.
+
+providers:
+  bedrock-anthropic:
+    adapter: bedrock
+    model: "anthropic.*"
+    status: unavailable
+    reason: >-
+      GEO-BLOCKED from this environment — ValidationException "not allowed
+      from unsupported countries" (verified build-notes.md, us-west-2,
+      2026-08-21). adapters/claude_cli.py is the only working
+      Claude-as-judge route.
+  openai-compatible-dashscope:
+    adapter: openai-compatible
+    model: qwen3-max
+    status: unavailable
+    reason: "DASHSCOPE_API_KEY unset"
+  openai-compatible-zai:
+    adapter: openai-compatible
+    model: glm-5.2
+    status: unavailable
+    reason: >-
+      unfunded — POST https://api.z.ai/api/paas/v4 returns "Insufficient
+      balance" (verified build-notes.md, 2026-08-21); GLM coverage comes
+      from adapters/anthropic_compatible.py via the Anthropic-compatible
+      route (api.z.ai/api/anthropic) instead.
+
+runtime_entries: []

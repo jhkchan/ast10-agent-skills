@@ -1,0 +1,42 @@
+owasp-ast10-agent-skills
+Copyright 2026 Jacky Chan
+
+This product operationalizes the OWASP Agentic Skills Top 10 (AST01-AST10)
+whitepaper as a set of provider-agnostic agent skills. The repository credits
+the OWASP project as the source whitepaper; Jacky Chan is a credited
+Reviewer/Contributor to that publication (run-plan.md "Confirmed decisions").
+
+Intended to be licensed under the Apache License, Version 2.0 (see
+THIRD_PARTY_LICENSES.md for the compatibility policy this follows). The root
+LICENSE file is tracked as separate follow-up work and is not asserted to
+exist as of this NOTICE.
+
+================================================================================
+Third-party attributions
+================================================================================
+
+This repository vendors a standalone, read-only copy of three files from one
+upstream repository, pinned at the commit below (spec.md gate-3; see
+THIRD_PARTY_LICENSES.md for the full per-file breakdown of what was kept
+verbatim vs. adapted).
+
+- scripts/ship_floor.py, scripts/content_hash.py, scripts/eval_counts.py
+  Source: REDACTED-SIBLING-REPO, scripts/
+  (https://example.invalid/redacted-sibling-repo)
+  Copyright 2026 Votee AI
+  License: Apache License, Version 2.0
+  Vendored at commit 34ac48d680323ce4b5302c8a756db6327984b59e
+  (upstream publishes no semver tags at this commit)
+
+scripts/ship_floor.py additionally pins a rubric version by SHA
+(3027f20f3181758385a1bb8c022d4041dfb4de84) matching the skill-judge rubric
+that REDACTED-SIBLING-REPO vendors from softaworks/agent-toolkit
+(skills/skill-judge, MIT, (c) 2026 Leonardo Flores). That rubric tree itself
+is not yet vendored into this repository — see THIRD_PARTY_LICENSES.md
+"Rubric pin (not yet vendored as a tree)".
+
+No modifications were made to the vendored formula (the Grade-A aggregate
+rule); only repo-specific glue (skill-name sets, file paths, environment
+variable name) was adapted for this repository, as itemized in
+THIRD_PARTY_LICENSES.md. Neither REDACTED-SIBLING-REPO nor
+softaworks/agent-toolkit endorses or is affiliated with this repository.

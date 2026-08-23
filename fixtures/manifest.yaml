@@ -1,0 +1,436 @@
+# fixtures/manifest.yaml
+#
+# T-4.1 hand-built fixture-corpus label manifest.
+#
+# Sizing rule (spec.md gate-4, locked): cases = max(min_floor, 2 * count(detectable_scenarios)),
+# class-balanced vulnerable/clean, drawn only from each category's static-detectable tier.
+# A category whose detectable tier is empty publishes no F1 and is reported
+# declared-and-uncovered rather than padded to manufacture a number (S-003).
+#
+# tier_lock_hash binds each category's fixture labeling to the scenario tiering it was
+# labeled against (sha256 over sorted "scenario_id:tier" pairs across BOTH the
+# detectable_scenarios and out_of_artifact_scenarios lists). If a scenario's tier is later
+# reclassified, recomputing this hash no longer matches the stored value, which flags the
+# category for re-labeling and a judge re-run before its F1 can be republished (S-011).
+#
+# NOTE (provenance): the authoritative 58-scenario coverage matrix is T-3.1 and has not yet
+# been authored in this repo. The detectable_scenarios / out_of_artifact_scenarios lists
+# below are the minimal per-category tier declaration this fixture-labeling task depends
+# on, scoped to what T-4.1 needs to label a corpus; they must be reconciled with T-3.1's
+# matrices before Gate 02 sign-off, per plan.md's tier-lock rule.
+
+min_floor: 6
+formula: "max(min_floor, 2 * count(detectable_scenarios))"
+
+categories:
+  AST01:
+    name: "Malicious Skills"
+    tier_lock_hash: "41ab0facbcd32f2d5e385cd5bbcf15a40328162e8391fc717c2b7821510aa3ad"
+    status: covered
+    published_f1: "pending-detector"
+    detectable_scenarios:
+      - id: AST01-S1
+        name: "Obfuscated malicious payload in script"
+        tier: static-detectable
+        reason: "A base64/hex-encoded shell payload decoded and exec'd at load or run time is a fixed byte pattern a static scanner can flag by decoding and matching against known dangerous shell primitives."
+      - id: AST01-S2
+        name: "Destructive postinstall hook"
+        tier: static-detectable
+        reason: "A declared postinstall/setup script performing destructive filesystem operations (e.g. recursive delete of $HOME) disguised as environment cleanup is a static command-pattern match against the manifest's declared lifecycle hooks."
+      - id: AST01-S3
+        name: "Covert exfiltration endpoint"
+        tier: static-detectable
+        reason: "A hardcoded HTTP endpoint in a script that POSTs local file contents outside any declared network policy is detectable by diffing egress calls in source against the manifest's declared allow-list."
+    out_of_artifact_scenarios:
+      []
+    cases:
+      - id: AST01-V1
+        scenario_id: AST01-S1
+        label: vulnerable
+        path: fixtures/AST01/V1-obfuscated-payload/SKILL.md
+      - id: AST01-C2
+        scenario_id: AST01-S1
+        label: clean
+        path: fixtures/AST01/C2-obfuscated-payload/SKILL.md
+      - id: AST01-V3
+        scenario_id: AST01-S2
+        label: vulnerable
+        path: fixtures/AST01/V3-destructive-postinstall/SKILL.md
+      - id: AST01-C4
+        scenario_id: AST01-S2
+        label: clean
+        path: fixtures/AST01/C4-destructive-postinstall/SKILL.md
+      - id: AST01-V5
+        scenario_id: AST01-S3
+        label: vulnerable
+        path: fixtures/AST01/V5-exfiltration-endpoint/SKILL.md
+      - id: AST01-C6
+        scenario_id: AST01-S3
+        label: clean
+        path: fixtures/AST01/C6-exfiltration-endpoint/SKILL.md
+
+  AST02:
+    name: "Supply Chain Compromise"
+    tier_lock_hash: "23f4d86d77710d458f04dbbfd70cf14e2b14c0f96959ab773890c2235481b056"
+    status: covered
+    published_f1: "pending-detector"
+    detectable_scenarios:
+      - id: AST02-S1
+        name: "Typosquatted dependency name"
+        tier: static-detectable
+        reason: "A dependency name at edit-distance 1 from a popular package (e.g. 'reqeusts' vs 'requests') is a static string-distance check against a known-package index."
+      - id: AST02-S2
+        name: "Unpinned wildcard dependency version"
+        tier: static-detectable
+        reason: "A dependency version pinned to an unbounded wildcard (e.g. '*' or '>=0') lets a compromised future release install silently; detectable by a static regex over the version-constraint field."
+      - id: AST02-S3
+        name: "Lockfile content-hash mismatch"
+        tier: static-detectable
+        reason: "The committed lockfile's recorded content hash not matching a recomputed hash of the referenced dependency archive is a static hash-comparison check."
+    out_of_artifact_scenarios:
+      - id: AST02-S4
+        name: "Maintainer account takeover"
+        tier: out-of-artifact
+        reason: "Registry-side account-compromise detection depends on registry auth logs and session history maintained outside the artifact; no in-artifact signal exists."
+    cases:
+      - id: AST02-V1
+        scenario_id: AST02-S1
+        label: vulnerable
+        path: fixtures/AST02/V1-typosquatted-dependency/SKILL.md
+      - id: AST02-C2
+        scenario_id: AST02-S1
+        label: clean
+        path: fixtures/AST02/C2-typosquatted-dependency/SKILL.md
+      - id: AST02-V3
+        scenario_id: AST02-S2
+        label: vulnerable
+        path: fixtures/AST02/V3-unpinned-wildcard-dependency/SKILL.md
+      - id: AST02-C4
+        scenario_id: AST02-S2
+        label: clean
+        path: fixtures/AST02/C4-unpinned-wildcard-dependency/SKILL.md
+      - id: AST02-V5
+        scenario_id: AST02-S3
+        label: vulnerable
+        path: fixtures/AST02/V5-lockfile-hash-mismatch/SKILL.md
+      - id: AST02-C6
+        scenario_id: AST02-S3
+        label: clean
+        path: fixtures/AST02/C6-lockfile-hash-mismatch/SKILL.md
+
+  AST03:
+    name: "Over-Privileged Skills"
+    tier_lock_hash: "c7090f29a229e96da46014b3b1606a0adaed6ea01a9a32f87e7340edfc54062e"
+    status: covered
+    published_f1: "pending-detector"
+    detectable_scenarios:
+      - id: AST03-S1
+        name: "Production-secrets write scope"
+        tier: static-detectable
+        reason: "The manifest's allow_write policy granting a path pattern matching production secrets storage (e.g. '/secrets/**', '.env.production') is a static glob match against a known-sensitive-path list."
+      - id: AST03-S2
+        name: "Undeclared shell-exec permission"
+        tier: static-detectable
+        reason: "Unrestricted shell-execution permission requested with no corresponding use case in the skill's declared description is a static cross-check between the permissions block and the description text."
+      - id: AST03-S3
+        name: "Wildcard network egress"
+        tier: static-detectable
+        reason: "A network policy allow-list containing a wildcard host ('*') instead of an enumerated allow-list is a static structural check on the manifest field."
+    out_of_artifact_scenarios:
+      []
+    cases:
+      - id: AST03-V1
+        scenario_id: AST03-S1
+        label: vulnerable
+        path: fixtures/AST03/V1-prod-secrets-write-scope/SKILL.md
+      - id: AST03-C2
+        scenario_id: AST03-S1
+        label: clean
+        path: fixtures/AST03/C2-prod-secrets-write-scope/SKILL.md
+      - id: AST03-V3
+        scenario_id: AST03-S2
+        label: vulnerable
+        path: fixtures/AST03/V3-undeclared-shell-exec/SKILL.md
+      - id: AST03-C4
+        scenario_id: AST03-S2
+        label: clean
+        path: fixtures/AST03/C4-undeclared-shell-exec/SKILL.md
+      - id: AST03-V5
+        scenario_id: AST03-S3
+        label: vulnerable
+        path: fixtures/AST03/V5-wildcard-network-egress/SKILL.md
+      - id: AST03-C6
+        scenario_id: AST03-S3
+        label: clean
+        path: fixtures/AST03/C6-wildcard-network-egress/SKILL.md
+
+  AST04:
+    name: "Insecure Metadata"
+    tier_lock_hash: "16a47c857a31fd6ac2bc7e441933b1232023f3b964727100cf3d8c8e9c9283ba"
+    status: covered
+    published_f1: "pending-detector"
+    detectable_scenarios:
+      - id: AST04-S1
+        name: "YAML frontmatter injection"
+        tier: static-detectable
+        reason: "SKILL.md YAML frontmatter containing an unescaped anchor/merge or an '!!python/object' tag enabling arbitrary object construction on load is a static parse-time check distinct from JSON/TOML variants (spec.md S-005)."
+      - id: AST04-S2
+        name: "JSON metadata injection"
+        tier: static-detectable
+        reason: "A JSON-format manifest sidecar embedding a '__proto__' prototype-pollution key or an executable expression value is a static key-name/value-shape check distinct from the YAML and TOML variants (spec.md S-005)."
+      - id: AST04-S3
+        name: "TOML metadata injection"
+        tier: static-detectable
+        reason: "A TOML-format manifest sidecar redefining a trusted top-level table via a duplicate table header (e.g. a second '[permissions]' table overriding the declared one) is a static duplicate-table-key check distinct from the YAML and JSON variants (spec.md S-005)."
+    out_of_artifact_scenarios:
+      []
+    cases:
+      - id: AST04-V1
+        scenario_id: AST04-S1
+        label: vulnerable
+        path: fixtures/AST04/V1-yaml-frontmatter-injection/SKILL.md
+      - id: AST04-C2
+        scenario_id: AST04-S1
+        label: clean
+        path: fixtures/AST04/C2-yaml-frontmatter-injection/SKILL.md
+      - id: AST04-V3
+        scenario_id: AST04-S2
+        label: vulnerable
+        path: fixtures/AST04/V3-json-metadata-injection/SKILL.md
+      - id: AST04-C4
+        scenario_id: AST04-S2
+        label: clean
+        path: fixtures/AST04/C4-json-metadata-injection/SKILL.md
+      - id: AST04-V5
+        scenario_id: AST04-S3
+        label: vulnerable
+        path: fixtures/AST04/V5-toml-metadata-injection/SKILL.md
+      - id: AST04-C6
+        scenario_id: AST04-S3
+        label: clean
+        path: fixtures/AST04/C6-toml-metadata-injection/SKILL.md
+
+  AST05:
+    name: "Untrusted External Instructions"
+    tier_lock_hash: "3dc23889393d91e314c4eb3c52186cc807d00fd3c4f5ce0d9a05c03736753365"
+    status: covered
+    published_f1: "pending-detector"
+    detectable_scenarios:
+      - id: AST05-S1
+        name: "Unsanitized fetched instructions"
+        tier: static-detectable
+        reason: "A script that fetches remote content and appends it directly to the instruction/prompt path with no delimiter or provenance tag is a static data-flow check from a fetch call to the instruction sink."
+      - id: AST05-S2
+        name: "Eval of remote response body"
+        tier: static-detectable
+        reason: "A script that evaluates or exec's a third-party API response body directly as code is a static call-site match on eval/exec fed by a network response."
+      - id: AST05-S3
+        name: "Absent instruction-boundary marker"
+        tier: static-detectable
+        reason: "Decision-rule text with no explicit boundary marker separating trusted operator instructions from untrusted tool/web output is a static presence/absence check for a declared delimiter convention."
+    out_of_artifact_scenarios:
+      []
+    cases:
+      - id: AST05-V1
+        scenario_id: AST05-S1
+        label: vulnerable
+        path: fixtures/AST05/V1-unsanitized-fetched-instructions/SKILL.md
+      - id: AST05-C2
+        scenario_id: AST05-S1
+        label: clean
+        path: fixtures/AST05/C2-unsanitized-fetched-instructions/SKILL.md
+      - id: AST05-V3
+        scenario_id: AST05-S2
+        label: vulnerable
+        path: fixtures/AST05/V3-eval-remote-response/SKILL.md
+      - id: AST05-C4
+        scenario_id: AST05-S2
+        label: clean
+        path: fixtures/AST05/C4-eval-remote-response/SKILL.md
+      - id: AST05-V5
+        scenario_id: AST05-S3
+        label: vulnerable
+        path: fixtures/AST05/V5-absent-boundary-marker/SKILL.md
+      - id: AST05-C6
+        scenario_id: AST05-S3
+        label: clean
+        path: fixtures/AST05/C6-absent-boundary-marker/SKILL.md
+
+  AST06:
+    name: "Weak Isolation"
+    tier_lock_hash: "d22946d405b961a25da7194c868288f384bc8035d4555112acd49a5421ae30e3"
+    status: covered
+    published_f1: "pending-detector"
+    detectable_scenarios:
+      - id: AST06-S1
+        name: "Filesystem-root write scope"
+        tier: static-detectable
+        reason: "An empty deny_write policy or an allow_write scope including filesystem root ('/') is a static structural check on the manifest's write-policy field."
+      - id: AST06-S2
+        name: "Unrestricted sudo permission"
+        tier: static-detectable
+        reason: "A shell-permission block granting unrestricted sudo/root escalation with no scoped command allow-list is a static check on the shell-permission field shape."
+      - id: AST06-S3
+        name: "Shared unscoped credential namespace"
+        tier: static-detectable
+        reason: "A skill declaring no isolated credential namespace and instead reading from the global unscoped environment is a static check for a missing scoped-secrets declaration field."
+    out_of_artifact_scenarios:
+      []
+    cases:
+      - id: AST06-V1
+        scenario_id: AST06-S1
+        label: vulnerable
+        path: fixtures/AST06/V1-filesystem-root-write-scope/SKILL.md
+      - id: AST06-C2
+        scenario_id: AST06-S1
+        label: clean
+        path: fixtures/AST06/C2-filesystem-root-write-scope/SKILL.md
+      - id: AST06-V3
+        scenario_id: AST06-S2
+        label: vulnerable
+        path: fixtures/AST06/V3-unrestricted-sudo/SKILL.md
+      - id: AST06-C4
+        scenario_id: AST06-S2
+        label: clean
+        path: fixtures/AST06/C4-unrestricted-sudo/SKILL.md
+      - id: AST06-V5
+        scenario_id: AST06-S3
+        label: vulnerable
+        path: fixtures/AST06/V5-shared-credential-namespace/SKILL.md
+      - id: AST06-C6
+        scenario_id: AST06-S3
+        label: clean
+        path: fixtures/AST06/C6-shared-credential-namespace/SKILL.md
+
+  AST07:
+    name: "Update Drift"
+    tier_lock_hash: "915a39231a0d4084d1b18f100a7b2036b422ee17ec5b8a9b7cc8379512f4d596"
+    status: covered
+    published_f1: "pending-detector"
+    detectable_scenarios:
+      - id: AST07-S1
+        name: "Missing signed content hash"
+        tier: static-detectable
+        reason: "A manifest omitting the signed content-hash field the Universal Skill Format requires for update-integrity verification is a static required-field check."
+      - id: AST07-S2
+        name: "Unpinned mutable update channel"
+        tier: static-detectable
+        reason: "An update source pointing at a mutable branch/tag (e.g. 'latest') rather than an immutable pinned release reference is a static regex check on the update-source field."
+      - id: AST07-S3
+        name: "Absent semantic version field"
+        tier: static-detectable
+        reason: "A manifest with no semantic-version field, making a future update undetectable as a version change by a consuming registry, is a static required-field check."
+    out_of_artifact_scenarios:
+      - id: AST07-S4
+        name: "Rollback attack"
+        tier: out-of-artifact
+        reason: "Detecting a downgrade to a prior vulnerable version requires release-history metadata (version timeline, prior hashes) maintained outside a single artifact snapshot; no in-artifact signal exists."
+      - id: AST07-S5
+        name: "Hot-reload abuse"
+        tier: out-of-artifact
+        reason: "Detecting an in-place code swap after install requires runtime reload-event history from the host process, not the artifact itself; no in-artifact signal exists."
+    cases:
+      - id: AST07-V1
+        scenario_id: AST07-S1
+        label: vulnerable
+        path: fixtures/AST07/V1-missing-signed-content-hash/SKILL.md
+      - id: AST07-C2
+        scenario_id: AST07-S1
+        label: clean
+        path: fixtures/AST07/C2-missing-signed-content-hash/SKILL.md
+      - id: AST07-V3
+        scenario_id: AST07-S2
+        label: vulnerable
+        path: fixtures/AST07/V3-unpinned-update-channel/SKILL.md
+      - id: AST07-C4
+        scenario_id: AST07-S2
+        label: clean
+        path: fixtures/AST07/C4-unpinned-update-channel/SKILL.md
+      - id: AST07-V5
+        scenario_id: AST07-S3
+        label: vulnerable
+        path: fixtures/AST07/V5-absent-version-field/SKILL.md
+      - id: AST07-C6
+        scenario_id: AST07-S3
+        label: clean
+        path: fixtures/AST07/C6-absent-version-field/SKILL.md
+
+  AST08:
+    name: "Poor Scanning"
+    tier_lock_hash: "3a70c4332c9d0794e248baf728cb65715f9e0b6956dab506927f8b8f7d11526b"
+    status: covered
+    published_f1: "pending-detector"
+    detectable_scenarios:
+      - id: AST08-S1
+        name: "No scan-attestation field"
+        tier: static-detectable
+        reason: "A manifest carrying no scan-attestation or SECURITY.md reference field indicating the skill underwent any pre-publish security scan is a static required-field check; it is the one AST08 signal visible in the artifact itself. The remaining AST08 scenarios (scan-tool efficacy, reviewer diligence) are natural-language and judged agent-judgable per spec.md's Rejected-C rationale, not static-detectable."
+    out_of_artifact_scenarios:
+      []
+    cases:
+      - id: AST08-V1
+        scenario_id: AST08-S1
+        label: vulnerable
+        path: fixtures/AST08/V1-no-scan-attestation/SKILL.md
+      - id: AST08-V2
+        scenario_id: AST08-S1
+        label: vulnerable
+        path: fixtures/AST08/V2-no-scan-attestation/SKILL.md
+      - id: AST08-V3
+        scenario_id: AST08-S1
+        label: vulnerable
+        path: fixtures/AST08/V3-no-scan-attestation/SKILL.md
+      - id: AST08-C4
+        scenario_id: AST08-S1
+        label: clean
+        path: fixtures/AST08/C4-no-scan-attestation/SKILL.md
+      - id: AST08-C5
+        scenario_id: AST08-S1
+        label: clean
+        path: fixtures/AST08/C5-no-scan-attestation/SKILL.md
+      - id: AST08-C6
+        scenario_id: AST08-S1
+        label: clean
+        path: fixtures/AST08/C6-no-scan-attestation/SKILL.md
+
+  AST09:
+    name: "No Governance"
+    tier_lock_hash: "9d6e4bcff9530029f3146342784a56624912dd197ec48e786f26e02480b098fe"
+    status: declared-and-uncovered
+    published_f1: null
+    detectable_scenarios:
+      []
+    out_of_artifact_scenarios:
+      - id: AST09-S1
+        name: "Orphaned Skill"
+        tier: out-of-artifact
+        reason: "An agent receiving no updates for 6+ months while still in active use is a process property, not an artifact property; the skill package itself carries no signal (spec.md S-003, exact scenario)."
+      - id: AST09-S2
+        name: "Regulatory Exposure"
+        tier: out-of-artifact
+        reason: "Regulatory-exposure status depends on the deploying organization's compliance posture and jurisdiction, maintained outside the artifact; no in-artifact signal exists."
+      - id: AST09-S3
+        name: "Undetected Compromise"
+        tier: out-of-artifact
+        reason: "Whether a compromise has gone undetected depends on an organization's monitoring and incident-response process, not on any field present in the skill package."
+    cases:
+      []
+
+  AST10:
+    name: "Cross-Platform Reuse"
+    tier_lock_hash: "bb981d8ea2f4cdaca2b5e636debafd46390d58f32fe82e8c83d5bf466443b120"
+    status: declared-and-uncovered
+    published_f1: null
+    detectable_scenarios:
+      []
+    out_of_artifact_scenarios:
+      - id: AST10-S1
+        name: "Cross-registry arbitrage"
+        tier: out-of-artifact
+        reason: "Detecting the same skill republished with different permissions across registries requires a cross-registry corpus outside any single artifact; no in-artifact signal exists."
+      - id: AST10-S2
+        name: "Multi-platform campaign"
+        tier: out-of-artifact
+        reason: "Detecting a coordinated campaign spanning multiple platforms requires cross-platform telemetry outside any single artifact; no in-artifact signal exists."
+    cases:
+      []
