@@ -108,7 +108,25 @@ def test_calibration_emits_json():
     )
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
-    assert set(payload) == {"summary", "providers", "skills"}
+    assert set(payload) == {"summary", "providers", "skills", "judge_quality"}
+
+
+def test_the_headline_figures_still_describe_the_whole_panel(computed):
+    """Judge-quality diagnostics must not quietly filter the tables above them.
+
+    `judge_quality` may flag a judge, and its exclusion block may show what
+    dropping that judge would do. `summary`, `providers` and `skills` describe
+    the panel as recorded — every judge, flagged or not — because that is the
+    panel the scorecards, the dashboard and ADR-0005 all report.
+    """
+    flagged = computed["judge_quality"]["flagged"]
+    if not flagged:
+        pytest.skip("no judge flagged on the recorded panel")
+    named = {row["provider"] for row in computed["providers"]}
+    assert set(flagged) <= named, "a flagged judge vanished from the per-provider bias table"
+    with_flagged = computed["judge_quality"]["exclusion"]["with_flagged"]
+    assert with_flagged["pooled_mean"] == computed["summary"]["pooled_mean"]
+    assert with_flagged["n_judgments"] == computed["summary"]["n_judgments"]
 
 
 def test_empty_corpus_is_reported_not_crashed(tmp_path):

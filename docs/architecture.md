@@ -288,6 +288,20 @@ from `aggregate.judgments` before comparing it to the stored value. A stored mea
 claim; the judgments are the evidence. `eval/generate_dashboard.py` calls the same function
 the gate calls, so the dashboard and the gate cannot drift apart.
 
+**The prompt carries the scale, and the judge must justify itself.** `build_prompt` reads
+the pinned rubric off disk at build time and quotes each dimension's own band table, red
+flags and worked examples verbatim — there is no second copy of the bands in this repository
+to drift, and the prompt refuses to build if the vendored bytes do not hash to the pinned
+`RUBRIC_CONTENT_SHA256`. The response contract is one object per dimension carrying a score
+and a one-sentence `why`; a judgement whose justification is missing, empty, or repeated
+across dimensions is recorded as **malformed** and excluded from the pool with an audit-trail
+entry, exactly as a crashed provider is. Both properties date from 2026-08-23 and both are
+breaking: **scores measured under this prompt are not comparable to `eval/scorecards/` or
+`eval/scorecards-run1/`**, which were produced by a prompt that sent only the dimension names
+and forbade prose. Those directories are kept unmodified as the record of the earlier
+instrument — see the callout at the top of
+[`skill-judge-dashboard.md`](skill-judge-dashboard.md).
+
 The ship rule itself — mean ≥ 108, mean − σ ≥ 105, per-dimension floors, ≥ 4 pooled rounds
 — and the full provider roster with the unavailable entries and their reasons are in
 [`skill-judge-dashboard.md`](skill-judge-dashboard.md).
