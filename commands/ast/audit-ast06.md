@@ -50,9 +50,10 @@ AST10 is a boundary that existed on the source platform and did not survive the 
 
 ## Checks this command runs
 
-`Tier` is the mechanism tier (`SCENARIO_TIERS`): is the check decidable from bytes?
-`Covers` is the separate question (`CHECK_COVERAGE`): does deciding it cover a named
-whitepaper scenario? Only the first two do, and they decide the two disjuncts of the same
+`Tier` is the check's own mechanism tier: is it decidable from bytes? (It is not read
+from `SCENARIO_TIERS`, which mirrors `scenarios/registry.yaml`'s per-SCENARIO tiering
+and says nothing about any individual check.) `Covers` is the separate question
+(`CHECK_COVERAGE`): does deciding it cover a named whitepaper scenario? Only the first two do, and they decide the two disjuncts of the same
 scenario — AST06-S01 Host Escape — which is why the published F1 is `mixed-proxy`.
 
 | Check id | Tier | Covers | Fires when |

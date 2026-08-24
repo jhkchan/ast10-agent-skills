@@ -66,6 +66,20 @@ proxy label — it is **not** coverage of AST01-S07 and must never be reported a
 Ten mechanical checks. Eight are `covers: full` against a registry scenario the registry
 independently tiers static-detectable; two decide no named scenario and say so.
 
+**Ten is a count of checks. Seven is the count of static-detectable scenarios, and the two
+are not interchangeable** — this category is where that was demonstrated. `SCENARIO_TIERS`
+in `skills/AST01/scripts/detector.py` used to be keyed by the check ids in the table below
+rather than by the registry's scenario ids, so `node cli/bin/cli.js list` read ten
+check-shaped entries out of it and printed `AST01 [static-detectable x10]`: a reader was
+told this category decides ten of the whitepaper's named scenarios when the registry rules
+seven. Nothing about the detectors changed to fix it. `SCENARIO_TIERS` is now the
+registry's eleven ids at the registry's tiers, per-check metadata stayed where it belongs
+in `CHECK_COVERAGE`, and `list` prints the two counts under their own nouns. Three
+quantities, three tables: **eleven** registry scenarios (`SCENARIO_TIERS`), **seven** of
+them static-detectable (`STATIC_DETECTABLE`, the F1 denominator), **ten** shipped checks
+(`CHECK_COVERAGE`). `tests/test_scenario_tiers_are_registry_keyed.py` holds all ten
+categories to that split.
+
 | Detector function | Check id | `CHECK_COVERAGE` | Registry link |
 | --- | --- | --- | --- |
 | `detect_social_engineering_prerequisites` | `AST01-social-engineering-prerequisites` | `full` | AST01-S02 |

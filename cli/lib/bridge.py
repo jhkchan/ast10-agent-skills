@@ -348,6 +348,33 @@ def read_surface_files(pkg_dir: Path) -> dict[str, str]:
     return dogfood.surface_files(pkg_dir)
 
 
+def check_tiers(module) -> dict[str, str]:
+    """The MECHANISM tier of every shipped check, keyed by the id a Finding carries.
+
+    `SCENARIO_TIERS` is keyed by `scenarios/registry.yaml`'s scenario ids and
+    answers a question about the SCENARIO: can one package decide it? A finding,
+    though, is a CHECK, and the audit output's `tier` column has always answered
+    the other question: is this check decidable from bytes? While a module keyed
+    its tier table by its own check slugs the two lookups happened to coincide
+    and a bare `tiers.get(finding.scenario)` served both. Re-keying the table
+    onto registry ids separated them, and the bare lookup started returning
+    `None` -- rendered `untiered` -- for every check whose id is a slug.
+
+    Two cases, and no guessing between them:
+
+    * a check whose id IS a registry scenario id (AST08 and AST10 name their
+      checks that way) takes the registry's tier for it, unchanged;
+    * any other shipped check is `static-detectable`, and not by assumption:
+      every entry in `DETECTORS` is a deterministic rule over the package's own
+      bytes, which is exactly what that tier means. Whether the check *covers* a
+      named scenario is the separate question `CHECK_COVERAGE` answers, and the
+      CLI prints the reminder beneath the table rather than folding the two
+      questions back together here.
+    """
+    tiers: dict[str, str] = dict(getattr(module, "SCENARIO_TIERS", {}))
+    return {check: tiers.get(check, "static-detectable") for check in getattr(module, "DETECTORS", {})}
+
+
 # ---------------------------------------------------------------------------
 # Commands
 # ---------------------------------------------------------------------------
@@ -391,10 +418,11 @@ def audit(target: str) -> dict:
             )
             continue
         surface_scoped = category in SURFACE_SCOPED
+        mechanism_tiers = check_tiers(module)
         findings = [
             {
                 "scenario": f.scenario,
-                "tier": tiers.get(f.scenario),
+                "tier": mechanism_tiers.get(f.scenario),
                 "detected": bool(f.detected),
                 "evidence": f.evidence,
             }

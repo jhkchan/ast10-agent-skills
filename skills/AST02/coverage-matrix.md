@@ -65,12 +65,21 @@ One check, for the one scenario a package can decide.
 | --- | --- | --- | --- |
 | `detect_config_file_hijacking` | `AST02-config-file-hijacking` | `full` | AST02-S03 |
 
-`SCENARIO_TIERS` additionally declares `AST02-registry-flooding`,
-`AST02-dependency-confusion` and `AST02-maintainer-account-takeover` as `out-of-artifact`
-with no function behind them, so a reader of the module — not only a reader of this file —
-sees the three-quarters of the category that is out of reach. `F1_SCOPE` is
-`scenario-level`: the module's only check is `covers: full` against a scenario the registry
-independently tiers static-detectable.
+`SCENARIO_TIERS` enumerates all four of the category's scenarios, keyed by the registry's
+canonical ids and carrying the registry's tier for each — `AST02-S03` static-detectable,
+`AST02-S01`, `AST02-S02` and `AST02-S04` out-of-artifact. So a reader of the module, not
+only a reader of this file, sees the three-quarters of the category that is out of reach.
+
+Three counts are in play and the module keeps them in separate tables: **four** registry
+scenarios (`SCENARIO_TIERS`), **one** of them static-detectable (`STATIC_DETECTABLE`, the
+F1 denominator), and **one** shipped check (`CHECK_COVERAGE`, keyed by check id — the table
+above). They coincide at one here, which is exactly why this module's earlier check-keyed
+table looked correct: the slug map happened to be one-to-one, so `node cli/bin/cli.js list`
+printed the right number for AST02 while printing ten for AST01's seven scenarios. Agreeing
+by coincidence is not agreeing, and the keying is now the registry's in every module.
+
+`F1_SCOPE` is `scenario-level`: the module's only check is `covers: full` against a scenario
+the registry independently tiers static-detectable.
 
 ### Two decisions inside the check, both load-bearing
 

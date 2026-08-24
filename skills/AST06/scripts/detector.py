@@ -25,6 +25,25 @@ Attack Surface) and Cross-Agent Workspace Contamination are out-of-artifact;
 ``skills/AST06/coverage-matrix.md`` records why for each, and the two checks
 below that touch them are declared non-coverage in ``CHECK_COVERAGE``.
 
+TWO TABLES, TWO NAMESPACES
+--------------------------
+``SCENARIO_TIERS`` mirrors ``scenarios/registry.yaml``: all five canonical
+scenario ids (``AST06-S01`` .. ``AST06-S05``) mapped to the tier the registry
+assigns them, out-of-artifact ones included, never a tier of this module's own
+invention. It used to be keyed by this module's CHECK slugs with five of them
+written down as ``static-detectable``, which made ``STATIC_DETECTABLE`` five
+checks deep and let ``cli/bin/cli.js list`` report AST06 as deciding five
+scenarios in a category that decides exactly one.
+
+Per-CHECK metadata lives in ``CHECK_COVERAGE``, keyed by check id -- the table
+that answers "what does this check bear on, and how honestly", and the one
+``scenarios/registry.yaml`` names checks into through
+``artifact_signal_checks``. The join between the two runs through
+``SCENARIO_DETECTORS`` at the foot of this file: ``AST06-S01`` is decided by
+whichever of its two ``covers: full`` disjuncts fires, and the F1 denominator
+stays the registry's tier -- one scenario -- rather than the module's check
+count.
+
 Package shape (the flat dict every detector in this repo consumes)::
 
     {
@@ -50,30 +69,33 @@ import re
 from typing import Callable
 
 from detectors import pysource
-from detectors.scaffold import Finding, static_detectable
+from detectors.scaffold import Finding, scenario_detectors, static_detectable
 from detectors.scaffold import f1_report as _f1_report
 from detectors.scaffold import f1_scope as _f1_scope
 from detectors.scaffold import run_all as _run_all
 from validators import usf
 
+#: Tiers keyed by ``scenarios/registry.yaml``'s canonical scenario ids, taken
+#: verbatim from it. All five of AST06's named scenarios are here, including the
+#: four out-of-artifact ones, so a reader of this module alone counts the same
+#: five scenarios and the same tiers a reader of the registry does. The registry
+#: is the authority; this restates it and may never disagree with it
+#: (`skills/AST06/scripts/test_ast06_detector.py` pins the equality).
 SCENARIO_TIERS: dict[str, str] = {
-    # The two halves of AST06-S01's defining condition.
-    "AST06-host-persistence-write": "static-detectable",
-    "AST06-root-write-scope": "static-detectable",
-    # Broader postures. Mechanical, but each decides something other than a
-    # named AST06 scenario -- see CHECK_COVERAGE.
-    "AST06-unrestricted-shell-exec": "static-detectable",
-    "AST06-unscoped-shared-state-write": "static-detectable",
-    "AST06-missing-sandbox-declaration": "static-detectable",
-    # Whether data actually crossed between co-installed skills at runtime is
-    # an execution-trace property, not something the package alone shows. The
-    # registry tiers the corresponding named scenario (AST06-S05)
-    # out-of-artifact for the same reason; nothing is implemented for it.
-    "AST06-cross-skill-data-leak": "out-of-artifact",
+    "AST06-S01": "static-detectable",  # Host Escape
+    "AST06-S02": "out-of-artifact",  # Network Pivot
+    "AST06-S03": "out-of-artifact",  # Skill Shadowing
+    "AST06-S04": "out-of-artifact",  # Localhost Attack Surface
+    "AST06-S05": "out-of-artifact",  # Cross-Agent Workspace Contamination
 }
 
+#: One scenario: AST06-S01. The module ships five checks, which is a different
+#: number about a different thing.
 STATIC_DETECTABLE: set[str] = static_detectable(SCENARIO_TIERS)
 
+# Per-CHECK metadata, keyed by check id -- a different namespace from
+# SCENARIO_TIERS above, and the one `scenarios/registry.yaml` names checks into
+# through `artifact_signal_checks`.
 CHECK_COVERAGE: dict[str, dict] = {
     "AST06-host-persistence-write": {
         "registry_ids": ["AST06-S01"],
@@ -138,6 +160,23 @@ CHECK_COVERAGE: dict[str, dict] = {
             "missing-sandbox-declaration check reads'). It cannot decide AST10-S04: a ported "
             "package with no permission block is indistinguishable from one that never "
             "declared any without the pre-port manifest to diff against."
+        ),
+    },
+    # Declared and deliberately NOT implemented. It kept its place when this
+    # module's tier table was re-keyed onto registry ids rather than being
+    # dropped: an id the category once declared, silently deleted, reads as a
+    # check that never existed instead of one that was ruled out on purpose.
+    "AST06-cross-skill-data-leak": {
+        "registry_ids": ["AST06-S05"],
+        "covers": "artifact-signal-only",
+        "reason": (
+            "No function ships for this id and none may: whether data actually crossed "
+            "between two co-installed skills is an execution-trace property, which is why "
+            "the registry tiers AST06-S05 out-of-artifact. The nearest package-decidable "
+            "thing is that scenario's declared artifact_signal, and "
+            "AST06-unscoped-shared-state-write above is the check that computes it; this "
+            "id is recorded as the same proxy link and is absent from DETECTORS, so it "
+            "enters no denominator anywhere."
         ),
     },
 }
@@ -458,9 +497,30 @@ DETECTORS: dict[str, Callable[[dict], Finding]] = {
 }
 
 
+#: The registry-keyed view of the checks: every scenario in STATIC_DETECTABLE
+#: mapped to the `covers: full` checks that decide it. For AST06 that is
+#: ``{"AST06-S01": <host-persistence-write OR root-write-scope>}`` -- the
+#: scenario's defining condition is a disjunction, so either disjunct firing
+#: decides it. The three checks that are not `covers: full` are deliberately not
+#: here: a proxy is never coverage, so it may not put a true positive in a
+#: scenario's column.
+SCENARIO_DETECTORS: dict[str, Callable[[dict], Finding]] = scenario_detectors(DETECTORS, CHECK_COVERAGE)
+
+
 def run_all(pkg: dict) -> list[Finding]:
     return _run_all(DETECTORS, pkg)
 
 
-def f1_report(fixtures: list[tuple[dict, set[str]]]) -> dict:
-    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures, F1_SCOPE)
+def f1_report(fixtures: list[tuple[dict, set[str]]] | None = None) -> dict:
+    """F1 over the registry's static-detectable tier for AST06 -- AST06-S01 alone.
+
+    The denominator is one scenario, not five checks. ``fixtures`` label
+    expected detections with registry scenario ids, and ``SCENARIO_DETECTORS``
+    is what puts the module's findings into that same namespace; the three
+    checks that decide no named scenario are measured per labeled pair by
+    ``detectors/fixture_loader.py`` under their own ``covers`` labels instead.
+    ``F1_SCOPE`` stays ``mixed-proxy`` -- the module as a whole is a mixture, and
+    reporting the more conservative of the two available labels beside the
+    number is the direction this repository errs in.
+    """
+    return _f1_report(STATIC_DETECTABLE, SCENARIO_DETECTORS, fixtures, F1_SCOPE)

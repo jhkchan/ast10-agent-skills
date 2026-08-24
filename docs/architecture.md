@@ -35,14 +35,26 @@ thing in the repository. When two artifacts disagree, the lower rank is a bug.
 | 4 | `fixtures/manifest.yaml` | which fixture case is labeled against which check |
 | 5 | `skills/<AST>/scripts/detector.py` | implementation only — subordinate to rank 2 |
 
-A detector module may carry its own interim `SCENARIO_TIERS` table. Where that table and
-the registry differ, **the registry governs** and the divergence is itemised under the
-matrix's "Coverage debt" section rather than being quietly reconciled.
+A detector module's `SCENARIO_TIERS` is a **mirror of the registry, not an opinion about
+it**: it maps `scenarios/registry.yaml`'s canonical scenario ids (`AST07-S01`) to the tier
+the registry assigns them, enumerates the category completely, and says nothing whatever
+about any individual check. A module never invents a tier, and there is no such thing as
+an interim one — where the module and the registry ever differ, the module is the bug.
+`tests/test_scenario_tiers_are_registry_keyed.py` enforces that over all ten categories.
 
-`SCENARIO_TIERS` answers only "is this check mechanical?". A second table in the same
-module, `CHECK_COVERAGE`, answers the separate question "does it decide a named
-scenario?", using `fixtures/manifest.yaml`'s own vocabulary — `full`,
-`artifact-signal-only`, `category-precondition`. Collapsing the two is how the same
+That test exists because the modules did not always agree on what the table's KEYS were.
+AST01–AST06 keyed it by their own check slugs (`AST01-content-hash-missing`) while
+AST07–AST10 keyed it by registry ids, and the divergence stayed invisible until something
+counted the table. `node cli/bin/cli.js list` does: under check-keying it printed
+`AST01 [static-detectable x10]` — ten *checks* wearing a *scenario* tier label — against a
+registry that rules seven AST01 scenarios static-detectable. `list` now prints the two
+quantities under their own nouns ("11 scenarios: 7 static-detectable … · 10 checks
+shipped") for the same reason.
+
+The per-check question is a second table's job. `CHECK_COVERAGE`, keyed by check id in the
+same module, answers "does this check decide a named scenario?" using
+`fixtures/manifest.yaml`'s own vocabulary — `full`, `artifact-signal-only`,
+`category-precondition`. Collapsing the two is how the same
 predicate came to be ruled `static-detectable` where it let a detector claim coverage and
 `artifact_signal`-only where counting it would have obliged someone to build one. The
 registry closes the other side of that with `artifact_signal_decidable` and

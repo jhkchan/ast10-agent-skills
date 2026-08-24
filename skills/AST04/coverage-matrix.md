@@ -64,10 +64,16 @@ python3 -c "import yaml; [print(s['id'], '|', s['title'], '|', s['tier']) for s 
 
 ## Detector checks that are not whitepaper scenarios
 
-`skills/AST04/scripts/detector.py` declares six scenario ids. Five map onto registry
-scenarios; one does not.
+`skills/AST04/scripts/detector.py` ships six CHECKS. Five map onto registry scenarios;
+one does not. Three counts are in play here and the module keeps them in separate
+tables: **seven** registry scenarios (`SCENARIO_TIERS`, keyed by canonical registry id
+and carrying the registry's tier for each), **five** of them static-detectable
+(`STATIC_DETECTABLE`, the F1 denominator), and **six** shipped checks (`CHECK_COVERAGE`,
+keyed by check id — the table below). Reading any one of those as another is the
+overclaim the keying split removed: while `SCENARIO_TIERS` was keyed by check slugs,
+`node cli/bin/cli.js list` reported AST04 as deciding six scenarios.
 
-| Detector scenario id | Maps to | `CHECK_COVERAGE` | Basis |
+| Detector check id | Maps to | `CHECK_COVERAGE` | Basis |
 | --- | --- | --- | --- |
 | `AST04-permission-understating` | `AST04-S02` | `full` | Named scenario, which the registry independently tiers `static-detectable`. |
 | `AST04-risk-tier-spoofing` | `AST04-S03` | `full` | Named scenario, which the registry independently tiers `static-detectable`. |

@@ -53,9 +53,10 @@ reads at runtime is AST05.
 
 ## Checks this command runs
 
-`Tier` is the mechanism tier (`SCENARIO_TIERS`): is the check decidable from bytes?
-`Covers` is the separate question (`CHECK_COVERAGE`): does deciding it cover a named
-whitepaper scenario? For AST05 the answer to the second is **never** — the registry tiers
+`Tier` is the check's own mechanism tier: is it decidable from bytes? (It is not read
+from `SCENARIO_TIERS`, which mirrors `scenarios/registry.yaml`'s per-SCENARIO tiering
+and says nothing about any individual check.) `Covers` is the separate question
+(`CHECK_COVERAGE`): does deciding it cover a named whitepaper scenario? For AST05 the answer to the second is **never** — the registry tiers
 none of its six scenarios static-detectable — which is why every published number here is
 scoped `artifact-signal-only`.
 

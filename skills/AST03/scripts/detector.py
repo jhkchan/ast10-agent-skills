@@ -21,6 +21,37 @@ they are instead:
   network, shell, tools) - reject skills without one" -- and decides no named
   scenario at all.
 
+TWO NAMESPACES, AND WHICH TABLE HOLDS WHICH
+-------------------------------------------
+``SCENARIO_TIERS`` is keyed by ``scenarios/registry.yaml``'s canonical scenario
+ids and carries the tier the registry assigns each one, verbatim. It enumerates
+ALL FIVE of AST03's named scenarios, including the three the registry rules
+out-of-artifact, and it never disagrees with the registry: the registry decides
+tier, this table mirrors it.
+
+It used to be keyed by this module's own check slugs instead, and every one of
+the four shipped checks was listed there as ``static-detectable``. Anything
+reading the table for a tier count therefore read "AST03 decides four
+scenarios" -- ``cli/bin/cli.js list`` printed exactly that -- when the registry
+rules ONE AST03 scenario static-detectable. That is a coverage overclaim on the
+repo's most-run command, and re-keying is the fix.
+
+Nothing check-keyed was lost in the move, because the per-check table already
+existed: ``CHECK_COVERAGE`` below is keyed by CHECK id and says, for each
+shipped check, which registry scenarios it bears on and what it claims over
+them (``full`` / ``artifact-signal-only`` / ``category-precondition``). The two
+tables answer different questions and neither substitutes for the other.
+
+One id had no code behind it and is gone from both tables:
+``AST03-task-scope-mismatch``, the module's old slug for "the grant is broader
+than the skill's stated function". It was declared ``agent-judgable`` and
+implemented by nothing. What it recorded is now stated where it belongs and
+more precisely -- ``SCENARIO_TIERS["AST03-S01"] == "agent-judgable"``, the
+registry's own ruling on the scenario it stood in for -- and adding it to
+``CHECK_COVERAGE`` would have been a claim that this module computes a
+predicate it does not compute. ``skills/AST03/coverage-matrix.md`` records the
+same disposition.
+
 SHAPE
 -----
 Permission fields are read through ``detectors.scaffold``'s accessors, which
@@ -46,6 +77,7 @@ from detectors.scaffold import (
     network_allowlist,
     network_unbounded,
     permissions,
+    scenario_detectors,
     shell_granted,
     static_detectable,
 )
@@ -61,18 +93,43 @@ IDENTITY_FILES: tuple[str, ...] = ("SOUL.md", "MEMORY.md", "AGENTS.md")
 
 _GLOB_CHARS = "*?[]"
 
+#: Tiers keyed by ``scenarios/registry.yaml``'s canonical scenario ids, all five
+#: of them, with the registry's tier for each. The registry is authoritative and
+#: this map mirrors it; ``test_the_registry_is_the_authority_for_these_five_tiers``
+#: in this directory's test module pins the two equal by construction, so a tier
+#: cannot be invented, softened or omitted here.
 SCENARIO_TIERS: dict[str, str] = {
-    "AST03-identity-file-write-grant": "static-detectable",
-    "AST03-unbounded-write-scope": "static-detectable",
-    "AST03-shell-network-privilege-combo": "static-detectable",
-    "AST03-wildcard-network-egress": "static-detectable",
-    # Whether the *task* actually needs the privileges it was granted requires
-    # reading intent against the skill's stated purpose -- semantic judgment.
-    "AST03-task-scope-mismatch": "agent-judgable",
+    # Weather Assistant Data Exfiltration -- "far beyond what it needs" is a
+    # purpose-versus-scope judgement; the same read scope is legitimate for a
+    # credential-management skill.
+    "AST03-S01": "agent-judgable",
+    # Database Admin Wipe -- the defining event is an injected instruction
+    # arriving at runtime in input the package does not contain.
+    "AST03-S02": "out-of-artifact",
+    # Identity File Backdoors -- the request IS the artifact: a declared write
+    # permission naming SOUL.md / MEMORY.md / AGENTS.md.
+    "AST03-S03": "static-detectable",
+    # Logic-layer Injection of Privileged Actions (LPCI) -- payload and
+    # permission-evaluation granularity both live outside the package.
+    "AST03-S04": "out-of-artifact",
+    # Low-Privilege Skill Invokes a High-Privilege Skill -- spans two packages
+    # plus the host's inter-skill trust configuration.
+    "AST03-S05": "out-of-artifact",
 }
 
+#: The registry's static-detectable tier for AST03: a set of SCENARIO ids, and
+#: the F1 denominator. Deliberately NOT the set of shipped checks -- three of
+#: the four checks below are mechanical and decide no named scenario, which is
+#: what ``CHECK_COVERAGE`` records and what keeps them out of this set.
 STATIC_DETECTABLE: set[str] = static_detectable(SCENARIO_TIERS)
 
+# What each mechanical check actually COVERS, in fixtures/manifest.yaml's own
+# vocabulary, keyed by CHECK id -- the id a Finding carries, the id
+# fixtures/manifest.yaml's `detector_check` names, and the id
+# config/dogfood_waivers.yml matches on. SCENARIO_TIERS above says what the
+# registry rules about a scenario; this says which scenarios a shipped check
+# bears on and what it claims over them. Both halves are needed, or a tier
+# reads as a coverage claim it does not make.
 CHECK_COVERAGE: dict[str, dict] = {
     "AST03-identity-file-write-grant": {
         "registry_ids": ["AST03-S03"],
@@ -313,4 +370,20 @@ def run_all(pkg: dict) -> list[Finding]:
 
 
 def f1_report(fixtures: list[tuple[dict, set[str]]]) -> dict:
-    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures, F1_SCOPE)
+    """F1 over the registry's static-detectable tier, in registry ids.
+
+    ``STATIC_DETECTABLE`` is a set of SCENARIO ids while ``DETECTORS`` is keyed
+    by this module's check slugs, so the raw check map cannot be scored against
+    it -- ``"AST03-identity-file-write-grant"`` is not ``"AST03-S03"`` and every
+    case would come back a false negative. ``scenario_detectors`` folds the
+    ``covers: full`` checks onto the scenarios they decide, which is also the
+    tier doctrine: the two proxy checks and the category precondition never put
+    a true positive in a scenario's column. ``fixtures`` therefore carries
+    expected sets of registry scenario ids.
+    """
+    return _f1_report(
+        STATIC_DETECTABLE,
+        scenario_detectors(DETECTORS, CHECK_COVERAGE),
+        fixtures,
+        F1_SCOPE,
+    )

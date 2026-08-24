@@ -47,18 +47,54 @@ def package(path: str, document: dict) -> dict:
 
 
 def test_s001_detector_registry_matches_declared_detectable_tier():
+    """No orphan detector, no unimplemented declared-detectable scenario.
+
+    Re-pointed onto the registry keying. ``SCENARIO_TIERS`` is now the
+    registry's table, so the declared-detectable tier is a set of SCENARIO ids
+    while ``DETECTORS`` stays keyed by CHECK id -- the namespace the CLI and
+    ``fixtures/manifest.yaml``'s ``detector_check`` use. ``SCENARIO_DETECTORS``
+    is the join between them, and it is the pair that has to match: an orphan
+    check or an unimplemented static-detectable scenario still fails here.
+    """
     declared_detectable = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"}
-    assert set(detector.DETECTORS.keys()) == declared_detectable == {"AST02-config-file-hijacking"}
+    assert declared_detectable == {"AST02-S03"}
+    assert set(detector.SCENARIO_DETECTORS) == declared_detectable
+    assert set(detector.DETECTORS) == {"AST02-config-file-hijacking"}
+
+
+def test_scenario_tiers_is_the_registrys_table_and_not_the_modules_opinion():
+    """The module restates the registry, verbatim and complete.
+
+    Asserted by equality rather than by subset so a scenario cannot be dropped
+    from the table -- which is how a category comes to report fewer scenarios
+    than the whitepaper names -- and so a tier cannot be moved here without
+    being moved in `scenarios/registry.yaml` first.
+    """
+    import yaml
+
+    registry = yaml.safe_load((_REPO_ROOT / "scenarios" / "registry.yaml").read_text(encoding="utf-8"))
+    from_registry = {s["id"]: s["tier"] for s in registry["scenarios"] if s["category"] == "AST02"}
+    assert detector.SCENARIO_TIERS == from_registry
+    assert len(from_registry) == 4
 
 
 @pytest.mark.parametrize(
-    "check",
-    ["AST02-registry-flooding", "AST02-dependency-confusion", "AST02-maintainer-account-takeover"],
+    ("scenario", "title"),
+    [
+        ("AST02-S01", "Registry Flooding"),
+        ("AST02-S02", "Dependency Confusion"),
+        ("AST02-S04", "Maintainer Account Takeover"),
+    ],
 )
-def test_s003_the_three_out_of_artifact_scenarios_stay_declared_and_unimplemented(check):
-    """Published, never padded: three quarters of AST02 is not decidable here."""
-    assert detector.SCENARIO_TIERS[check] == "out-of-artifact"
-    assert check not in detector.DETECTORS
+def test_s003_the_three_out_of_artifact_scenarios_stay_declared_and_unimplemented(scenario, title):
+    """Published, never padded: three quarters of AST02 is not decidable here.
+
+    Keyed on the registry ids the whitepaper's scenarios actually have, not on
+    the local slugs this table used to carry.
+    """
+    assert detector.SCENARIO_TIERS[scenario] == "out-of-artifact", title
+    assert scenario not in detector.SCENARIO_DETECTORS, title
+    assert scenario not in detector.SCORED_SCENARIOS, title
 
 
 def test_the_registrys_one_static_detectable_ast02_scenario_is_the_one_implemented():

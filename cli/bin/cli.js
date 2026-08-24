@@ -202,10 +202,18 @@ function pyDictBody(source, name) {
 /**
  * A skill's own tier declaration: `SCENARIO_TIERS` in its detector module.
  *
- * This is the skill's claim about what IT can decide, which is what `list
- * --tier` filters on. It is NOT the whitepaper scenario tiering —
- * `scenarios/registry.yaml` is authoritative on that, and `coverage` reports
- * it. The two answer different questions and are never summed.
+ * These are WHITEPAPER SCENARIOS, keyed by `scenarios/registry.yaml`'s
+ * canonical ids, each carrying the tier the registry assigns it. The registry
+ * is authoritative and every module mirrors it, so `list`'s counts and
+ * `coverage`'s counts agree by construction — `tests/test_cli.py` and each
+ * category's own detector tests pin the equality from both ends.
+ *
+ * They did not always. Six modules used to key this table by their own check
+ * slugs, so the count `list` printed was a count of CHECKS wearing tier
+ * labels: AST01 reported ten static-detectable scenarios where the registry
+ * rules seven, AST03 four where the registry rules one. What a check COVERS is
+ * a separate question that a separate per-module table (`CHECK_COVERAGE`)
+ * answers, and `audit` is where the check ids surface.
  */
 function readDetectorDeclaration(skillDir) {
   const source = readText(join(skillDir, "scripts", "detector.py"));
@@ -618,8 +626,14 @@ function cmdList(options) {
           id: s.id,
           name: s.name,
           description: oneLine(s.description),
+          // Two counts, never one. `tier_counts` and `scenario_count` are
+          // SCENARIOS, mirrored from scenarios/registry.yaml; `check_count` is
+          // the checks the module registers in DETECTORS. `detectors` names
+          // them, so a consumer can join them against CHECK_COVERAGE.
+          scenario_count: Object.keys(s.tiers).length,
           tier_counts: s.tierCounts,
           declared_scenarios: s.tiers,
+          check_count: s.detectors.length,
           detectors: s.detectors,
           f1: s.f1 ? s.f1.value : "not-scored-on-f1",
         })),
@@ -630,8 +644,12 @@ function cmdList(options) {
     return 0;
   }
 
+  // "with at least one", never "that decide". `--tier out-of-artifact` selects
+  // the categories that DECLARE such scenarios, which are by definition the
+  // ones no package can decide; a heading promising otherwise would invert the
+  // tier's meaning.
   const heading = options.tier
-    ? `OWASP AST skills that decide ${options.tier} scenarios (${skills.length})`
+    ? `OWASP AST skills with at least one ${options.tier} scenario (${skills.length})`
     : `OWASP Agentic Skills Top 10 — ${skills.length} skills`;
   console.log(`\n${heading}`);
   console.log(DISCLAIMER);
@@ -640,28 +658,57 @@ function cmdList(options) {
     console.log("  (none)");
     return 0;
   }
-  const nameWidth = Math.max(...skills.map((s) => s.name.length));
+  const indent = " ".repeat(11);
   for (const skill of skills) {
-    const badge = skill.isDetector
-      ? TIERS.filter((t) => skill.tierCounts[t] > 0)
-          .map((t) => `${t} x${skill.tierCounts[t]}`)
-          .join(", ") || "no scenarios declared"
-      : "router — guidance-quality judged, never an F1 signal";
-    console.log(`  ${pad(skill.id, 9)}${pad(skill.name, nameWidth + 2)}[${badge}]`);
-    console.log(`  ${" ".repeat(9)}${oneLine(skill.description)}`);
+    console.log(`  ${pad(skill.id, 9)}${skill.name}`);
+    if (skill.isDetector) {
+      const total = Object.keys(skill.tiers).length;
+      // Each segment carries its own noun. The bug this replaces printed
+      // "static-detectable x10" for AST01 — a count of CHECKS under a SCENARIO
+      // tier label, against a registry that rules seven AST01 scenarios
+      // static-detectable. Both quantities are useful; neither may wear the
+      // other's name.
+      const byTier =
+        TIERS.filter((t) => skill.tierCounts[t] > 0)
+          .map((t) => `${skill.tierCounts[t]} ${t}`)
+          .join(", ") || "none declared";
+      const checks =
+        skill.detectors.length === 0
+          ? "no check ships"
+          : `${skill.detectors.length} ${skill.detectors.length === 1 ? "check" : "checks"} shipped`;
+      console.log(`${indent}${total} scenarios: ${byTier}  ·  ${checks}`);
+    } else {
+      console.log(`${indent}router — guidance-quality judged, never an F1 signal`);
+    }
+    console.log(`${indent}${oneLine(skill.description, 92)}`);
   }
   console.log("");
   console.log(
-    "Tier = what the skill's own detector module declares it can decide " +
-      "(SCENARIO_TIERS)."
+    "scenarios = the whitepaper's named attack scenarios for this category, each at the tier"
   );
   console.log(
-    "The whitepaper's per-scenario tiering is a different question: " +
-      "`coverage` reports it from scenarios/registry.yaml."
+    "scenarios/registry.yaml assigns it. Every module's SCENARIO_TIERS mirrors the registry,"
+  );
+  console.log(
+    "so these counts are `coverage`'s counts. A tier is not a coverage claim: only the"
+  );
+  console.log(
+    "static-detectable ones can enter an F1 denominator, and only where a check ships."
+  );
+  console.log("");
+  console.log(
+    "checks = the deterministic checks the module registers in DETECTORS. Counted separately"
+  );
+  console.log(
+    "on purpose — one scenario can take several checks to decide, and several checks decide"
+  );
+  console.log(
+    "no named scenario at all. Each module's CHECK_COVERAGE says which; `audit` runs them."
   );
   if (!options.tier) {
     const advisory = skills.find((s) => !s.isDetector);
     if (advisory) {
+      console.log("");
       console.log(
         `${advisory.name} declares no scenarios and is excluded from every --tier filter.`
       );
@@ -830,12 +877,19 @@ function cmdAudit(target, options) {
     }
   }
   console.log("");
+  // Not SCENARIO_TIERS, which is what this footer used to name. These rows are
+  // CHECK ids out of each module's DETECTORS; what any one of them may claim
+  // over a named scenario is CHECK_COVERAGE's answer, per check.
   console.log(
-    "These are detector-level checks, each module's own SCENARIO_TIERS — not coverage"
+    "These are detector-level CHECKS (each module's DETECTORS) — not coverage of the"
   );
   console.log(
-    "of the whitepaper's named scenarios. See skills/<AST>/coverage-matrix.md and `coverage`."
+    "whitepaper's named scenarios. Each module's CHECK_COVERAGE rules on every check: `full`,"
   );
+  console.log(
+    "`artifact-signal-only`, or `category-precondition`. See skills/<AST>/coverage-matrix.md,"
+  );
+  console.log("and `list` or `coverage` for the per-scenario tiers.");
   return payload.totals.detected > 0 && options.failOnDetect ? 1 : 0;
 }
 

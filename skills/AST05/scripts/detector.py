@@ -8,10 +8,29 @@ Transitive Reference Chaining needs the chain followed, Relay-Node
 Amplification needs the pipeline's per-node backbone models, DoS needs a
 runtime budget, and Malicious Instructions Embedded in Documents is
 agent-judgable. No check in this module therefore claims ``covers: full``, and
-this module can never publish a scenario-level F1 -- ``F1_SCOPE`` is
-``artifact-signal-only`` and travels with every number ``f1_report`` returns.
+this module can never publish a scenario-level F1.
 
-What it does ship is five mechanical checks over the *enabling preconditions*
+TWO TABLES, TWO NAMESPACES
+--------------------------
+``SCENARIO_TIERS`` mirrors ``scenarios/registry.yaml``: canonical scenario ids
+(``AST05-S01`` .. ``AST05-S06``) mapped to the tier the registry assigns them,
+every scenario present, out-of-artifact ones included, and never a tier of this
+module's own invention. It used to be keyed by this module's CHECK slugs with
+five of them written down as ``static-detectable``, which made
+``STATIC_DETECTABLE`` five checks deep and let ``cli/bin/cli.js list`` report
+AST05 as deciding five scenarios in a category that decides none.
+
+Per-CHECK metadata lives in ``CHECK_COVERAGE``, keyed by check id, which is the
+table that answers "what does this check bear on, and how honestly" and the
+table ``scenarios/registry.yaml`` names checks into via
+``artifact_signal_checks``. ``STATIC_DETECTABLE`` is therefore empty here and
+``f1_report`` publishes no number at all (S-003 / gate-4, the same result AST07
+and AST09 reach). The category's proxies are still measured -- per labeled pair,
+under the ``artifact-signal-only`` label ``F1_SCOPE`` carries -- by
+``detectors/fixture_loader.py``, which scores each check against its own corpus
+rather than folding proxies into a scenario denominator.
+
+What this module ships is five mechanical checks over the *enabling preconditions*
 the registry declares as ``artifact_signal`` for four of those scenarios. Each
 is grounded in a preventive mitigation the whitepaper states for AST05:
 
@@ -52,28 +71,35 @@ import re
 from typing import Callable, Iterator
 
 from detectors import pysource
-from detectors.scaffold import Finding, static_detectable
+from detectors.scaffold import Finding, scenario_detectors, static_detectable
 from detectors.scaffold import f1_report as _f1_report
 from detectors.scaffold import f1_scope as _f1_scope
 from detectors.scaffold import run_all as _run_all
 
+#: Tiers keyed by ``scenarios/registry.yaml``'s canonical scenario ids, taken
+#: verbatim from it. All six of AST05's named scenarios are here, including the
+#: out-of-artifact ones: the table mirrors the registry, so a reader of this
+#: module alone counts the same six scenarios and the same tiers a reader of the
+#: registry does. The registry is the authority; this restates it and may never
+#: disagree with it (`skills/AST05/scripts/test_ast05_detector.py` pins the
+#: equality).
 SCENARIO_TIERS: dict[str, str] = {
-    "AST05-fetched-content-instruction-sink": "static-detectable",
-    "AST05-remote-response-executed": "static-detectable",
-    "AST05-absent-instruction-boundary": "static-detectable",
-    "AST05-unrestricted-network-fetch": "static-detectable",
-    "AST05-wildcard-domain-allowlist": "static-detectable",
-    # Whether a fetched instruction was actually *complied with* over the
-    # skill's own stated task needs the transcript read with judgment. The
-    # registry tiers the corresponding named scenario (AST05-S05) agent-judgable
-    # for the same reason; nothing is implemented for it.
-    "AST05-injected-instruction-compliance": "agent-judgable",
+    "AST05-S01": "out-of-artifact",  # Author Rug-Pull
+    "AST05-S02": "out-of-artifact",  # Reviewer Bait-and-Switch
+    "AST05-S03": "out-of-artifact",  # Transitive Reference Chaining
+    "AST05-S04": "out-of-artifact",  # Relay-Node Amplification
+    "AST05-S05": "agent-judgable",  # Malicious Instructions Embedded in Documents
+    "AST05-S06": "out-of-artifact",  # Denial-of-Service (DoS) through Malicious Skills
 }
 
+#: Empty, and that is the category's finding rather than a gap in this file.
 STATIC_DETECTABLE: set[str] = static_detectable(SCENARIO_TIERS)
 
-# Not one of AST05's six named scenarios is static-detectable, so not one check
-# here may claim `covers: full`. Every entry is a declared artifact_signal.
+# Per-CHECK metadata, keyed by check id -- a different namespace from
+# SCENARIO_TIERS above, and the one `scenarios/registry.yaml` names checks into
+# through `artifact_signal_checks`. Not one of AST05's six named scenarios is
+# static-detectable, so not one check here may claim `covers: full`. Every entry
+# is a declared artifact_signal.
 CHECK_COVERAGE: dict[str, dict] = {
     "AST05-fetched-content-instruction-sink": {
         "registry_ids": ["AST05-S01", "AST05-S05"],
@@ -130,6 +156,23 @@ CHECK_COVERAGE: dict[str, dict] = {
             "A '*' or bare-TLD entry in the declared allow-list is the same AST06-S02 "
             "artifact_signal read one field deeper -- an allowlist that is not an allowlist. "
             "Package-decidable, never coverage of the pivot."
+        ),
+    },
+    # Declared and deliberately NOT implemented. It kept its place when this
+    # module's tier table was re-keyed onto registry ids rather than being
+    # dropped: an id the category once declared, silently deleted, reads as a
+    # check that never existed instead of one that was ruled out on purpose.
+    "AST05-injected-instruction-compliance": {
+        "registry_ids": ["AST05-S05"],
+        "covers": "artifact-signal-only",
+        "reason": (
+            "No function ships for this id and none may: whether fetched text was actually "
+            "*complied with* as instruction, rather than used as data, is read off the "
+            "transcript with judgement, which is why the registry tiers AST05-S05 "
+            "agent-judgable and routes it to the judge harness. It is recorded here as a "
+            "proxy on that scenario -- the strongest honest link, since the in-artifact "
+            "evidence AST05-S05 turns on is the handling this module's other checks read -- "
+            "and it is absent from DETECTORS, so it enters no denominator anywhere."
         ),
     },
 }
@@ -616,10 +659,30 @@ DETECTORS: dict[str, Callable[[dict], Finding]] = {
 }
 
 
+#: The registry-keyed view of the checks: every scenario in STATIC_DETECTABLE
+#: mapped to the `covers: full` checks that decide it. Empty for AST05, because
+#: STATIC_DETECTABLE is empty and no check claims `full` -- the two facts are the
+#: same fact, and this is where they meet.
+SCENARIO_DETECTORS: dict[str, Callable[[dict], Finding]] = scenario_detectors(DETECTORS, CHECK_COVERAGE)
+
+
 def run_all(pkg: dict) -> list[Finding]:
     return _run_all(DETECTORS, pkg)
 
 
-def f1_report(fixtures: list[tuple[dict, set[str]]]) -> dict:
-    """Always ``artifact-signal-only``. AST05 has no scenario-level F1 to publish."""
-    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures, F1_SCOPE)
+def f1_report(fixtures: list[tuple[dict, set[str]]] | None = None) -> dict:
+    """No F1 at all: AST05's declared-detectable tier is empty (S-003 / gate-4).
+
+    The denominator is ``scenarios/registry.yaml``'s static-detectable tier for
+    this category, which is the empty set, so this reports
+    ``declared-and-uncovered`` rather than manufacturing a number -- the same
+    result AST07 and AST09 reach for the same reason.
+
+    The five shipped checks are still measured, and it is not this function that
+    measures them: ``detectors/fixture_loader.py`` scores each against its own
+    labeled vulnerable/clean pair and publishes the result under the
+    ``artifact-signal-only`` label ``F1_SCOPE`` carries. That is the whole point
+    of the split -- a proxy F1 exists and is published, and it is never published
+    in a scenario's column.
+    """
+    return _f1_report(STATIC_DETECTABLE, SCENARIO_DETECTORS, fixtures, F1_SCOPE)

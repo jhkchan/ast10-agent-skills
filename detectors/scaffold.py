@@ -20,10 +20,13 @@ scan logic and supply only their own scenario id.
 
 CHECK COVERAGE -- the symmetry axis (tier-doctrine integrity, HIGH)
 -------------------------------------------------------------------
-A module's ``SCENARIO_TIERS`` says only whether a check is *mechanical*. It
-does not say whether the check decides a named whitepaper scenario. Those are
-two different claims, and collapsing them is how the same package-decidable
-predicate came to be read as scenario coverage inside a detector module while
+A module's ``SCENARIO_TIERS`` maps ``scenarios/registry.yaml``'s canonical
+scenario ids to the tier the registry assigns them, and says nothing whatever
+about any individual check. Whether a check is mechanical, and whether it
+decides a named whitepaper scenario, are two further claims that belong to the
+check and not to the tier table; collapsing any of the three is how the same
+package-decidable predicate came to be read as scenario coverage inside a
+detector module while
 ``scenarios/registry.yaml`` recorded it as an ``artifact_signal`` -- a proxy
 that the registry's own ``defining_condition_rule`` says "is never counted as
 coverage of the scenario".
@@ -76,8 +79,60 @@ class Finding:
 
 
 def static_detectable(scenario_tiers: dict[str, str]) -> set[str]:
-    """The static-detectable subset of a module's SCENARIO_TIERS."""
+    """The static-detectable subset of a module's SCENARIO_TIERS.
+
+    ``SCENARIO_TIERS`` is keyed by ``scenarios/registry.yaml``'s canonical
+    scenario ids, so what comes back is a set of SCENARIO ids -- the registry's
+    static-detectable tier for that category, and nothing else.
+    """
     return {s for s, tier in scenario_tiers.items() if tier == "static-detectable"}
+
+
+def scenario_detectors(
+    detectors: dict[str, Callable[[dict], Finding]],
+    check_coverage: dict[str, dict],
+) -> dict[str, Callable[[dict], Finding]]:
+    """A module's checks re-keyed onto the registry scenarios they DECIDE.
+
+    Two namespaces meet in ``f1_report`` and they are not the same one.
+    ``SCENARIO_TIERS`` (and therefore ``STATIC_DETECTABLE``, the F1 denominator)
+    is keyed by registry scenario id; ``DETECTORS`` is keyed by the module's own
+    check ids, and the mapping between them is neither total nor one-to-one.
+    ``AST06-S01``'s defining condition is a disjunction that two checks
+    implement between them, and most checks in this repository decide no named
+    scenario at all. Scoring raw check ids against a scenario-id denominator
+    would score ``tp=0`` on a corpus a working detector labels perfectly,
+    because ``"AST06-host-persistence-write"`` is not ``"AST06-S01"``.
+
+    Only ``covers: full`` checks are folded in, and that is the tier doctrine
+    rather than an implementation convenience: a proxy is never coverage of the
+    scenario it proxies, so an ``artifact-signal-only`` or
+    ``category-precondition`` check may not put a true positive in a scenario's
+    column. A scenario several checks decide between them is detected when any
+    one of them fires, and the firing check's own evidence travels with it.
+
+    Modules whose checks already carry registry ids (AST08, AST10) get the
+    identity mapping back, so passing the result to ``f1_report`` changes
+    nothing for them.
+    """
+    by_scenario: dict[str, list[str]] = {}
+    for check, entry in check_coverage.items():
+        if entry.get("covers") != "full" or check not in detectors:
+            continue
+        for scenario_id in entry.get("registry_ids") or []:
+            by_scenario.setdefault(scenario_id, []).append(check)
+
+    def _decide(scenario_id: str, checks: tuple[str, ...]) -> Callable[[dict], Finding]:
+        def run(pkg: dict) -> Finding:
+            findings = [(check, detectors[check](pkg)) for check in checks]
+            for check, finding in findings:
+                if finding.detected:
+                    return Finding(scenario_id, True, f"{check}: {finding.evidence}")
+            return Finding(scenario_id, False, "; ".join(f"{c}: {f.evidence}" for c, f in findings))
+
+        return run
+
+    return {scenario_id: _decide(scenario_id, tuple(checks)) for scenario_id, checks in by_scenario.items()}
 
 
 def f1_scope(check_coverage: dict[str, dict]) -> str:
@@ -139,6 +194,12 @@ def f1_report(
     pairs. A category whose declared-detectable tier is empty must never
     manufacture a number (S-003 / gate-4); it reports "declared-and-uncovered"
     instead.
+
+    ``static_detectable_scenarios`` is the registry's static-detectable tier, so
+    the ``detectors`` passed here must report findings in that same namespace --
+    ``scenario_detectors(DETECTORS, CHECK_COVERAGE)`` is how a module whose
+    checks carry their own slugs supplies them. Handing this the raw check map
+    when the two namespaces differ scores every case a false negative.
 
     ``scope`` is the module's ``F1_SCOPE`` (see ``f1_scope``) and is returned
     alongside every number, so a proxy F1 cannot be quoted as coverage of a

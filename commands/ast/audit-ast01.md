@@ -64,7 +64,16 @@ lying manifest; AST01 owns a truthful manifest over a malicious body.
 | `AST01-obfuscated-payload-exec` | static-detectable | an encoded blob is decoded straight into an execution sink; the payload is decoded once and reported |
 | `AST01-content-hash-missing` | static-detectable | the manifest declares no signed `content_hash`, so there is nothing to verify the shipped bytes against — an artifact signal, never coverage of a named scenario |
 | `AST01-content-hash-mismatch` | static-detectable | the declared hash disagrees with a sha256 recomputed over the package's sorted (path, content) pairs |
-| `AST01-obfuscated-payload-intent` | agent-judgable | *not implemented as code* — deciding a payload is *intentionally* malicious rather than merely unusual is a semantic reading, not a byte match |
+
+Every row above is a check that runs. Nothing else does: AST01's judged surface —
+`AST01-S01` Typosquatting, `AST01-S03` Instruction Override, `AST01-S04` ClickFix Prompts —
+is tiered `agent-judgable` by `scenarios/registry.yaml` and routed to the judge harness, and
+`AST01-S07` Cognitive Degradation is out-of-artifact. That includes the judged half of the
+obfuscation pair: `AST01-obfuscated-payload-exec` decides only whether a decoded blob reaches
+an execution sink, and deciding a payload is *intentionally* malicious rather than merely
+unusual is a semantic reading no byte match makes. (This table used to carry that half as an
+eleventh row, `AST01-obfuscated-payload-intent`, which was never a check — no function
+computed it — and is not a registry scenario id either.)
 
 Check ids are the detector's own, not registry scenario ids (`AST01-S01`, `AST01-S02`, …).
 Which registry scenario each check maps to — and how honestly it measures that scenario,

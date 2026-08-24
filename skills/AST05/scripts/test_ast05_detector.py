@@ -46,9 +46,39 @@ def script(body: str) -> dict:
 # ------------------------------------------------------------- module contract
 
 
+def test_scenario_tiers_are_the_registrys_six_canonical_ids_and_tiers():
+    """The table restates the registry; it does not get its own opinion.
+
+    It used to be keyed by this module's CHECK slugs, five of them recorded as
+    ``static-detectable`` -- so anything reading the table (``cli/bin/cli.js
+    list`` reads exactly this) was told AST05 decides five scenarios in a
+    category that decides none. Asserted by equality, not by subset, so a
+    scenario cannot be dropped, renamed or re-tiered here without failing.
+    """
+    import pathlib
+
+    import yaml
+
+    registry_path = pathlib.Path(__file__).resolve().parents[3] / "scenarios" / "registry.yaml"
+    registry = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
+    from_registry = {s["id"]: s["tier"] for s in registry["scenarios"] if s["category"] == "AST05"}
+    assert len(from_registry) == 6
+    assert detector.SCENARIO_TIERS == from_registry
+
+
 def test_s001_detector_registry_matches_declared_detectable_tier():
-    declared_detectable = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"}
-    assert set(detector.DETECTORS.keys()) == declared_detectable
+    """S-001 read in the registry's namespace, which is the only one that counts.
+
+    ``STATIC_DETECTABLE`` is now the registry's static-detectable tier for AST05
+    -- the empty set -- so what S-001 pins is that no check may be filed as
+    deciding a named scenario: no ``covers: full`` entry, and nothing in
+    ``SCENARIO_DETECTORS``. The five shipped checks are the ``CHECK_COVERAGE``
+    entries that carry a function; the sixth id is declared and unimplemented.
+    """
+    assert detector.STATIC_DETECTABLE == set()
+    assert {c for c, e in detector.CHECK_COVERAGE.items() if e["covers"] == "full"} == set()
+    assert detector.SCENARIO_DETECTORS == {}
+    assert set(detector.DETECTORS) < set(detector.CHECK_COVERAGE)
     assert "AST05-injected-instruction-compliance" not in detector.DETECTORS
 
 
@@ -58,12 +88,20 @@ def test_ast05_may_never_claim_scenario_level_coverage():
     modes = {entry["covers"] for entry in detector.CHECK_COVERAGE.values()}
     assert modes == {"artifact-signal-only"}, modes
     assert detector.F1_SCOPE == "artifact-signal-only"
-    assert set(detector.CHECK_COVERAGE) == set(detector.DETECTORS)
+    # Every shipped check declares its coverage, and the one declared id that
+    # ships no function keeps its entry rather than vanishing from the record.
+    assert set(detector.DETECTORS) <= set(detector.CHECK_COVERAGE)
+    assert set(detector.CHECK_COVERAGE) - set(detector.DETECTORS) == {"AST05-injected-instruction-compliance"}
 
 
-def test_f1_report_carries_the_artifact_signal_label_with_every_number():
+def test_f1_report_publishes_no_number_because_the_detectable_tier_is_empty():
+    """Was: "carries the artifact-signal label with every number". Same rule, and
+    now there is no number to carry it -- the registry tiers nothing here
+    static-detectable, so gate-4 forbids manufacturing one (S-003). The proxies
+    are still measured, by ``detectors/fixture_loader.py``, per labeled pair."""
     report = detector.f1_report([])
-    assert report["scope"] in {"artifact-signal-only", "none"}
+    assert report == {"status": "declared-and-uncovered", "f1": None, "scope": "none"}
+    assert detector.F1_SCOPE == "artifact-signal-only"
 
 
 # ------------------------------------------------ declared fetch surface (AST06-S02 signal)

@@ -7,6 +7,38 @@ under another category but whose defining condition is a property of *this*
 package's bundled scripts; and two are the pre-existing content-hash controls,
 which decide no named scenario at all and say so in ``CHECK_COVERAGE``.
 
+TWO TABLES, TWO NAMESPACES
+--------------------------
+``SCENARIO_TIERS`` mirrors ``scenarios/registry.yaml``: every one of AST01's
+ELEVEN canonical scenario ids mapped to the tier the registry assigns it, and
+nothing else. It describes the whitepaper's attack surface, not this file's
+code, so it reads seven static-detectable, three agent-judgable and one
+out-of-artifact however many checks happen to ship below. Keyed by check id --
+which is how it used to be keyed -- ``node cli/bin/cli.js list`` printed
+``AST01 [static-detectable x10]`` and told a reader this category decides ten
+scenarios where the registry rules seven.
+
+``CHECK_COVERAGE`` is the per-CHECK table: one entry per mechanical check,
+keyed by check id, naming the registry scenarios the check bears on and what
+it claims over them (``full`` / ``artifact-signal-only`` /
+``category-precondition``). The two namespaces cannot be collapsed into one
+the way AST08's and AST10's can, because three of the ten checks decide no
+AST01 scenario at all: the two content-hash controls and the AST08-S02
+obfuscation check. ``detectors/scaffold.py``'s ``scenario_detectors`` is the
+join between them, and it is what ``f1_report`` scores over.
+
+The old check-keyed table also carried one key that is neither a check nor a
+scenario: ``AST01-obfuscated-payload-intent``, a local slug recording that
+judging a decoded payload's *intent* -- malicious rather than merely unusual --
+is semantic work no byte match does. No function ever computed it, so it is not
+a check and has no ``CHECK_COVERAGE`` entry, and it is not a canonical registry
+id, so it cannot stay in ``SCENARIO_TIERS``. Both halves of what it said
+survive: ``detect_obfuscated_payload_exec`` decides only the mechanical half (a
+decoded blob reaching an execution sink) and its ``CHECK_COVERAGE`` entry says
+so, and AST01's genuinely judged surface is now stated outright and by name --
+AST01-S01 Typosquatting, AST01-S03 Instruction Override, AST01-S04 ClickFix
+Prompts -- instead of being represented by one invented slug.
+
 WHAT EACH CHECK IS ANCHORED TO
 ------------------------------
 Every rule below is the mechanism the whitepaper describes, not a keyword
@@ -78,6 +110,7 @@ from detectors.scaffold import (
     network_allowlist,
     network_unbounded,
     permissions,
+    scenario_detectors,
     static_detectable,
 )
 from detectors.scaffold import f1_report as _f1_report
@@ -85,28 +118,36 @@ from detectors.scaffold import f1_scope as _f1_scope
 from detectors.scaffold import run_all as _run_all
 from validators.usf import network_egress_allowed, write_allowed
 
+#: AST01's eleven canonical scenarios and the tier `scenarios/registry.yaml`
+#: assigns each one, verbatim and complete -- including the three it judges and
+#: the one it puts out of reach. Keyed by registry id, never by check id: this
+#: table is a statement about the whitepaper's attack surface, not about the
+#: code below it, and `tests/test_coverage_matrix_ast01_ast03.py` reads the
+#: registry as the authority on every row.
 SCENARIO_TIERS: dict[str, str] = {
-    "AST01-content-hash-missing": "static-detectable",
-    "AST01-content-hash-mismatch": "static-detectable",
-    "AST01-social-engineering-prerequisites": "static-detectable",
-    "AST01-soul-md-persistence": "static-detectable",
-    "AST01-memory-poisoning": "static-detectable",
-    "AST01-identity-clone-exfiltration": "static-detectable",
-    "AST01-websocket-c2": "static-detectable",
-    "AST01-undeclared-egress": "static-detectable",
-    "AST01-hidden-output-injection": "static-detectable",
-    "AST01-obfuscated-payload-exec": "static-detectable",
-    # Judging whether a payload is *intentionally* malicious (vs. merely
-    # unusual) needs semantic judgment a static pattern cannot supply.
-    "AST01-obfuscated-payload-intent": "agent-judgable",
+    "AST01-S01": "agent-judgable",  # Typosquatting
+    "AST01-S02": "static-detectable",  # Social Engineering Prerequisites
+    "AST01-S03": "agent-judgable",  # Instruction Override
+    "AST01-S04": "agent-judgable",  # ClickFix Prompts
+    "AST01-S05": "static-detectable",  # SOUL.md Persistence
+    "AST01-S06": "static-detectable",  # Memory Poisoning
+    "AST01-S07": "out-of-artifact",  # Cognitive Degradation and Agent Drift
+    "AST01-S08": "static-detectable",  # Identity Cloning and Impersonation
+    "AST01-S09": "static-detectable",  # WebSocket Hijacking
+    "AST01-S10": "static-detectable",  # Data Exfiltration
+    "AST01-S11": "static-detectable",  # Hidden Prompt Injection in Skill Output
 }
 
+#: The seven AST01 scenarios the registry rules decidable from one package.
+#: A set of SCENARIO ids -- see `SCORED_CHECKS` below for the F1 denominator,
+#: which is a set of CHECK ids and is deliberately not the same set.
 STATIC_DETECTABLE: set[str] = static_detectable(SCENARIO_TIERS)
 
 # What each mechanical check actually COVERS, in fixtures/manifest.yaml's own
-# vocabulary. `static-detectable` above says the check is deterministic; this
-# says whether it decides a named whitepaper scenario. Both halves are needed
-# or the tier reads as a coverage claim it does not make.
+# vocabulary, keyed by CHECK id. `SCENARIO_TIERS` above says what the registry
+# rules about a scenario; this says which scenarios a shipped check bears on
+# and what it claims over them. Both halves are needed or a tier reads as a
+# coverage claim it does not make.
 CHECK_COVERAGE: dict[str, dict] = {
     "AST01-content-hash-missing": {
         "registry_ids": ["AST05-S01", "AST07-S01"],
@@ -771,6 +812,9 @@ def detect_obfuscated_payload_exec(pkg: dict) -> Finding:
     return Finding(scenario, False, "no encoded blob is decoded into an execution sink")
 
 
+#: The ten mechanical checks, keyed by CHECK id. This is the namespace the CLI
+#: reports a finding under and the one `fixtures/manifest.yaml` names in each
+#: labeled case's `detector_check`; it is NOT the scenario namespace above.
 DETECTORS: dict[str, Callable[[dict], Finding]] = {
     "AST01-content-hash-missing": detect_content_hash_missing,
     "AST01-content-hash-mismatch": detect_content_hash_mismatch,
@@ -784,10 +828,49 @@ DETECTORS: dict[str, Callable[[dict], Finding]] = {
     "AST01-obfuscated-payload-exec": detect_obfuscated_payload_exec,
 }
 
+#: The same checks re-keyed onto the registry scenarios they DECIDE, which is
+#: the namespace `SCENARIO_TIERS` and `scenarios/registry.yaml` are in. Only
+#: `covers: full` checks fold in, and that is the tier doctrine rather than a
+#: convenience: a proxy is never coverage of the scenario it proxies, so the two
+#: content-hash controls are absent here by ruling, not by oversight.
+SCENARIO_DETECTORS: dict[str, Callable[[dict], Finding]] = scenario_detectors(DETECTORS, CHECK_COVERAGE)
+
+#: The F1 denominator: every registry scenario a `covers: full` check here
+#: decides. That is AST01's seven static-detectable scenarios plus AST08-S02 --
+#: filed by the whitepaper under another category, decided here from an AST01
+#: package's own bundled script, and published for exactly that reason as the
+#: eighth labeled check in `fixtures/manifest.yaml`. Empty whenever the registry
+#: tiers nothing in this category static-detectable, which is the gate-4 / S-003
+#: guard `f1_report` reads: an empty detectable tier publishes no number at all
+#: rather than manufacturing one.
+SCORED_SCENARIOS: set[str] = set(SCENARIO_DETECTORS) if STATIC_DETECTABLE else set()
+
 
 def run_all(pkg: dict) -> list[Finding]:
     return _run_all(DETECTORS, pkg)
 
 
-def f1_report(fixtures: list[tuple[dict, set[str]]]) -> dict:
-    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures, F1_SCOPE)
+def _scenario_labels(expected: set[str]) -> set[str]:
+    """One fixture's expected labels, in the scenario namespace.
+
+    `fixtures/manifest.yaml` labels every case with a registry `scenario_id` and
+    records the CHECK it was measured against (`detector_check`), and
+    `detectors/corpus.py` hands the scorer the check id. `SCORED_SCENARIOS` is a
+    set of scenario ids, so a check-id label is resolved through
+    `CHECK_COVERAGE` to the scenarios that check decides, and a label that is
+    already a registry id passes through untouched. Only `covers: full` links
+    resolve: a proxy label may not put a true positive in a scenario's column.
+    """
+    resolved: set[str] = set()
+    for label in expected:
+        entry = CHECK_COVERAGE.get(label)
+        if entry is None:
+            resolved.add(label)
+        elif entry["covers"] == "full":
+            resolved.update(entry["registry_ids"])
+    return resolved
+
+
+def f1_report(fixtures: list[tuple[dict, set[str]]] | None = None) -> dict:
+    labeled = [(pkg, _scenario_labels(expected)) for pkg, expected in (fixtures or [])]
+    return _f1_report(SCORED_SCENARIOS, SCENARIO_DETECTORS, labeled, F1_SCOPE)

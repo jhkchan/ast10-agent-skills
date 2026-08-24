@@ -32,6 +32,29 @@ and zero-width characters invisible to human reviewers") and is declared
 ``category-precondition``. AST04-S01 (Brand Impersonation) is agent-judgable and
 AST04-S05 (Staged Loader) out-of-artifact; neither has a check, by tier.
 
+TWO NAMESPACES, AND WHICH TABLE HOLDS WHICH
+-------------------------------------------
+``SCENARIO_TIERS`` is keyed by ``scenarios/registry.yaml``'s canonical scenario
+ids and carries the tier the registry assigns each one, verbatim. It enumerates
+ALL SEVEN of AST04's named scenarios -- the five static-detectable ones, plus
+agent-judgable AST04-S01 and out-of-artifact AST04-S05 -- and it never disagrees
+with the registry: the registry decides tier, this table mirrors it.
+
+It used to be keyed by this module's own check slugs, with all six shipped
+checks listed as ``static-detectable``. Anything reading the table for a tier
+count therefore read "AST04 decides six scenarios" -- ``cli/bin/cli.js list``
+printed exactly that -- when the registry rules FIVE AST04 scenarios
+static-detectable, and one of those six checks
+(``AST04-invisible-unicode-smuggling``) decides no named scenario in any
+category at all. Re-keying removes both overstatements in one move.
+
+Nothing check-keyed was lost, because the per-check table already existed:
+``CHECK_COVERAGE`` below is keyed by CHECK id and says, for each of the six
+shipped checks, which registry scenarios it bears on and what it claims over
+them (``full`` / ``artifact-signal-only`` / ``category-precondition``). Six
+checks, seven scenarios, five of them decided -- three different counts, and
+the two tables keep them apart.
+
 SECURITY NOTE
 -------------
 This module NEVER calls ``yaml.load()``/``UnsafeLoader`` on scanned content --
@@ -52,6 +75,7 @@ from detectors.scaffold import (
     file_scopes,
     network_allowlist,
     permissions,
+    scenario_detectors,
     shell_granted,
     static_detectable,
 )
@@ -63,17 +87,40 @@ from detectors.scaffold import f1_scope as _f1_scope
 from detectors.scaffold import run_all as _run_all
 from validators.usf import RISK_TIERS, derive_risk_tier
 
+#: Tiers keyed by ``scenarios/registry.yaml``'s canonical scenario ids, all
+#: seven of them, with the registry's tier for each. The registry is
+#: authoritative and this map mirrors it;
+#: ``test_the_registry_is_the_authority_for_these_seven_tiers`` in this
+#: directory's test module pins the two equal by construction, so a tier cannot
+#: be invented, softened or omitted here.
 SCENARIO_TIERS: dict[str, str] = {
-    "AST04-permission-understating": "static-detectable",
-    "AST04-risk-tier-spoofing": "static-detectable",
-    "AST04-yaml-injection": "static-detectable",
-    "AST04-json-injection": "static-detectable",
-    "AST04-toml-injection": "static-detectable",
-    "AST04-invisible-unicode-smuggling": "static-detectable",
+    # Brand Impersonation -- name, author and description all ship in the
+    # package, but deciding they imply a vendor relationship needs a trademark
+    # and vendor-namespace corpus the package does not carry.
+    "AST04-S01": "agent-judgable",
+    "AST04-S02": "static-detectable",  # Permission Understating
+    "AST04-S03": "static-detectable",  # Risk Tier Spoofing
+    "AST04-S04": "static-detectable",  # YAML Code Execution
+    # Staged Loader -- the staging structure is visible; the pulled package
+    # that makes it an attack is resolved off-artifact at install time.
+    "AST04-S05": "out-of-artifact",
+    "AST04-S06": "static-detectable",  # JSON Prototype Pollution
+    "AST04-S07": "static-detectable",  # TOML / Config Injection
 }
 
+#: The registry's static-detectable tier for AST04: five SCENARIO ids, and the
+#: F1 denominator. Deliberately NOT the set of shipped checks -- there are six
+#: of those, and the sixth decides no named scenario, which is what
+#: ``CHECK_COVERAGE`` records and what keeps it out of this set.
 STATIC_DETECTABLE: set[str] = static_detectable(SCENARIO_TIERS)
 
+# What each mechanical check actually COVERS, in fixtures/manifest.yaml's own
+# vocabulary, keyed by CHECK id -- the id a Finding carries, the id
+# fixtures/manifest.yaml's `detector_check` names, and the id
+# config/dogfood_waivers.yml matches on. SCENARIO_TIERS above says what the
+# registry rules about a scenario; this says which scenarios a shipped check
+# bears on and what it claims over them. Both halves are needed, or a tier
+# reads as a coverage claim it does not make.
 CHECK_COVERAGE: dict[str, dict] = {
     "AST04-permission-understating": {
         "registry_ids": ["AST04-S02"],
@@ -489,4 +536,20 @@ def run_all(pkg: dict) -> list[Finding]:
 
 
 def f1_report(fixtures: list[tuple[dict, set[str]]]) -> dict:
-    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures, F1_SCOPE)
+    """F1 over the registry's static-detectable tier, in registry ids.
+
+    ``STATIC_DETECTABLE`` is a set of SCENARIO ids while ``DETECTORS`` is keyed
+    by this module's check slugs, so the raw check map cannot be scored against
+    it -- ``"AST04-yaml-injection"`` is not ``"AST04-S04"`` and every case would
+    come back a false negative. ``scenario_detectors`` folds the ``covers: full``
+    checks onto the scenarios they decide, which is also the tier doctrine: the
+    invisible-Unicode category precondition decides no named scenario and so
+    never puts a true positive in one's column. ``fixtures`` therefore carries
+    expected sets of registry scenario ids.
+    """
+    return _f1_report(
+        STATIC_DETECTABLE,
+        scenario_detectors(DETECTORS, CHECK_COVERAGE),
+        fixtures,
+        F1_SCOPE,
+    )

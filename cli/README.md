@@ -33,6 +33,33 @@ node cli/bin/cli.js status
 Every command takes `--json`. `audit` takes `--fail-on-detect`, which exits 1 when any
 check fires — the form to use in a pre-install gate.
 
+### Reading a `list` row
+
+Each row prints two counts, under two different nouns, because they are two different
+quantities:
+
+```
+  AST01    ast01-malicious-skills
+           11 scenarios: 7 static-detectable, 3 agent-judgable, 1 out-of-artifact  ·  10 checks shipped
+```
+
+**scenarios** are the whitepaper's named attack scenarios for the category, at the tier
+`scenarios/registry.yaml` assigns each one. `list` reads them from the module's
+`SCENARIO_TIERS`, which mirrors the registry, so these are the same numbers `coverage`
+prints from the registry directly. **checks** is the size of the module's `DETECTORS` map.
+
+The distinction is load-bearing and it was once got wrong here. While `SCENARIO_TIERS` was
+keyed by check ids in six of the ten modules, `list` counted checks and labeled them with a
+scenario tier — printing `AST01 [static-detectable x10]` against a registry that rules
+seven AST01 scenarios static-detectable. One scenario can take several checks to decide,
+and several checks decide no named scenario at all; each module's `CHECK_COVERAGE` rules on
+every check individually, and `tests/test_scenario_tiers_are_registry_keyed.py` keeps the
+two tables from merging again.
+
+`--tier` filters to the skills that *declare* at least one scenario at that tier — for
+`out-of-artifact` that is the tier no package can decide, so it selects categories by what
+they publish as out of reach, not by what they detect.
+
 ### What it reads directly, and what it delegates
 
 `cli/bin/cli.js` reads **data** out of the repository's own artifacts: SKILL.md
@@ -70,11 +97,13 @@ Two package views are used, deliberately:
   or `pyproject.toml` is exactly where AST04's findings live and neither is part of that
   surface.
 
-The findings are detector-level checks — each module's own `SCENARIO_TIERS` — and are
+The findings are detector-level **checks** — each module's own `DETECTORS` — and are
 **not** coverage of the whitepaper's named scenarios. Each module's `CHECK_COVERAGE` says
 so per check, in `fixtures/manifest.yaml`'s vocabulary (`full`, `artifact-signal-only`,
 `category-precondition`), and `f1_report` returns the resulting `F1_SCOPE` beside any
-number. For the full picture, read
+number. The per-*scenario* tiers are a different table, `SCENARIO_TIERS`, which mirrors
+`scenarios/registry.yaml` and is what `list` and `coverage` count. For the full picture,
+read
 `skills/<AST>/coverage-matrix.md`, or run `coverage`, which reports what each category
 publishes and, where it publishes no F1, which of the two distinct reasons applies:
 

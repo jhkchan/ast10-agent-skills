@@ -27,6 +27,13 @@ Account Takeover        the legitimate signing key verifies exactly as an honest
                         release does. The registry records no in-package signal.
 ======================  =========================================================
 
+``SCENARIO_TIERS`` below is that table in code, keyed by the registry's own
+canonical ids rather than by this module's check slugs, so what
+``node cli/bin/cli.js list`` counts is scenarios the registry tiers and not
+checks this file happens to ship. ``CHECK_COVERAGE`` stays keyed by check id
+and is where the per-check claim lives; ``detectors/scaffold.py``'s
+``scenario_detectors`` joins the two for scoring.
+
 THE ONE CHECK
 -------------
 AST02-S03's defining condition, in the whitepaper's own words, is "execution
@@ -63,20 +70,33 @@ import json
 import re
 from typing import Callable
 
-from detectors.scaffold import Finding, static_detectable
+from detectors.scaffold import Finding, scenario_detectors, static_detectable
 from detectors.scaffold import f1_report as _f1_report
 from detectors.scaffold import f1_scope as _f1_scope
 from detectors.scaffold import run_all as _run_all
 
+#: AST02's four canonical scenarios and the tier `scenarios/registry.yaml`
+#: assigns each one, verbatim and complete. Keyed by registry id, never by
+#: check id: this table states what the whitepaper's attack surface is and what
+#: the registry rules about it, not what this file implements. Keyed by check
+#: id -- which is how it used to be keyed -- it happened to agree with the
+#: registry's counts here, but only by coincidence of a one-to-one slug map,
+#: and `node cli/bin/cli.js list` had no way to tell that from AST01's
+#: ten-checks-for-seven-scenarios overclaim.
 SCENARIO_TIERS: dict[str, str] = {
-    "AST02-config-file-hijacking": "static-detectable",
-    "AST02-registry-flooding": "out-of-artifact",
-    "AST02-dependency-confusion": "out-of-artifact",
-    "AST02-maintainer-account-takeover": "out-of-artifact",
+    "AST02-S01": "out-of-artifact",  # Registry Flooding
+    "AST02-S02": "out-of-artifact",  # Dependency Confusion
+    "AST02-S03": "static-detectable",  # Config-File Hijacking
+    "AST02-S04": "out-of-artifact",  # Maintainer Account Takeover
 }
 
+#: The one AST02 scenario the registry rules decidable from a single package.
+#: A set of SCENARIO ids; `SCORED_SCENARIOS` below is the F1 denominator.
 STATIC_DETECTABLE: set[str] = static_detectable(SCENARIO_TIERS)
 
+# What the one mechanical check COVERS, keyed by CHECK id. `SCENARIO_TIERS`
+# above says what the registry rules about a scenario; this says which scenario
+# the shipped check bears on and what it claims over it.
 CHECK_COVERAGE: dict[str, dict] = {
     "AST02-config-file-hijacking": {
         "registry_ids": ["AST02-S03"],
@@ -263,14 +283,50 @@ def detect_config_file_hijacking(pkg: dict) -> Finding:
     )
 
 
+#: The one mechanical check, keyed by CHECK id -- the namespace the CLI reports
+#: a finding under and the one `fixtures/manifest.yaml` names in each labeled
+#: case's `detector_check`. Not the scenario namespace above.
 DETECTORS: dict[str, Callable[[dict], Finding]] = {
     "AST02-config-file-hijacking": detect_config_file_hijacking,
 }
+
+#: The same check re-keyed onto the registry scenario it DECIDES, which is the
+#: namespace `SCENARIO_TIERS` is in. `covers: full` only, so a proxy could never
+#: reach a scenario's column here. See detectors/scaffold.py::scenario_detectors.
+SCENARIO_DETECTORS: dict[str, Callable[[dict], Finding]] = scenario_detectors(DETECTORS, CHECK_COVERAGE)
+
+#: The F1 denominator: the registry scenarios a `covers: full` check here
+#: decides, which for this category is exactly AST02-S03. Empty whenever the
+#: registry tiers nothing in AST02 static-detectable -- the gate-4 / S-003
+#: guard `f1_report` reads before it will publish any number at all.
+SCORED_SCENARIOS: set[str] = set(SCENARIO_DETECTORS) if STATIC_DETECTABLE else set()
 
 
 def run_all(pkg: dict) -> list[Finding]:
     return _run_all(DETECTORS, pkg)
 
 
+def _scenario_labels(expected: set[str]) -> set[str]:
+    """One fixture's expected labels, in the scenario namespace.
+
+    `fixtures/manifest.yaml` labels every case with a registry `scenario_id` and
+    records the CHECK it was measured against (`detector_check`), and
+    `detectors/corpus.py` hands the scorer the check id. `SCORED_SCENARIOS` is a
+    set of scenario ids, so a check-id label is resolved through
+    `CHECK_COVERAGE` to the scenario that check decides, and a label that is
+    already a registry id passes through untouched. Only `covers: full` links
+    resolve: a proxy label may not put a true positive in a scenario's column.
+    """
+    resolved: set[str] = set()
+    for label in expected:
+        entry = CHECK_COVERAGE.get(label)
+        if entry is None:
+            resolved.add(label)
+        elif entry["covers"] == "full":
+            resolved.update(entry["registry_ids"])
+    return resolved
+
+
 def f1_report(fixtures: list[tuple[dict, set[str]]] | None = None) -> dict:
-    return _f1_report(STATIC_DETECTABLE, DETECTORS, fixtures, F1_SCOPE)
+    labeled = [(pkg, _scenario_labels(expected)) for pkg, expected in (fixtures or [])]
+    return _f1_report(SCORED_SCENARIOS, SCENARIO_DETECTORS, labeled, F1_SCOPE)

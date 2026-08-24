@@ -40,10 +40,82 @@ def pkg(permissions: dict | None = None, files: dict | None = None) -> dict:
 # ---------------------------------------------------------------- module shape
 
 
+def test_scenario_tiers_are_the_registrys_five_canonical_ids_and_tiers():
+    """The table restates the registry; it does not get its own opinion.
+
+    It used to be keyed by this module's CHECK slugs, five of them recorded as
+    ``static-detectable`` -- so anything reading the table (``cli/bin/cli.js
+    list`` reads exactly this) was told AST06 decides five scenarios when the
+    registry rules exactly one of its five decidable. Asserted by equality, not
+    by subset, so a scenario cannot be dropped, renamed or re-tiered here
+    without failing.
+    """
+    import pathlib
+
+    import yaml
+
+    registry_path = pathlib.Path(__file__).resolve().parents[3] / "scenarios" / "registry.yaml"
+    registry = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
+    from_registry = {s["id"]: s["tier"] for s in registry["scenarios"] if s["category"] == "AST06"}
+    assert len(from_registry) == 5
+    assert detector.SCENARIO_TIERS == from_registry
+
+
 def test_s001_detector_registry_matches_declared_detectable_tier():
-    declared_detectable = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"}
-    assert set(detector.DETECTORS.keys()) == declared_detectable
+    """S-001 read in the registry's namespace, which is the only one that counts.
+
+    ``STATIC_DETECTABLE`` is the registry's static-detectable tier -- AST06-S01
+    alone -- and what S-001 pins is that the module ships a decider for exactly
+    that tier: ``SCENARIO_DETECTORS`` covers it and nothing else. The five
+    shipped checks are a different count of a different thing, and the sixth
+    declared id ships no function.
+    """
+    assert detector.STATIC_DETECTABLE == {"AST06-S01"}
+    assert set(detector.SCENARIO_DETECTORS) == detector.STATIC_DETECTABLE
+    assert set(detector.DETECTORS) < set(detector.CHECK_COVERAGE)
     assert "AST06-cross-skill-data-leak" not in detector.DETECTORS
+
+
+def test_ast06_s01_is_decided_by_either_disjunct_not_by_a_check_named_after_it():
+    """The join between the two namespaces, exercised rather than asserted.
+
+    The F1 denominator is a registry scenario id; the checks carry their own
+    slugs. Feeding the raw check map to `f1_report` would score tp=0 on a corpus
+    a working detector labels perfectly, because "AST06-root-write-scope" is not
+    "AST06-S01". `SCENARIO_DETECTORS` is the translation, and AST06-S01's
+    defining condition being a disjunction means EITHER disjunct decides it.
+    """
+    script_side = {
+        "manifest": {"permissions": {"write": ["./out"], "deny_write": []}},
+        "files": {"scripts/persist.py": _CRON_ESCAPE},
+    }
+    manifest_side = {"manifest": {"permissions": {"write": ["/"], "deny_write": []}}, "files": {}}
+    neither = {"manifest": {"permissions": {"write": ["./out"], "deny_write": []}}, "files": {}}
+
+    decide = detector.SCENARIO_DETECTORS["AST06-S01"]
+    assert decide(script_side).detected is True
+    assert "AST06-host-persistence-write" in decide(script_side).evidence
+    assert decide(manifest_side).detected is True
+    assert "AST06-root-write-scope" in decide(manifest_side).evidence
+    assert decide(neither).detected is False
+
+    report = detector.f1_report([(script_side, {"AST06-S01"}), (neither, set())])
+    assert (report["tp"], report["fp"], report["fn"]) == (1, 0, 0)
+    assert report["f1"] == 1.0
+    assert report["scope"] == detector.F1_SCOPE
+
+
+def test_a_proxy_check_never_puts_a_true_positive_in_a_scenarios_column():
+    """The doctrine, mechanised where it would otherwise leak.
+
+    `AST06-missing-sandbox-declaration` fires on a package with no permissions
+    block at all, and it is `covers: artifact-signal-only` on AST10-S04. If
+    proxies were folded into `SCENARIO_DETECTORS`, that package would score a
+    true positive for AST06-S01 Host Escape, which it does not demonstrate.
+    """
+    no_permissions = {"manifest": {}, "files": {}}
+    assert detector.detect_missing_sandbox_declaration(no_permissions).detected is True
+    assert detector.SCENARIO_DETECTORS["AST06-S01"](no_permissions).detected is False
 
 
 def test_the_two_checks_that_decide_ast06_s01_claim_full_and_nothing_else_does():

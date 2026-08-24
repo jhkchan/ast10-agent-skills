@@ -363,19 +363,32 @@ def test_every_manifest_case_path_is_listed_in_the_matrix(category, matrices, ma
 
 @pytest.mark.parametrize("category", AUTHORED)
 def test_every_declared_detector_scenario_id_is_accounted_for(category, matrices):
-    """A check cannot be added to the module without the matrix saying what it covers."""
+    """A check cannot be added to the module without the matrix saying what it covers.
+
+    Both of the module's tables are held to the page, because they say different
+    things: `SCENARIO_TIERS` names the registry scenarios the category has, and
+    `CHECK_COVERAGE` names the checks it ships. A matrix that accounted for one
+    and not the other would let a whole check, or a whole scenario, go unwritten.
+    """
     _, body = matrices[category]
     module = _load_detector(category)
-    for scenario_id in module.SCENARIO_TIERS:
-        assert f"`{scenario_id}`" in body, (
-            f"{category}/scripts/detector.py declares {scenario_id} but the coverage matrix does not account for it"
+    for declared_id in {*module.SCENARIO_TIERS, *module.CHECK_COVERAGE}:
+        assert f"`{declared_id}`" in body, (
+            f"{category}/scripts/detector.py declares {declared_id} but the coverage matrix does not account for it"
         )
 
 
 @pytest.mark.parametrize("category", AUTHORED)
 def test_implemented_detectors_are_a_subset_of_the_declared_ids(category):
+    """The declared ids a shipped check answers to are `CHECK_COVERAGE`'s keys.
+
+    Not `SCENARIO_TIERS`': that table is keyed by `scenarios/registry.yaml`'s
+    scenario ids and says nothing about any individual check, so asserting
+    `DETECTORS <= SCENARIO_TIERS` would be asserting the conflation this
+    repository removed.
+    """
     module = _load_detector(category)
-    assert set(module.DETECTORS) <= set(module.SCENARIO_TIERS)
+    assert set(module.DETECTORS) <= set(module.CHECK_COVERAGE)
     assert module.STATIC_DETECTABLE == {s for s, t in module.SCENARIO_TIERS.items() if t == "static-detectable"}
 
 

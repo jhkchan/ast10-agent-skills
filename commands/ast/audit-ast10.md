@@ -72,9 +72,13 @@ covers the case where the bytes are opaque until decoded.
 
 ## Checks this command runs
 
-`Tier` is the mechanism tier (`SCENARIO_TIERS`); `Covers` is the separate question
-(`CHECK_COVERAGE`) of whether deciding it covers a named whitepaper scenario. AST10 ships
-exactly one check, and it does.
+`Tier` is the check's own mechanism tier: is it decidable from bytes? (It is not read
+from `SCENARIO_TIERS`, which mirrors `scenarios/registry.yaml`'s per-SCENARIO tiering
+and says nothing about any individual check.) `Covers` is the separate question
+(`CHECK_COVERAGE`): does deciding it cover a named whitepaper scenario? AST10 ships
+exactly one check, and it does. That check is named after the single scenario it decides
+in full, so `AST10-S06` reads in both columns — an identity, not the two tables collapsing
+into one.
 
 | Check id | Tier | Covers | Fires when |
 | --- | --- | --- | --- |

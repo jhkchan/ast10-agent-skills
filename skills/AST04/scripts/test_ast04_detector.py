@@ -105,8 +105,94 @@ TIER_SPOOF_CLEAN = _tier_pkg("L3")
 
 
 def test_s001_detector_registry_matches_declared_detectable_tier():
+    """Re-pointed for the registry keying, not weakened.
+
+    The old form read `set(DETECTORS) == {slugs tiered static-detectable}`, which
+    held only while `SCENARIO_TIERS` was keyed by this module's own check slugs and
+    all six shipped checks were listed there as static-detectable. Two counts were
+    wrong at once: the registry rules FIVE AST04 scenarios static-detectable, and
+    the sixth check decides no named scenario at all. The claim the assertion made
+    -- the declared-detectable tier is answered by shipped code, and nothing else
+    reaches the F1 denominator -- now runs through `CHECK_COVERAGE`.
+    """
     declared_detectable = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"}
-    assert set(detector.DETECTORS.keys()) == declared_detectable
+    assert declared_detectable == {"AST04-S02", "AST04-S03", "AST04-S04", "AST04-S06", "AST04-S07"}
+
+    decided = {
+        rid
+        for check, entry in detector.CHECK_COVERAGE.items()
+        if entry["covers"] == "full" and check in detector.DETECTORS
+        for rid in entry["registry_ids"]
+    }
+    assert decided == declared_detectable, (
+        "each of AST04's five static-detectable scenarios is claimed by exactly one "
+        "shipped covers: full check, and no other scenario is claimed"
+    )
+    # Every shipped check declares what it covers, and nothing is declared that
+    # does not ship: the two check-keyed tables are the same set of ids.
+    assert set(detector.CHECK_COVERAGE) == set(detector.DETECTORS)
+    assert len(detector.DETECTORS) == 6, "six checks, five decided scenarios -- different counts"
+
+
+def test_the_registry_is_the_authority_for_these_seven_tiers():
+    """The module restates `scenarios/registry.yaml`; it does not get its own opinion.
+
+    `SCENARIO_TIERS` used to name six check slugs, all static-detectable, so a reader
+    checking the module alone -- or `node cli/bin/cli.js list`, which prints these
+    counts under tier labels -- was told AST04 decides six scenarios. It has seven,
+    five of them static-detectable. Equality against the registry is what stops that
+    gap reopening in either direction, and it is what carries agent-judgable
+    AST04-S01 and out-of-artifact AST04-S05 into the module at all.
+    """
+    import yaml
+
+    registry = yaml.safe_load((REPO_ROOT / "scenarios" / "registry.yaml").read_text(encoding="utf-8"))
+    from_registry = {s["id"]: s["tier"] for s in registry["scenarios"] if s["category"] == "AST04"}
+    assert len(from_registry) == 7
+    assert detector.SCENARIO_TIERS == from_registry
+    assert detector.SCENARIO_TIERS["AST04-S01"] == "agent-judgable"
+    assert detector.SCENARIO_TIERS["AST04-S05"] == "out-of-artifact"
+
+
+def test_the_invisible_unicode_check_ships_but_decides_no_scenario():
+    """The check the old tier table counted as a sixth static-detectable scenario.
+
+    It is mechanical and it ships, so it stays in `DETECTORS` and in
+    `CHECK_COVERAGE` with its `category-precondition` ruling intact. What it may not
+    do is occupy a slot in the registry's static-detectable tier, which is the
+    slot the slug-keyed table gave it.
+    """
+    check = "AST04-invisible-unicode-smuggling"
+    assert check in detector.DETECTORS
+    assert detector.CHECK_COVERAGE[check]["covers"] == "category-precondition"
+    assert detector.CHECK_COVERAGE[check]["registry_ids"] == []
+    assert check not in detector.SCENARIO_TIERS
+    assert check not in detector.STATIC_DETECTABLE
+
+
+def test_the_f1_denominator_is_scenario_ids_and_the_precondition_stays_out_of_it():
+    from detectors.scaffold import scenario_detectors
+
+    assert len(detector.STATIC_DETECTABLE) == 5
+    assert set(detector.DETECTORS) != detector.STATIC_DETECTABLE
+    assert set(scenario_detectors(detector.DETECTORS, detector.CHECK_COVERAGE)) == detector.STATIC_DETECTABLE
+
+
+def test_f1_report_scores_the_corpus_in_registry_ids():
+    """Handing `f1_report` the raw check map would score every case a false negative:
+    `"AST04-yaml-injection"` is not `"AST04-S04"`."""
+    report = detector.f1_report(
+        [
+            (YAML_TAG_VULN, {"AST04-S04"}),
+            (YAML_CLEAN, set()),
+            (JSON_VULN, {"AST04-S06"}),
+            (JSON_CLEAN, set()),
+        ]
+    )
+    assert report["status"] == "measured"
+    assert report["scope"] == detector.F1_SCOPE
+    assert (report["tp"], report["fp"], report["fn"]) == (2, 0, 0)
+    assert report["f1"] == 1.0
 
 
 def test_every_static_detectable_registry_scenario_has_a_check():

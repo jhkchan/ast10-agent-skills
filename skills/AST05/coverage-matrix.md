@@ -35,9 +35,11 @@ Bait-and-Switch, chaining, relay amplification, or DoS would be false.
 **Authority chain.** `scenarios/registry.yaml` is authoritative on tier; this file
 reproduces its tiering and may not diverge from it. `fixtures/manifest.yaml` is
 authoritative on which fixture cases exist. `SCENARIO_TIERS` inside
-`skills/AST05/scripts/detector.py` says only whether each *check* is mechanical; it
-never says a check covers a named scenario. That second question is answered by the
-module's `CHECK_COVERAGE`, and for AST05 every entry answers
+`skills/AST05/scripts/detector.py` restates that registry tiering verbatim, keyed by the
+same canonical scenario ids, and says nothing whatever about any individual check —
+which is why `STATIC_DETECTABLE` is empty here and the module publishes no F1 at all.
+Whether a check is mechanical, and whether it covers a named scenario, are answered by
+the module's `CHECK_COVERAGE`, and for AST05 every entry answers
 `artifact-signal-only` — see
 [Detector checks that are not whitepaper scenarios](#detector-checks-that-are-not-whitepaper-scenarios).
 `tests/test_tier_doctrine_symmetry.py` fails if a check ever claims otherwise while the
@@ -55,7 +57,7 @@ omission.
 | `AST05-S02` | Reviewer Bait-and-Switch | out-of-artifact | `—` | The URL serves clean content keyed on IP, user-agent, or timing and malicious content to live runs. The package is identical in the reviewed case and the exploited case; only the server differs. The registry records no `artifact_signal` for this scenario at all — there is nothing in the artifact that even hints at it. |
 | `AST05-S03` | Transitive Reference Chaining | out-of-artifact | `—` | Everything after the first hop lives on remote servers. The package shows one reference; the chain's depth, destinations, and content are discoverable only by fetching and following. |
 | `AST05-S04` | Relay-Node Amplification | out-of-artifact | `—` | The whitepaper states the property directly: "a chain's injection resistance is the minimum over the backbone models on its path", and "certifying the endpoints does not certify the chain". That is deployment topology and per-node model assignment — facts about a pipeline, not about a package. |
-| `AST05-S05` | Malicious Instructions Embedded in Documents | agent-judgable | `—` | The malicious document arrives at runtime and is not in the package, but the whitepaper's stated cause is the skill's own failure: "the skill fails to distinguish document content from executable instructions". That failure is in-artifact — prose in `SKILL.md` and code in the bundle — so the evidence is present; judging whether the boundary a skill establishes is *adequate* is semantic, not mechanical. `skills/AST05/scripts/detector.py` declares an id for it (`AST05-injected-instruction-compliance`) and correctly implements nothing, keeping it out of `STATIC_DETECTABLE`. |
+| `AST05-S05` | Malicious Instructions Embedded in Documents | agent-judgable | `—` | The malicious document arrives at runtime and is not in the package, but the whitepaper's stated cause is the skill's own failure: "the skill fails to distinguish document content from executable instructions". That failure is in-artifact — prose in `SKILL.md` and code in the bundle — so the evidence is present; judging whether the boundary a skill establishes is *adequate* is semantic, not mechanical. `skills/AST05/scripts/detector.py` declares an id for it (`AST05-injected-instruction-compliance`) in `CHECK_COVERAGE` and correctly implements nothing, keeping it out of `DETECTORS`. |
 | `AST05-S06` | Denial-of-Service (DoS) through Malicious Skills | out-of-artifact | `—` | "Excessive" is measured against a runtime budget and shared infrastructure the package knows nothing about. The identical loop is efficient on one deployment and exhausting on another, so the package cannot carry the fact that decides it. |
 
 Re-derive the ids, titles and tiers in this table from the authority at rank 2,
@@ -80,11 +82,15 @@ whitepaper states for AST05, and all five run over the package's own bytes.
 | `AST05-absent-instruction-boundary` | `AST05-S04` + `AST05-S05` `artifact_signal` (`covers: artifact-signal-only`) | For a package whose bundled scripts contain at least one fetch call site, whether its prose declares an instruction-versus-data convention at all (a delimiter marker, "reference data", "must not override", a provenance rule). **Gated on the call site, not on prose**: a package that never fetches has no external-content hop to bound, and an ungated absence check would fire on every package in every corpus — the non-discriminating shape this repository's detector review called out. Grounded in AST05-S04's `artifact_signal` verbatim: "decision rules that consume upstream skill output without re-establishing an instruction-versus-data boundary at the hop". |
 | `AST05-unrestricted-network-fetch` | `AST06-S02`'s `artifact_signal` (`covers: artifact-signal-only`) | Egress granted with no host set bounded: a bare boolean `network: true` (the binary the whitepaper's "domain allowlists, not a binary `network: true/false`" mitigation names), an allow-all policy string, or a network block declaring a network-capable tool with neither an allowlist nor a restrictive policy. An **empty** `allow` list is *not* a hit — USF v1 evaluates egress default-deny, so `allow: []` is no egress, and reading it as unrestricted would invert the policy. |
 | `AST05-wildcard-domain-allowlist` | `AST06-S02`'s `artifact_signal` (`covers: artifact-signal-only`) | An allowlist that exists and bounds nothing: `"*"`, or a bare-TLD wildcard such as `"*.com"`. A scoped `*.example.com` is not reported — it reads wider than USF v1 host-only matching grants, which `validators/usf.py`'s `host_errors` flags as a validation error, but it does not open the internet. |
-| `AST05-injected-instruction-compliance` | `AST05-S05` | Declared `agent-judgable` in `SCENARIO_TIERS`, deliberately absent from `DETECTORS`. Correct as it stands: excluded from `STATIC_DETECTABLE` and therefore from any denominator. |
+| `AST05-injected-instruction-compliance` | `AST05-S05`'s `artifact_signal` (`covers: artifact-signal-only`) | Declared in `CHECK_COVERAGE` and deliberately absent from `DETECTORS` — the registry tiers `AST05-S05` agent-judgable and routes it to the judge harness. Correct as it stands: it ships no function, so it enters no denominator anywhere. It keeps its entry rather than being deleted, because an id silently dropped reads as a check that never existed instead of one that was ruled out on purpose. |
 
 Because every entry is `artifact-signal-only`, `detectors/scaffold.py::f1_scope` returns
-**`artifact-signal-only`** for this module and `f1_report` returns that label beside
-every number it produces. That is the signal-symmetry ruling applied here: the
+**`artifact-signal-only`** for this module — and there is no module-level number for it to
+label: `STATIC_DETECTABLE` is the registry's static-detectable tier for AST05, which is
+empty, so `f1_report` reports `declared-and-uncovered` rather than manufacturing an F1
+(S-003 / gate-4). The proxies are still measured, per labeled pair, by
+`detectors/fixture_loader.py`, and that is the number this page publishes under the
+`artifact-signal-only` label. That is the signal-symmetry ruling applied here: the
 `allow-all` predicate IS decidable from the package —
 `scenarios/registry.yaml` states `artifact_signal_decidable: package-decidable` on
 AST06-S02 and names both network checks in `artifact_signal_checks` — and being
@@ -288,10 +294,12 @@ V5/C6  byte-identical loader; the difference is entirely in SKILL.md's decision 
 
 Closed since the previous revision of this page:
 
-1. ~~The module's interim tiers overclaim.~~ `SCENARIO_TIERS` now says only whether a
-   check is mechanical; `CHECK_COVERAGE` carries the coverage claim, and for AST05 every
-   entry is `artifact-signal-only`, so `F1_SCOPE` is `artifact-signal-only` and no
-   scenario-level number can be produced by this module at all.
+1. ~~The module's interim tiers overclaim.~~ `SCENARIO_TIERS` now mirrors
+   `scenarios/registry.yaml` — all six canonical scenario ids, the registry's tier for
+   each — instead of naming this module's five checks as `static-detectable` scenarios;
+   `CHECK_COVERAGE` carries the per-check coverage claim, and for AST05 every entry is
+   `artifact-signal-only`, so `F1_SCOPE` is `artifact-signal-only` and no scenario-level
+   number can be produced by this module at all.
 2. ~~Both implemented checks are dead against USF v1.~~ Both now read
    `permissions.network.allow` alongside the native `policy`/boolean spellings.
 3. ~~No fixture check has a detector.~~ All three corpus checks name a

@@ -91,11 +91,78 @@ def manifest_only(**file_scopes) -> dict:
 
 
 def test_s001_detector_registry_matches_declared_detectable_tier():
-    """No orphan detector, no unimplemented declared-detectable scenario."""
+    """No orphan detector, no unimplemented declared-detectable scenario.
+
+    Re-pointed onto the registry keying. ``SCENARIO_TIERS`` is now the
+    registry's eleven-scenario table, so its declared-detectable tier is a set
+    of SCENARIO ids, while ``DETECTORS`` stays keyed by CHECK id -- the
+    namespace the CLI reports under and ``fixtures/manifest.yaml`` names in
+    ``detector_check``. ``SCENARIO_DETECTORS`` is the join, and the equality
+    below is the same claim the old check-keyed assertion made: every scenario
+    the registry rules decidable here has a check, and no check claims a
+    scenario the registry does not rule decidable.
+    """
     declared_detectable = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"}
-    assert set(detector.DETECTORS.keys()) == declared_detectable
-    # agent-judgable scenarios must NOT have a detector function (out of this tier's scope).
-    assert "AST01-obfuscated-payload-intent" not in detector.DETECTORS
+    assert declared_detectable <= set(detector.SCENARIO_DETECTORS)
+    # The one scenario decided here that AST01 does not own. The whitepaper
+    # files it under AST08; the artifact it is decided from is an AST01
+    # package's own bundled script, so the link is recorded, not reassigned.
+    assert set(detector.SCENARIO_DETECTORS) - declared_detectable == {"AST08-S02"}
+
+
+def test_the_judged_half_of_ast01_gets_no_detector_function():
+    """What the retired ``AST01-obfuscated-payload-intent`` slug used to say.
+
+    That key was a local invention: it declared "judging a payload's intent is
+    semantic work" and no function ever computed it. The registry says the same
+    thing with three named scenarios, so the claim is re-pointed onto them
+    rather than deleted -- an agent-judgable scenario must never acquire a
+    static check, and neither must the judged half of the obfuscation pair.
+    """
+    judged = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "agent-judgable"}
+    assert judged == {"AST01-S01", "AST01-S03", "AST01-S04"}
+    assert not judged & set(detector.SCENARIO_DETECTORS)
+    assert not judged & set(detector.DETECTORS)
+    assert not judged & detector.SCORED_SCENARIOS
+    # And the out-of-artifact one stays out of every one of them too.
+    assert detector.SCENARIO_TIERS["AST01-S07"] == "out-of-artifact"
+    assert "AST01-S07" not in detector.SCENARIO_DETECTORS
+
+
+def test_scenario_tiers_is_the_registrys_table_and_not_the_modules_opinion():
+    """The module restates the registry, verbatim and complete.
+
+    Asserted by equality, not by subset: the table this replaced named ten
+    checks under one tier and a reader of `node cli/bin/cli.js list` was told
+    AST01 decides ten scenarios when the registry rules seven. A dropped
+    scenario, an invented one, or a tier moved here but not in
+    `scenarios/registry.yaml` fails.
+    """
+    import yaml
+
+    registry = yaml.safe_load((_REPO_ROOT / "scenarios" / "registry.yaml").read_text(encoding="utf-8"))
+    from_registry = {s["id"]: s["tier"] for s in registry["scenarios"] if s["category"] == "AST01"}
+    assert detector.SCENARIO_TIERS == from_registry
+    assert len(from_registry) == 11
+    tally = {tier: sum(1 for t in from_registry.values() if t == tier) for tier in set(from_registry.values())}
+    assert tally == {"static-detectable": 7, "agent-judgable": 3, "out-of-artifact": 1}
+
+
+def test_every_check_the_module_ships_declares_what_it_covers():
+    """The check-keyed information the old table carried, in its own table now.
+
+    Ten checks ship and ten CHECK_COVERAGE entries describe them -- including
+    the three that decide no AST01 scenario, which is exactly why the two
+    namespaces cannot be collapsed into one map here.
+    """
+    assert set(detector.CHECK_COVERAGE) == set(detector.DETECTORS)
+    assert len(detector.DETECTORS) == 10
+    by_mode: dict[str, set[str]] = {}
+    for check, entry in detector.CHECK_COVERAGE.items():
+        by_mode.setdefault(entry["covers"], set()).add(check)
+    assert by_mode["artifact-signal-only"] == {"AST01-content-hash-missing"}
+    assert by_mode["category-precondition"] == {"AST01-content-hash-mismatch"}
+    assert len(by_mode["full"]) == 8
 
 
 def test_every_registry_static_detectable_ast01_scenario_has_a_check():

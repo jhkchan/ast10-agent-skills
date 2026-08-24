@@ -32,9 +32,11 @@ declared scope that ship with the skill.
 **Authority chain.** `scenarios/registry.yaml` is authoritative on tier; this file
 reproduces its tiering and may not diverge from it. `fixtures/manifest.yaml` is
 authoritative on which fixture cases exist. The `SCENARIO_TIERS` dict inside
-`skills/AST06/scripts/detector.py` is an interim declaration by its own docstring
-("superseded by … T-3.1's authored `skills/AST06/coverage-matrix.md` once locked") —
-where it disagrees with this file, this file wins.
+`skills/AST06/scripts/detector.py` restates that registry tiering verbatim, keyed by the
+same canonical scenario ids — all five of them, `AST06-S01` static-detectable and the
+other four out-of-artifact — and says nothing whatever about any individual check. Per-check
+metadata lives in the same module's `CHECK_COVERAGE`; where any of the three disagrees with
+`scenarios/registry.yaml`, the registry wins.
 
 ## Scenario table
 
@@ -72,7 +74,7 @@ and one that is deliberately not implemented.
 | `AST06-unrestricted-shell-exec` | no named scenario (`covers: category-precondition`) | Shell granted with nothing bounding it — a wildcard entry such as `sudo *` does not bound. Derived from AST06's premise that isolation is an architectural default and from its "implement per-skill process isolation" mitigation, **not** from AST06-S01: a granted shell is a capability and the scenario's defining condition is an act. It flags a superset of packages, so it may not claim coverage of a named scenario. |
 | `AST06-unscoped-shared-state-write` | `AST06-S05`'s `artifact_signal` (`covers: artifact-signal-only`) | Computes that scenario's declared signal verbatim — "declared writes to shared workspace, memory, or credential paths with no agent-scoped namespace". Fires on an effective write to an identity/memory file, a credential store (`~/.aws/credentials`, `~/.netrc`, `.env`), a shared workspace root, or a shared agent-memory directory, unless the path carries an `agents/<id>/` or `sessions/<id>/` segment. Never coverage: whether a second agent is pointed at the same state, and whether it later treats the content as trusted, are deployment facts. |
 | `AST06-missing-sandbox-declaration` | `AST10-S04`'s `artifact_signal` (`covers: artifact-signal-only`) | Fires when `manifest.permissions` is absent or empty. `scenarios/registry.yaml` names *this check by name* as the reader of AST10-S04 Manifest Stripping's `artifact_signal`, and records `artifact_signal_decidable: package-decidable`. It cannot decide AST10-S04: without the pre-port manifest, a ported package with no permission block is indistinguishable from one that never declared any. It has no fixture pair and is the check most likely to produce noise — on any package whose manifest is not loaded, it fires unconditionally. |
-| `AST06-cross-skill-data-leak` | closest to `AST06-S05` | Declared `out-of-artifact` in `SCENARIO_TIERS`, matching the registry's tier for the named scenario, and absent from `DETECTORS`. Nothing is implemented; the label now agrees with the registry and with this file. |
+| `AST06-cross-skill-data-leak` | `AST06-S05`'s `artifact_signal` (`covers: artifact-signal-only`) | Declared in `CHECK_COVERAGE` and absent from `DETECTORS`. Nothing is implemented and nothing may be: the registry tiers `AST06-S05` out-of-artifact because whether data actually crossed between two co-installed skills is an execution-trace property. It keeps its entry rather than being deleted, because an id silently dropped reads as a check that never existed instead of one that was ruled out on purpose. |
 
 ### The signal-symmetry ruling, applied here
 
@@ -86,7 +88,7 @@ Both files now give it one ruling. Missing permission metadata IS decidable by i
 the package alone, the registry says so in `artifact_signal_decidable`, and precisely
 because it is only a precondition the module declares `covers: artifact-signal-only` and
 may never publish it as coverage of AST10-S04. `F1_SCOPE` for this module is
-**`mixed-proxy`** — one `full` pair, one category precondition, two proxies — returned by
+**`mixed-proxy`** — one `full` pair, one category precondition, three proxies — returned by
 `f1_report` beside any number.
 `tests/test_tier_doctrine_symmetry.py` fails if either file moves without the other.
 

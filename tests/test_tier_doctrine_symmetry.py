@@ -149,21 +149,38 @@ def test_check_coverage_is_structurally_valid(modules, category):
 def test_every_scored_check_declares_its_coverage(modules, category):
     """Nothing enters the F1 denominator without saying what it measures.
 
-    `STATIC_DETECTABLE` is the denominator. A check that reaches it without a
-    CHECK_COVERAGE entry is an unqualified coverage claim by default, which is the
-    shape the review objected to.
+    `STATIC_DETECTABLE` is the denominator. Whatever reaches it must be named by
+    a CHECK_COVERAGE entry -- as that entry's key, for a module whose checks are
+    keyed by registry scenario id, or in its `registry_ids`, for a module whose
+    checks carry their own slugs. Either way the denominator element has a
+    written coverage claim beside it; reaching it with none is the unqualified
+    claim-by-default the review objected to.
     """
     module = modules[category]
-    undeclared = sorted(module.STATIC_DETECTABLE - set(module.CHECK_COVERAGE))
+    declared = set(module.CHECK_COVERAGE)
+    for entry in module.CHECK_COVERAGE.values():
+        declared.update(entry.get("registry_ids") or [])
+    undeclared = sorted(module.STATIC_DETECTABLE - declared)
     assert not undeclared, f"{category}: {undeclared} are in the F1 denominator but declare no CHECK_COVERAGE entry"
 
 
 @pytest.mark.parametrize("category", CATEGORIES)
 def test_check_coverage_only_describes_checks_the_module_declares(modules, category):
+    """The two tables are two namespaces, and each has to stay inside its own.
+
+    `SCENARIO_TIERS` is keyed by `scenarios/registry.yaml`'s canonical scenario
+    ids; `CHECK_COVERAGE` is keyed by the module's own CHECK ids. This used to
+    assert `CHECK_COVERAGE <= SCENARIO_TIERS`, which only held while the tier
+    table was keyed by check slugs -- the very conflation that let a module
+    report its check count as a scenario count. What survives the split is the
+    load-bearing half: a module describes only its OWN checks, and every check
+    it actually ships declares what it covers.
+    """
     module = modules[category]
-    assert set(module.CHECK_COVERAGE) <= set(module.SCENARIO_TIERS), (
-        f"{category}: CHECK_COVERAGE describes checks SCENARIO_TIERS does not declare"
-    )
+    foreign = sorted(c for c in module.CHECK_COVERAGE if not c.startswith(f"{category}-"))
+    assert not foreign, f"{category}: CHECK_COVERAGE describes {foreign}, which are not this module's checks"
+    undeclared = sorted(set(module.DETECTORS) - set(module.CHECK_COVERAGE))
+    assert not undeclared, f"{category}: {undeclared} ship as checks but declare no CHECK_COVERAGE entry"
     for tier in module.SCENARIO_TIERS.values():
         assert tier in VALID_CHECK_TIERS
 

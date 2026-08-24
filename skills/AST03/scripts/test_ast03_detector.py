@@ -68,9 +68,93 @@ def detector_shaped(**overrides) -> dict:
 
 
 def test_s001_detector_registry_matches_declared_detectable_tier():
+    """Re-pointed for the registry keying, not weakened.
+
+    The old form read `set(DETECTORS) == {slugs tiered static-detectable}`, which
+    held only while `SCENARIO_TIERS` was keyed by this module's own check slugs
+    and every shipped check was listed there as static-detectable. The claim it
+    made -- the declared-detectable tier is answered by shipped code, and nothing
+    else reaches the F1 denominator -- now runs through `CHECK_COVERAGE`, which is
+    where the check-to-scenario link lives.
+    """
     declared_detectable = {s for s, tier in detector.SCENARIO_TIERS.items() if tier == "static-detectable"}
-    assert set(detector.DETECTORS.keys()) == declared_detectable
-    assert "AST03-task-scope-mismatch" not in detector.DETECTORS
+    assert declared_detectable == {"AST03-S03"}
+
+    decided = {
+        rid
+        for check, entry in detector.CHECK_COVERAGE.items()
+        if entry["covers"] == "full" and check in detector.DETECTORS
+        for rid in entry["registry_ids"]
+    }
+    assert decided == declared_detectable, (
+        "AST03-S03 is the registry's whole static-detectable tier for this category; "
+        "exactly one shipped check may claim covers: full over it"
+    )
+    # Every shipped check declares what it covers, and nothing is declared that
+    # does not ship: the two check-keyed tables are the same set of ids.
+    assert set(detector.CHECK_COVERAGE) == set(detector.DETECTORS)
+
+
+def test_the_registry_is_the_authority_for_these_five_tiers():
+    """The module restates `scenarios/registry.yaml`; it does not get its own opinion.
+
+    `SCENARIO_TIERS` used to name four check slugs as static-detectable, so a reader
+    checking the module alone -- or `node cli/bin/cli.js list`, which prints these
+    counts under tier labels -- was told AST03 decides four scenarios. The registry
+    rules ONE of AST03's five static-detectable. Equality against the registry is
+    what stops that gap reopening in either direction.
+    """
+    import yaml
+
+    registry = yaml.safe_load((REPO_ROOT / "scenarios" / "registry.yaml").read_text(encoding="utf-8"))
+    from_registry = {s["id"]: s["tier"] for s in registry["scenarios"] if s["category"] == "AST03"}
+    assert len(from_registry) == 5
+    assert detector.SCENARIO_TIERS == from_registry
+
+
+def test_the_unimplemented_task_scope_slug_is_gone_and_ast03_s01_carries_its_ruling():
+    """The one id the re-key retired, pinned so it cannot drift back in silently.
+
+    `AST03-task-scope-mismatch` was the module's local slug for "the grant is broader
+    than the skill's stated function", declared `agent-judgable` and implemented by
+    nothing. It is not a check, so it has no place in `CHECK_COVERAGE`; what it
+    recorded is now the registry's own ruling on the scenario it stood in for.
+    """
+    for table in (detector.SCENARIO_TIERS, detector.CHECK_COVERAGE, detector.DETECTORS):
+        assert "AST03-task-scope-mismatch" not in table
+    assert detector.SCENARIO_TIERS["AST03-S01"] == "agent-judgable"
+    assert "AST03-S01" not in detector.STATIC_DETECTABLE
+
+
+def test_the_f1_denominator_is_scenario_ids_and_the_proxies_stay_out_of_it():
+    """`STATIC_DETECTABLE` and the shipped check set are different sets, on purpose.
+
+    Three of the four checks are mechanical and decide no AST03 scenario; folding
+    them into the denominator is exactly the overclaim the re-key removes. The
+    scenario-keyed detector map `f1_report` scores is built from the `covers: full`
+    entries alone.
+    """
+    from detectors.scaffold import scenario_detectors
+
+    assert detector.STATIC_DETECTABLE == {"AST03-S03"}
+    assert set(detector.DETECTORS) != detector.STATIC_DETECTABLE
+    assert set(scenario_detectors(detector.DETECTORS, detector.CHECK_COVERAGE)) == {"AST03-S03"}
+
+
+def test_f1_report_scores_the_corpus_in_registry_ids():
+    """The end-to-end shape: a package that carries AST03-S03 scores as AST03-S03.
+
+    Handing `f1_report` the raw check map would score this a false negative --
+    `"AST03-identity-file-write-grant"` is not `"AST03-S03"` -- which is the failure
+    the scenario-keyed detector map exists to prevent.
+    """
+    vulnerable = usf(write=["SOUL.md"], deny_write=["config/credentials.env"])
+    clean = usf()
+    report = detector.f1_report([(vulnerable, {"AST03-S03"}), (clean, set())])
+    assert report["status"] == "measured"
+    assert report["scope"] == detector.F1_SCOPE
+    assert (report["tp"], report["fp"], report["fn"]) == (1, 0, 0)
+    assert report["f1"] == 1.0
 
 
 def test_identity_file_list_does_not_drift_from_the_usf_validator():
