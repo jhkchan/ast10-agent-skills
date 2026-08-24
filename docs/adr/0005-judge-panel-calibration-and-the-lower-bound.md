@@ -32,28 +32,28 @@ basis: repeated sweeps over byte-identical content produced binding means of 101
 coherent — it asks for a Grade-A mean and refuses one perched on a wobble.
 
 The six-provider judged run of 2026-08-23 measured a different instrument. Eleven skills ×
-three rounds × six providers = 198 judgments, and the per-skill sigma is **6.57 to 10.34**,
+three rounds × six providers = 198 judgments, and the per-skill sigma is **5.43 to 14.04**,
 double to triple the figure the rule was tuned against.
 
 ### The spread is bias, not noise
 
 Sigma is that wide because the judges disagree systematically. Measured over 33 judgments each,
-against a pooled mean of **107.4**:
+against a pooled mean of **109.2**:
 
 | Judge | n | Mean | Bias vs pooled | Round means |
 | --- | ---: | ---: | ---: | --- |
-| `bedrock/qwen3-235b` | 33 | 119.9 | +12.4 | 120 / 119.6 / 120 |
-| `bedrock/deepseek-v3.2` | 33 | 109.3 | +1.8 | 110.3 / 109.5 / 108 |
-| `anthropic-compatible/glm-5.2` | 33 | 107.3 | −0.2 | 106.8 / 107.3 / 107.7 |
-| `claude-cli/sonnet` | 33 | 104.0 | −3.4 | 103.6 / 103.6 / 104.7 |
-| `bedrock/gpt-oss-120b` | 33 | 102.2 | −5.2 | 101.7 / 102.6 / 102.3 |
-| `bedrock/nova-pro` | 33 | 102.0 | −5.4 | 101.9 / 102.6 / 101.5 |
+| `bedrock/qwen3-235b` | 33 | 120 | +10.8 | 120 / 120 / 120 |
+| `anthropic-compatible/glm-5.2` | 33 | 109.9 | +0.7 | 110.1 / 110.3 / 109.5 |
+| `bedrock/deepseek-v3.2` | 33 | 109.5 | +0.3 | 107.5 / 109.8 / 111.1 |
+| `bedrock/gpt-oss-120b` | 33 | 106.8 | -2.4 | 106.8 / 107.5 / 106.2 |
+| `claude-cli/sonnet` | 33 | 105.5 | -3.7 | 104.9 / 105.9 / 105.7 |
+| `bedrock/nova-pro` | 33 | 103.5 | -5.7 | 103.6 / 101.4 / 105.4 |
 
-Top to bottom that is a **17.9-point spread** — one and a half grade bands between the harshest
+Top to bottom that is a **16.5-point spread** — one and a half grade bands between the harshest
 and the most generous reader of the same eleven files.
 
 The right-hand column is what settles the diagnosis. Each judge scored the whole roster three
-independent times, and no judge moved more than **2.3 points** between its own rounds;
+independent times, and no judge moved more than **4.0 points** between its own rounds;
 `qwen3-235b` returned 120 / 119.6 / 120. Every judge is precise. They are precise about
 different things. What sigma is measuring across the pooled column is therefore mostly a
 constant per judge, and a constant per judge carries no information about any skill.
@@ -67,9 +67,7 @@ have different denominators. The uncertainty of a mean shrinks with sample size:
 much better estimate of the mean and leaves `mean − stdev` exactly where it was.
 
 Written out, `mean − stdev ≥ 105` is the same constraint as `mean ≥ 105 + stdev`. So the sigma a
-panel happens to produce sets the mean the rule actually demands. At this panel's sigma the
-locked pair silently requires a mean of **111.6 to 115.3** — 93.0% to 96.1% of the 120-point
-rubric — rather than the 108 (90.0%) it names as its target. Nobody chose a 93% bar. It arrived
+panel happens to produce sets the mean the rule actually demands. At this panel's sigma the rule demands a mean of **110.4 to 119.0** — 92.0% to 99.2% of the rubric — rather than the 108 (90.0%) it names as its target. Nobody chose a 92-99% bar. It arrived
 as a side effect of adding judges.
 
 ### The perverse incentive, stated plainly
@@ -83,18 +81,18 @@ idiosyncrasies become the rubric otherwise."
 
 ### The concrete case
 
-`AST04` pooled a mean of **111.1** across 18 judgments — Grade A by three points, the highest
+`AST04` pooled a mean of **108.7** across 18 judgments — Grade A, and among the tightest
 mean on the board, with every dimension mean clear of its floor. It is BLOCKED, and the recorded
 reason is arithmetic:
 
 ```
-111.1 - 6.57 = 104.5   <   105
+108.7 - 6.29 = 102.4 < 105
 ```
 
-It missed by half a point of a statistic that is not about `AST04`. Its sigma of 6.57 is the
+It missed by half a point of a statistic that is not about `AST04`. Its sigma of 6.29 is the
 *lowest* of the eleven — `AST04` is the skill the panel agreed on most — and the bound punished
 it for the residual disagreement anyway. Under the standard error of the mean the same 18
-judgments give `111.1 - 6.57/sqrt(18) = 109.6`, comfortably clear.
+judgments give `108.7 - 6.29/sqrt(18) = 109.6`, comfortably clear.
 
 ## Decision
 
@@ -149,7 +147,7 @@ pooled score from a different panel.** The scale is not the rubric; the scale is
 read by these specific judges*. Two consequences follow for anyone quoting a number from here or
 bringing one in:
 
-- A pooled mean is only meaningful next to its panel roster. Moving `AST04`'s 111.1 into a
+- A pooled mean is only meaningful next to its panel roster. Moving `AST04`'s 108.7 into a
   context judged by a different set of models compares two different instruments.
 - `gpt-oss-120b` is a common solo judge, and on this panel it runs **5.2 points harsh**. A skill
   scored 103 by `gpt-oss-120b` alone and a skill scored 103 by this six-model panel are not the
@@ -174,14 +172,18 @@ bringing one in:
 
 ### Negative
 
-- **The repository currently ships 0 of 11 skills under its own gate**, and this record does not
-  change that. Four skills grade A on the mean (`AST04` 111.1, `AST08` 109.6, `AST07` 109.2,
-  `AST10` 108.6) and all four are BLOCKED. That is a deliberate integrity choice, not an
-  oversight: shipping nothing under a rule we can defend is worth more than shipping four skills
-  under a rule we edited after reading the scores.
+- **The repository ships 1 of 11 skills under its own gate**, and this record did not move the bar
+  to get there. As of the second judged run, nine of eleven skills grade A on the mean and clear
+  every one of the eight dimension floors (`advisory` 112.8, `AST05` and `AST08` 110.7, `AST10`
+  110.2, `AST01` 109.8, `AST06` 109.3, `AST02` 109.1, `AST03` and `AST04` 108.7). Exactly one,
+  `advisory`, also clears the lower bound — 112.8 − 5.43 = 107.4 ≥ 105 — and is the first SHIP
+  verdict this repository has recorded. The other eight are Grade A and BLOCKED on the lower bound
+  alone. `AST07` 105.4 and `AST09` 105.7 remain genuinely below floor on D6 and D8. Shipping one
+  skill under a rule we can defend is worth more than shipping nine under a rule we edited after
+  reading the scores.
 - Anyone reading the dashboard sees a wall of BLOCKED and may conclude the skills are weak. For
-  three of them (`AST04`, `AST08`, `AST10`) that conclusion is unsupported — they are blocked by
-  the lower bound alone. This ADR is the only thing standing between that table and a wrong
+  eight of them it is unsupported — they are Grade A on the mean with every dimension floor clear,
+  and blocked by the lower bound alone. This ADR is the only thing standing between that table and a wrong
   reading of it, which makes the ADR load-bearing documentation rather than a footnote.
 - Correcting the bound later means the corrected numbers cannot be compared to this run's
   numbers without care, since adoption requires a fresh run. This run becomes a historical

@@ -285,10 +285,24 @@ def test_adr_is_nygard_shaped_and_accepted():
 
 
 def test_adr_reports_the_gate_honestly_in_both_directions():
-    """The record must state the cost as plainly as the flaw."""
+    """The record must state the cost as plainly as the flaw.
+
+    The count is DERIVED from the recorded scorecards rather than hard-coded, so the
+    ADR cannot quietly keep claiming an old, more flattering (or more self-flagellating)
+    number after a fresh run moves it. The point of the assertion is that the record
+    states what the gate actually costs, not that the cost is any particular figure.
+    """
     flat = _text(ADR)
-    assert "0 of 11 skills" in flat, "the ADR must state that nothing currently clears the gate"
-    assert "deliberate integrity choice, not an oversight" in flat
+    cards = sorted(SCORECARDS.glob("*.json"))
+    assert cards, "no scorecards recorded — nothing to hold the ADR to"
+    shipped = sum(1 for c in cards if json.loads(c.read_text())["verdict"] == "SHIP")
+    assert f"{shipped} of {len(cards)} skills" in flat, (
+        f"the ADR must state what the gate currently costs: {shipped} of {len(cards)} skills "
+        f"clear it, and that exact phrase does not appear in ADR-0005"
+    )
+    assert "worth more than shipping" in flat, (
+        "the ADR must still say plainly why the cost is accepted rather than engineered away"
+    )
 
 
 # ---------------------------------------------------------------------------
