@@ -53,6 +53,8 @@ category that ships a check for them, and nothing is left behind in AST07.
   zero detectors*.
 - Arguing that a tier should move → *Scope and out-of-artifact boundary*, then
   `coverage-matrix.md`, which is binding where this file is not.
+- Writing the verdict down, or reading one somebody else wrote → *NEVER — the ways an
+  empty tier gets written up as a result*, whichever path above you took to get there.
 
 **Do NOT load `scripts/detector.py` looking for a check.** Its detector map is empty by
 design; the zero-detectors section below is the explanation, and reading the module adds
@@ -192,6 +194,76 @@ in the command's own format if you want it generated rather than written;
 `coverage-matrix.md` enumerates the full evidence set behind each step. The failure this
 procedure exists to prevent is short and common: a reviewer completes step 1, sees a
 `sha256:` pin, and files "AST07: pass".
+
+## NEVER — the ways an empty tier gets written up as a result
+
+Each of these is checkable in this package — against `scripts/detector.py`,
+`coverage-matrix.md`, `fixtures/manifest.yaml`, or `scenarios/registry.yaml`. None is a
+general caution about keeping software up to date.
+
+- **NEVER write "AST07: pass", "clean", or "no findings".** `DETECTORS` is `{}`,
+  `STATIC_DETECTABLE` is `set()`, and `f1_report()` returns
+  `{"status": "declared-and-uncovered", "f1": None, "scope": "none"}` — never `0.0`,
+  never `1.0`, pinned by
+  `test_ast07_detector.py::test_s007_empty_tier_never_manufactures_an_f1`. Nothing ran,
+  so nothing passed. The cost is not a wrong number but a retired ticket: a pass is the
+  one word that stops anyone from ever attempting steps 2–4, and those three steps are
+  the entire category.
+- **NEVER file either artifact signal under an AST07 scenario id.** The registry records
+  absent hash pinning as `AST07-S01`'s `artifact_signal`, with
+  `artifact_signal_checks: [AST01-content-hash-missing]`, and mutable version ranges as
+  `AST07-S02`'s, with `artifact_signal_checks: []`. The registry's own
+  `defining_condition_rule` says a precondition "is never counted as coverage of the
+  scenario". Filing one anyway yields a coverage table that looks complete over a
+  measurement of nothing — and it costs every other category too, because once one
+  column is padded a reader can no longer tell a covered category from an uncovered one
+  anywhere in the report.
+- **NEVER read a `sha256:` pin as evidence that no malicious update occurred.** The pin
+  binds a label to bytes. It says nothing about who authored those bytes, and it stops
+  binding the moment an operator accepts a new hash — which is exactly what an accepted
+  malicious update looks like from inside the manifest. Decision rule 1's control is
+  aimed at a *resolver*, not at a publisher. This is the specific failure the by-hand
+  procedure is worded against: step 1 terminates inside the artifact, and a reviewer who
+  stops there files a pass on the strength of the one fact that cannot decide S01.
+- **NEVER convict Rollback Attack on "the resolved version decreased".** Rule 2's
+  discriminator has two halves and the second is an operator-intent record separating a
+  deliberate pin-back from an imposed one. Without it the rule convicts every admin who
+  rolled back a bad release — a false accusation aimed at the person who did the right
+  thing, and a worse outcome than the undecided row step 3 tells you to write instead.
+  Step 3's *cannot get the intent half* branch is one word long: stop.
+- **NEVER claim Hot-Reload Abuse from a before/after content-hash pair.** The registry
+  gives `AST07-S03` `artifact_signal: null` — alone among this category's scenarios, it
+  leaves no precondition in the package at all, because the directory holds a perfectly
+  ordinary skill before the swap and a perfectly ordinary skill after it. `coverage-matrix.md`
+  fixes the ordering: the hash pair proves the bytes changed, host reload telemetry proves
+  the change took effect without a restart, directory ownership attributes it. A claim
+  resting on fewer than all three asserts a runtime property from a filesystem one, and
+  the first person to ask "could that have been a normal reinstall?" collapses it.
+- **NEVER accept the changelog, the version string, or the publisher's own account of
+  what changed as the predecessor record.** All three are authored by the party under
+  suspicion — that is the whole content of step 2's *Insufficient* list, and it is why
+  *Sufficient* names a signed release-transparency entry or an operator-held
+  `version → content hash → publisher key` binding instead. Accepting one converts an
+  undecided S01 into "no evidence of compromise", a sentence that reads as a finding of
+  absence and is a finding of nothing.
+- **NEVER admit a fixture to this category to give it a number.** `fixtures/manifest.yaml`
+  records `declared_expected_cases: 0` and `cases: []` — the gate-4 floor of six is
+  branched around for an empty tier, not applied to it — and `detectors/engine.py` raises
+  `OutOfArtifactFixtureError` on any AST07 scenario that reaches the corpus. Six files
+  once sat under `fixtures/AST07/` and were deleted rather than re-labeled, because
+  admitting them would have moved the category from `declared-and-uncovered` to
+  `proxy-covered`: a new published claim about the most temporal category in the set,
+  bought with pairs that decide none of its three scenarios. Note how close that came to
+  passing review — one of those pairs was labeled `AST07-S3` for "absent semantic version
+  field" while registry `AST07-S03` is Hot-Reload Abuse. A local slug that reads like a
+  registry id is how a padded corpus survives a reader who is checking ids rather than
+  content.
+- **NEVER record drift in *referenced* content as AST07.** When the skill's own pin holds
+  byte-for-byte and the thing that changed is content it fetches at runtime, the finding
+  is AST05 and every version-based control will keep passing forever. Recorded here, the
+  remediation gets written as "pin harder" — which cannot work by construction, because
+  the pin already held — while the referenced content stays unpinned and the incident
+  recurs against a manifest everyone now believes is fixed.
 
 ## Scope and out-of-artifact boundary — read this before tiering
 

@@ -2,10 +2,10 @@
 
 Bias tests (`tests/test_calibration.py`) ask whether a judge's number is in the
 right place. These ask the prior question: whether the number is a measurement
-at all. The recorded panel contains a judge that returned exactly 120.0 on all
-eleven skills — three distinct values, every one of them a dimension's maximum —
-and no bias figure can express that, because +10.8 reads as "lenient" when what
-happened was that nothing was ranked.
+at all. Run 2 contains a judge that returned exactly 120.0 on all eleven skills
+— three distinct values, every one of them a dimension's maximum — and no bias
+figure can express that, because +10.8 reads as "lenient" when what happened was
+that nothing was ranked.
 
 Four things are held here:
 
@@ -15,14 +15,25 @@ Four things are held here:
    motivated it. A judge that is merely coarse — rounds to fives but still ranks
    skills — must come out COARSE and must *not* be flagged, because conflating
    the two would make the flag useless.
-2. **The rule lands correctly on the real recorded panel.** `bedrock/qwen3-235b`
-   is flagged; `claude-cli/sonnet` is not. Both are asserted, and the second is
-   the load-bearing one: a rule that flags a strict judge as a broken one would
-   be worse than no rule.
-3. **Nothing is silently excluded.** The flagged judge stays in every pooled
+2. **The rule lands correctly on the real recorded panels, and the published
+   verdicts are a recomputation of them.** No verdict is written down here as a
+   constant. Every provider's verdict is recomputed from the corpus and checked
+   against `eval/judge-quality.json`, so the artifact cannot disagree with the
+   data; and the two claims that carry the argument are made against corpora
+   that pin them from opposite sides. On the frozen run-2 corpus
+   (`eval/scorecards-run2/`) `bedrock/qwen3-235b` must still come out
+   NON-DISCRIMINATING — the detector detects. On run 3 (`eval/scorecards/`),
+   scored by the rubric-grounded prompt, *nobody* is NON-DISCRIMINATING: the
+   same judge now varies and ranks. That is a repair, recorded as a result, and
+   the run-2 pin is what stops it being mistaken for a relaxed detector. The
+   third claim is that the harshest judge on a panel — whoever that is on a
+   given run — is never flagged: a rule that flags a strict judge as a broken
+   one would be worse than no rule.
+3. **Nothing is silently excluded.** A flagged judge stays in every pooled
    figure, `eval/judge-quality.json` says so in words, and the report shows the
    with- and without- columns side by side so the size of the effect is visible
-   rather than pre-applied. Declare and record.
+   rather than pre-applied. When a panel has nothing to exclude, it says that
+   instead of printing an empty column. Declare and record.
 4. **The thresholds are justified rather than fitted.** `MIN_DISTINCT_
    DIMENSION_VALUES` is asserted against the actual band count in the pinned
    rubric, and the vendored maxima table against the rubric's own headings, so
@@ -32,8 +43,10 @@ Four things are held here:
 from __future__ import annotations
 
 import json
+import statistics
 import subprocess
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 import pytest
@@ -44,8 +57,14 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CALIBRATION_PY = REPO_ROOT / "eval" / "calibration.py"
 DASHBOARD = REPO_ROOT / "docs" / "skill-judge-dashboard.md"
 SCORECARDS = REPO_ROOT / "eval" / "scorecards"
+#: Run 2, archived and frozen: the corpus in which the flat judge is on record.
+#: Nothing writes here, which is what makes it usable as a fixed point — the
+#: detector's behaviour on it can only change if the detector changes.
+SCORECARDS_RUN2 = REPO_ROOT / "eval" / "scorecards-run2"
 JUDGE_QUALITY_JSON = REPO_ROOT / "eval" / "judge-quality.json"
 RUBRIC = REPO_ROOT / "vendor" / "skill-judge" / "SKILL.md"
+
+QWEN = "bedrock/qwen3-235b"
 
 MAXIMA = cal.FALLBACK_DIMENSION_MAXIMA
 
@@ -240,38 +259,180 @@ def quality(recorded):
     return cal.judge_quality(recorded)
 
 
-def test_the_recorded_panel_flags_qwen(quality):
-    assert quality["flagged"] == ["bedrock/qwen3-235b"], (
-        "the recorded panel's flat judge must be flagged, and no one else with it"
-    )
+@pytest.fixture(scope="module")
+def archived_run2():
+    """The frozen run-2 panel, diagnosed by today's rule.
 
-
-def test_the_recorded_panel_does_not_flag_sonnet(quality):
-    """The harshest judge on the panel is a judge, not a defect.
-
-    `claude-cli/sonnet` sits 3.7 points below the pooled mean and never once
-    awards a dimension maximum. Both are things a strict grader does. If the
-    rule could not tell it apart from a judge returning 120.0 eleven times, the
-    rule would be measuring severity and calling it quality.
+    Not skipped when absent. `eval/scorecards-run2/` is committed history, and a
+    missing one means the fixed point these tests measure the detector against
+    has been deleted — which is a failure, not a reason to stay quiet.
     """
-    row = next(r for r in quality["providers"] if r["provider"] == "claude-cli/sonnet")
-    assert row["verdict"] == cal.VERDICT_DISCRIMINATING
-    assert row["reasons"] == []
-    assert "claude-cli/sonnet" not in quality["flagged"]
+    assert SCORECARDS_RUN2.is_dir() and any(SCORECARDS_RUN2.glob("*.json")), (
+        f"{SCORECARDS_RUN2.relative_to(REPO_ROOT)} is the archived run-2 corpus and must stay committed: "
+        "it is what pins that the NON-DISCRIMINATING rule still fires on the judge it was built for"
+    )
+    return cal.judge_quality(cal.load_judgments(SCORECARDS_RUN2))
 
 
-def test_qwen_signals_are_the_measured_ones(quality):
-    """The specific measurement that motivated all of this, asserted directly."""
-    row = next(r for r in quality["providers"] if r["provider"] == "bedrock/qwen3-235b")
-    disc, gran, sat, cons = row["discrimination"], row["granularity"], row["saturation"], row["self_consistency"]
-    assert row["n_judgments"] == 33 and row["n_skills"] == 11
-    assert disc["distinct_dimension_values"] == 3
-    assert disc["dimension_values"] == [10.0, 15.0, 20.0]
-    assert (disc["across_skill_sd"], disc["across_skill_variance"]) == (0.0, 0.0)
-    assert (disc["skill_mean_min"], disc["skill_mean_max"]) == (120.0, 120.0)
-    assert gran["multiple_of_five_rate"] == 1.0
-    assert (sat["dimension_max_rate"], sat["full_total_rate"]) == (1.0, 1.0)
-    assert cons["same_skill_spread_max"] == 0.0
+def _row(quality: dict, provider: str) -> dict:
+    return next(r for r in quality["providers"] if r["provider"] == provider)
+
+
+def _signals_from_disk(directory: Path, provider: str) -> dict[str, object]:
+    """One judge's four signals, recomputed straight out of the scorecard files.
+
+    A second opinion on `eval/calibration.py`, in the same spirit as the rubric
+    re-slice in `tests/scripts/test_judge_harness.py`: a test that only asked the
+    module under test what it measured would agree just as happily with a
+    provider_quality() that had lost a scorecard or divided by the wrong count.
+    """
+    totals: dict[str, list[float]] = defaultdict(list)
+    dimension_scores: list[tuple[str, float]] = []
+    for card in sorted(directory.glob("*.json")):
+        payload = json.loads(card.read_text(encoding="utf-8"))
+        for judgment in payload.get("judgments") or []:
+            if judgment.get("provider") != provider:
+                continue
+            totals[payload["skill"]].append(float(judgment["total"]))
+            dimension_scores.extend((d, float(v)) for d, v in (judgment.get("scores") or {}).items())
+    flat_totals = [t for values in totals.values() for t in values]
+    assert flat_totals and dimension_scores, f"{provider} cast no recorded judgments in {directory.name}"
+    skill_means = [statistics.fmean(values) for values in totals.values()]
+    n_dimension = len(dimension_scores)
+    return {
+        "n_judgments": len(flat_totals),
+        "n_skills": len(totals),
+        "dimension_values": sorted({v for _, v in dimension_scores}),
+        "distinct_dimension_values": len({v for _, v in dimension_scores}),
+        "across_skill_sd": round(statistics.pstdev(skill_means), 2),
+        "skill_mean_min": round(min(skill_means), 1),
+        "skill_mean_max": round(max(skill_means), 1),
+        "multiple_of_five_rate": round(sum(1 for _, v in dimension_scores if v % 5 == 0) / n_dimension, 3),
+        "dimension_max_rate": round(sum(1 for d, v in dimension_scores if v >= MAXIMA[d]) / n_dimension, 3),
+        "full_total_rate": round(sum(1 for t in flat_totals if t >= sum(MAXIMA.values())) / len(flat_totals), 3),
+    }
+
+
+def _measured(row: dict) -> dict[str, object]:
+    """The same signals, as `eval/calibration.py` published them."""
+    disc, gran, sat = row["discrimination"], row["granularity"], row["saturation"]
+    return {
+        "n_judgments": row["n_judgments"],
+        "n_skills": row["n_skills"],
+        "dimension_values": disc["dimension_values"],
+        "distinct_dimension_values": disc["distinct_dimension_values"],
+        "across_skill_sd": disc["across_skill_sd"],
+        "skill_mean_min": disc["skill_mean_min"],
+        "skill_mean_max": disc["skill_mean_max"],
+        "multiple_of_five_rate": gran["multiple_of_five_rate"],
+        "dimension_max_rate": sat["dimension_max_rate"],
+        "full_total_rate": sat["full_total_rate"],
+    }
+
+
+def test_the_published_verdicts_are_a_recomputation_of_the_recorded_corpus(quality):
+    """No verdict in this repository is a constant anybody typed.
+
+    This replaces an assertion that `eval/judge-quality.json` flags exactly
+    `bedrock/qwen3-235b`. That was true of run 2 and false of run 3, and it was
+    brittle in the way the thing it guards is brittle: a hard-coded verdict has
+    to be edited whenever the measurement moves, and the edit is indistinguish-
+    able from someone quietly making a failure go away. What is asserted instead
+    is the invariant — for *every* provider, the published verdict, its reasons
+    and the signals behind it are exactly what recomputing from
+    `eval/scorecards/` produces — so the artifact can never disagree with the
+    data, whatever the data says next time.
+    """
+    published = json.loads(JUDGE_QUALITY_JSON.read_text(encoding="utf-8"))
+    recomputed = {row["provider"]: row for row in cal.provider_quality(cal.load_judgments(SCORECARDS))}
+
+    assert {row["provider"] for row in published["providers"]} == set(recomputed), (
+        "eval/judge-quality.json names a different panel than eval/scorecards/ contains"
+    )
+    for row in published["providers"]:
+        provider = row["provider"]
+        expected = recomputed[provider]
+        assert row["verdict"] == expected["verdict"], (
+            f"{provider}: eval/judge-quality.json publishes {row['verdict']} but the recorded scorecards "
+            f"produce {expected['verdict']} — re-run `python3 eval/calibration.py`"
+        )
+        assert row["reasons"] == expected["reasons"], f"{provider}: published reasons are not the measured ones"
+        for block in ("discrimination", "granularity", "saturation", "self_consistency"):
+            assert row[block] == expected[block], f"{provider}: published {block} signals are not the measured ones"
+
+    # The flag list is a projection of the rows, not a separate claim: it must be
+    # derivable from the published rows *and* agree with the recomputation.
+    assert published["flagged"] == cal.flagged_providers(published["providers"])
+    assert published["flagged"] == cal.flagged_providers(list(recomputed.values())) == quality["flagged"]
+
+
+def test_no_judge_on_the_run_3_panel_is_non_discriminating(quality):
+    """A result, not a regression — and deliberately asserted rather than assumed.
+
+    Under the pre-2026-08-23 prompt `bedrock/qwen3-235b` returned exactly 120.0
+    on all eleven skills from three distinct values, and this file's central
+    assertion was that it got flagged. Run 3 sent the judges the rubric's own
+    score bands, and that judge now varies across skills and ranks them: it
+    comes out COARSE, and the panel has no NON-DISCRIMINATING judge at all. The
+    fix repaired the broken judge; the flag did not go soft.
+
+    The two are only distinguishable if both are pinned, so they are: the run-2
+    corpus below must still produce the flag, and this test must fail the moment
+    a live judge goes flat again. An empty `flagged` list is a claim about the
+    panel and is worth recording as one.
+    """
+    verdicts = {row["provider"]: row["verdict"] for row in quality["providers"]}
+    assert cal.VERDICT_NON_DISCRIMINATING not in verdicts.values(), (
+        f"a judge on the run-3 panel is returning no ranking information: {verdicts}"
+    )
+    assert quality["flagged"] == []
+    # Every judge still has to have been *examined* — an empty flag list is only
+    # meaningful if the rule actually ran on all of them.
+    assert len(verdicts) == len({j.provider for j in cal.load_judgments(SCORECARDS)})
+    assert all(verdict in quality["verdicts"] for verdict in verdicts.values())
+
+
+def test_the_rule_still_flags_the_archived_run_2_judge(archived_run2):
+    """The detector detects: the same rule, on the corpus that motivated it.
+
+    This is the load-bearing half of the pair above. `eval/scorecards-run2/` is
+    frozen, so this assertion can only break by someone loosening the rule —
+    which is exactly the change that "nobody is flagged in run 3" would
+    otherwise be able to hide.
+    """
+    assert archived_run2["flagged"] == [QWEN], "the run-2 flat judge must still be flagged, and no one else with it"
+    assert _row(archived_run2, QWEN)["verdict"] == cal.VERDICT_NON_DISCRIMINATING
+
+
+def test_the_qwen_signals_are_recomputed_from_disk_on_both_corpora(quality, archived_run2):
+    """The measurement that motivated all of this, and the one that closed it.
+
+    Both sides are recomputed from the scorecard files rather than transcribed:
+    the run-2 numbers (three distinct values, zero across-skill sd, every
+    judgment at the full 120) are re-derived, not quoted, and the run-3 numbers
+    are never written down at all — what is asserted about them is which side of
+    the *published thresholds* they fall on. So the pair keeps working when the
+    next run moves the figures again, and it states the finding precisely: the
+    same judge crossed both discrimination thresholds when the prompt changed.
+    """
+    run2, run3 = _row(archived_run2, QWEN), _row(quality, QWEN)
+    assert _measured(run2) == _signals_from_disk(SCORECARDS_RUN2, QWEN)
+    assert _measured(run3) == _signals_from_disk(SCORECARDS, QWEN)
+
+    # Run 2: below both thresholds, in the two ways the rule cares about.
+    r2 = run2["discrimination"]
+    assert r2["distinct_dimension_values"] < cal.MIN_DISTINCT_DIMENSION_VALUES
+    assert r2["across_skill_sd"] < cal.DISCRIMINATION_SD_FLOOR
+    assert r2["skill_mean_min"] == r2["skill_mean_max"], "run 2's flat judge placed every skill on one number"
+    assert run2["saturation"]["full_total_rate"] >= cal.SATURATION_FULL_TOTAL_CEILING
+
+    # Run 3: above both, and now separating the skills it was given.
+    r3 = run3["discrimination"]
+    assert r3["distinct_dimension_values"] >= cal.MIN_DISTINCT_DIMENSION_VALUES
+    assert r3["across_skill_sd"] >= cal.DISCRIMINATION_SD_FLOOR
+    assert r3["skill_mean_min"] < r3["skill_mean_max"], "run 3's qwen must rank the skills, not repeat one total"
+    assert run3["verdict"] != cal.VERDICT_NON_DISCRIMINATING
+    assert QWEN not in quality["flagged"]
 
 
 def test_every_judge_on_the_panel_gets_a_verdict(quality, recorded):
@@ -280,12 +441,63 @@ def test_every_judge_on_the_panel_gets_a_verdict(quality, recorded):
     assert all(row["verdict"] in quality["verdicts"] for row in quality["providers"])
 
 
-def test_granularity_across_the_panel_is_measured_not_asserted(quality):
-    """The spread the defect report quotes: 100% down to 0%, on the same rubric."""
-    rates = {r["provider"]: r["granularity"]["multiple_of_five_rate"] for r in quality["providers"]}
-    assert rates["bedrock/qwen3-235b"] == 1.0
-    assert rates["claude-cli/sonnet"] == 0.0
-    assert all(rate is not None for rate in rates.values())
+@pytest.mark.parametrize("corpus", ["run3", "run2"])
+def test_the_harshest_judge_on_the_panel_is_never_flagged(corpus, quality, archived_run2):
+    """A strict judge is a judge, not a defect.
+
+    This used to name `claude-cli/sonnet` and quote its −3.7 bias. Sonnet is not
+    the harshest judge on run 3 — `bedrock/gpt-oss-120b` is, at a bias the panel
+    computes — so the test had stopped exercising the claim its docstring makes.
+    The judge is now *found* rather than named: whoever sits lowest against the
+    pooled mean on a given corpus must come out DISCRIMINATING with no reasons
+    against it. If the rule could not tell a harsh grader apart from a judge
+    returning 120.0 eleven times, it would be measuring severity and calling it
+    quality — and that failure would now be caught on whichever judge is harsh
+    next run, not only on the one that was harsh when this was written.
+    """
+    directory, panel = (SCORECARDS, quality) if corpus == "run3" else (SCORECARDS_RUN2, archived_run2)
+    biases = cal.provider_bias(cal.load_judgments(directory))
+    harshest = min(biases, key=lambda r: r["bias"])
+    row = _row(panel, harshest["provider"])
+    assert harshest["bias"] < 0, "the harshest judge must actually sit below the pooled mean"
+    assert row["verdict"] == cal.VERDICT_DISCRIMINATING, (
+        f"{corpus}: the harshest judge ({harshest['provider']}, bias {harshest['bias']:+.1f}) is flagged "
+        f"{row['verdict']} — the rule is reading severity as a defect"
+    )
+    assert row["reasons"] == []
+    assert harshest["provider"] not in panel["flagged"]
+
+
+@pytest.mark.parametrize("corpus", ["run3", "run2"])
+def test_granularity_across_the_panel_is_measured_not_asserted(corpus, quality, archived_run2):
+    """Every published granularity figure is re-derived from the scorecards here.
+
+    The old form hard-coded run 2's two extremes (100% for qwen, 0% for sonnet)
+    and so had to be edited the moment the prompt changed them. What actually
+    matters is that the figure is a measurement and that it separates judges on
+    one rubric, and both are now checked against the files: every provider's
+    published rate equals a from-disk recount, the panel's spread is wider than
+    the chance rate the ceiling is justified against, and the coarsest judge is
+    identified rather than assumed.
+    """
+    directory, panel = (SCORECARDS, quality) if corpus == "run3" else (SCORECARDS_RUN2, archived_run2)
+    rates = {r["provider"]: r["granularity"]["multiple_of_five_rate"] for r in panel["providers"]}
+    assert all(rate is not None for rate in rates.values()), "a rate of None is an unrecorded signal, not a zero"
+
+    for provider, rate in rates.items():
+        assert rate == _signals_from_disk(directory, provider)["multiple_of_five_rate"], (
+            f"{corpus}: the published multiple-of-five rate for {provider} is not what the scorecards say"
+        )
+
+    chance = cal.multiple_of_five_chance_rate(MAXIMA)
+    assert max(rates.values()) - min(rates.values()) > chance, (
+        f"{corpus}: judges on one rubric span {min(rates.values()):.0%}-{max(rates.values()):.0%}, "
+        f"less than the {chance:.0%} chance rate — the signal would not be separating anyone"
+    )
+    assert max(rates, key=lambda p: rates[p]) == QWEN, (
+        f"{corpus}: the coarsest judge on the panel is no longer {QWEN}; the granularity narrative "
+        "on the dashboard and in ADR-0005 is about that judge and needs rewriting"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -293,15 +505,41 @@ def test_granularity_across_the_panel_is_measured_not_asserted(quality):
 # ---------------------------------------------------------------------------
 
 
-def test_the_exclusion_block_shows_both_columns_and_the_delta(quality):
-    exclusion = quality["exclusion"]
+@pytest.mark.parametrize("corpus", ["run3", "run2"])
+def test_the_exclusion_block_agrees_with_the_flag_list(corpus, quality, archived_run2):
+    """The exclusion block is a function of who is flagged, on any panel.
+
+    The old form asserted both columns unconditionally, which only held while
+    some judge was flagged; on run 3 nobody is, and it fell over on a `None`
+    rather than on a claim. Both states are now checked, and against real
+    corpora rather than only synthetic ones: run 2 exercises the two-column
+    path — including the delta arithmetic, which the old test named in its title
+    but only half-checked — and run 3 exercises the path where the honest output
+    is a sentence instead of a column.
+    """
+    panel = quality if corpus == "run3" else archived_run2
+    exclusion = panel["exclusion"]
     with_flagged, without_flagged = exclusion["with_flagged"], exclusion["without_flagged"]
-    assert with_flagged is not None and without_flagged is not None
+
+    assert exclusion["flagged"] == panel["flagged"]
+    assert with_flagged is not None, "the unfiltered column is the panel itself and always exists"
+    assert with_flagged["providers"] == sorted(r["provider"] for r in panel["providers"])
+
+    if not panel["flagged"]:
+        assert without_flagged is None, "a panel with nothing to exclude must not print an exclusion column"
+        assert exclusion["delta"] is None
+        assert "nothing to exclude" in exclusion["note"].lower()
+        return
+
+    assert without_flagged is not None
     assert with_flagged["n_judgments"] > without_flagged["n_judgments"]
-    assert "bedrock/qwen3-235b" in with_flagged["providers"]
-    assert "bedrock/qwen3-235b" not in without_flagged["providers"]
-    assert exclusion["delta"]["pooled_mean"] == round(without_flagged["pooled_mean"] - with_flagged["pooled_mean"], 2)
-    assert exclusion["delta"]["sigma_median"] < 0, "dropping the flat judge must visibly narrow the panel"
+    for flagged in panel["flagged"]:
+        assert flagged in with_flagged["providers"]
+        assert flagged not in without_flagged["providers"]
+    delta = exclusion["delta"]
+    for key in ("n_judgments", "pooled_mean", "bias_spread", "sigma_min", "sigma_max", "sigma_median"):
+        assert delta[key] == round(without_flagged[key] - with_flagged[key], 2), f"{corpus}: {key} delta is not the gap"
+    assert delta["sigma_median"] < 0, "dropping a flat judge must visibly narrow the panel"
 
 
 def test_the_flagged_judge_is_still_in_every_pooled_figure(recorded, quality):
@@ -312,10 +550,25 @@ def test_the_flagged_judge_is_still_in_every_pooled_figure(recorded, quality):
     assert full["n_judgments"] == quality["exclusion"]["with_flagged"]["n_judgments"]
 
 
-def test_the_exclusion_note_says_the_decision_is_a_human_one(quality):
-    note = quality["exclusion"]["note"].lower()
-    assert "no judge has been excluded" in note
-    assert "adr" in note
+def test_the_exclusion_note_says_the_decision_is_a_human_one(archived_run2, quality):
+    """Whenever there is something to exclude, the note says who decides.
+
+    Re-pointed at run 2 for the same reason the block above was: on run 3 there
+    is no flagged judge, so a note about not having excluded one would be a
+    sentence about nobody. The doctrine sentence is asserted where it applies,
+    and run 3's note is asserted to say the true thing instead — silence in
+    either state would let the report drop the doctrine the day it matters.
+    """
+    with_a_flagged_judge = archived_run2["exclusion"]["note"].lower()
+    assert archived_run2["flagged"], "run 2 is the corpus that has a flagged judge; without one this proves nothing"
+    assert "no judge has been excluded" in with_a_flagged_judge
+    assert "human decision" in with_a_flagged_judge
+    assert "adr" in with_a_flagged_judge
+
+    clean = quality["exclusion"]["note"].lower()
+    assert not quality["flagged"]
+    assert "nothing to exclude" in clean
+    assert "excluded from" not in clean, "a clean panel must not imply a judge was held out of anything"
 
 
 def test_exclusion_is_reported_as_impossible_rather_than_faked(tmp_path):
@@ -417,15 +670,39 @@ def _run(*args: str):
     )
 
 
-def test_the_report_prints_the_verdict_prominently(quality):
+def test_the_report_prints_the_verdict_prominently(quality, archived_run2):
+    """The banner is asserted where a banner is owed, and its absence where it is not.
+
+    `assert VERDICT_NON_DISCRIMINATING in head` was a test of run 2's panel
+    wearing the clothes of a test of the printer. Run 3 flags nobody, so the
+    banner is correctly absent — and a test that only checked the present run
+    would now be checking nothing at all. The printer is therefore exercised on
+    both corpora: run 2 must still lead with the flagged judge by name, and run
+    3 must lead with the panel line instead of a banner it has no grounds for.
+    """
     proc = _run("--no-emit")
     assert proc.returncode == 0, proc.stderr
     head = "\n".join(proc.stdout.splitlines()[:6])
     for flagged in quality["flagged"]:
         assert flagged in head, f"{flagged} is flagged but is not in the first lines of the report"
-    assert cal.VERDICT_NON_DISCRIMINATING in head
+    if not quality["flagged"]:
+        assert not proc.stdout.startswith("!!"), "the report must not raise a banner for a panel it has not flagged"
+        assert f"{cal.VERDICT_NON_DISCRIMINATING} JUDGE(S) ON THIS PANEL" not in proc.stdout
+        assert proc.stdout.startswith("Panel:")
     assert "Judge quality" in proc.stdout
     assert "WITH and WITHOUT" in proc.stdout
+    # Every verdict the panel produced has to reach the printed table, not just the banner.
+    for row in quality["providers"]:
+        assert row["provider"] in proc.stdout and row["verdict"] in proc.stdout
+
+    flagged_run = _run("--scorecards", str(SCORECARDS_RUN2), "--no-emit")
+    assert flagged_run.returncode == 0, flagged_run.stderr
+    flagged_head = "\n".join(flagged_run.stdout.splitlines()[:6])
+    assert archived_run2["flagged"], "run 2 is the corpus with a flagged judge; without one this proves nothing"
+    for flagged in archived_run2["flagged"]:
+        assert flagged in flagged_head, f"{flagged} is flagged in run 2 but is not in the first lines of the report"
+    assert cal.VERDICT_NON_DISCRIMINATING in flagged_head
+    assert "Still pooled into every figure below" in flagged_run.stdout
 
 
 def test_judge_quality_json_is_committed_and_current(recorded):
@@ -446,12 +723,23 @@ def test_judge_quality_json_carries_no_timestamp():
 
 
 def test_judge_quality_json_states_that_nothing_was_excluded():
+    """The doctrine is unconditional; the flag list is derived from the file's own rows.
+
+    `payload["flagged"] == ["bedrock/qwen3-235b"]` was a transcription of run 2
+    living inside the test that guards against transcriptions. The list is now
+    recomputed from the rows the file publishes, so a hand-edited `flagged` — a
+    name added to it, or one quietly dropped out of it — fails here even if the
+    edit is internally tidy.
+    """
     payload = json.loads(JUDGE_QUALITY_JSON.read_text(encoding="utf-8"))
     doctrine = payload["doctrine"].lower()
     assert "does not remove that judge" in doctrine
     assert "as an exclusion list" in doctrine
     assert "human decision" in doctrine
-    assert payload["flagged"] == ["bedrock/qwen3-235b"]
+    assert payload["flagged"] == cal.flagged_providers(payload["providers"])
+    assert payload["flagged"] == payload["exclusion"]["flagged"]
+    # And whatever is flagged is still pooled: the with-column is the whole panel.
+    assert payload["exclusion"]["with_flagged"]["providers"] == sorted(r["provider"] for r in payload["providers"])
 
 
 def test_running_against_another_corpus_does_not_overwrite_the_committed_file(tmp_path):
@@ -502,26 +790,63 @@ def test_dashboard_publishes_the_measured_judge_quality_figures(quality):
 
 
 def test_dashboard_publishes_the_exclusion_delta_without_applying_it(quality):
+    """The page's headline figures are the unfiltered ones, in either state.
+
+    Before run 3 this dereferenced the without-flagged column unconditionally
+    and crashed on `None` the moment a panel had nobody to exclude — an
+    unhelpful failure, because "there is no such column" is the correct answer
+    and not a defect in the page. What the test is actually for survives in both
+    branches: the numbers the dashboard publishes must be the *with*-flagged
+    ones, so no pre-filtered figure can reach a reader as the panel's result.
+    """
     exclusion = quality["exclusion"]
+    with_flagged, without_flagged = exclusion["with_flagged"], exclusion["without_flagged"]
     flat = _flat(DASHBOARD)
-    assert f"{exclusion['with_flagged']['pooled_mean']}" in flat
-    assert f"{exclusion['without_flagged']['pooled_mean']}" in flat
-    assert f"{exclusion['with_flagged']['sigma_median']:.2f}" in flat
-    assert f"{exclusion['without_flagged']['sigma_median']:.2f}" in flat
+
+    assert f"{with_flagged['pooled_mean']}" in flat
+    assert f"{with_flagged['sigma_median']:.2f}" in flat
     assert "eval/judge-quality.json" in flat
-    for phrase in ("human decision", "not excluded"):
-        assert phrase in flat.lower(), f"the dashboard must say the panel is {phrase!r} here"
+    assert "human decision" in flat.lower(), "the dashboard must say whose decision an exclusion is"
+
+    if without_flagged is None:
+        # Nothing is flagged, so there is no second column to publish. The page
+        # has to say that rather than leave the reader to assume a filter ran;
+        # the sentence asserted is the one `eval/calibration.py` itself prints.
+        assert not quality["flagged"]
+        # Quoted from the tool rather than paraphrased, for the same reason the
+        # judge prompt quotes the rubric's band rows byte-for-byte: a paraphrase
+        # is a second claim that nothing regenerates. Only the sentence-final
+        # stop is forgiven, so the note can be quoted inside a sentence.
+        quoted = exclusion["note"].rstrip(".")
+        assert quoted in " ".join(DASHBOARD.read_text(encoding="utf-8").split()), (
+            "the dashboard must carry the exclusion note this run produces, word for word:\n"
+            f"  {exclusion['note']}\n"
+            "(print it with `python3 eval/calibration.py`)"
+        )
+        return
+
+    assert f"{without_flagged['pooled_mean']}" in flat
+    assert f"{without_flagged['sigma_median']:.2f}" in flat
+    assert "not excluded" in flat.lower(), "the dashboard must say the flagged judge is still pooled"
 
 
-def test_dashboard_records_that_the_recorded_runs_predate_the_rubric_bands():
-    """The note the absolute numbers on this page depend on.
+def test_dashboard_records_which_runs_predate_the_rubric_bands():
+    """The note the absolute numbers on this page depend on — pointed at the right runs.
 
     Run 1 and run 2 were both scored by a prompt that sent dimension names and
-    no bands. Their relative orderings are still evidence; their absolute values
-    are weaker evidence than a future run's, and the page has to say so next to
-    the table rather than only in a callout at the top.
+    no bands, so their absolute values are weaker evidence than a run scored
+    against the bands. That was written when `eval/scorecards/` *was* run 2; it
+    is now run 3, scored with the bands, and a page that still files the current
+    corpus under "no bands were sent" is telling the reader the opposite of the
+    truth. The archived runs are therefore asserted by the directory a reader
+    can go and open, which the pre-band claim can no longer drift away from.
     """
     flat = _flat(DASHBOARD).lower()
-    assert "run 1" in flat and "run 2" in flat
+    for archive in ("scorecards-run1", "scorecards-run2"):
+        assert archive in flat, (
+            f"the dashboard must name eval/{archive}/ as the pre-band corpus it is talking about, "
+            "rather than a run number that has since been reused"
+        )
     assert "rubric bands" in flat or "scoring bands" in flat
     assert "weaker evidence" in flat
+    assert "run 3" in flat, "the page publishes run 3; it has to say which run its figures come from"

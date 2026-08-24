@@ -296,10 +296,11 @@ to drift, and the prompt refuses to build if the vendored bytes do not hash to t
 and a one-sentence `why`; a judgement whose justification is missing, empty, or repeated
 across dimensions is recorded as **malformed** and excluded from the pool with an audit-trail
 entry, exactly as a crashed provider is. Both properties date from 2026-08-23 and both are
-breaking: **scores measured under this prompt are not comparable to `eval/scorecards/` or
-`eval/scorecards-run1/`**, which were produced by a prompt that sent only the dimension names
-and forbade prose. Those directories are kept unmodified as the record of the earlier
-instrument — see the callout at the top of
+breaking: **scores measured under this prompt are not comparable to `eval/scorecards-run1/` or
+`eval/scorecards-run2/`**, which were produced by a prompt that sent only the dimension names
+and forbade prose. Those two directories are kept unmodified as the record of the earlier
+instrument. `eval/scorecards/` is **run 3**, the first corpus scored under this prompt and the
+one every published figure comes from — see the callout at the top of
 [`skill-judge-dashboard.md`](skill-judge-dashboard.md).
 
 The ship rule itself — mean ≥ 108, mean − σ ≥ 105, per-dimension floors, ≥ 4 pooled rounds

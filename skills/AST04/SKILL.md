@@ -41,7 +41,9 @@ its neighbors*; this table is only the jump.
 
 **Stop after *Decision rules*** if you are producing a verdict. Read *Where the shipped
 checks go quiet* only when a check returned **negative** and you must decide whether that
-is a pass or a blind spot — it is a false-negative map, not background.
+is a pass or a blind spot — it is a false-negative map, not background. **NEVER**
+is the last stop before you write a finding down: the eight ways a result of either
+sign gets over-read.
 
 **Layer 3 — load on condition, never by default.**
 
@@ -206,6 +208,67 @@ to Google) is checkable against a trademark/brand list at publish time but requi
 external reference corpus this artifact does not carry — whether that makes it
 static-detectable-with-a-supplied-list or agent-judgable is fixed in
 `coverage-matrix.md`, not decided here.
+
+## NEVER — how a check result becomes a wrong verdict
+
+- **NEVER report a positive `AST04-yaml-injection` as "an executable payload ships in
+  this package."** The check ORs two independent halves — a `!!python/…`/`!!ruby/…` tag
+  in shipped YAML or in `.md` frontmatter, and an unsafe loader call site in bundled
+  `.py` — because a package can ship the payload for a host loader it does not bundle,
+  and can bundle the loader for a payload that arrives later. A bare
+  `yaml.load(open(...))` with no tag anywhere produces the same `detected=True` as a
+  planted `!!python/object/apply`. Read which half the evidence names: one fix pins
+  `SafeLoader`, the other deletes bytes, and shipping the wrong one leaves the defect.
+- **NEVER file an `AST04-json-injection` hit without locating the key.** The three
+  dangerous names are matched at any depth of any shipped `.json`, and two of them —
+  `constructor`, `prototype` — are ordinary property names: a JSON Schema whose
+  `properties` block declares a field called `constructor` comes back `detected=True`
+  in the pollution wording. The cost runs both ways. A benign schema is convicted of
+  `AST04-S06`, and because the check returns on its first hit, a genuine `__proto__`
+  elsewhere in the package is never named in the evidence you are reading.
+- **NEVER read an "unexpected top-level key" as config injection before checking which
+  file it fired on.** The six-name allowlist (`name`, `description`, `version`,
+  `settings`, `permissions`, `metadata`) is the *skill manifest's* schema, and
+  `detect_toml_injection` applies it to every `.toml` in the package: a shipped
+  `pyproject.toml` fires on `['build-system', 'project', 'tool']`, a `ruff.toml` on
+  `['line-length', 'lint']`. The damage is not the noise. A reviewer who learns to wave
+  this check through is the one who waves through the redefined `[table]` — the
+  precedence violation the scenario is actually named for.
+- **NEVER treat a parse failure as a scan.** `detect_json_injection` skips a file
+  `json.loads` rejects; `detect_toml_injection` skips one `tomllib` rejects, after its
+  redefined-table text scan. Each then returns the same negative, in the same words, it
+  returns for a genuinely clean package. A config the host's lenient parser accepts and
+  the stdlib refuses is the most attacker-friendly shape in this category, and it is
+  exactly the one whose Finding is indistinguishable from clean. Only the list of files
+  actually parsed tells you which of the two you are holding.
+- **NEVER read "no check fired" as "AST04 is clean."** Six checks decide five of seven
+  scenarios. `AST04-S01` Brand Impersonation is agent-judgable — name, author and
+  description all ship, but the trademark and vendor-namespace corpus that would settle
+  them does not — and `AST04-S05` Staged Loader is out-of-artifact; neither has a check,
+  and `detectors/engine.py::run_category` raises `OutOfArtifactFixtureError` if a
+  fixture is ever labeled under S05. A verdict that does not name the two questions
+  nobody asked is a statement about the tooling wearing the package's name.
+- **NEVER decide the staged loader from the dependency's name.** The tempting close on
+  `AST04-S05` is to read the referenced `requirements.txt` and judge what it lists. The
+  staging structure is in the artifact; the payload is resolved from an index at install
+  time, is version-range dependent, and can change between the review fetch and the
+  install fetch with no edit to the skill. Judging the listed name is `AST04-S01`'s
+  problem restated with less evidence, and it costs the one control that does work —
+  sandboxing the install-time resolve — by making it look already done.
+- **NEVER let `AST04-invisible-unicode-smuggling` into an AST04 number or a verdict.**
+  Its `CHECK_COVERAGE` entry carries `registry_ids: []` and `covers:
+  category-precondition`, it has no fixture pair, and it is the single reason this
+  module's `F1_SCOPE` reads `mixed-proxy` while every corpus-labeled check is `covers:
+  full`. With rule 5's base rate, a hit is an instruction to decode and re-scan —
+  AST08-S02's work — not a finding. Counted as coverage it inflates the category with a
+  check that decides no named scenario in any category.
+- **NEVER quote AST04's `1.00` as a rate.** Each of the five labeled checks is scored
+  over exactly one vulnerable and one clean case (`coverage-matrix.md`, reconciliation
+  debt 1), and the fixtures share an author with the checks (debt 2), so the corpus
+  cannot surface a blind spot both were built around. The number is evidence that
+  the checks discriminate at all. Printed as precision it buys a reader's confidence with
+  a measurement nobody made; the honest form is "five checks, one labeled pair each,
+  written alongside them".
 
 ## References
 

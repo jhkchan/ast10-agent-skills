@@ -32,6 +32,7 @@ the porting event itself, which no tool observes.
 | a manifest field's meaning or precedence | rules 1–5, then stop |
 | a skill that just changed runtimes | rules 6–8 |
 | an encoded blob, or a scanner result on one | rule 9, then "Where the one shipped check goes quiet" |
+| a write-up about to quote a validator `OK`, a matching hash, or a clean scan | **"NEVER"** — read it before the finding leaves |
 | "is this AST10 or AST0n?" | "Distinguishing AST10 from its neighbors" |
 | a write-up that attributes the Universal Skill Format | "Attribution" — mandatory before you cite it |
 | a value that is wrong rather than a field that is absent | wrong skill → the AST01–AST09 category that owns that value |
@@ -173,6 +174,67 @@ line or through a single assignment. Both arms have edges a reviewer inherits.
 - **The decode is bounded: depth 2, 256 KiB per blob, 400 candidates per file.** Past any
   of those, content is unexamined rather than examined-and-cleared. A deeply nested or
   blob-dense package needs a manual pass, not a re-run.
+
+## NEVER
+
+Every entry below is a *passing* result being read as more than it says. That is this
+category's characteristic failure: the tooling here is unusually good at shape and unusually
+quiet about substance, so the false assurance arrives wearing a green check.
+
+- **NEVER read `OK (signature=signed, ...)` as a verified signature.** `signature_state`
+  (`validators/usf.py` line 579) is a regex on the shape `ed25519:<128 hex>` and nothing more;
+  `validate_manifest` never calls `verify_signature`, and neither does the CLI — grep the repo
+  and `tests/test_usf.py` is its only caller. A ported copy that kept the signature line while
+  the body was re-serialized therefore passes the exact gate that exists to catch that port.
+  Call `verify_signature(manifest)` explicitly: it raises rather than returning `False` when
+  there is no key, so "unverifiable" cannot be logged as "verified".
+- **NEVER treat a matching `content_hash` as integrity over the package.** The hashed surface
+  is `SURFACE_GLOBS` (`scripts/content_hash.py` line 26), of which only `SKILL.md` and
+  `scripts/*.py` are populated in this repo (line 44), and `skill.usf.yaml` is deliberately
+  outside it so the hash does not depend on the field carrying it. A `coverage-matrix.md`, a
+  data file, or any non-`.py` script can be rewritten with the hash unmoved. "Hash matches"
+  answers *did the hashed surface change*, and a porting tool that touched anything else has
+  produced exactly the silent metadata loss the category is named for.
+- **NEVER accept the "deny_write wins, so the write grant is inert" warning as proof the
+  identity file is protected.** `_identity_state` matches by basename, so
+  `deny_write: [config/SOUL.md]` registers `SOUL.md` as denied and downgrades the finding to a
+  warning — while `_write_allowed` matches a path-form entry against that exact path only, so
+  `write: [SOUL.md]` still resolves to allowed. The two halves of rule 1 disagree on that
+  manifest and the validator prints the reassuring half. Settle it by evaluating
+  `write_allowed(manifest, "SOUL.md")`, not by reading the warning.
+- **NEVER read a default-run `OK` as "nothing was stripped in the port".**
+  `UsfValidationResult.ok` is `not errors`, and the three signals that most directly mark a
+  port — an absent `network.deny: "*"`, an absent `scan_status`, an absent `author.identity` —
+  are all *warnings*. `semantic_errors` says why in its own message text: a reviewer "cannot
+  tell an intentional omission from metadata dropped in a port". The validator's entire
+  port-detection value lives in the stream the default exit code discards. Run `--strict`.
+- **NEVER report a manifest's defect list as complete when the structural pass failed.**
+  `validate_manifest` returns the schema errors and skips `semantic_errors` entirely, so
+  precedence, the risk-tier floor, signature/key coherence, changelog cover, and the
+  content-hash binding were never evaluated on that run. Fix the schema errors, re-run, and a
+  second and larger list appears — after the first count has already gone into someone's
+  ticket.
+- **NEVER let a parent domain in `network.allow` stand for its subdomains.** Rule 3 states the
+  discipline the format permits; the shipped evaluator is stricter than that ceiling —
+  `network_egress_allowed` is an exact lowercased set-membership test, so `api.example.com`
+  does not permit `evil.api.example.com`, and `host_errors` rejects `*.example.com` outright
+  rather than expanding it. Never carry a rule-3 reading into a claim about what this
+  evaluator allowed. The misreading costs in both directions: an allowlist read as covering a
+  subtree hides a real egress gap, and an author who hits the wildcard rejection "fixes" it by
+  widening to the apex domain — trading a rejected manifest for a genuinely broader grant.
+- **NEVER cite `AST06-missing-sandbox-declaration` as coverage of AST10-S04.** The registry's
+  own AST10-S04 entry lists that check under `artifact_signal_checks` and states in the same
+  breath that it is "declared covers: artifact-signal-only and never coverage of this
+  scenario", because an absent permission block is byte-identical to one that never existed.
+  Promoting the proxy turns 1-of-6 into 2-of-6 on paper while nothing new became decidable,
+  and it is the single move `coverage-matrix.md` records the proxies in order to prevent.
+- **NEVER close AST10-S06 on a clean detector line.** The clean verdict's own words are
+  "N surface(s) scanned, M decodable blob(s) read" — an account of what was decoded, not of
+  what is there. `_raw_candidates` extracts base64, bare hex, `\xNN` and percent encodings
+  only, so base32, base85 and any custom alphabet are never candidates at all, and a third
+  layer is past `MAX_DECODE_DEPTH`. Report the two numbers rather than the verdict; "0 blobs
+  read" and "0 payloads present" are the same sentence to every reader downstream, and only
+  one of them is something the check measured.
 
 ## Scope and out-of-artifact boundary
 

@@ -19,6 +19,14 @@ malformed and is excluded from the pool with an audit-trail entry -- the same
 treatment ``adapters/base.py`` gives a provider that crashed. A score nobody
 can explain is not evidence, and the pre-2026-08-23 flat shape is rejected
 precisely so that a judge cannot opt out of explaining and still bind.
+
+**Which corpus is which.** ``eval/scorecards-run1/`` and
+``eval/scorecards-run2/`` were both scored before either change and are frozen;
+``eval/scorecards/`` is run 3, the first run under the rubric-grounded prompt
+and the justification contract. Section 4 holds one test per side: the archives
+must stay unexplainable by today's parser, and the current corpus must satisfy
+it for every pooled judgment. Those two facts are what make the runs
+distinguishable by inspection rather than by memory.
 """
 
 from __future__ import annotations
@@ -498,7 +506,18 @@ def test_every_adapter_malformed_publishes_failed_not_a_zero_pool(tmp_path):
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("directory", ["scorecards", "scorecards-run1"])
+#: The runs recorded before 2026-08-23, when the prompt sent dimension names
+#: and no bands and the response contract asked for a bare number. They are
+#: frozen history: nothing writes to them, and the assertions below are what
+#: makes that immutability checkable rather than merely intended.
+ARCHIVED_CORPORA = ["scorecards-run1", "scorecards-run2"]
+
+#: The run the repository currently publishes, produced by the rubric-grounded
+#: prompt under the justification contract.
+CURRENT_CORPUS = "scorecards"
+
+
+@pytest.mark.parametrize("directory", [CURRENT_CORPUS, *ARCHIVED_CORPORA])
 def test_the_recorded_scorecards_are_still_readable_by_their_readers(directory):
     """The prompt changed; the audit trail did not.
 
@@ -521,22 +540,252 @@ def test_the_recorded_scorecards_are_still_readable_by_their_readers(directory):
     assert load_scorecards(path)
 
 
-def test_recorded_scorecards_predate_the_justification_contract():
-    """Stated as a test so the incomparability cannot be forgotten.
-
-    Every judgment in ``eval/scorecards/`` was produced by the unanchored
-    prompt and carries no justification. Scores measured under the current
-    prompt are a different instrument and must not be pooled with, differenced
-    against, or trended into these -- see the module docstring of
-    ``scripts/judge_harness.py``.
-    """
-    cards = sorted((REPO_ROOT / "eval" / "scorecards").glob("*.json"))
-    if not cards:
-        pytest.skip("no scorecards recorded")
+def _recorded_rows(directory: str) -> list[tuple[str, dict]]:
+    """``(card name, judgment)`` for every pooled judgment in a recorded corpus."""
+    cards = sorted((REPO_ROOT / "eval" / directory).glob("*.json"))
+    assert cards, (
+        f"eval/{directory}/ holds no scorecards. It is committed history, not a cache: "
+        "an empty one means a recorded run was deleted, which is the thing this file guards."
+    )
+    rows: list[tuple[str, dict]] = []
     for card in cards:
         payload = json.loads(card.read_text(encoding="utf-8"))
-        for row in payload.get("judgments") or []:
-            assert "justifications" not in row, (
-                f"{card.name} carries justifications, so it was NOT produced by the pre-2026-08-23 "
-                "prompt this test describes — the incomparability note needs updating, not this file"
-            )
+        judgments = payload.get("judgments") or []
+        assert payload["aggregate"]["n"] == len(judgments), (
+            f"{directory}/{card.name}: the aggregate pooled {payload['aggregate']['n']} judgments but "
+            f"{len(judgments)} are recorded, so some pooled judgment is not on disk to be checked"
+        )
+        rows.extend((card.name, row) for row in judgments)
+    assert rows, f"eval/{directory}/ records no judgments"
+    return rows
+
+
+@pytest.mark.parametrize("directory", ARCHIVED_CORPORA)
+def test_the_archived_corpora_predate_the_justification_contract(directory):
+    """Stated as a test so the incomparability cannot be forgotten.
+
+    Every judgment in ``eval/scorecards-run1/`` and ``eval/scorecards-run2/``
+    was produced by the unanchored prompt and carries no justification. Scores
+    measured under the current prompt are a different instrument and must not
+    be pooled with, differenced against, or trended into these -- see the
+    module docstring of ``scripts/judge_harness.py``.
+
+    Until run 3 this said ``eval/scorecards/``, which was true when it was
+    written and stopped being true the moment a run was recorded under the new
+    contract. Pointing it at the archives restores the premise *and* lets the
+    claim be made in the strongest available form: it is no longer "these rows
+    have no ``justifications`` key" -- which a re-serialisation could satisfy by
+    accident -- but "the bytes these judges actually returned are rejected by
+    today's parser, for the stated reason". That cannot be true of a corpus
+    produced under the current contract, so the two runs can never be confused.
+    """
+    for card_name, row in _recorded_rows(directory):
+        where = f"{directory}/{card_name}:{row['provider']}"
+        assert "justifications" not in row, (
+            f"{where} carries justifications, so it was NOT produced by the pre-2026-08-23 prompt "
+            "this test describes — an archived run must never be rewritten"
+        )
+        with pytest.raises(JudgmentParseError) as excinfo:
+            parse_judgment(row["raw_response"])
+        message = str(excinfo.value)
+        assert "no justification" in message, where
+        assert "flat contract" in message, where
+
+
+def test_the_current_scorecards_honour_the_justification_contract():
+    """The old test's premise, inverted into a guard that faces forward.
+
+    ``parse_judgment`` refuses a judgement whose dimensions are unexplained, and
+    ``run_judge`` drops such a judgement into the audit trail rather than the
+    pool. Both are assertions about a live run. This is the assertion about what
+    was actually banked: every pooled judgment in ``eval/scorecards/`` carries a
+    distinct, non-empty justification for every dimension it scored, and its
+    recorded ``raw_response`` still parses -- reproducing exactly the scores and
+    justifications stored beside it. A judgement that was let into the pool
+    without a reason, or a stored score that has drifted from the bytes it came
+    from, fails here.
+    """
+    for card_name, row in _recorded_rows(CURRENT_CORPUS):
+        where = f"{CURRENT_CORPUS}/{card_name}:{row['provider']}"
+        justifications = row.get("justifications")
+        assert isinstance(justifications, dict), f"{where} was pooled with no justifications block"
+        assert set(justifications) == set(DIMENSIONS), f"{where} justifies {sorted(justifications)}"
+        assert set(justifications) == set(row["scores"]), f"{where} scores and reasons name different dimensions"
+        for dimension, why in justifications.items():
+            assert isinstance(why, str) and why.strip(), f"{where} {dimension} has an empty justification"
+
+        # The rule parse_judgment enforces at the door, checked against what got in:
+        # one sentence reused across two dimensions justifies neither of them.
+        normalised = [" ".join(why.split()).casefold() for why in justifications.values()]
+        assert len(set(normalised)) == len(normalised), f"{where} reuses one justification across dimensions"
+
+        parsed = parse_judgment(row["raw_response"])
+        assert parsed.scores == row["scores"], f"{where}: stored scores differ from the recorded response"
+        assert parsed.justifications == justifications, f"{where}: stored reasons differ from the recorded response"
+
+
+# ---------------------------------------------------------------------------
+# 5. Every document that names a corpus names the right one
+# ---------------------------------------------------------------------------
+#
+# Section 4 checks the corpora against the parser. This section checks the
+# PROSE against the corpora, because that is where the last drift actually
+# landed: when run 3 was recorded, `eval/scorecards/` stopped being the
+# pre-rebuild archive and five documents went on saying it was — including the
+# README sitting inside the directory, which told a reader that the 198
+# judgments beneath it carried no reasons while all 177 of them carried eight
+# apiece. Nothing failed, because no test asked the documents which corpus they
+# meant. These do, and they derive the answer from the judgments rather than
+# from a name anyone typed.
+
+
+#: The files that tell a reader which recorded run is which.
+CORPUS_PROSE = (
+    "CONTRIBUTING.md",
+    "docs/architecture.md",
+    "docs/skill-judge-dashboard.md",
+    "docs/adr/0005-judge-panel-calibration-and-the-lower-bound.md",
+    "eval/calibration.py",
+    "eval/scorecards/README.md",
+    "eval/scorecards-run1/README.md",
+    "eval/scorecards-run2/README.md",
+    "scripts/judge_harness.py",
+)
+
+#: Phrases that introduce the claim "this corpus was measured by the other
+#: instrument". A sentence carrying one of these is making a dating claim, and a
+#: dating claim about a corpus is checkable against that corpus's bytes.
+INCOMPARABILITY_MARKERS = (
+    "not comparable",
+    "do not compare",
+    "do not diff",
+    "do not trend",
+    "must not be pooled",
+    "predate",
+)
+
+#: Only a path counts as naming a corpus. The bare word "scorecards" is ordinary
+#: prose ("the scorecards here"), and matching it would flag sentences that name
+#: no directory at all.
+_CORPUS_PATH = re.compile(r"eval/scorecards(?:-run\d+)?(?![-\w])")
+
+#: Sentence ends, plus the list-item boundaries that survive whitespace
+#: flattening -- so a marker in one bullet cannot capture a corpus named in the
+#: next one.
+_SENTENCE_BREAK = re.compile(r"(?<=[.!?])\s+|\s+[-*]\s+")
+
+#: The JSON key a judgment produced under the current contract carries. Quoted
+#: as a key rather than matched as a word, so prose *about* justification
+#: ("requires a one-sentence justification per dimension" -- true in every
+#: README, including the archives') cannot be mistaken for the claim that these
+#: particular rows have one.
+JUSTIFICATION_KEY = "`justifications`"
+
+
+def _corpus_contract_split() -> tuple[list[str], list[str]]:
+    """Every recorded corpus, split pre-/post-justification-contract by its bytes.
+
+    The split is a measurement, not a list: a corpus is post-contract when its
+    judgments carry justifications, and that is decided by reading them. A
+    corpus that carries some and not others is refused outright — the whole
+    point of the two directories is that each one is a single instrument.
+    """
+    pre: list[str] = []
+    post: list[str] = []
+    for directory in sorted((REPO_ROOT / "eval").glob("scorecards*")):
+        if not directory.is_dir():
+            continue
+        rows = [row for _, row in _recorded_rows(directory.name)]
+        explained = sum(1 for row in rows if row.get("justifications"))
+        assert explained in (0, len(rows)), (
+            f"eval/{directory.name}/ pools {explained} explained judgments with "
+            f"{len(rows) - explained} unexplained ones — a corpus is one instrument or it is not a corpus"
+        )
+        (post if explained else pre).append(directory.name)
+    assert pre and post, "the repository must hold both a pre-contract archive and a current corpus"
+    return pre, post
+
+
+def test_which_corpora_are_archived_is_read_off_the_judgments_not_off_this_file():
+    """The two constants section 4 parametrises on are themselves checked.
+
+    ``ARCHIVED_CORPORA`` and ``CURRENT_CORPUS`` are the names this file uses to
+    decide which corpus must fail the parser and which must satisfy it. If they
+    were only ever typed, the day a new run lands the archived list would still
+    read ``scorecards`` and the strongest tests in section 4 would be pointed at
+    the wrong directory — which is precisely the failure that produced this
+    section. So the names are re-derived from the judgments and compared.
+    """
+    pre, post = _corpus_contract_split()
+    assert pre == sorted(ARCHIVED_CORPORA), (
+        f"the corpora that carry no justifications are {pre}, but this file archives {sorted(ARCHIVED_CORPORA)} — "
+        "a run was recorded or archived without repointing ARCHIVED_CORPORA"
+    )
+    assert post == [CURRENT_CORPUS], (
+        f"the corpora written under the justification contract are {post}, but this file publishes "
+        f"{CURRENT_CORPUS!r} as the current one"
+    )
+
+
+def test_each_corpus_readme_describes_the_instrument_that_wrote_it():
+    """A directory's own README is the first thing a reader opens. It must be true.
+
+    The failure this pins happened: ``eval/scorecards/README.md`` was written
+    for run 2, run 3 was recorded into the same directory, and the README went
+    on announcing that it predated the prompt rebuild and that not one of its
+    judgments carried a reason. Both halves are now decided by the judgments
+    underneath the README instead of by whoever last edited it.
+    """
+    pre, post = _corpus_contract_split()
+    for name in post:
+        flat = " ".join((REPO_ROOT / "eval" / name / "README.md").read_text(encoding="utf-8").split())
+        assert "predate" not in flat.lower(), (
+            f"eval/{name}/README.md says its scorecards predate the prompt rebuild, but every judgment in it "
+            "carries a justification, so it was written under the rebuilt prompt"
+        )
+        assert JUSTIFICATION_KEY in flat, (
+            f"eval/{name}/README.md must tell a reader that these rows carry {JUSTIFICATION_KEY} — "
+            "it is the one visible difference between this corpus and the archives"
+        )
+    for name in pre:
+        flat = " ".join((REPO_ROOT / "eval" / name / "README.md").read_text(encoding="utf-8").split())
+        assert JUSTIFICATION_KEY not in flat, (
+            f"eval/{name}/README.md claims its rows carry {JUSTIFICATION_KEY}, but not one of them does"
+        )
+
+
+@pytest.mark.parametrize("relative", CORPUS_PROSE)
+def test_no_document_files_the_current_corpus_among_the_pre_rebuild_archives(relative):
+    """Whichever corpora a document calls incomparable must be the archived ones.
+
+    Every sentence in these files that makes a dating claim is located, and the
+    corpus paths inside it are compared against the split measured from the
+    judgments. Naming the current corpus there is the drift that occurred; and a
+    document that names any corpus in such a sentence has to name *all* the
+    archived ones, so an archive cannot be quietly dropped from the warning the
+    day a third one exists. A corpus README says "this directory" rather than
+    its own path, so it counts as having named itself.
+    """
+    pre, post = _corpus_contract_split()
+    path = REPO_ROOT / relative
+    flat = " ".join(path.read_text(encoding="utf-8").split())
+    deictic = {path.parent.name} & set(pre)
+
+    named_in_claims: set[str] = set()
+    for sentence in _SENTENCE_BREAK.split(flat):
+        if not any(marker in sentence.lower() for marker in INCOMPARABILITY_MARKERS):
+            continue
+        named = {match.group(0).split("/")[-1] for match in _CORPUS_PATH.finditer(sentence)}
+        current = named & set(post)
+        assert not current, (
+            f"{relative} files {sorted(current)} with the pre-rebuild archives:\n  {sentence.strip()}\n"
+            f"Those corpora were written UNDER the current prompt — every judgment in them carries a "
+            f"justification. The archives are {pre}."
+        )
+        named_in_claims |= named
+
+    if named_in_claims:
+        assert named_in_claims | deictic == set(pre), (
+            f"{relative} calls {sorted(named_in_claims | deictic)} incomparable, but the corpora that predate "
+            f"the justification contract are {pre}"
+        )

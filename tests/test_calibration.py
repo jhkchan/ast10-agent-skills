@@ -43,6 +43,10 @@ CALIBRATION_PY = REPO_ROOT / "eval" / "calibration.py"
 ADR = REPO_ROOT / "docs" / "adr" / "0005-judge-panel-calibration-and-the-lower-bound.md"
 DASHBOARD = REPO_ROOT / "docs" / "skill-judge-dashboard.md"
 SCORECARDS = REPO_ROOT / "eval" / "scorecards"
+#: Run 2, archived and frozen. Used where a claim needs a panel that has a
+#: flagged judge on it: run 3 has none, and a check that only runs when someone
+#: is flagged is a check that stops running the moment the panel improves.
+SCORECARDS_RUN2 = REPO_ROOT / "eval" / "scorecards-run2"
 
 
 def _load_calibration():
@@ -118,15 +122,32 @@ def test_the_headline_figures_still_describe_the_whole_panel(computed):
     dropping that judge would do. `summary`, `providers` and `skills` describe
     the panel as recorded — every judge, flagged or not — because that is the
     panel the scorecards, the dashboard and ADR-0005 all report.
+
+    This used to `skip` when nothing was flagged, which run 3 made permanent:
+    the check that the published headline figures are unfiltered went silent on
+    exactly the panel that is published. Nothing here needed a flagged judge
+    except one line, so the rest now always runs, and that line is exercised
+    against the archived run-2 corpus — which has a flagged judge and, being
+    frozen, always will.
     """
-    flagged = computed["judge_quality"]["flagged"]
-    if not flagged:
-        pytest.skip("no judge flagged on the recorded panel")
     named = {row["provider"] for row in computed["providers"]}
-    assert set(flagged) <= named, "a flagged judge vanished from the per-provider bias table"
     with_flagged = computed["judge_quality"]["exclusion"]["with_flagged"]
+    assert with_flagged["providers"] == sorted(named), "the with-flagged column is the panel, or it is nothing"
     assert with_flagged["pooled_mean"] == computed["summary"]["pooled_mean"]
     assert with_flagged["n_judgments"] == computed["summary"]["n_judgments"]
+    assert set(computed["judge_quality"]["flagged"]) <= named
+
+    archived = cal.report(cal.load_judgments(SCORECARDS_RUN2))
+    flagged = archived["judge_quality"]["flagged"]
+    assert flagged, (
+        f"{SCORECARDS_RUN2.relative_to(REPO_ROOT)} is the recorded panel that has a flagged judge; "
+        "without one, the assertion below proves nothing"
+    )
+    archived_named = {row["provider"] for row in archived["providers"]}
+    assert set(flagged) <= archived_named, "a flagged judge vanished from the per-provider bias table"
+    archived_with = archived["judge_quality"]["exclusion"]["with_flagged"]
+    assert archived_with["pooled_mean"] == archived["summary"]["pooled_mean"]
+    assert archived_with["n_judgments"] == archived["summary"]["n_judgments"]
 
 
 def test_empty_corpus_is_reported_not_crashed(tmp_path):

@@ -44,6 +44,7 @@ the route sends you. Mechanism (manifest-vs-behavior diffing) lives in
 | Decision rules | always: six rules, and the reason this file exists |
 | Distinguishing AST03 from its neighbors | the route above was contested, or one incident spans two categories |
 | What the shipped checks decide, and where they go quiet | **MANDATORY before you report a negative, and before you extend any check by hand.** The last silence is why a previous version of the identity check false-positived against every conformant USF manifest |
+| NEVER | **always, and again before a finding is written down or a number published.** What the three non-covering checks and the three out-of-artifact scenarios invite you to conclude; each entry names the check, tier or test that refutes it |
 | Scope and out-of-artifact boundary | you are being asked whether an LPCI trigger will actually fire |
 
 **Do NOT load `coverage-matrix.md`** to decide whether something is a finding. It is the
@@ -160,6 +161,64 @@ exists to prevent.
   of the identity check read only the flattened spelling and reported a false positive
   against every conformant USF manifest. When you extend a check by hand, read all three
   or your extension will be dead against the manifests that actually ship.
+
+## NEVER
+
+Four checks ship and one of them claims a scenario, so this category's characteristic error
+is reading a green run as a conclusion the module never reached. Each entry names what
+refutes it, in this directory.
+
+- **NEVER read root-recursive as the only recursive grant that reaches an identity file.**
+  Only `**`, `./**` and `~/**` are treated as reaching the package or home root; the
+  home-expanded spelling of the same grant, `/home/agent/**`, clears all four checks while
+  `SOUL.md` beneath it is writable. The narrowing is deliberate — a scoped grant like
+  `/secrets/**` is a different finding — but an absolute path that happens to *be* the home
+  root is indistinguishable from a scoped one without the host's user, which the package
+  never carries. Resolve the root by hand before you accept the negative.
+- **NEVER let either network check speak for a package that declares no manifest.**
+  Unbounded egress is decided from a `network` key, and when there is none the finding reads
+  `egress is a bounded allowlist of 0 host(s): []` with `shell_granted=False` — the same
+  strings a carefully scoped manifest produces. Three of the four checks clear a package with
+  no permissions block at all; the one that fires is the one the module declares decides no
+  named scenario.
+- **NEVER publish `AST03-shell-network-privilege-combo` or `AST03-wildcard-network-egress`
+  as AST03 coverage.** Both are `covers: artifact-signal-only` in the module's own
+  `CHECK_COVERAGE`, and the second one's only registry parent is `AST06-S02` — an
+  out-of-artifact scenario belonging to a different category. `fixtures/manifest.yaml`
+  publishes two separate figures for exactly this reason; averaging the six cases into one
+  reports 1-of-5 named-scenario coverage as though the category were covered.
+- **NEVER count a firing `AST03-wildcard-network-egress` as a second finding when the combo
+  check has already fired.** Unbounded egress is a conjunct of both, so blanket egress fires
+  both on one manifest field — the cross-fire on `AST03-V3` is recorded in
+  `coverage-matrix.md` as expected behaviour, not as a false positive. Counted as two, one
+  declaration reads as two independent controls failing, and the inflation grows with every
+  proxy check added.
+- **NEVER extend a permission check against one spelling of the field.** A package reaches
+  these checks in three vocabularies: USF (`permissions.files.deny_write`), the flattened
+  shape `scripts/dogfood.py::translate_permissions` produces, and bare-boolean frontmatter.
+  The cost is measured rather than predicted — the previous `deny_write` read handled only
+  the flattened spelling and returned `detected=True` against this repository's own AST03
+  manifest, which denies all three identity files. A false positive on every conformant
+  package, now pinned by
+  `skills/AST03/scripts/test_ast03_detector.py::test_identity_write_grant_is_clear_on_this_repositorys_own_ast03_manifest`.
+- **NEVER close an LPCI finding on a negative static scan of the package.** `AST03-S04` is
+  tiered out-of-artifact and its `artifact_signal_checks` list is empty: no shipped check
+  bears on it, so a fully green run has not looked. The negative carries no information
+  about a payload that arrives later in memory, an index, or another tool's output; the
+  reviewable object is the write scope that reaches those stores, and that grant is in the
+  manifest even when the payload is not.
+- **NEVER file a confused-deputy finding against whichever of the two packages you happen to
+  be holding.** `AST03-S05`'s `artifact_signal` — a privileged skill declaring no
+  caller-authorization requirement — is visible in one package, and the registry states in
+  the same breath that it is insufficient to decide the scenario. Read alone the caller shows
+  a call it may make and the callee an operation it may perform; the condition lives in the
+  edge plus the host's inter-skill trust configuration, so the finding lands with an owner
+  who cannot fix it.
+- **NEVER keep a manifest that misdeclares in this category.** A declared `network: false`
+  contradicted by a script that calls out is AST04's seam, and the reason matters here
+  specifically: every check in this module reads the *declaration*, so AST03's checks take
+  the lie at face value and return clean. Routing it here buys a green run from the one
+  category structurally incapable of convicting it.
 
 ## Scope and out-of-artifact boundary
 

@@ -263,13 +263,21 @@ def skill_dispersion(judgments: list[Judgment]) -> list[dict[str, Any]]:
 #
 # Bias asks whether a judge's number is in the right place. These signals ask
 # the prior question — whether the number is a measurement at all. The panel
-# recorded in eval/scorecards/ contains a judge (`bedrock/qwen3-235b`) that
+# recorded in eval/scorecards-run2/ contains a judge (`bedrock/qwen3-235b`) that
 # returned exactly 120.0 on all eleven skills, from three distinct values, every
 # one of them a multiple of five and every one of them a dimension's maximum. No
 # bias figure can express that: its bias of +10.8 reads as "lenient", when what
 # it actually did was decline to rank anything. Averaging it with five judges
 # that did rank things adds a constant to every skill and widens every sigma,
 # and the sigma is what the ship rule subtracts.
+#
+# That judge is no longer flat. Run 3 (eval/scorecards/) sent the rubric's own
+# bands and it now varies and ranks, coming out COARSE rather than
+# NON-DISCRIMINATING. The rule below is unchanged and still fires on the run-2
+# corpus, which is what keeps "nobody is flagged" readable as a repair rather
+# than as a relaxed threshold. Every "Measured:" line in this section is that
+# run-2 panel — the evidence available when each threshold was written, kept as
+# a record of the margin rather than refreshed into a moving target.
 #
 # Every threshold below is stated as a constant with its derivation, for two
 # reasons. A threshold chosen after seeing which judge it catches is not a
@@ -291,12 +299,14 @@ MIN_DISTINCT_DIMENSION_VALUES = 4
 #: A judge's per-skill mean totals must vary by at least this much (population
 #: standard deviation, in points) across the skills it judged. Deliberately
 #: extreme — this is not "this judge agrees too much with itself", it is "this
-#: judge returned one number". For scale: the panel places its skills 105.4 to
-#: 112.8 apart, the grade bands in the dashboard are twelve points wide, and the
-#: ship rule turns on three-point differences. A judge whose every per-skill
-#: mean fits inside a one-point window has resolved that whole span to a single
-#: verdict. Measured: qwen3-235b 0.00, sonnet 2.23, glm 2.30, gpt-oss 2.41,
-#: deepseek 5.46, nova-pro 8.61 — nothing sits near the line, which is the point.
+#: judge returned one number". For scale: the run-2 panel places its skills
+#: 105.4 to 112.8 apart, the grade bands in the dashboard are twelve points
+#: wide, and the ship rule turns on three-point differences. A judge whose every
+#: per-skill mean fits inside a one-point window has resolved that whole span to
+#: a single verdict. Measured: qwen3-235b 0.00, sonnet 2.23, glm 2.30, gpt-oss
+#: 2.41, deepseek 5.46, nova-pro 8.61 — nothing sits near the line, which is the
+#: point. The lowest anyone has measured under the rubric-grounded prompt is
+#: 1.38, still clear of the floor and no longer the same judge's zero.
 #: The floor is written down now so that a FUTURE flat judge is caught by a rule
 #: that predates it.
 DISCRIMINATION_SD_FLOOR = 1.0

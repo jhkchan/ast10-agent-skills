@@ -26,8 +26,9 @@ THE PROMPT REBUILD OF 2026-08-23 -- AND WHY OLD SCORES ARE NOT COMPARABLE
 Until 2026-08-23 the prompt this module sent carried only the eight
 dimension NAMES and maxima ("D1 Knowledge Delta 20, D2 Mindset +
 Appropriate Procedures 15, ...") and ended with "and nothing else". Two
-consequences were measured directly off ``eval/scorecards/*.json`` (198
-judgments, 6 providers):
+consequences were measured directly off the last run scored that way --
+run 2, archived at ``eval/scorecards-run2/*.json`` (198 judgments, 6
+providers):
 
 * **The judge never saw the rubric.** The band tables that define what a
   0-5 means versus a 16-20 live in ``vendor/skill-judge/SKILL.md`` and were
@@ -49,15 +50,24 @@ one-sentence justification, treating a judgement that will not explain
 itself as malformed rather than binding it.
 
 **Scores produced under this prompt are NOT comparable to
-``eval/scorecards-run1/`` or to the current ``eval/scorecards/``.** Those
-files were produced by a different instrument: a different prompt, a
-different anchor (none), and a response contract that could not carry a
-reason. A pooled mean is a statement about "the rubric as read by these
-judges" (ADR-0005, "Cross-repo implication"), and the read changed. The
-old scorecards are retained unmodified as the audit trail of what the
-unanchored instrument produced; they must not be pooled with, differenced
-against, or trended into anything measured from here on. A fresh judged
-run under this prompt is a new baseline, not run 3 of the same series.
+``eval/scorecards-run1/`` or ``eval/scorecards-run2/``.** Those files were
+produced by a different instrument: a different prompt, a different anchor
+(none), and a response contract that could not carry a reason. A pooled
+mean is a statement about "the rubric as read by these judges" (ADR-0005,
+"Cross-repo implication"), and the read changed. The two archives are
+retained unmodified as the audit trail of what the unanchored instrument
+produced; they must not be pooled with, differenced against, or trended
+into anything measured from here on.
+
+``eval/scorecards/`` is no longer one of them. It holds **run 3**, the
+first run recorded under this prompt -- 177 binding judgments of 198
+attempted, the other 21 refused as malformed for want of a justification --
+and it is the new baseline those archives are not comparable to, rather
+than the third point on a trend through them. Which corpus is which is
+checkable rather than remembered: ``tests/scripts/test_judge_harness.py``
+asserts that the archived responses are still *rejected* by
+``parse_judgment`` for the stated reason, and that every judgment banked in
+``eval/scorecards/`` satisfies the contract this module now enforces.
 
 No gate constant moved for this change. ``ship_floor.FLOORS``,
 ``POOLED_TARGET``, ``POOLED_LOWER_BOUND``, ``MIN_ROUNDS`` and

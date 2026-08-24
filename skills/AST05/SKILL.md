@@ -63,7 +63,8 @@ its neighbors*; this table is only the jump.
 
 **Stop after *Decision rules*** if you are writing a control recommendation; rules 1–6 are
 the controls. Read *Where the shipped checks go quiet* only when a check came back
-**clean** and you must decide whether that clean result means anything.
+**clean** and you must decide whether that clean result means anything. **NEVER** is
+the last stop before a number or a clean result leaves this page.
 
 **Layer 3 — load on condition, never by default.**
 
@@ -210,6 +211,65 @@ fetch surface — without being able to certify *what the referenced content cur
 says on the open internet*, or that the author will edit it after review. Those checks
 are declared `artifact-signal-only` for exactly that reason. The exact split, and the
 number the proxy corpus does publish, are fixed in `coverage-matrix.md`.
+
+## NEVER — how a proxy result becomes a claim it cannot carry
+
+- **NEVER accept a boundary you have not read.** Taint clears on a call to any name in
+  the boundary set (`sanitize`, `tag`, `escape`, `as_reference_data`, …), matched by
+  attribute name and never resolved, and it clears again on any string literal in the
+  same expression that the marker regex matches — whose alternatives include the bare
+  words `untrusted` and `provenance`. `prompt += "untrusted" + fetched` comes back
+  clean; so does `sanitize(fetched)` whose body is `return text`, and assigning through
+  that name un-taints the value for the executable-sink check downstream as well. At the
+  static layer, naming the control *is* the control. Skip the manual read and the
+  category's two strongest checks become a spelling test the author always passes.
+- **NEVER read a clean `AST05-absent-instruction-boundary` as adherence to a
+  convention.** The check concatenates every `.md` in the package and clears on one
+  regex hit anywhere in it: a `CHANGELOG.md` line reading "fixed a typo in the word
+  provenance" clears the whole package. Presence of a convention is weaker than
+  adherence to one, and `coverage-matrix.md`'s open debt 2 names the shape that
+  separates them — a package whose prose declares the control its code then ignores.
+  Only the dataflow check sees that one, and only if the first NEVER above was honoured.
+- **NEVER read the two fetch-surface checks as observations of what the package
+  fetches.** `AST05-unrestricted-network-fetch` and `AST05-wildcard-domain-allowlist`
+  read `manifest.permissions.network` and `permissions.tools`, and nothing else. A
+  package with no permissions block at all returns clean with the evidence "no network
+  block to widen (network=None)" while a bundled script calls `requests.get` freely —
+  an undeclared fetcher is the quietest possible pass. Declaration against code is
+  AST04's `detect_permission_understating`; if the finding is not routed there, no
+  check in this repository reads the call sites against the manifest.
+- **NEVER read a clean `AST05-wildcard-domain-allowlist` as a valid allowlist.** The
+  check reports `*` and bare-TLD entries such as `*.com`, and deliberately spares
+  `*.example.com`, which at least bounds an organisation. But `validators/usf.py`'s
+  `host_errors` rejects *every* wildcard under USF v1 host-only matching — a wildcard
+  subdomain "would never match and reads as broader access than is actually granted".
+  The same field can therefore fail validation and pass this check, so quoting the
+  check's "allow-list scoped" evidence as conformance reports the opposite of the
+  validator's answer.
+- **NEVER say this category's checks looked at the hash pin.** Rule 1's control is a pin
+  plus re-verification on every load, and no check in `scripts/detector.py` reads one:
+  `scenarios/registry.yaml` routes AST05-S01's `artifact_signal` to
+  `AST01-content-hash-missing`, a check that lives in AST01's module. The registry also
+  closes the inverse shortcut in its own words — a pinned reference can still be
+  rug-pulled once the operator accepts the new hash, and an unpinned one may never be
+  edited at all. Unread here and insufficient there: a clean AST05 run has verified
+  nothing about pinning, and reporting otherwise retires the one control rule 1 asks for.
+- **NEVER cite `AST05-absent-instruction-boundary` about a relay hop.** Its gate is a
+  *network fetch* call site. A skill consuming a prior skill's output over stdin or a
+  handoff file — the relay shape of rule 5 and of AST05-S04 — never opens the gate and
+  returns "package declares no fetch call site, so there is no external-content hop to
+  bound". The scope choice was deliberate (`coverage-matrix.md` open debt 3: an ungated
+  stdin source would have fired on `skills/advisory`, which reads `sys.stdin`), which
+  makes the clean result correct and the citation wrong. The minimum-resistance node in
+  a chain is precisely what this check never looks at.
+- **NEVER let `artifact-signal-only 1.00 (n=6)` stand for all five checks.** Three of
+  them have a labeled pair. `AST05-unrestricted-network-fetch` and
+  `AST05-wildcard-domain-allowlist` fire on none of the six fixtures — every AST05
+  fixture declares a bounded, single-host allowlist — and their two-sided evidence lives
+  only in `scripts/test_ast05_detector.py`. A number measuring three checks, reported as
+  the category's, is the same promotion the freedom table forbids, arriving through the
+  denominator instead of the label, in the one category whose entire claim to honesty is
+  that its numbers say what they measured.
 
 ## References
 

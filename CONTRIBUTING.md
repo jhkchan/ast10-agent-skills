@@ -252,16 +252,18 @@ judgments. A provider that could not be reached is declared in
 `config/audit.yml` with a recorded reason — never silently averaged as zero and
 never dropped without a record.
 
-**Before you run it: the prompt was rebuilt on 2026-08-23 and the scorecards on
-disk predate it.** The judge is now sent the pinned rubric's per-dimension
-scoring bands verbatim (it was previously sent only the dimension names) and
-must return a one-sentence justification per dimension; a judgement that will
-not explain itself is recorded as malformed and excluded from the pool. That is
-a change of instrument, so **do not diff a fresh run against
-`eval/scorecards/` or `eval/scorecards-run1/` and do not trend them together** —
-a new run is a new baseline. Both directories stay exactly as recorded. No gate
-constant moved with the prompt; see the callout at the top of
-`docs/skill-judge-dashboard.md`.
+**Before you run it: the prompt was rebuilt on 2026-08-23, and two of the three
+recorded runs predate it.** The judge is now sent the pinned rubric's
+per-dimension scoring bands verbatim (it was previously sent only the dimension
+names) and must return a one-sentence justification per dimension; a judgement
+that will not explain itself is recorded as malformed and excluded from the
+pool. That is a change of instrument, so **do not diff a fresh run against
+`eval/scorecards-run1/` or `eval/scorecards-run2/` and do not trend them
+together** — those two are the pre-rebuild archives and stay exactly as
+recorded. `eval/scorecards/` is run 3, the first run under the rebuilt prompt
+and the corpus the dashboard publishes; a fresh run is comparable to it and is
+what replaces it. No gate constant moved with the prompt; see the callout at the
+top of `docs/skill-judge-dashboard.md`.
 
 ---
 

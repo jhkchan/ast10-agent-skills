@@ -8,29 +8,38 @@ This repository is an independent community implementation. It is **not** an off
 OWASP project and carries no OWASP endorsement — see [`../README.md`](../README.md) and
 [`../NOTICE`](../NOTICE).
 
-> ## Judged run recorded — run 2, 2026-08-23
+> ## Judged run recorded — run 3, 2026-08-24
 >
-> **11 skills x 3 rounds x 6 providers = 198 independent judgments**, the second such run.
-> Run 1's scorecards are retained under `eval/scorecards-run1/` so the delta is auditable.
+> **The first run scored with the rubric's bands in the prompt.** 11 skills x 3 rounds x
+> 6 providers were attempted; **177 judgments bind** and 21 were refused as malformed by the
+> justification contract, so `n` varies by judge (23 to 33) instead of sitting at a flat 33.
+> Runs 1 and 2 are retained under `eval/scorecards-run1/` and `eval/scorecards-run2/`.
 >
-> **Nine of eleven skills now clear every one of the eight dimension floors and score Grade A
-> on the pooled mean** (>= 108), against **zero** in run 1. Pooled mean rose from 107.5 to 109.2.
-> The largest single move is `advisory`, rebuilt from 103.3 to **112.8** — from the weakest
-> artifact in the repository to the strongest.
+> **Do not difference this run against run 2.** The judge prompt was rebuilt between them
+> (callout below), so the two are different instruments measuring the same files. The pooled
+> mean moved 109.2 → 108.7 and that number means nothing: it is not a change in the skills.
+> The comparison this run *does* support is between judges, and it is in
+> [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md).
 >
-> **Two skills still fall short, and they differ in kind.** `AST07` (105.4) is a measurement
-> artifact: five of six judges score it 107-120 and `nova-pro` alone returns 79, giving a sigma of
-> 14.04, and a trimmed judge-mean that drops the highest and lowest judge lands at 108.5 — a pass.
-> `AST09` (105.7) is a genuine gap: the judges broadly agree, and its trimmed judge-mean is 104.3.
-> Both are the categories that ship no detector at all because every one of their scenarios is
-> out-of-artifact, which is the honest limit of what a package-only skill can offer on D8.
+> **One skill ships: `advisory`, at 112.3.** It is the only skill that clears the pooled mean,
+> the lower bound and all eight dimension floors at once. Six skills grade A on the mean
+> (`advisory` 112.3, `AST08` 110.3, `AST01` 109.8, `AST02` and `AST04` 108.7, `AST10` 108.6),
+> and three of those clear every dimension floor.
 >
-> **Every skill remains BLOCKED under the locked ship rule**, because `mean - sigma >= 105` is
-> equivalent to `mean >= 105 + sigma` and at this panel's sigma that demands 110.4-119.0 rather
-> than the 108 the rule names. That defect is recorded in
-> [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) and deliberately **not**
-> fixed here: a bar changed after seeing the run it is applied to is not a bar. Adoption requires
-> a superseding record and a fresh run.
+> **Two skills are blocked by the lower bound alone.** `AST01` (mean 109.8, `mean - sigma`
+> 104.4) and `AST08` (110.3, 104.6) are Grade A with every dimension mean above its floor and
+> miss `POOLED_LOWER_BOUND` by 0.6 and 0.4 points. That clause is
+> [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md)'s subject: `mean - sigma
+> >= 105` is equivalent to `mean >= 105 + sigma`, and at this panel's sigma that demands
+> 108.4-113.0 rather than the 108 the rule names. The defect is recorded and deliberately
+> **not** fixed here — a bar changed after seeing the run it is applied to is not a bar.
+>
+> **The other eight are blocked first by a dimension floor, and it is `D3` every time.**
+> Anti-Pattern Quality runs 11.5 to 12.9 against a floor of 13 in all eight (`AST07` also misses
+> `D2` at 12.9). With the bands now in the prompt the judges say why: `bedrock/gpt-oss-120b`
+> scored `AST02`'s `D3` at 4 — "only generic warnings appear and there is no specific NEVER
+> list" — which is a claim a reader settles by opening the file. That is a finding about the
+> artifacts, not about the statistic, and no bound change retires it.
 >
 > Regenerate after a run with:
 >
@@ -43,10 +52,10 @@ OWASP project and carries no OWASP endorsement — see [`../README.md`](../READM
 
 > ## Instrument change — the judge prompt was rebuilt on 2026-08-23
 >
-> **Every number on this page was produced by the previous prompt. Nothing measured from now
-> on is comparable to it.** The break is recorded here rather than corrected in place, because
-> the recorded runs are the audit trail of what the old instrument produced and deleting them
-> would destroy the evidence that the two differ.
+> **Run 3 is the first run under the rebuilt prompt. Runs 1 and 2 are not comparable to it,
+> and neither is anything measured before 2026-08-23.** The break is recorded here rather than
+> corrected in place, because the archived runs are the audit trail of what the old instrument
+> produced and deleting them would destroy the evidence that the two differ.
 >
 > What changed, in `scripts/judge_harness.py`:
 >
@@ -58,22 +67,28 @@ OWASP project and carries no OWASP endorsement — see [`../README.md`](../READM
 >    red flags and worked examples verbatim; it refuses to build at all if those bytes do not
 >    hash to the pinned `RUBRIC_CONTENT_SHA256`.
 > 2. **The judge must justify every score.** The old prompt ended "and nothing else", and
->    measurably **0% of the 198 recorded judgments contain any prose**. The response contract is
+>    measurably **0% of run 2's 198 judgments contain any prose**. The response contract is
 >    now `{"D1": {"score": <int>, "why": "<one sentence citing something specific in the skill>"},
 >    …}`. A judgement whose `why` is missing, empty, or repeated across dimensions is recorded as
 >    **malformed** and excluded from the pool with an audit-trail entry — the same treatment a
 >    provider that crashed already gets. A judge that will not explain itself does not bind a score.
+>    In run 3 that rejected 21 of 198 attempted judgments.
 > 3. **The artifact is fenced as data.** The skill was previously delimited by a bare `---`, which
 >    is exactly what every scored skill's own YAML frontmatter opens with. It now sits between
 >    markers Markdown cannot produce, declared in words to be the thing under evaluation rather
 >    than a source of instructions.
 >
-> Why this invalidates comparison rather than merely improving it: a pooled mean is a statement
-> about *the rubric as read by these judges* (ADR-0005, "Cross-repo implication"), and the read
-> changed. `bedrock/qwen3-235b` returning 120.0 on all eleven skills, from three distinct values,
-> is what an unanchored judge does; whatever it returns when it can see the bands is a different
-> measurement, not a better draw of the same one. Treat a future run as a **new baseline**, not as
-> run 3 of this series — do not difference it against these means, and do not trend the two together.
+> **What the rebuild did to the panel, measured.** A pooled mean is a statement about *the rubric
+> as read by these judges* (ADR-0005, "Cross-repo implication"), and the read changed — which is
+> why run 3 is a new baseline rather than the third point on a trend. The judges themselves are
+> comparable across the break, and they moved: four of six now sit within 1.2 points of the
+> pooled mean against two of six in run 2, the largest within-judge round-to-round spread fell
+> from 4.0 points to 2.3, median per-skill sigma fell from 6.43 to 5.65, and
+> `bedrock/qwen3-235b` — which returned exactly 120.0 on all eleven skills from three distinct
+> values under the old prompt — now varies, ranks the skills, and is no longer flagged
+> NON-DISCRIMINATING. The prompt was the defect. See
+> [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md), "What the rubric fix did
+> to the panel".
 >
 > **No gate constant moved.** `FLOORS`, `POOLED_TARGET` (108), `POOLED_LOWER_BOUND` (105),
 > `MIN_ROUNDS` and the rubric pin are exactly as vendored. Rebuilding the instrument is not
@@ -84,20 +99,23 @@ OWASP project and carries no OWASP endorsement — see [`../README.md`](../READM
 
 ## Judge calibration (measured, diagnostics only)
 
-Regenerate with `python3 eval/calibration.py`. Panel: 6 providers x 11 skills = 198 judgments, pooled mean of **109.2**.
+Regenerate with `python3 eval/calibration.py`. Panel: 6 providers x 11 skills = 177 binding judgments, pooled mean of **108.7**.
 
 | Judge | n | mean | bias | round means |
 | --- | ---: | ---: | ---: | --- |
-| `bedrock/qwen3-235b` | 33 | 120 | +10.8 | 120 / 120 / 120 |
-| `anthropic-compatible/glm-5.2` | 33 | 109.9 | +0.7 | 110.1 / 110.3 / 109.5 |
-| `bedrock/deepseek-v3.2` | 33 | 109.5 | +0.3 | 107.5 / 109.8 / 111.1 |
-| `bedrock/gpt-oss-120b` | 33 | 106.8 | -2.4 | 106.8 / 107.5 / 106.2 |
-| `claude-cli/sonnet` | 33 | 105.5 | -3.7 | 104.9 / 105.9 / 105.7 |
-| `bedrock/nova-pro` | 33 | 103.5 | -5.7 | 103.6 / 101.4 / 105.4 |
+| `bedrock/qwen3-235b` | 32 | 117.3 | +8.7 | 117.7 / 117.1 / 117.2 |
+| `anthropic-compatible/glm-5.2` | 23 | 108.7 | +0.0 | 108.7 / 108.3 / 109.7 |
+| `claude-cli/sonnet` | 33 | 108.5 | -0.2 | 108.3 / 108.5 / 108.7 |
+| `bedrock/nova-pro` | 30 | 108.0 | -0.7 | 107.5 / 108.4 / 108.4 |
+| `bedrock/deepseek-v3.2` | 27 | 107.4 | -1.2 | 106.7 / 107.5 / 109 |
+| `bedrock/gpt-oss-120b` | 32 | 101.9 | -6.8 | 102.6 / 101.8 / 101.2 |
 
-A **16.5-point spread** separates the most generous judge from the harshest, while no judge's own
-round-to-round means differ by more than **4 points** — so this is systematic calibration bias,
-not measurement noise. Per-skill sigma runs **5.43 to 14.04** against the 3.3 `ship_floor.py` was calibrated on, which makes `mean - sigma >= 105` demand a mean of **110.4 to 119** (92% to 99.2% of 120) rather than the 108 (90%) it names.
+A **15.4-point spread** separates the most generous judge from the harshest, while no judge's own
+round-to-round means differ by more than **2.3 points** — so this is systematic calibration bias,
+not measurement noise. The middle of the panel has closed up since run 2: four of the six judges
+sit within 1.2 points of the pooled mean, and the spread that remains is carried by the two ends,
+`bedrock/qwen3-235b` at +8.7 and `bedrock/gpt-oss-120b` at -6.8.
+Per-skill sigma runs **3.44 to 8.01** (median 5.65) against the 3.3 `ship_floor.py` was calibrated on, which makes `mean - sigma >= 105` demand a mean of **108.4 to 113.0** (90.4% to 94.2% of 120) rather than the 108 (90.0%) it names.
 These figures are diagnostics: no gate constant is read from them and none was changed. See
 [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md).
 
@@ -112,25 +130,31 @@ signals ask the prior question — whether the number is a **measurement** at al
 
 | Judge | n | distinct values | across-skill σ | across-skill variance | multiples of 5 | at dimension max | full 120 | own-round spread | Verdict |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| `bedrock/qwen3-235b` | 33 | 3 | 0.00 | 0.00 | 100% | 100% | 100% | 0.00 | NON-DISCRIMINATING |
-| `anthropic-compatible/glm-5.2` | 33 | 10 | 2.30 | 5.27 | 6% | 6% | 0% | 4.00 | DISCRIMINATING |
-| `bedrock/deepseek-v3.2` | 33 | 13 | 5.46 | 29.78 | 36% | 34% | 21% | 13.27 | DISCRIMINATING |
-| `bedrock/gpt-oss-120b` | 33 | 12 | 2.41 | 5.79 | 9% | 8% | 0% | 4.82 | DISCRIMINATING |
-| `bedrock/nova-pro` | 33 | 11 | 8.61 | 74.13 | 24% | 11% | 6% | 7.18 | DISCRIMINATING |
-| `claude-cli/sonnet` | 33 | 8 | 2.23 | 4.98 | 0% | 0% | 0% | 3.27 | DISCRIMINATING |
+| `bedrock/qwen3-235b` | 32 | 9 | 1.38 | 1.90 | 75% | 75% | 22% | 3.18 | COARSE |
+| `anthropic-compatible/glm-5.2` | 23 | 11 | 2.63 | 6.91 | 16% | 15% | 0% | 2.00 | DISCRIMINATING |
+| `bedrock/deepseek-v3.2` | 27 | 13 | 3.00 | 8.99 | 24% | 24% | 0% | 6.18 | DISCRIMINATING |
+| `bedrock/gpt-oss-120b` | 32 | 14 | 2.76 | 7.60 | 10% | 8% | 0% | 5.00 | DISCRIMINATING |
+| `bedrock/nova-pro` | 30 | 10 | 3.51 | 12.33 | 18% | 15% | 3% | 5.91 | DISCRIMINATING |
+| `claude-cli/sonnet` | 33 | 11 | 1.99 | 3.95 | 19% | 19% | 0% | 3.36 | DISCRIMINATING |
 
-*distinct values* — how many different numbers the judge used across all 264 of its dimension
-scores. *across-skill σ / variance* — the spread of its own per-skill mean totals; near zero means
-it placed every skill in the same spot. *multiples of 5* — the share of its dimension scores
-divisible by five. *at dimension max* / *full 120* — how often it returned the top of a dimension,
-and the top of the rubric. *own-round spread* — the mean gap between its own rounds on one skill,
-which is what separates a judge that is *noisy* from one that is *constant*.
+*distinct values* — how many different numbers the judge used across all of its dimension scores
+(eight per judgment). *across-skill σ / variance* — the spread of its own per-skill mean totals;
+near zero means it placed every skill in the same spot. *multiples of 5* — the share of its
+dimension scores divisible by five. *at dimension max* / *full 120* — how often it returned the top
+of a dimension, and the top of the rubric. *own-round spread* — the mean gap between its own rounds
+on one skill, which is what separates a judge that is *noisy* from one that is *constant*.
 
-**`bedrock/qwen3-235b` is flagged NON-DISCRIMINATING.** It returned exactly 120.0 on all eleven
-skills, in all three rounds, using three distinct values — 10, 15 and 20, which are precisely the
-three dimension maxima. Its bias of +10.8 reads as "lenient"; it is not lenient, it is not ranking
-anything, and averaging it into the panel adds a constant to every skill while widening every sigma.
-Sigma is the quantity the ship rule subtracts.
+**No judge on this panel is flagged NON-DISCRIMINATING, and that is a result, not a relaxed rule.**
+Under the previous prompt `bedrock/qwen3-235b` was flagged: it returned exactly 120.0 on all eleven
+skills, in all three rounds, using three distinct values — 10, 15 and 20, precisely the three
+dimension maxima — for an across-skill σ of 0.00. Given the rubric's bands it uses nine distinct
+values, returns 117.7 / 117.1 / 117.2, and ranks the skills. It is still **COARSE**: 75% of its
+dimension scores are multiples of five and 75% sit at a dimension's maximum, so it is ranking
+through a filter that discards most of the scale. COARSE is a much milder problem than flat, and
+the rule keeps them apart on purpose — `bedrock/qwen3-235b`'s remaining +8.7 bias is now leniency
+that can be reasoned about rather than a constant standing in for a measurement. The detector that
+caught it is unchanged and still catches it on the archived run-2 corpus; what changed is the
+judge, and what changed the judge was the prompt.
 
 The thresholds are anchored to the rubric or to chance, never to this panel — a bar chosen after
 seeing which judge it catches is a name for that judge, not a bar:
@@ -138,16 +162,28 @@ seeing which judge it catches is a name for that judge, not a bar:
 | Signal | Flag when | Why that number |
 | --- | --- | --- |
 | Distinct dimension values | < 4 | Every dimension in the pinned rubric defines exactly four score bands (D1: 0–5 / 6–10 / 11–15 / 16–20). A judge with fewer distinct values than one dimension has bands cannot express that dimension's scale even once. |
-| Across-skill σ | < 1.0 points | Deliberately extreme: not "agrees too much" but "returned one number". The panel places its skills 105.4 to 112.8 apart and the grade bands are twelve points wide, so a judge whose per-skill means fit in a one-point window has resolved that span to a single verdict. The lowest non-degenerate judge measures 2.23; qwen measures 0.00. |
+| Across-skill σ | < 1.0 points | Deliberately extreme: not "agrees too much" but "returned one number". This panel places its skills 106.6 to 112.3 apart and the grade bands are twelve points wide, so a judge whose per-skill means fit in a one-point window has resolved that span to a single verdict. The lowest measured on run 3 is 1.38; on run 2 the flat judge measured 0.00. |
 | Multiples of 5 | ≥ 60% | A judge drawing uniformly at random would hit a multiple of five about **25%** of the time (5 of 21 values on D1, 4 of 16 on the six 15-point dimensions, 3 of 11 on D7). 60% is ~2.4× chance and unreachable by luck. Advisory only — it yields `COARSE`. |
 | At dimension max / full 120 | ≥ 50% | The rubric's top bands are reserved language ("pure knowledge delta — every paragraph earns its tokens"). A judge awarding them to the majority of what it sees has merged the top band with everything under it. Advisory only — it yields `COARSE`. |
 
 Only the first two decide `NON-DISCRIMINATING`, because that is what the verdict means: a judge that
 returns one number ranks nothing, whatever its granularity. Granularity and saturation explain the
 *mechanism* and are reported beside it. A judge can be coarse without being flat — a much milder
-problem, and one the rule must not conflate with this one.
+problem, and one the rule must not conflate with this one. `bedrock/qwen3-235b` is the worked
+example of the distinction in both directions: flat on run 2, merely coarse on run 3.
 
-### What excluding the flagged judge would do — shown, not applied
+### What excluding a flagged judge would do — shown, not applied
+
+**Run 3 has nothing to exclude.** `eval/calibration.py` prints, verbatim:
+
+> No judge on this panel is flagged NON-DISCRIMINATING; there is nothing to exclude.
+
+and `eval/judge-quality.json` records an empty `flagged` list. The block is kept rather than deleted
+because the alternative — a section that appears only when it has bad news — is how a reader loses
+the ability to tell "clean" from "not checked".
+
+The last panel that did have something to exclude was run 2 (`eval/scorecards-run2/`), and this is
+what it looked like. Nothing here was applied then either:
 
 | Figure | With `bedrock/qwen3-235b` | Without | Δ |
 | --- | ---: | ---: | ---: |
@@ -157,25 +193,27 @@ problem, and one the rule must not conflate with this one.
 | Per-skill σ, median | 6.43 | 5.00 | −1.43 |
 | Per-skill σ, range | 5.43–14.04 | 3.87–13.60 | — |
 
-`bedrock/qwen3-235b` is **not excluded** from anything. Every number everywhere else on this page,
-in `eval/scorecards/*.json`, and in [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md)
-is the *with* column. Both columns are published so a reader sees the size of the effect instead of
-being handed a pre-filtered number; deciding whether a flagged judge stops binding is a **human
-decision** and needs its own superseding record, written before the run it applies to. The same
-verdicts, thresholds and deltas are in `eval/judge-quality.json` for anything that needs to read them
+`bedrock/qwen3-235b` was **not excluded** from anything, on that run or this one. Every number
+everywhere else on this page, in `eval/scorecards/*.json`, and in
+[ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) is the *with* column. Both
+columns are published so a reader sees the size of the effect instead of being handed a pre-filtered
+number; deciding whether a flagged judge stops binding is a **human decision** and needs its own
+superseding record, written before the run it applies to. Run 3 is the case for having kept it: the
+judge that would have been dropped is the judge the prompt fix repaired. The same verdicts,
+thresholds and deltas are in `eval/judge-quality.json` for anything that needs to read them
 mechanically.
 
-### These scores were produced without the rubric's bands
+### Runs 1 and 2 were scored without the rubric's bands
 
-Both recorded runs — run 1 (`eval/scorecards-run1/`) and run 2 (`eval/scorecards/`) — were judged by
-the pre-2026-08-23 prompt, which sent the eight dimension names and their maxima and **none of the
-rubric bands**, and forbade prose. So the absolute values on this page are **weaker evidence** than a
-future run's: every mean, every grade and every threshold comparison above rests on six private
-scales invented from eight labels, which is also the most likely explanation for a judge that could
-return the maximum eleven times without contradiction. What survives is the *relative* picture — the
-bias ordering, the between-judge spread, and this table's verdicts, which turn on the shape of a
-judge's output rather than on where the rubric would have put it. Treat the next judged run as a new
-baseline, not as run 3.
+Run 1 (`eval/scorecards-run1/`) and run 2 (`eval/scorecards-run2/`) were judged by the
+pre-2026-08-23 prompt, which sent the eight dimension names and their maxima and **none of the
+rubric bands**, and forbade prose. Their absolute values are **weaker evidence** than the run-3
+figures on this page: every mean and every grade in those two archives rests on six private scales
+invented from eight labels, which is also the most likely explanation for a judge that could return
+the maximum eleven times without contradiction. What survives from them is the *relative* picture —
+the bias ordering, the between-judge spread, and their judge-quality verdicts, which turn on the
+shape of a judge's output rather than on where the rubric would have put it. They are kept unedited
+as the evidence for that defect, and this page's tables are run 3 throughout.
 
 ## The rubric — 8 dimensions, 120 points
 
@@ -193,7 +231,7 @@ structurally weak dimension.
 | --- | --- | --- | --- |
 | **D1** Knowledge Delta | 20 | 17 | Expert-only knowledge minus what the model already knows. The core dimension, and the one this repo's own S-006 failure shape targets: a `SKILL.md` restating generic definitions scores ≤5 here and blocks on the floor alone. |
 | **D2** Mindset + Appropriate Procedures | 15 | 13 | Whether the skill shapes *how* to think about the category, not just what to do — thinking frameworks plus domain-specific procedures. |
-| **D3** Anti-Pattern Quality | 15 | 13 | A specific NEVER list with the reasoning behind it. Generic warnings ("be careful", "consider edge cases") score in the 4–7 band. |
+| **D3** Anti-Pattern Quality | 15 | 13 | A specific NEVER list with the reasoning behind it. Generic warnings ("be careful", "consider edge cases") score in the 4–7 band. **The binding constraint on eight of eleven skills in run 3.** |
 | **D4** Specification Compliance | 15 | 13 | Valid frontmatter and, above all, a description carrying WHAT, WHEN, and trigger keywords — the text a runtime routes on. |
 | **D5** Progressive Disclosure | 15 | 13 | Layering: `SKILL.md` under the line budget, mechanism in `scripts/` and `references/`, explicit load triggers. Enforced mechanically too, by `tests/test_ast_skill_layout_lint.py`. |
 | **D6** Freedom Calibration | 15 | 13 | Whether the prescriptiveness matches the task — rigid procedure for fragile operations, latitude for judgement calls. |
@@ -232,7 +270,9 @@ A skill ships when **all** of the following hold (`ship_floor.aggregate_verdict`
 | Rubric version | `RUBRIC_SHA` | `3027f20f3181758385a1bb8c022d4041dfb4de84` |
 
 The mean-minus-sigma clause is the one that does the work: a mean of 108 sitting on a
-sigma of 4 is *within noise of failing badly*, and this rule refuses it.
+sigma of 4 is *within noise of failing badly*, and this rule refuses it. It is also the
+clause [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) shows to be
+measuring judge disagreement rather than skill quality — recorded, and left in force.
 
 ### Anti-re-roll
 
@@ -244,7 +284,10 @@ electricity.
 
 The single exception is an **invalidated** measurement — a defective instrument (a stale
 rubric path, a truncated response), flagged and auditable in the record. Never a score
-somebody merely dislikes.
+somebody merely dislikes. A judgment refused as **malformed** by the justification
+contract is the same exception applied at parse time, and it leaves an audit-trail entry
+naming the provider and the round: 21 of run 3's 198 attempted judgments were refused this
+way, which is why `n` differs by judge in the calibration table above.
 
 Only judgments produced in a context separate from the one that authored the skill may
 bind (`ship_floor.INDEPENDENT_METHODS`). Authoring-session self-scores measured **+12.2

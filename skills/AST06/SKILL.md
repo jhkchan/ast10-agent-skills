@@ -55,7 +55,8 @@ its neighbors*; this table is only the jump.
 
 **Stop after *Decision rules*** if you are producing a verdict or a remediation. Read
 *What the two shipped checks decide, and where they go quiet* only when a check returned
-**negative** and you must decide whether that is a pass or a blind spot.
+**negative** and you must decide whether that is a pass or a blind spot. Read
+*NEVER — the ways an AST06 review closes on nothing* before either one is written down.
 
 **Layer 3 — load on condition, never by default.**
 
@@ -165,6 +166,80 @@ package. The module's other three checks decide no scenario and say so in their 
   scenarios are tiered out-of-artifact for exactly that reason. Decision rules 2, 3 and 4
   above are what you apply by hand, against the deployment, when this detector has
   nothing to say.
+
+## NEVER — the ways an AST06 review closes on nothing
+
+Each of these is checkable in this package — against `scripts/detector.py`,
+`coverage-matrix.md`, or `scenarios/registry.yaml`. None is a general caution about
+isolation.
+
+- **NEVER report "the package plants no host persistence" from a negative
+  `AST06-host-persistence-write`.** The check walks `pysource.python_files()`, whose
+  `PY_SUFFIXES` is `(".py",)`, and matches `ast.Call` nodes whose *literal string
+  arguments* name a location in the persistence table. A `.sh` installer, a
+  `package.json` `postinstall`, a `Makefile` target, or a Python path assembled from
+  fragments or read from configuration plants the same cron job and produces no match at
+  all — `coverage-matrix.md` carries this as open reconciliation debt 3, "the persistence
+  scan reads Python only". The location table is platform-complete; the *language*
+  coverage is not. The defensible sentence is "no persistence call site in bundled
+  Python", which is what was checked.
+- **NEVER let an `unparsed:` note pass as a clean result.** A file `pysource.parse()`
+  cannot compile is appended to `unparsed` and the check still returns `detected=False`,
+  naming the file inside its own evidence string. One syntax error, or one file using a
+  grammar the running interpreter lacks, converts the load-bearing check of the only
+  scenario this category decides into a pass — and the note is the sole trace. Read that
+  file by hand and mark the result INCOMPLETE; nothing downstream will.
+- **NEVER read a negative `AST06-root-write-scope` as "the declared write scope is
+  narrow".** `_ROOT_SCOPES` is a closed set of thirteen literal spellings of root, home
+  and bare wildcards. `/etc/**`, `/usr/local/**` and `/var/**` are in none of them, and
+  match no entry in the persistence table either, so the broadest scopes short of `/`
+  return negative. This is the disjunct most often left holding a Host Escape verdict on
+  a package that ships no Python at all, and it fails silent: broad-but-not-root is a
+  manual read every time.
+- **NEVER cite the absence of a root-write finding as evidence about what the manifest
+  *declares*.** `_effective_writes()` filters every entry through
+  `validators/usf.py::write_allowed`, so a `write` entry that `deny_write` fully shadows
+  is skipped — right, because it grants nothing today. It also means a package can
+  declare `write: ["/"]` and have that breadth appear in no finding anywhere. When the
+  question is authorial intent, or what is left after a port drops the `deny_write` field
+  (that is AST10-S04, and `AST06-missing-sandbox-declaration` is the check the registry
+  names against it), read the declared list yourself rather than the detector's silence.
+- **NEVER count `AST06-unrestricted-shell-exec` as a Host Escape detection.** Its
+  `CHECK_COVERAGE` entry is `registry_ids: []`, `covers: category-precondition`, so
+  `SCENARIO_DETECTORS` excludes it from `AST06-S01`'s column and from the F1 denominator
+  by construction. A granted, unbounded shell is a *capability*; AST06-S01's defining
+  condition is an *act*. No fixture case is labeled against it either (`coverage-matrix.md`
+  open debt 2), so its corpus behaviour is an observation, not a measurement. Promoting it
+  flags a superset of packages — including many that never write outside their own tree —
+  and turns a one-scenario column into a number that cannot be defended when the first
+  false positive arrives.
+- **NEVER read `AST06-missing-sandbox-declaration` as an AST06 result.** Its
+  `registry_ids` is `["AST10-S04"]`: `scenarios/registry.yaml` names this check, by name,
+  as the reader of Manifest Stripping's `artifact_signal`, and it is
+  `covers: artifact-signal-only` because a ported package with no permission block is
+  indistinguishable from one that never declared any. Worse, `detected` is simply
+  `not permissions`, so a harness that failed to load the manifest and a package that was
+  stripped produce the identical finding (`coverage-matrix.md` open debt 1 — the noisiest
+  check in the module, and the one with no fixture pair). Confirm the manifest loaded
+  before this finding reaches a write-up, and file it under AST10.
+- **NEVER let a package scan close `AST06-S02`, `S03`, `S04` or `S05`.** All four are
+  tiered out-of-artifact, and `AST06-S03` Skill Shadowing carries `artifact_signal: null`
+  — there is not even a partial proxy available to be silent, because a shadowing package
+  and the legitimate one can be byte-identical apart from a name that only means something
+  against the host's inventory. The one signal that does ship does not rescue this either:
+  `AST06-unscoped-shared-state-write` skips any scope carrying an `agents/<id>/`,
+  `sessions/<id>/` or `tenants/<id>/` segment, so `workspace/tenants/shared/` reads as
+  namespaced. One decided scenario out of five, reported without that ratio, reads as
+  containment.
+- **NEVER close a host-mode finding on evidence about the product, or on a tightened
+  manifest.** A vendor sandbox capability, a documentation link, and a config file that
+  *could* enable isolation are facts about what the software supports; the finding is
+  about what this deployment runs (*Why "available if configured" does not close this
+  finding* is the argument). Narrowing the manifest is the same error wearing a
+  remediation's clothes: an AST06 finding says no boundary enforces the manifest, so
+  tightening a `write` list the runtime never reads buys a closed ticket, an unchanged
+  host, and an AST03 fix filed against an AST06 cause — the misroute the routing table's
+  AST03 row exists to prevent, arriving one step later.
 
 ## Scope and out-of-artifact boundary
 

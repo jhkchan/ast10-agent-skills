@@ -28,6 +28,7 @@ ships zero detectors" says why. Frozen scenario tiers live in `coverage-matrix.m
 | a departed employee's skill still live | rule 6 |
 | a multi-agent chain, or a fan-in join | rule 7 |
 | "no detector ships — so what do I actually do?" | "The manual pass" |
+| a write-up about to report this category clean, inconclusive, or numeric | **"NEVER"** — read it before the finding leaves |
 | one skill's manifest granting too much | wrong skill → **AST03** |
 | an installed skill drifted from its approved version | wrong skill → **AST07**, unless no approved version was ever recorded, in which case it is AST09 |
 | isolation not enforced at one deployment | wrong skill → **AST06** for the control failure; the fleet's inability to see that deployment is still AST09 |
@@ -170,6 +171,69 @@ for exactly one of them: its content hash.
 Steps 1–3 returning nothing is the ordinary first-pass outcome and is a result: report the
 missing system by name. "Inconclusive" is the one write-up to refuse, because it reads in a
 report exactly like a clean scan of a system that was never checked.
+
+## NEVER
+
+Each of these is a mistake this category actually produces, with the file, check, or
+scenario id it can be checked against. They are failures of *reporting* more often than
+failures of analysis, which is why they survive review.
+
+- **NEVER write "AST09: clean" — and do not write "inconclusive" either.**
+  `cli/bin/cli.js` line 826 prints `no static detectors` for a category with no checks, and
+  `detectors/scaffold.py` line 209 returns `{"status": "declared-and-uncovered", "f1": None}`
+  *before* it inspects any corpus. Both outputs mean **not asked**. "Clean" closes the
+  ticket on evidence that was never gathered; "inconclusive" reads in a report exactly like a
+  clean scan of a system nobody checked, so it fails in the same direction while sounding
+  cautious. Name the missing system instead — see the manual pass.
+- **NEVER make a scenario detectable by writing prose into a fixture.** All seven registry
+  entries carry `artifact_signal: null` — AST09 is the only category with not even a partial
+  in-package proxy. A fixture whose SKILL.md says "the installer has left the organization"
+  makes AST09-S03 detectable in precisely the sense that measures the fixture author.
+  `skills/AST09/scripts/test_ast09_detector.py::test_s007_a_non_empty_corpus_still_gets_no_f1`
+  refuses to score one, and re-tiering to make it legal trips `validators/tier_lock.py`. The
+  cost is not the failing test: a manufactured rate is indistinguishable in any published
+  report from a real one, and it cannot be retracted from the readers who already quoted it.
+- **NEVER read "no alert fired" as evidence that nothing happened.** That absence is
+  AST09-S01's *defining condition* — the registry's reason for its tier is that the identical
+  artifact is caught instantly at an organization that keeps an inventory and missed at one
+  that does not, so the package is never the discriminator. Quoting the silence as an
+  all-clear reports the finding as if it were its own refutation, and it converts the one
+  observation that should have opened an inventory gap into the reason nobody opens one.
+- **NEVER read a missing outcome receipt as proof the action was blocked.** A DENY admission
+  with no matching `terminal_state` (decision rule 2) is byte-identical to telemetry loss, a
+  crashed worker, a full queue, or deletion. Establishing receipt-pipeline health is therefore
+  a *precondition* for reading the pattern at all, not a nice-to-have. If it was never
+  established, every DENY in the interval is unevidenced — and the silence that should have
+  raised the outage is instead being cited as evidence the pipeline works.
+- **NEVER let an endpoint- or registry-based scan scope a fleet-wide claim.** AST09-S05's
+  registry reason is the whitepaper's own "there is no host to scan and no local package
+  manifest to read" — that population is invisible to endpoint scanning by architecture, not
+  by concealment. A clean result is coverage over *skills on hosts the security team
+  administers*, and reporting it over "all skills" makes the shadow-AI population inside
+  sanctioned SaaS the one nobody ever re-checks. State the discovery method in the finding
+  (rule 4) or the next reader cannot re-scope it.
+- **NEVER key an inventory row on "the package hash" without recording which surface produced
+  it.** Join step 1 of the manual pass turns on the content hash because it is the one key the
+  package supplies — but `scripts/content_hash.py` line 26 defines that surface as
+  `SURFACE_GLOBS`, of which only `SKILL.md` and `scripts/*.py` are populated here (line 44,
+  `POPULATED_SURFACE_GLOBS`), and `skill.usf.yaml` sits outside it by design. Two teams hashing
+  "the same package" two ways produce two keys, the join returns no row, and the empty result
+  gets written up as AST09-S02 — an approval that never happened — while the approval record
+  sits in the inventory under the other key.
+- **NEVER let the broad credential or the version mismatch capture an AST09 finding.** An
+  orphaned skill (AST09-S03) presents as an over-scoped credential and reads like AST03; an
+  unapproved install presents as a version nobody recognizes and reads like AST07. Both
+  reroutes are fixable-looking: AST03's owner tightens a manifest, AST07's owner pins a
+  version. Neither touches the offboarding workflow that rule 6 identifies as the actual
+  control, so the same finding returns at the next departure — and per the neighbours section
+  there is no approved version of record for AST07 to drift against in the first place.
+- **NEVER present a `parent_action_ref` walk as a complete causal reconstruction on a fan-in.**
+  Version 1 of the receipt model covers a single upstream parent (rule 7); where a skill is
+  admitted from more than one upstream outcome, the walk terminates at whichever parent it
+  followed and returns a chain that *looks* complete. The sibling branch that actually carried
+  the instruction is never walked. For AST09-S06 this is worse than missing evidence: the
+  coverage matrix records fan-in joins as an open proposal, so part of the evidence that would
+  decide the scenario is not merely outside the artifact — it is not yet specified anywhere.
 
 ## Scope and out-of-artifact boundary
 

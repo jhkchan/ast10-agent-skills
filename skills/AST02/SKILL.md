@@ -52,6 +52,7 @@ the rest of it is an audit:**
 | Decision rules | always: six rules, and the reason this file exists |
 | Distinguishing AST02 from its neighbors | the route above was contested, or one incident spans two categories |
 | What the one shipped check decides, and the six ways it goes quiet | **MANDATORY before you report a negative `AST02-S03` result.** Every one of the six returns a negative verdict that is not a clean one |
+| NEVER | **always, and again before the verdict is written down.** The conclusions the silences above and the empty three-quarters of the matrix invite; each names the check, scenario id or test that refutes it |
 | Scope and out-of-artifact boundary | you are being asked to detect a maintainer-account compromise from the artifact |
 
 **Do NOT load `coverage-matrix.md`** to decide whether something is a finding. It is the
@@ -193,6 +194,59 @@ verdict that is not a clean one.
   `exec`, `run`, `shellcmd`). An entry that carries only `args`, or that spells the key
   `entrypoint` or `program`, yields no command value and clears — inside a hook block
   that the host will still execute.
+
+## NEVER
+
+The check above is narrow on purpose and three of four scenarios are out of reach, so this
+category's characteristic error is not a missed pattern — it is a conclusion drawn from a
+silence. Each entry names what refutes it, in this directory.
+
+- **NEVER close the config-hijacking question for a deployment on the strength of a clean
+  package scan.** `AST02-S03`'s trigger in CVE-2025-59536 and CVE-2026-21852 is a *cloned
+  repository the agent opens*; the check's entire input is the package's own shipped files.
+  The one delivery path the scenario is named after is the one the check structurally cannot
+  see, so a negative here is filed as though the incident shape had been examined when it was
+  never in scope. Scan the workspace as a separate target.
+- **NEVER read a negative `AST02-config-file-hijacking` as "every config file was
+  examined".** The first file that fails to parse returns immediately, so a
+  `.claude/settings.json` carrying a JSONC trailing comma ends the run before
+  `.vscode/tasks.json` is opened — and the Finding it returns is `detected=False`. Any
+  aggregator that reads the boolean records the category clean; only the evidence string says
+  `unparseable JSON; no execution path decided`.
+- **NEVER add a host's config path to the closed list without a parser for that host's
+  dialect.** `.envrc` is shell, `.github/workflows/*` is YAML, `.devcontainer/devcontainer.json`
+  is JSONC. Each one added under the strict-JSON parse turns every package that ships it into
+  the undecided verdict above and abandons the files sorted after it. Widening the surface
+  that way makes the check quieter, not louder — the opposite of the intended change.
+- **NEVER treat `package ships no config file a host auto-reads at project open` as a
+  statement about a host outside the eight covered path tails.** A
+  `.devcontainer/devcontainer.json` whose `postCreateCommand` is precisely this scenario
+  returns that sentence verbatim — the same sentence a package with no config file at all
+  gets. An uncovered host and a clean package are indistinguishable in the output, so the
+  gap never surfaces in a report unless a reader knows the list is closed.
+- **NEVER re-key the check on command-looking strings instead of on the config surface.**
+  That ablation is written and scored: `tests/test_corpus_discriminates_mechanism.py` runs it
+  over this corpus at **F1 0.667** (tp 2, fp 1, fn 1) against the shipped check's 1.000. It
+  fails in both directions at once — it misses the `ANTHROPIC_BASE_URL` case, which carries a
+  URL and no command, and convicts the clean folder-open case, which carries the
+  byte-identical command with no `runOn` trigger.
+- **NEVER file a pin-posture observation under `AST02-S02`.** Version ranges rather than
+  `sha256:` pins is that scenario's declared `artifact_signal`, its `artifact_signal_checks`
+  list is empty, and pin posture is a lockfile property while the scenario is a resolver
+  outcome. This is not hypothetical: the pin-posture pair is one of the six orphan fixtures
+  `tests/test_coverage_matrix_ast07_ast08.py::test_ast02_ships_no_orphan_fixture_corpus`
+  names by directory so the delisting cannot be quietly undone.
+- **NEVER report a Maintainer Account Takeover as ruled out because the release verified.**
+  The registry's written reason for tiering `AST02-S04` out-of-artifact is that a release
+  pushed by an attacker holding the legitimate key is byte-indistinguishable from an honest
+  one. A passing signature read as a negative converts "no in-package signal exists" into
+  "no compromise occurred"; the honest verdict is undecidable-from-here, and it escalates to
+  auth logs, signing-key provenance and publication cadence, never to another scan.
+- **NEVER give a takeover incident one label to keep it on one ticket.** The compromise is
+  AST02 and the agent auto-applying the resulting update without human review is AST07. The
+  two halves have different fixes and different owners — revocation addressable at the three
+  granularities of decision rule 6, versus a human gate on the update path — and a single
+  label schedules exactly one of them while closing the incident.
 
 ## Scope and out-of-artifact boundary
 
