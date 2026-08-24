@@ -21,6 +21,14 @@ the route sends you. No mechanism is in this file: the static checks live in
 - **Stop now** if the route below sends you elsewhere. The rest of this file will not
   answer that question and will cost you the context to ask it properly.
 
+**Freedom, stated up front, because this category is two jobs and they do not take the
+same hand:**
+
+| Half | Freedom | Why |
+| --- | --- | --- |
+| **Is this a finding?** | Low — apply the predicate, do not extend it | The shape is fixed under *The predicate shape* below: a construct *plus* a contradiction of the package's own declaration. Convicting on the construct alone invents a check whose false-positive rate nobody measured; acquitting on the declaration alone reads a silence as a result. What tier a named scenario holds is settled above this file — `scenarios/registry.yaml` is rank 2 of `coverage-matrix.md`'s authority chain and `scripts/detector.py` is rank 5, subordinate to it. Where a row in *Route first* and a neighbor's own *Distinguishing* section disagree, the neighbor fixed that seam and this file is the bug. |
+| **What to do about what no check can see** | High — the reviewer is the instrument | Rule 4's runtime accumulation has no predicate available to it, because the quantity does not exist inside one snapshot. Which of the two in-reach traces to pull, how far back to diff the identity artifacts, whether a climbing retry count is worth a session of host telemetry, and how loudly to state the domain gap alongside the static result are all yours to decide. Do not wait here for a rule; there is not going to be one, and the failure mode here is a reviewer who reports `clean` because nothing told them what else to do. |
+
 ### Route first
 
 | If the finding is | Go |
@@ -76,6 +84,13 @@ that depend on it — see the quiet list below before reading any negative resul
 "no payload".
 
 ## Decision rules
+
+Split by the freedom table above, so that the voice is not mistaken for uniform. Rules 1,
+2, 3 and 5 *close* a question — each says what a given fact already is, and re-deriving one
+at review time produces a second, quieter answer that will disagree with the next
+reviewer's. Rules 4 and 6 *open* one: 4 hands a degradation complaint back with no
+predicate to apply, and 6 names a boundary this file does not tell you how to certify
+because the certification is the host's, not this package's.
 
 1. **A verified signature answers "who published this," never "is this safe."**
    Ed25519 signing composes with behavioral scanning and reputation; it does not

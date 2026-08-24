@@ -34,6 +34,18 @@ with every number they produce.
 serves to someone else. That is the whole category — read *Why review-time inspection
 cannot close this category* before you argue with it.
 
+**How much freedom this page grants, and the one place it grants none.** Nearly all of
+AST05 is judgement — a property of the category, not a gap in this file — so the
+exception is worth naming before the rules rather than after them:
+
+| Work | Freedom | Why |
+| --- | --- | --- |
+| **Labelling a number one of these checks produced** | Low — the label is looked up, not argued | `CHECK_COVERAGE` marks all five checks `artifact-signal-only`, `STATIC_DETECTABLE` is empty, and `scenarios/registry.yaml` places every AST05 scenario outside the static tier. Promoting a proxy to coverage is the one error this category cannot absorb, because no scenario-level number exists underneath it to contradict the claim later. Where this file and `coverage-matrix.md` disagree about a tier, the matrix wins and this file is the bug. |
+| **Deciding what a result means** | High — this is the work, and rules 1–6 supply its questions, not its answers | Whether a fetch surface is too wide for the function, whether a named boundary does anything, what a clean run over a package that fetches through a shell is worth: nothing in this repository closes any of them. A page that implied a rule here would be manufacturing certainty the category does not have. |
+
+A clean run of the five checks with no manual step beside it is an incomplete review, not
+a negative finding — name the step from *Where the shipped checks go quiet* that you ran.
+
 **Route first.** Reasoning for each cross-category call is in *Distinguishing AST05 from
 its neighbors*; this table is only the jump.
 
@@ -47,6 +59,7 @@ its neighbors*; this table is only the jump.
 | The skill's own version changing | **AST07** — same drift, different object |
 | Content a scanner may never observe at all | **AST08** — this category widens their gap |
 | A `sanitize()` the static check accepted | *Where the shipped checks go quiet*, first bullet — highest-yield manual step on this page |
+| An `audit` tier column reading `static-detectable` for these five checks | *Why review-time inspection cannot close this category*, last paragraph — that column reports mechanism, not coverage |
 
 **Stop after *Decision rules*** if you are writing a control recommendation; rules 1–6 are
 the controls. Read *Where the shipped checks go quiet* only when a check came back
@@ -81,6 +94,15 @@ followed, or the pipeline's per-node backbone models. The five checks that do sh
 *enabling preconditions* and are declared `artifact-signal-only` — a label that travels
 with every number they produce, so no consumer can quietly promote a proxy into
 coverage.
+
+Two commands here answer two different questions about those same five checks, and taking
+one for the other is how the promotion happens anyway. `cli.js audit <path>` reports a
+check's **mechanism**: each one is a deterministic rule over the package's own bytes, so
+its tier column reads `static-detectable` for all five, and the footer beneath the table
+says these are checks and not scenario coverage. `cli.js coverage` reports this
+**category's** position — static tier `0`, `artifact-signal-only 1.00 (n=6)`. Both are
+true of the same code: one says how a check works, the other says what it may claim. Quote
+`coverage`.
 
 ## Decision rules
 

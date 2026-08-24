@@ -24,6 +24,14 @@ scenario tiers, and the three scenarios no package decides, live in `coverage-ma
 - **Stop now** if the route below sends you elsewhere. This is the category where the
   in-artifact surface is smallest, so a wrong route wastes the most reading.
 
+**Freedom, stated up front, because one narrow half of this category is mechanical and
+the rest of it is an audit:**
+
+| Half | Freedom | Why |
+| --- | --- | --- |
+| **The one in-package scenario** | Low — the keying decides, you do not | `AST02-S03` fires on the config *surface*, not on how alarming a command reads: the scanned path list is closed, the auto-executed shapes are four, and the command keys are a fixed set. Widening any of those is an edit to `scripts/detector.py` that somebody reviews, never a call made while reading a result. What tier a named scenario holds is settled above this file — `scenarios/registry.yaml` is rank 2 of `coverage-matrix.md`'s authority chain and `scripts/detector.py` is rank 5, subordinate to it. Where a row in *Route first* and a neighbor's own *Distinguishing* section disagree, the neighbor fixed that seam and this file is the bug. |
+| **Everything registry-side** | High — there is no check to defer to | Registry Flooding, Dependency Confusion and Maintainer Account Takeover are audited by a person or not at all, and the decision rules below hand you tests rather than verdicts: which of the three provenance questions an implementation actually performs, whether a pin reaches every package in the transitive tree, whether revocation is addressable at the granularity a given incident needs. The evidence for each lives in a corpus, a resolver and an account, so no rule can close them from here. The one thing that is *not* free: a judgement you reach this way stays a judgement — it does not get filed under a scenario id. |
+
 ### Route first
 
 | If the finding is | Go |
@@ -71,6 +79,14 @@ assertions answered by two different mechanisms; a lookup that returns *found* h
 verified anything.
 
 ## Decision rules
+
+Split by the freedom table above, so that the voice is not mistaken for uniform. Two are
+closed and act on bytes you are holding: rule 5 is the reasoning the shipped check
+implements, and rule 2's in-package half is already decided elsewhere — a declared
+`content_hash` contradicting the shipped bytes is AST01's check, recorded as a category
+precondition. The other four are audit instruments. They tell you what to ask of a
+registry, a resolver, a dependency tree and a revocation endpoint; each leaves the verdict
+with you, because the thing that would settle it is not in the package.
 
 1. **"Listed", "signed", and "unrewritten" are three separate questions, and a system
    that answers only the first reports PASS for all three.** A membership lookup

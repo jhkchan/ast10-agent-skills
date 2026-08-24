@@ -11,8 +11,8 @@ or it doesn't, and "sandboxing is available if configured" is evidence *for* thi
 finding, not evidence against it. Mechanism lives in `scripts/detector.py`: the two
 halves of Host Escape's defining condition — a bundled-script call site planting host
 persistence, and a declared write scope reaching filesystem root — plus the declared
-shell posture and shared-state write scope. Frozen scenario tiers live in
-`coverage-matrix.md`.
+shell posture, shared-state write scope and sandbox declaration. Frozen scenario
+tiers live in `coverage-matrix.md`.
 
 ## Orientation — read this much first
 
@@ -29,6 +29,14 @@ hot-reload behaviour and cross-agent shared state are facts about a *deployment*
 package carries them. For those, decision rules 2–4 are the procedure and you run them by
 hand against the running instance — the detector will stay silent and that silence is not
 a pass.
+
+**Freedom on this page is split unevenly between those two halves, so it is stated
+rather than left to be inferred:**
+
+| Half of the job | Freedom | Why |
+| --- | --- | --- |
+| **Deciding `AST06-S01`** | Low — take the disjunction as given | `scenarios/registry.yaml` states Host Escape as two disjuncts and `scripts/detector.py` implements exactly those two, the manifest side against a closed literal set of root-ish scopes. A third disjunct reasoned out mid-review is a private doctrine the corpus, the F1 and the next reviewer do not share; widening the set is an edit to the module and its fixtures, not a judgement call at review time. Where this file and `coverage-matrix.md` disagree about a tier, the matrix wins and this file is the bug. |
+| **The other four scenarios** | High — no rule exists, and simulating one is the failure mode | Bind address, workspace-over-bundled precedence, hot-reload and cross-agent state are properties of an instance. Rules 2–4 tell you what to ask of that instance; what counts as an adequate answer is yours to argue. The recurring error here is not too little rigour but the wrong subject — closing on evidence about the product when the finding is about the deployment (next section). |
 
 **Route first.** Reasoning for each cross-category call is in *Distinguishing AST06 from
 its neighbors*; this table is only the jump.
@@ -132,8 +140,9 @@ about the deployment. Note which one you have before you close it.
 it as a disjunction, so the module implements one check per disjunct: a bundled-script
 call site planting host persistence (cron table, systemd unit, shell rc, launch agent),
 or a declared write scope reaching filesystem root. Both are structural facts of the
-package. The two remaining checks in the module read `artifact_signal`s for scenarios
-they do not decide, and say so in their own `CHECK_COVERAGE`.
+package. The module's other three checks decide no scenario and say so in their own
+`CHECK_COVERAGE`: two read `artifact_signal`s, and the shell-posture check is a
+`category-precondition`.
 
 - **The script disjunct needs the persistence path as a literal string argument of a
   shell-exec or write call.** It matches `ast.Call` nodes, not text — which is why the
@@ -152,7 +161,7 @@ they do not decide, and say so in their own `CHECK_COVERAGE`.
   nothing — which means the declaration's breadth never appears in any finding here.
 - **Everything about the running system is outside the artifact.** Bind address,
   workspace-over-bundled precedence, hot-reload behaviour and cross-agent shared state
-  are properties of a deployment, not of a package; three of this category's five
+  are properties of a deployment, not of a package; four of this category's five
   scenarios are tiered out-of-artifact for exactly that reason. Decision rules 2, 3 and 4
   above are what you apply by hand, against the deployment, when this detector has
   nothing to say.
