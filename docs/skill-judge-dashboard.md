@@ -302,17 +302,17 @@ during a round is excluded from that round's pool with a timestamped audit entry
 
 | Skill | Rounds | Mean | Mean − σ | Lowest dim (floor) | Grade | Verdict |
 | --- | ---: | ---: | ---: | --- | --- | --- |
-| `AST01` | 18 | 109.8 | 103.8 | `D8` 13.3/13 | A | BLOCKED — lower bound (mean - stdev) 103.8 < 105 — mean 109.8 is within noise (sigma 6.02) of failing badly |
-| `AST02` | 18 | 109.1 | 102.6 | `D8` 13.1/13 | A | BLOCKED — lower bound (mean - stdev) 102.6 < 105 — mean 109.1 is within noise (sigma 6.45) of failing badly |
-| `AST03` | 18 | 108.7 | 101.3 | `D6` 13/13 | A | BLOCKED — lower bound (mean - stdev) 101.3 < 105 — mean 108.7 is within noise (sigma 7.44) of failing badly |
-| `AST04` | 18 | 108.7 | 102.4 | `D6` 13.1/13 | A | BLOCKED — lower bound (mean - stdev) 102.4 < 105 — mean 108.7 is within noise (sigma 6.29) of failing badly |
-| `AST05` | 18 | 110.7 | 104.3 | `D8` 13.3/13 | A | BLOCKED — lower bound (mean - stdev) 104.3 < 105 — mean 110.7 is within noise (sigma 6.36) of failing badly |
-| `AST06` | 18 | 109.3 | 103.2 | `D8` 13.1/13 | A | BLOCKED — lower bound (mean - stdev) 103.2 < 105 — mean 109.3 is within noise (sigma 6.13) of failing badly |
-| `AST07` | 18 | 105.4 | 91.4 | `D6` 12.2/13 ⚠ | B | BLOCKED — dimension means below floor: D6, D8 |
-| `AST08` | 18 | 110.7 | 104.3 | `D6` 13.3/13 | A | BLOCKED — lower bound (mean - stdev) 104.3 < 105 — mean 110.7 is within noise (sigma 6.43) of failing badly |
-| `AST09` | 18 | 105.7 | 97.7 | `D6` 12.3/13 ⚠ | B | BLOCKED — dimension means below floor: D6, D8 |
-| `AST10` | 18 | 110.2 | 102.6 | `D6` 13.3/13 | A | BLOCKED — lower bound (mean - stdev) 102.6 < 105 — mean 110.2 is within noise (sigma 7.59) of failing badly |
-| `advisory` | 18 | 112.8 | 107.4 | `D8` 13.8/13 | A | SHIP |
+| `AST01` | 17 | 109.8 | 104.4 | `D3` 13.1/13 | A | BLOCKED — lower bound (mean - stdev) 104.4 < 105 — mean 109.8 is within noise (sigma 5.37) of failing badly |
+| `AST02` | 16 | 108.7 | 103.4 | `D3` 11.8/13 ⚠ | A | BLOCKED — dimension means below floor: D3 |
+| `AST03` | 15 | 107.9 | 102.4 | `D3` 12.2/13 ⚠ | B | BLOCKED — dimension means below floor: D3 |
+| `AST04` | 15 | 108.7 | 102.5 | `D3` 12.4/13 ⚠ | A | BLOCKED — dimension means below floor: D3 |
+| `AST05` | 15 | 107.9 | 99.9 | `D3` 12.9/13 ⚠ | B | BLOCKED — dimension means below floor: D3 |
+| `AST06` | 17 | 107.4 | 102.5 | `D3` 11.5/13 ⚠ | B | BLOCKED — dimension means below floor: D3 |
+| `AST07` | 17 | 106.6 | 100.4 | `D3` 12.1/13 ⚠ | B | BLOCKED — dimension means below floor: D2, D3 |
+| `AST08` | 15 | 110.3 | 104.6 | `D3` 13.5/13 | A | BLOCKED — lower bound (mean - stdev) 104.6 < 105 — mean 110.3 is within noise (sigma 5.65) of failing badly |
+| `AST09` | 17 | 107.4 | 101 | `D3` 12.3/13 ⚠ | B | BLOCKED — dimension means below floor: D3 |
+| `AST10` | 16 | 108.6 | 102 | `D3` 12.4/13 ⚠ | A | BLOCKED — dimension means below floor: D3 |
+| `advisory` | 17 | 112.3 | 108.9 | `D2` 13.7/13 | A | SHIP |
 | `ast01-malicious-skills` | — | — | — | — | — | NOT YET JUDGED |
 | `ast02-supply-chain-compromise` | — | — | — | — | — | NOT YET JUDGED |
 | `ast03-over-privileged-skills` | — | — | — | — | — | NOT YET JUDGED |

@@ -1,0 +1,485 @@
+{
+  "skill": "AST09",
+  "rounds": 3,
+  "providers": [
+    "bedrock/gpt-oss-120b",
+    "bedrock/qwen3-235b",
+    "bedrock/deepseek-v3.2",
+    "bedrock/nova-pro",
+    "claude-cli/sonnet",
+    "anthropic-compatible/glm-5.2"
+  ],
+  "providers_unavailable": [],
+  "judgments": [
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 11.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 12.0,
+        "D6": 13.0,
+        "D7": 8.0,
+        "D8": 12.0
+      },
+      "justifications": {
+        "D1": "Decision rule 1 mandates signed admission and outcome receipts, a non\u2011obvious expert requirement Claude is unlikely to know (band 16\u201120).",
+        "D2": "The skill combines thinking prompts (e.g., treat a missing outcome receipt as ambiguous) with domain\u2011specific procedures like mandatory receipt fields and off\u2011boarding revocation workflow (band 8\u201111).",
+        "D3": "It lists specific NEVER directives such as \"Do NOT open `coverage\u2011matrix.md` except for a binding tier\" with justification, satisfying expert\u2011grade anti\u2011patterns (band 12\u201115).",
+        "D4": "The description states the WHAT (\u201cDetect and triage OWASP AST09 No Governance\u201d), the WHEN (\u201cUse when designing or auditing\u2026\u201d) and keywords (OWASP AST09, SaaS copilot, EU AI Act) fulfilling all three required elements (band 14\u201115).",
+        "D5": "The skill includes explicit loading triggers like \u201cDo NOT open `scripts/detector.py`\u201d and limits the body to concise sections, providing good layering (band 11\u201113).",
+        "D6": "By enforcing mandatory signed receipts and prohibiting ambiguous outcomes, the skill tightly constrains fragile audit\u2011logging tasks, showing appropriate low\u2011freedom calibration (band 11\u201113).",
+        "D7": "Its structured decision\u2011rule sections and phased workflow match the official \u2018Process\u2019 pattern for complex multi\u2011step projects (band 7\u20118).",
+        "D8": "The guidance offers clear decision rules, fallback considerations, and concrete audit steps, making the skill usable for agents despite lacking code snippets (band 11\u201113)."
+      },
+      "total": 102.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Decision rule 1 mandates signed admission and outcome receipts, a non\u2011obvious expert requirement Claude is unlikely to know (band 16\u201120).\"}, \"D2\": {\"score\": 11, \"why\": \"The skill combines thinking prompts (e.g., treat a missing outcome receipt as ambiguous) with domain\u2011specific procedures like mandatory receipt fields and off\u2011boarding revocation workflow (band 8\u201111).\"}, \"D3\": {\"score\": 13, \"why\": \"It lists specific NEVER directives such as \\\"Do NOT open `coverage\u2011matrix.md` except for a binding tier\\\" with justification, satisfying expert\u2011grade anti\u2011patterns (band 12\u201115).\"}, \"D4\": {\"score\": 15, \"why\": \"The description states the WHAT (\u201cDetect and triage OWASP AST09 No Governance\u201d), the WHEN (\u201cUse when designing or auditing\u2026\u201d) and keywords (OWASP AST09, SaaS copilot, EU AI Act) fulfilling all three required elements (band 14\u201115).\"}, \"D5\": {\"score\": 12, \"why\": \"The skill includes explicit loading triggers like \u201cDo NOT open `scripts/detector.py`\u201d and limits the body to concise sections, providing good layering (band 11\u201113).\"}, \"D6\": {\"score\": 13, \"why\": \"By enforcing mandatory signed receipts and prohibiting ambiguous outcomes, the skill tightly constrains fragile audit\u2011logging tasks, showing appropriate low\u2011freedom calibration (band 11\u201113).\"}, \"D7\": {\"score\": 8, \"why\": \"Its structured decision\u2011rule sections and phased workflow match the official \u2018Process\u2019 pattern for complex multi\u2011step projects (band 7\u20118).\"}, \"D8\": {\"score\": 12, \"why\": \"The guidance offers clear decision rules, fallback considerations, and concrete audit steps, making the skill usable for agents despite lacking code snippets (band 11\u201113).\"}}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 20.0,
+        "D2": 15.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill presents pure knowledge delta with expert-level decision rules like 'A DENY decision still requires a signed admission receipt' that only an expert would know, meeting the 'Pure knowledge delta' band of 16-20.",
+        "D2": "It provides expert thinking patterns such as the four-step manual pass for triaging governance gaps and domain-specific procedures like identity-state checks for orphaned skills, meeting the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band of 12-15.",
+        "D3": "It includes expert-grade anti-patterns such as 'NEVER treat \"no outcome receipt\" as confirmation of a block' with clear reasoning from real-world architectural flaws, meeting the 'Expert-grade anti-patterns with WHY' band of 12-15.",
+        "D4": "The description precisely answers WHAT, WHEN, and includes trigger keywords like 'EU AI Act Article 12 logging obligations' and 'SaaS copilot the security team cannot scan', meeting the 'Perfect: comprehensive description with WHAT, WHEN, and trigger keywords' band of 14-15.",
+        "D5": "It implements excellent progressive disclosure with mandatory triggers like 'Read only what the finding needs' and explicit 'Do NOT open' guidance, meeting the 'Perfect: decision trees + explicit triggers + \"Do NOT Load\" guidance' band of 14-15.",
+        "D6": "It perfectly calibrates freedom with low-freedom mandates for fragile operations like requiring bilateral receipts and exact evidence plans, matching the 'fragile ops' requirement in the 'Perfect freedom calibration throughout' band of 14-15.",
+        "D7": "It masterfully follows the Tool pattern with decision trees, precise rules, and low-freedom operations for a format-like compliance framework, meeting the 'Masterful application of appropriate pattern' band of 9-10.",
+        "D8": "It provides comprehensive usability with actionable decision trees, clear fallback logic for inconclusive findings, and explicit error handling like refusing 'Inconclusive' write-ups, meeting the 'Comprehensive coverage including edge cases and error handling' band of 14-15."
+      },
+      "total": 120.0,
+      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"The skill presents pure knowledge delta with expert-level decision rules like 'A DENY decision still requires a signed admission receipt' that only an expert would know, meeting the 'Pure knowledge delta' band of 16-20.\"}, \"D2\": {\"score\": 15, \"why\": \"It provides expert thinking patterns such as the four-step manual pass for triaging governance gaps and domain-specific procedures like identity-state checks for orphaned skills, meeting the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band of 12-15.\"}, \"D3\": {\"score\": 15, \"why\": \"It includes expert-grade anti-patterns such as 'NEVER treat \\\"no outcome receipt\\\" as confirmation of a block' with clear reasoning from real-world architectural flaws, meeting the 'Expert-grade anti-patterns with WHY' band of 12-15.\"}, \"D4\": {\"score\": 15, \"why\": \"The description precisely answers WHAT, WHEN, and includes trigger keywords like 'EU AI Act Article 12 logging obligations' and 'SaaS copilot the security team cannot scan', meeting the 'Perfect: comprehensive description with WHAT, WHEN, and trigger keywords' band of 14-15.\"}, \"D5\": {\"score\": 15, \"why\": \"It implements excellent progressive disclosure with mandatory triggers like 'Read only what the finding needs' and explicit 'Do NOT open' guidance, meeting the 'Perfect: decision trees + explicit triggers + \\\"Do NOT Load\\\" guidance' band of 14-15.\"}, \"D6\": {\"score\": 15, \"why\": \"It perfectly calibrates freedom with low-freedom mandates for fragile operations like requiring bilateral receipts and exact evidence plans, matching the 'fragile ops' requirement in the 'Perfect freedom calibration throughout' band of 14-15.\"}, \"D7\": {\"score\": 10, \"why\": \"It masterfully follows the Tool pattern with decision trees, precise rules, and low-freedom operations for a format-like compliance framework, meeting the 'Masterful application of appropriate pattern' band of 9-10.\"}, \"D8\": {\"score\": 15, \"why\": \"It provides comprehensive usability with actionable decision trees, clear fallback logic for inconclusive findings, and explicit error handling like refusing 'Inconclusive' write-ups, meeting the 'Comprehensive coverage including edge cases and error handling' band of 14-15.\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 16.0,
+        "D2": 13.0,
+        "D3": 12.0,
+        "D4": 15.0,
+        "D5": 13.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The skill provides expert knowledge delta like the distinction between 'operator-editable logs' and 'compliance-grade audit evidence', meeting the 'Pure knowledge delta' criteria.",
+        "D2": "The 'Decision rules' section provides expert thinking patterns (e.g., signed admission vs. outcome receipts) and domain-specific procedures Claude wouldn't know, achieving a 'Good balance.'",
+        "D3": "Specific NEVER statements like 'DENY decision still requires a signed admission receipt' with reasoning constitute 'Expert-grade anti-patterns with WHY.'",
+        "D4": "The description explicitly details WHAT, WHEN, and includes trigger keywords (e.g., 'EU AI Act Article 12'), meeting 'Perfect' criteria.",
+        "D5": "The 'Read only what the finding needs' table provides MANDATORY triggers and 'Do NOT open' warnings, demonstrating 'Good layering with MANDATORY triggers present.'",
+        "D6": "The skill correctly employs low freedom (precise rules) for fragile compliance operations, achieving 'Perfect freedom calibration.'",
+        "D7": "It masterfully applies the 'Mindset' pattern with strong decision rules and philosophy, meeting 'Masterful application of appropriate pattern.'",
+        "D8": "Clear decision trees like the 'If the finding is...' table and comprehensive 'The manual pass' guidance show 'Comprehensive coverage including edge cases.'"
+      },
+      "total": 108.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 16,\n    \"why\": \"The skill provides expert knowledge delta like the distinction between 'operator-editable logs' and 'compliance-grade audit evidence', meeting the 'Pure knowledge delta' criteria.\"\n  },\n  \"D2\": {\n    \"score\": 13,\n    \"why\": \"The 'Decision rules' section provides expert thinking patterns (e.g., signed admission vs. outcome receipts) and domain-specific procedures Claude wouldn't know, achieving a 'Good balance.'\"\n  },\n  \"D3\": {\n    \"score\": 12,\n    \"why\": \"Specific NEVER statements like 'DENY decision still requires a signed admission receipt' with reasoning constitute 'Expert-grade anti-patterns with WHY.'\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description explicitly details WHAT, WHEN, and includes trigger keywords (e.g., 'EU AI Act Article 12'), meeting 'Perfect' criteria.\"\n  },\n  \"D5\": {\n    \"score\": 13,\n    \"why\": \"The 'Read only what the finding needs' table provides MANDATORY triggers and 'Do NOT open' warnings, demonstrating 'Good layering with MANDATORY triggers present.'\"\n  },\n  \"D6\": {\n    \"score\": 15,\n    \"why\": \"The skill correctly employs low freedom (precise rules) for fragile compliance operations, achieving 'Perfect freedom calibration.'\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"It masterfully applies the 'Mindset' pattern with strong decision rules and philosophy, meeting 'Masterful application of appropriate pattern.'\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"Clear decision trees like the 'If the finding is...' table and comprehensive 'The manual pass' guidance show 'Comprehensive coverage including edge cases.'\"\n  }\n}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 12.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The skill provides expert knowledge on OWASP AST09, specifically addressing governance issues and compliance-grade audit trails, which are not commonly known or easily accessible.",
+        "D2": "The skill provides both thinking patterns and domain-specific procedures, though it could benefit from more explicit thinking frameworks.",
+        "D3": "The skill includes specific anti-patterns with reasoning, such as the distinction between logs and compliance-grade audit evidence.",
+        "D4": "The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and includes relevant KEYWORDS.",
+        "D5": "The skill implements good content layering with clear triggers for when to load additional resources, though it could be more explicit about 'Do NOT Load' guidance.",
+        "D6": "The level of specificity is appropriate for the task's fragility, providing exact steps where needed and allowing for judgment in other areas.",
+        "D7": "The skill follows the 'Knowledge' pattern well, though with minor deviations, providing decision rules and clear guidance.",
+        "D8": "The skill provides clear and comprehensive guidance, including decision trees and fallbacks, though it could improve edge case coverage slightly."
+      },
+      "total": 109.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"The skill provides expert knowledge on OWASP AST09, specifically addressing governance issues and compliance-grade audit trails, which are not commonly known or easily accessible.\"\n  },\n  \"D2\": {\n    \"score\": 13,\n    \"why\": \"The skill provides both thinking patterns and domain-specific procedures, though it could benefit from more explicit thinking frameworks.\"\n  },\n  \"D3\": {\n    \"score\": 12,\n    \"why\": \"The skill includes specific anti-patterns with reasoning, such as the distinction between logs and compliance-grade audit evidence.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and includes relevant KEYWORDS.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"The skill implements good content layering with clear triggers for when to load additional resources, though it could be more explicit about 'Do NOT Load' guidance.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The level of specificity is appropriate for the task's fragility, providing exact steps where needed and allowing for judgment in other areas.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows the 'Knowledge' pattern well, though with minor deviations, providing decision rules and clear guidance.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides clear and comprehensive guidance, including decision trees and fallbacks, though it could improve edge case coverage slightly.\"\n  }\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 13.0,
+        "D7": 8.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "Decision rule 2 ('A DENY decision still requires a signed admission receipt \u2014 the absence of an outcome receipt is not itself proof the action was blocked') is exactly the kind of non-obvious expert claim the 16-20 band describes, and the file has essentially no 'what is logging' filler, so it sits at the top of the Pure Knowledge Delta band.",
+        "D2": "It pairs a thinking frame ('a log an operator controls can be edited after the fact; a receipt an independent verifier can cryptographically check cannot') with domain-specific procedures like the four-join manual pass and the seven numbered decision rules, matching the 8-11/12-15 'good balance' description rather than generic file-op steps.",
+        "D3": "The anti-pattern 'Do NOT open scripts/detector.py looking for a check: DETECTORS is {} by construction' and the fixture-gaming warning ('One could write fixtures whose SKILL.md prose says this skill was never approved... The number would measure a fixture-authoring convention, not a governance control') are specific-with-reasoning, placing it in the 12-15 expert-grade band rather than generic 'be careful' warnings.",
+        "D4": "The description stacks multiple explicit WHEN clauses ('Use when designing or auditing...', 'when a skill lives inside a SaaS copilot...', 'when distinguishing a signed-tamper-evident log...', 'when mapping an AST09 finding to EU AI Act Article 12') plus concrete keywords like 'bilateral-receipt audit logging', satisfying the 14-15 'comprehensive WHAT+WHEN+keywords' band.",
+        "D5": "The 'Read only what the finding needs' routing table combined with explicit negative triggers ('Do NOT open coverage-matrix.md except for a binding tier...' and 'Do NOT open scripts/detector.py looking for a check') is the scenario-detection-plus-Do-NOT-Load pattern the rubric calls Excellent, landing in the 14-15 band.",
+        "D6": "For a compliance-grade audit-log domain the skill mandates exact field names and joins (attempt_id, policy_version, terminal_state) rather than leaving structure to judgment, which is the appropriate low-freedom calibration the rubric's file-format-operations row describes, earning the 11-13 'good calibration' band.",
+        "D7": "It blends the Navigation pattern's routing table with the Process pattern's numbered decision rules and phased manual pass, a clear-but-hybrid application that fits the 7-8 'minor deviations' band rather than a single masterful canonical pattern.",
+        "D8": "'The manual pass' gives four concrete, ordered steps with explicit fallback guidance ('Inconclusive is the one write-up to refuse, because it reads in a report exactly like a clean scan of a system that was never checked'), which is clear common-case guidance with edge-case handling matching the 11-13 band, just short of exhaustive edge-case coverage needed for 14-15."
+      },
+      "total": 108.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Decision rule 2 ('A DENY decision still requires a signed admission receipt \u2014 the absence of an outcome receipt is not itself proof the action was blocked') is exactly the kind of non-obvious expert claim the 16-20 band describes, and the file has essentially no 'what is logging' filler, so it sits at the top of the Pure Knowledge Delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"It pairs a thinking frame ('a log an operator controls can be edited after the fact; a receipt an independent verifier can cryptographically check cannot') with domain-specific procedures like the four-join manual pass and the seven numbered decision rules, matching the 8-11/12-15 'good balance' description rather than generic file-op steps.\"}, \"D3\": {\"score\": 13, \"why\": \"The anti-pattern 'Do NOT open scripts/detector.py looking for a check: DETECTORS is {} by construction' and the fixture-gaming warning ('One could write fixtures whose SKILL.md prose says this skill was never approved... The number would measure a fixture-authoring convention, not a governance control') are specific-with-reasoning, placing it in the 12-15 expert-grade band rather than generic 'be careful' warnings.\"}, \"D4\": {\"score\": 15, \"why\": \"The description stacks multiple explicit WHEN clauses ('Use when designing or auditing...', 'when a skill lives inside a SaaS copilot...', 'when distinguishing a signed-tamper-evident log...', 'when mapping an AST09 finding to EU AI Act Article 12') plus concrete keywords like 'bilateral-receipt audit logging', satisfying the 14-15 'comprehensive WHAT+WHEN+keywords' band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Read only what the finding needs' routing table combined with explicit negative triggers ('Do NOT open coverage-matrix.md except for a binding tier...' and 'Do NOT open scripts/detector.py looking for a check') is the scenario-detection-plus-Do-NOT-Load pattern the rubric calls Excellent, landing in the 14-15 band.\"}, \"D6\": {\"score\": 13, \"why\": \"For a compliance-grade audit-log domain the skill mandates exact field names and joins (attempt_id, policy_version, terminal_state) rather than leaving structure to judgment, which is the appropriate low-freedom calibration the rubric's file-format-operations row describes, earning the 11-13 'good calibration' band.\"}, \"D7\": {\"score\": 8, \"why\": \"It blends the Navigation pattern's routing table with the Process pattern's numbered decision rules and phased manual pass, a clear-but-hybrid application that fits the 7-8 'minor deviations' band rather than a single masterful canonical pattern.\"}, \"D8\": {\"score\": 13, \"why\": \"'The manual pass' gives four concrete, ordered steps with explicit fallback guidance ('Inconclusive is the one write-up to refuse, because it reads in a report exactly like a clean scan of a system that was never checked'), which is clear common-case guidance with edge-case handling matching the 11-13 band, just short of exhaustive edge-case coverage needed for 14-15.\"}}\n"
+    },
+    {
+      "provider": "anthropic-compatible/glm-5.2",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 12.0,
+        "D4": 14.0,
+        "D5": 14.0,
+        "D6": 12.0,
+        "D7": 8.0,
+        "D8": 12.0
+      },
+      "justifications": {
+        "D1": "Expert-only content throughout, e.g. rule 2's 'A DENY-with-no-outcome pattern is... indistinguishable from telemetry loss, a crash, a queue failure, or tampering' and the 'approved copy and an unapproved copy of the same skill are byte identical' argument \u2014 pure knowledge delta band (16-20).",
+        "D2": "The four-join manual-pass workflow ('The review itself is four joins, and the package supplies the key for exactly one of them: its content hash') plus framing heuristics like 'Read a clean run of either as not asked, never as asked and cleared' combine procedures Claude wouldn't know with expert thinking \u2014 12-15 band.",
+        "D3": "Specific NEVERs with non-obvious reasons: '\"Inconclusive\" is the one write-up to refuse, because it reads in a report exactly like a clean scan of a system that was never checked' and the warning against fixture-prose detection measuring 'a fixture-authoring convention, not a governance control' \u2014 expert-grade anti-patterns (12-15).",
+        "D4": "The description packs WHAT (detect and triage AST09), WHEN ('Use when designing or auditing a compliance-grade skill audit trail...'), and trigger keywords (offboarding, SaaS copilot, EU AI Act Article 12) \u2014 perfect band (14-15).",
+        "D5": "Conditional loading table ('If the finding is... Read rules 1-3, then stop') with explicit 'Do NOT open coverage-matrix.md except for...' and 'Do NOT open scripts/detector.py' guidance gives decision trees plus Do-NOT-Load triggers \u2014 excellent layering (14-15).",
+        "D6": "Freedom is calibrated to fragility: rigid rules for the tamper-evident receipt schema versus reasoned judgment latitude for routing contested AST09/AST06/AST07 distinctions \u2014 good calibration for most scenarios (11-13).",
+        "D7": "Clear Navigation/Tool hybrid: minimal routing SKILL.md delegating per-scenario evidence to coverage-matrix.md with a dispatch table, with only minor deviations like the long inline rule detail \u2014 clear pattern with minor deviations (7-8).",
+        "D8": "Actionable decision table with explicit fallbacks and routing corrections ('wrong skill -> AST07, unless no approved version was ever recorded, in which case it is AST09') and named CLI commands covers edge cases and error paths \u2014 11-13 band."
+      },
+      "total": 103.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Expert-only content throughout, e.g. rule 2's 'A DENY-with-no-outcome pattern is... indistinguishable from telemetry loss, a crash, a queue failure, or tampering' and the 'approved copy and an unapproved copy of the same skill are byte identical' argument \u2014 pure knowledge delta band (16-20).\"}, \"D2\": {\"score\": 13, \"why\": \"The four-join manual-pass workflow ('The review itself is four joins, and the package supplies the key for exactly one of them: its content hash') plus framing heuristics like 'Read a clean run of either as not asked, never as asked and cleared' combine procedures Claude wouldn't know with expert thinking \u2014 12-15 band.\"}, \"D3\": {\"score\": 12, \"why\": \"Specific NEVERs with non-obvious reasons: '\\\"Inconclusive\\\" is the one write-up to refuse, because it reads in a report exactly like a clean scan of a system that was never checked' and the warning against fixture-prose detection measuring 'a fixture-authoring convention, not a governance control' \u2014 expert-grade anti-patterns (12-15).\"}, \"D4\": {\"score\": 14, \"why\": \"The description packs WHAT (detect and triage AST09), WHEN ('Use when designing or auditing a compliance-grade skill audit trail...'), and trigger keywords (offboarding, SaaS copilot, EU AI Act Article 12) \u2014 perfect band (14-15).\"}, \"D5\": {\"score\": 14, \"why\": \"Conditional loading table ('If the finding is... Read rules 1-3, then stop') with explicit 'Do NOT open coverage-matrix.md except for...' and 'Do NOT open scripts/detector.py' guidance gives decision trees plus Do-NOT-Load triggers \u2014 excellent layering (14-15).\"}, \"D6\": {\"score\": 12, \"why\": \"Freedom is calibrated to fragility: rigid rules for the tamper-evident receipt schema versus reasoned judgment latitude for routing contested AST09/AST06/AST07 distinctions \u2014 good calibration for most scenarios (11-13).\"}, \"D7\": {\"score\": 8, \"why\": \"Clear Navigation/Tool hybrid: minimal routing SKILL.md delegating per-scenario evidence to coverage-matrix.md with a dispatch table, with only minor deviations like the long inline rule detail \u2014 clear pattern with minor deviations (7-8).\"}, \"D8\": {\"score\": 12, \"why\": \"Actionable decision table with explicit fallbacks and routing corrections ('wrong skill -> AST07, unless no approved version was ever recorded, in which case it is AST09') and named CLI commands covers edge cases and error paths \u2014 11-13 band.\"}}"
+    },
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 17.0,
+        "D2": 13.0,
+        "D3": 10.0,
+        "D4": 15.0,
+        "D5": 12.0,
+        "D6": 14.0,
+        "D7": 8.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "the detailed decision rules about signed admission and outcome receipts and their linking represent expert knowledge Claude does not already have",
+        "D2": "the skill combines thinking patterns (e.g., matching discovery method to skill location) with domain\u2011specific procedures like mandatory receipt fields and off\u2011boarding revocation workflows",
+        "D3": "it includes specific anti\u2011patterns such as \"Do NOT open `coverage-matrix.md`\" and \"Do NOT open `scripts/detector.py`\" with clear rationale",
+        "D4": "the description explicitly states WHAT the skill does, WHEN to use it, and includes trigger keywords like \"AST09\" and \"EU AI Act\"",
+        "D5": "the body stays concise, using short \"Do NOT open\" directives instead of dumping large reference files, demonstrating proper progressive disclosure",
+        "D6": "the mandatory signed receipt requirements and exact procedural steps show low\u2011freedom calibration suitable for fragile audit\u2011logging tasks",
+        "D7": "the skill follows the Process pattern with phased decision rules and a clear workflow structure",
+        "D8": "the step\u2011by\u2011step audit guidance (inventory row, identity state, execution record) provides clear, actionable instructions covering common and edge cases"
+      },
+      "total": 102.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 17,\n    \"why\": \"the detailed decision rules about signed admission and outcome receipts and their linking represent expert knowledge Claude does not already have\"\n  },\n  \"D2\": {\n    \"score\": 13,\n    \"why\": \"the skill combines thinking patterns (e.g., matching discovery method to skill location) with domain\u2011specific procedures like mandatory receipt fields and off\u2011boarding revocation workflows\"\n  },\n  \"D3\": {\n    \"score\": 10,\n    \"why\": \"it includes specific anti\u2011patterns such as \\\"Do NOT open `coverage-matrix.md`\\\" and \\\"Do NOT open `scripts/detector.py`\\\" with clear rationale\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"the description explicitly states WHAT the skill does, WHEN to use it, and includes trigger keywords like \\\"AST09\\\" and \\\"EU AI Act\\\"\"\n  },\n  \"D5\": {\n    \"score\": 12,\n    \"why\": \"the body stays concise, using short \\\"Do NOT open\\\" directives instead of dumping large reference files, demonstrating proper progressive disclosure\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"the mandatory signed receipt requirements and exact procedural steps show low\u2011freedom calibration suitable for fragile audit\u2011logging tasks\"\n  },\n  \"D7\": {\n    \"score\": 8,\n    \"why\": \"the skill follows the Process pattern with phased decision rules and a clear workflow structure\"\n  },\n  \"D8\": {\n    \"score\": 13,\n    \"why\": \"the step\u2011by\u2011step audit guidance (inventory row, identity state, execution record) provides clear, actionable instructions covering common and edge cases\"\n  }\n}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill provides pure knowledge delta with expert-level decision rules like binding policy_version at decision time and cross-execution linkage limitations, which are non-obvious and earned through real-world experience, meeting the 'Pure knowledge delta' band (16-20).",
+        "D2": "It establishes expert thinking patterns such as questioning discovery method validity and organizational process boundaries, while providing domain-specific procedures like requiring signed admission and outcome receipts linked by attempt_id, which Claude wouldn't inherently know, placing it in the 'Expert-level' band (12-15).",
+        "D3": "The skill features a strong NEVER list including 'NEVER treat drift as routine telemetry' and 'Do NOT open `coverage-matrix.md` except for binding tier', each backed by operational reasoning gained from hard experience, matching the 'Expert-grade anti-patterns' band (12-15).",
+        "D4": "The description clearly answers WHAT (detect and triage AST09 governance gaps), WHEN (during compliance audits or when skills lack governance), and includes trigger keywords like 'no approval workflow', 'regulated-data exposure', and 'EU AI Act Article 12', fulfilling the 'Perfect' band (14-15).",
+        "D5": "It implements excellent progressive disclosure with MANDATORY reading triggers for specific rules based on the finding type and explicit 'Do NOT load' instructions for irrelevant files, achieving the 'Perfect' band (14-15).",
+        "D6": "Freedom calibration is perfectly matched to the fragile nature of audit trail design, enforcing strict constraints like mandatory signed receipts and decision rules rather than offering flexibility, appropriate for a low-freedom, high-consequence domain as per the 'Perfect' band (14-15).",
+        "D7": "The skill masterfully follows the established 'Tool' pattern (~300 lines) with decision trees, code-like rules, and low freedom, appropriate for precise governance operations, representing a 'Masterful application' (9-10).",
+        "D8": "It offers comprehensive practical usability through a clear decision tree for seven distinct findings, includes fallback reasoning like treating 'no outcome receipt' as ambiguous, and covers edge cases such as fan-in joins, meeting the 'Comprehensive coverage' band (14-15)."
+      },
+      "total": 117.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill provides pure knowledge delta with expert-level decision rules like binding policy_version at decision time and cross-execution linkage limitations, which are non-obvious and earned through real-world experience, meeting the 'Pure knowledge delta' band (16-20).\"}, \"D2\": {\"score\": 14, \"why\": \"It establishes expert thinking patterns such as questioning discovery method validity and organizational process boundaries, while providing domain-specific procedures like requiring signed admission and outcome receipts linked by attempt_id, which Claude wouldn't inherently know, placing it in the 'Expert-level' band (12-15).\"}, \"D3\": {\"score\": 15, \"why\": \"The skill features a strong NEVER list including 'NEVER treat drift as routine telemetry' and 'Do NOT open `coverage-matrix.md` except for binding tier', each backed by operational reasoning gained from hard experience, matching the 'Expert-grade anti-patterns' band (12-15).\"}, \"D4\": {\"score\": 15, \"why\": \"The description clearly answers WHAT (detect and triage AST09 governance gaps), WHEN (during compliance audits or when skills lack governance), and includes trigger keywords like 'no approval workflow', 'regulated-data exposure', and 'EU AI Act Article 12', fulfilling the 'Perfect' band (14-15).\"}, \"D5\": {\"score\": 15, \"why\": \"It implements excellent progressive disclosure with MANDATORY reading triggers for specific rules based on the finding type and explicit 'Do NOT load' instructions for irrelevant files, achieving the 'Perfect' band (14-15).\"}, \"D6\": {\"score\": 15, \"why\": \"Freedom calibration is perfectly matched to the fragile nature of audit trail design, enforcing strict constraints like mandatory signed receipts and decision rules rather than offering flexibility, appropriate for a low-freedom, high-consequence domain as per the 'Perfect' band (14-15).\"}, \"D7\": {\"score\": 10, \"why\": \"The skill masterfully follows the established 'Tool' pattern (~300 lines) with decision trees, code-like rules, and low freedom, appropriate for precise governance operations, representing a 'Masterful application' (9-10).\"}, \"D8\": {\"score\": 15, \"why\": \"It offers comprehensive practical usability through a clear decision tree for seven distinct findings, includes fallback reasoning like treating 'no outcome receipt' as ambiguous, and covers edge cases such as fan-in joins, meeting the 'Comprehensive coverage' band (14-15).\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 16.0,
+        "D2": 13.0,
+        "D3": 13.0,
+        "D4": 14.0,
+        "D5": 14.0,
+        "D6": 14.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Every paragraph contains expert knowledge delta, such as distinguishing admission and outcome receipts and explaining architectural out-of-artifact reasons, meeting the 'Pure knowledge delta' band.",
+        "D2": "The skill provides high-value expert thinking patterns ('Decision rules') and domain-specific workflow procedures ('The manual pass'), fitting the 'Expert-level: shapes thinking AND provides procedures' band.",
+        "D3": "It includes a 'NEVER' list embedded in rules (e.g., 'DENY decision still requires a signed admission receipt') with expert reasoning, aligning with the 'Expert-grade anti-patterns with WHY' band.",
+        "D4": "The description has perfect WHAT, WHEN, and keywords (e.g., 'Detect and triage OWASP AST09...' and 'Use when designing or auditing...'), meeting the top 'Perfect: comprehensive description' band.",
+        "D5": "It implements excellent progressive disclosure with explicit triggers ('Read only what the finding needs') and 'Do NOT load' commands, fitting the 'Perfect: decision trees + explicit triggers' band.",
+        "D6": "Freedom calibration is perfect with low freedom for precise audit decisions ('Use when...') and judgment calls, matching the 'Perfect freedom calibration throughout' band for fragile operations.",
+        "D7": "The skill clearly follows the 'Mindset' pattern with a decision-rules focus and ~200 lines, fitting the 'Clear pattern with minor deviations' band.",
+        "D8": "The skill offers comprehensive decision trees for routing, actionable 'The manual pass' steps, and edge-case coverage, meeting the 'Comprehensive coverage' band."
+      },
+      "total": 106.0,
+      "raw_response": "{\"D1\": {\"score\": 16, \"why\": \"Every paragraph contains expert knowledge delta, such as distinguishing admission and outcome receipts and explaining architectural out-of-artifact reasons, meeting the 'Pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"The skill provides high-value expert thinking patterns ('Decision rules') and domain-specific workflow procedures ('The manual pass'), fitting the 'Expert-level: shapes thinking AND provides procedures' band.\"}, \"D3\": {\"score\": 13, \"why\": \"It includes a 'NEVER' list embedded in rules (e.g., 'DENY decision still requires a signed admission receipt') with expert reasoning, aligning with the 'Expert-grade anti-patterns with WHY' band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description has perfect WHAT, WHEN, and keywords (e.g., 'Detect and triage OWASP AST09...' and 'Use when designing or auditing...'), meeting the top 'Perfect: comprehensive description' band.\"}, \"D5\": {\"score\": 14, \"why\": \"It implements excellent progressive disclosure with explicit triggers ('Read only what the finding needs') and 'Do NOT load' commands, fitting the 'Perfect: decision trees + explicit triggers' band.\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom calibration is perfect with low freedom for precise audit decisions ('Use when...') and judgment calls, matching the 'Perfect freedom calibration throughout' band for fragile operations.\"}, \"D7\": {\"score\": 8, \"why\": \"The skill clearly follows the 'Mindset' pattern with a decision-rules focus and ~200 lines, fitting the 'Clear pattern with minor deviations' band.\"}, \"D8\": {\"score\": 14, \"why\": \"The skill offers comprehensive decision trees for routing, actionable 'The manual pass' steps, and edge-case coverage, meeting the 'Comprehensive coverage' band.\"}}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 12.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The skill provides expert knowledge on OWASP AST09 No Governance, including decision rules, discovery methods, and distinctions from related categories.",
+        "D2": "The skill provides both expert thinking patterns and domain-specific procedures, though some sections could benefit from more explicit thinking frameworks.",
+        "D3": "The skill includes specific NEVER lists with reasoning, such as 'Do NOT open `scripts/detector.py` looking for a check' and 'Do NOT treat fan-in joins as solved.'",
+        "D4": "The description is comprehensive, specifying WHAT the skill does, WHEN it should be used, and including relevant keywords.",
+        "D5": "The skill implements good content layering with clear mandatory triggers and references to external resources.",
+        "D6": "The level of specificity is appropriate for the task's fragility, with low freedom for critical operations and clear guidance.",
+        "D7": "The skill follows the Knowledge pattern well, with minor deviations, providing decision rules and explicit guidance.",
+        "D8": "The skill provides clear and actionable guidance, including decision trees, fallbacks, and error handling."
+      },
+      "total": 109.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"The skill provides expert knowledge on OWASP AST09 No Governance, including decision rules, discovery methods, and distinctions from related categories.\"\n  },\n  \"D2\": {\n    \"score\": 13,\n    \"why\": \"The skill provides both expert thinking patterns and domain-specific procedures, though some sections could benefit from more explicit thinking frameworks.\"\n  },\n  \"D3\": {\n    \"score\": 12,\n    \"why\": \"The skill includes specific NEVER lists with reasoning, such as 'Do NOT open `scripts/detector.py` looking for a check' and 'Do NOT treat fan-in joins as solved.'\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, specifying WHAT the skill does, WHEN it should be used, and including relevant keywords.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"The skill implements good content layering with clear mandatory triggers and references to external resources.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The level of specificity is appropriate for the task's fragility, with low freedom for critical operations and clear guidance.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows the Knowledge pattern well, with minor deviations, providing decision rules and explicit guidance.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides clear and actionable guidance, including decision trees, fallbacks, and error handling.\"\n  }\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 13.0,
+        "D4": 14.0,
+        "D5": 15.0,
+        "D6": 13.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Rules like 'A DENY decision still requires a signed admission receipt' and the policy_version-binding rule teach non-obvious auditing distinctions no generic knowledge covers, putting it in the 16-20 pure-delta band.",
+        "D2": "It pairs the mindset framing ('a log an operator controls can be edited... a receipt an independent verifier can check cannot') with domain-specific procedures like 'The manual pass' four-join review, landing in the 12-15 expert-level band.",
+        "D3": "Rule 2's 'no outcome receipt' ambiguity warning and rule 6's 'Revocation tied only to explicit incident response misses the routine case' are specific NEVER-style claims with stated reasoning, meeting the 12-15 expert-grade band.",
+        "D4": "The description names concrete triggers ('when a skill lives inside a SaaS copilot the security team cannot scan', 'mapping an AST09 finding to EU AI Act Article 12') giving both WHAT and WHEN with keywords, just short of the perfect-band bar of an itemized (1)(2)(3) list.",
+        "D5": "The 'Read only what the finding needs' table plus explicit 'Do NOT open coverage-matrix.md except...' and 'Do NOT open scripts/detector.py looking for a check' instructions are exactly the excellent conditional-trigger pattern the rubric describes, meeting the 14-15 band.",
+        "D6": "Medium-freedom decision rules and a routing table fit a judgment-heavy classification task well, though the rigid four-step 'manual pass' is slightly more prescriptive than the open-ended discovery-method reasoning around it, keeping it just under perfect calibration.",
+        "D7": "The routing table plus per-scenario decision rules resembles the Navigation pattern crossed with Process, a clear but hybrid structure that fits the 7-8 'clear pattern with minor deviations' band rather than a single textbook pattern.",
+        "D8": "The 'Distinguishing AST09 from its neighbors' section and the numbered four-join manual-pass fallback ('Steps 1-3 returning nothing is the ordinary first-pass outcome and is a result') give concrete edge-case and failure-mode guidance, meeting the 14-15 comprehensive band."
+      },
+      "total": 108.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Rules like 'A DENY decision still requires a signed admission receipt' and the policy_version-binding rule teach non-obvious auditing distinctions no generic knowledge covers, putting it in the 16-20 pure-delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"It pairs the mindset framing ('a log an operator controls can be edited... a receipt an independent verifier can check cannot') with domain-specific procedures like 'The manual pass' four-join review, landing in the 12-15 expert-level band.\"}, \"D3\": {\"score\": 13, \"why\": \"Rule 2's 'no outcome receipt' ambiguity warning and rule 6's 'Revocation tied only to explicit incident response misses the routine case' are specific NEVER-style claims with stated reasoning, meeting the 12-15 expert-grade band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description names concrete triggers ('when a skill lives inside a SaaS copilot the security team cannot scan', 'mapping an AST09 finding to EU AI Act Article 12') giving both WHAT and WHEN with keywords, just short of the perfect-band bar of an itemized (1)(2)(3) list.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Read only what the finding needs' table plus explicit 'Do NOT open coverage-matrix.md except...' and 'Do NOT open scripts/detector.py looking for a check' instructions are exactly the excellent conditional-trigger pattern the rubric describes, meeting the 14-15 band.\"}, \"D6\": {\"score\": 13, \"why\": \"Medium-freedom decision rules and a routing table fit a judgment-heavy classification task well, though the rigid four-step 'manual pass' is slightly more prescriptive than the open-ended discovery-method reasoning around it, keeping it just under perfect calibration.\"}, \"D7\": {\"score\": 8, \"why\": \"The routing table plus per-scenario decision rules resembles the Navigation pattern crossed with Process, a clear but hybrid structure that fits the 7-8 'clear pattern with minor deviations' band rather than a single textbook pattern.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Distinguishing AST09 from its neighbors' section and the numbered four-join manual-pass fallback ('Steps 1-3 returning nothing is the ordinary first-pass outcome and is a result') give concrete edge-case and failure-mode guidance, meeting the 14-15 comprehensive band.\"}}\n"
+    },
+    {
+      "provider": "anthropic-compatible/glm-5.2",
+      "scores": {
+        "D1": 19.0,
+        "D2": 13.0,
+        "D3": 13.0,
+        "D4": 14.0,
+        "D5": 14.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "Rules like 'a DENY-with-no-outcome pattern is only trustworthy evidence of a blocked action when the receipt pipeline itself is provably healthy' and 'an approved copy and an unapproved copy of the same skill are byte identical' are pure expert knowledge with near-zero redundancy, landing solidly in the 16-20 band.",
+        "D2": "The 'manual pass' four-join workflow (inventory row keyed on hash, identity state, execution record, named discovery method) is a domain procedure Claude would not know, paired with decision rules that shape judgment about evidence claims, hitting the 12-15 band.",
+        "D3": "Expert-grade NEVERs with reasoning: 'Read a clean run of either as *not asked*, never as *asked and cleared*' and refusing the \"Inconclusive\" write-up because it reads like a clean scan of a system never checked \u2014 the 12-15 band.",
+        "D4": "The description names specific capabilities (inventory, offboarding orphans, bilateral-receipt logging), trigger scenarios ('Use when designing or auditing a compliance-grade skill audit trail'), and searchable keywords (AST09, EU AI Act Article 12, SaaS copilot), meeting the perfect WHAT/WHEN/KEYWORDS bar.",
+        "D5": "Explicit conditional triggers with negative guidance \u2014 'Do NOT open coverage-matrix.md except for a binding tier\u2026' and 'Do NOT open scripts/detector.py looking for a check' \u2014 plus a finding-type routing table, which is the Excellent trigger tier.",
+        "D6": "Freedom matches fragility: a low-freedom prescribed evidence workflow for audit-grade operations while leaving judgment framing ('decides nothing from the package') to rules rather than scripts, good calibration for most scenarios.",
+        "D7": "A clean Navigation/Tool hybrid: short SKILL.md routing by finding type to rules, neighbor categories (AST03/06/07), and external references, a masterful application of the navigation pattern for a multi-scenario triage task.",
+        "D8": "Covers edge cases and error handling \u2014 telemetry loss vs tampering ambiguity, fan-in joins marked unsolved, and the 'steps 1-3 returning nothing is the result' fallback guidance \u2014 clear coverage for common and unusual cases."
+      },
+      "total": 108.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Rules like 'a DENY-with-no-outcome pattern is only trustworthy evidence of a blocked action when the receipt pipeline itself is provably healthy' and 'an approved copy and an unapproved copy of the same skill are byte identical' are pure expert knowledge with near-zero redundancy, landing solidly in the 16-20 band.\"}, \"D2\": {\"score\": 13, \"why\": \"The 'manual pass' four-join workflow (inventory row keyed on hash, identity state, execution record, named discovery method) is a domain procedure Claude would not know, paired with decision rules that shape judgment about evidence claims, hitting the 12-15 band.\"}, \"D3\": {\"score\": 13, \"why\": \"Expert-grade NEVERs with reasoning: 'Read a clean run of either as *not asked*, never as *asked and cleared*' and refusing the \\\"Inconclusive\\\" write-up because it reads like a clean scan of a system never checked \u2014 the 12-15 band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description names specific capabilities (inventory, offboarding orphans, bilateral-receipt logging), trigger scenarios ('Use when designing or auditing a compliance-grade skill audit trail'), and searchable keywords (AST09, EU AI Act Article 12, SaaS copilot), meeting the perfect WHAT/WHEN/KEYWORDS bar.\"}, \"D5\": {\"score\": 14, \"why\": \"Explicit conditional triggers with negative guidance \u2014 'Do NOT open coverage-matrix.md except for a binding tier\u2026' and 'Do NOT open scripts/detector.py looking for a check' \u2014 plus a finding-type routing table, which is the Excellent trigger tier.\"}, \"D6\": {\"score\": 13, \"why\": \"Freedom matches fragility: a low-freedom prescribed evidence workflow for audit-grade operations while leaving judgment framing ('decides nothing from the package') to rules rather than scripts, good calibration for most scenarios.\"}, \"D7\": {\"score\": 9, \"why\": \"A clean Navigation/Tool hybrid: short SKILL.md routing by finding type to rules, neighbor categories (AST03/06/07), and external references, a masterful application of the navigation pattern for a multi-scenario triage task.\"}, \"D8\": {\"score\": 13, \"why\": \"Covers edge cases and error handling \u2014 telemetry loss vs tampering ambiguity, fan-in joins marked unsolved, and the 'steps 1-3 returning nothing is the result' fallback guidance \u2014 clear coverage for common and unusual cases.\"}}"
+    },
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 7.0,
+        "D4": 15.0,
+        "D5": 9.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 12.0
+      },
+      "justifications": {
+        "D1": "The skill\u2019s detailed decision rule 1 about signed admission and outcome receipts provides expert knowledge not found in Claude\u2019s baseline, placing it in the 16\u201120 pure knowledge\u2011delta band.",
+        "D2": "It combines thinking guidance (e.g., \u201cTwo consequences a reviewer should carry\u2026\u201d) with domain\u2011specific procedures like discovery method rule\u202f4, meeting the 12\u201115 expert\u2011level band.",
+        "D3": "Only a few \u201cDo NOT open \u2026\u201d lines appear and there is no dedicated NEVER list of design anti\u2011patterns, fitting the 4\u20117 generic\u2011warning band.",
+        "D4": "The description states the WHAT (\u201cDetect and triage OWASP AST09 No Governance\u201d), WHEN (use when designing or auditing...), and key terms (AST09, EU AI Act), satisfying the 14\u201115 perfect\u2011description band.",
+        "D5": "References such as `coverage\u2011matrix.md` are mentioned but the skill lacks explicit loading triggers, matching the 6\u201110 unclear\u2011loading band.",
+        "D6": "The skill enforces strict mandatory steps (e.g., rules\u202f1\u20114) for a high\u2011consequence audit task, aligning with the 11\u201113 good\u2011calibration band.",
+        "D7": "Its structure of phased decision rules and scenario tables follows the official \u201cProcess\u201d pattern, fitting the 7\u20118 clear\u2011pattern band.",
+        "D8": "Provides concrete decision rules and error handling guidance for audit scenarios, covering common cases but lacking full implementation details, placing it in the 11\u201113 usable band."
+      },
+      "total": 96.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"The skill\u2019s detailed decision rule 1 about signed admission and outcome receipts provides expert knowledge not found in Claude\u2019s baseline, placing it in the 16\u201120 pure knowledge\u2011delta band.\"},\n  \"D2\": {\"score\": 13, \"why\": \"It combines thinking guidance (e.g., \u201cTwo consequences a reviewer should carry\u2026\u201d) with domain\u2011specific procedures like discovery method rule\u202f4, meeting the 12\u201115 expert\u2011level band.\"},\n  \"D3\": {\"score\": 7, \"why\": \"Only a few \u201cDo NOT open \u2026\u201d lines appear and there is no dedicated NEVER list of design anti\u2011patterns, fitting the 4\u20117 generic\u2011warning band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description states the WHAT (\u201cDetect and triage OWASP AST09 No Governance\u201d), WHEN (use when designing or auditing...), and key terms (AST09, EU AI Act), satisfying the 14\u201115 perfect\u2011description band.\"},\n  \"D5\": {\"score\": 9, \"why\": \"References such as `coverage\u2011matrix.md` are mentioned but the skill lacks explicit loading triggers, matching the 6\u201110 unclear\u2011loading band.\"},\n  \"D6\": {\"score\": 13, \"why\": \"The skill enforces strict mandatory steps (e.g., rules\u202f1\u20114) for a high\u2011consequence audit task, aligning with the 11\u201113 good\u2011calibration band.\"},\n  \"D7\": {\"score\": 9, \"why\": \"Its structure of phased decision rules and scenario tables follows the official \u201cProcess\u201d pattern, fitting the 7\u20118 clear\u2011pattern band.\"},\n  \"D8\": {\"score\": 12, \"why\": \"Provides concrete decision rules and error handling guidance for audit scenarios, covering common cases but lacking full implementation details, placing it in the 11\u201113 usable band.\"}\n}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 20.0,
+        "D2": 15.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill delivers pure knowledge delta with expert insights like 'an approved copy and an unapproved copy of the same skill are byte identical,' which is a non-obvious truth only known through deep domain experience, meeting the 'Pure knowledge delta' band.",
+        "D2": "It provides expert thinking patterns such as distinguishing between operator-controlled logs and independently verifiable receipts, and domain-specific procedures like the mandatory dual-receipt model with `attempt_id`, meeting the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band.",
+        "D3": "It includes expert-grade anti-patterns such as 'NEVER treat \"no outcome receipt\" as confirmation of a block' with clear rationale about telemetry loss and tampering, which reflects hard-won experience, meeting the 'Expert-grade anti-patterns with WHY' band.",
+        "D4": "The description clearly specifies WHAT the skill does (triage OWASP AST09), WHEN to use it (e.g., when auditing compliance-grade audit trails), and includes trigger keywords like 'EU AI Act Article 12' and 'SaaS copilot', meeting the 'Perfect: comprehensive description with WHAT, WHEN, and trigger keywords' band.",
+        "D5": "The skill implements excellent progressive disclosure with MANDATORY reading guidance for specific scenarios and clear 'Do NOT open' directives, but lacks explicit conditional loading triggers for all references, placing it in the 'Perfect: decision trees + explicit triggers + \"Do NOT Load\" guidance' band with minor deduction.",
+        "D6": "It perfectly calibrates freedom by imposing strict constraints where needed, such as requiring signed admission and outcome receipts, because file integrity and auditability are fragile, meeting the 'Perfect freedom calibration throughout' band.",
+        "D7": "The skill follows the 'Knowledge' pattern with strong decision rules, clear scenario routing, and a focus on expert judgment over technique, demonstrating a masterful application of the appropriate pattern for governance and audit tasks.",
+        "D8": "It provides comprehensive, actionable guidance including a clear decision tree for scenario handling, fallback interpretations for ambiguous evidence, and edge case coverage like orphaned skills and unreachable SaaS platforms, meeting the 'Comprehensive coverage including edge cases and error handling' band."
+      },
+      "total": 119.0,
+      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"The skill delivers pure knowledge delta with expert insights like 'an approved copy and an unapproved copy of the same skill are byte identical,' which is a non-obvious truth only known through deep domain experience, meeting the 'Pure knowledge delta' band.\"}, \"D2\": {\"score\": 15, \"why\": \"It provides expert thinking patterns such as distinguishing between operator-controlled logs and independently verifiable receipts, and domain-specific procedures like the mandatory dual-receipt model with `attempt_id`, meeting the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band.\"}, \"D3\": {\"score\": 15, \"why\": \"It includes expert-grade anti-patterns such as 'NEVER treat \\\"no outcome receipt\\\" as confirmation of a block' with clear rationale about telemetry loss and tampering, which reflects hard-won experience, meeting the 'Expert-grade anti-patterns with WHY' band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description clearly specifies WHAT the skill does (triage OWASP AST09), WHEN to use it (e.g., when auditing compliance-grade audit trails), and includes trigger keywords like 'EU AI Act Article 12' and 'SaaS copilot', meeting the 'Perfect: comprehensive description with WHAT, WHEN, and trigger keywords' band.\"}, \"D5\": {\"score\": 14, \"why\": \"The skill implements excellent progressive disclosure with MANDATORY reading guidance for specific scenarios and clear 'Do NOT open' directives, but lacks explicit conditional loading triggers for all references, placing it in the 'Perfect: decision trees + explicit triggers + \\\"Do NOT Load\\\" guidance' band with minor deduction.\"}, \"D6\": {\"score\": 15, \"why\": \"It perfectly calibrates freedom by imposing strict constraints where needed, such as requiring signed admission and outcome receipts, because file integrity and auditability are fragile, meeting the 'Perfect freedom calibration throughout' band.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill follows the 'Knowledge' pattern with strong decision rules, clear scenario routing, and a focus on expert judgment over technique, demonstrating a masterful application of the appropriate pattern for governance and audit tasks.\"}, \"D8\": {\"score\": 15, \"why\": \"It provides comprehensive, actionable guidance including a clear decision tree for scenario handling, fallback interpretations for ambiguous evidence, and edge case coverage like orphaned skills and unreachable SaaS platforms, meeting the 'Comprehensive coverage including edge cases and error handling' band.\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 16.0,
+        "D2": 12.0,
+        "D3": 12.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The entire artifact provides expert-level knowledge about AST09 governance gaps, decision rules concerning audit logs vs receipts, and scenario distinction that Claude would not know, fitting the 'pure knowledge delta' band.",
+        "D2": "It provides expert thinking patterns ('The gap here is architectural') and domain-specific procedures like the four-step manual pass, aligning with the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band.",
+        "D3": "Explicit NEVER list includes 'A DENY decision still requires a signed admission receipt' and warning against treating 'no outcome receipt' as proof, matching the 'Expert-grade anti-patterns with WHY' band.",
+        "D4": "Description comprehensively answers WHAT (detect/triage AST09), WHEN, and includes keywords (OWASP AST09, compliance-grade audit trail), meeting the 'Perfect' band criteria.",
+        "D5": "Excellent content layering with explicit triggers ('Do NOT open `coverage-matrix.md` except for...' and conditional reading table) and 'Do NOT load' guidance, fitting the 'Perfect' band.",
+        "D6": "Matches low-freedom scripting for commands and high-freedom analytical guidance to the procedural fragility of governance auditing, aligning with the 'Good calibration for most scenarios' band.",
+        "D7": "Clearly follows the established 'Mindset' pattern with strong NEVER lists and high-level decision frameworks, fitting the 'Masterful application of appropriate pattern' band with minor deviation in length.",
+        "D8": "Provides actionable decision rules, a scenario routing table, error handling ('inconclusive' is the one write-up to refuse), and edge case coverage, meeting the 'Comprehensive coverage' band."
+      },
+      "total": 105.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 16, \"why\": \"The entire artifact provides expert-level knowledge about AST09 governance gaps, decision rules concerning audit logs vs receipts, and scenario distinction that Claude would not know, fitting the 'pure knowledge delta' band.\"},\n  \"D2\": {\"score\": 12, \"why\": \"It provides expert thinking patterns ('The gap here is architectural') and domain-specific procedures like the four-step manual pass, aligning with the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band.\"},\n  \"D3\": {\"score\": 12, \"why\": \"Explicit NEVER list includes 'A DENY decision still requires a signed admission receipt' and warning against treating 'no outcome receipt' as proof, matching the 'Expert-grade anti-patterns with WHY' band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"Description comprehensively answers WHAT (detect/triage AST09), WHEN, and includes keywords (OWASP AST09, compliance-grade audit trail), meeting the 'Perfect' band criteria.\"},\n  \"D5\": {\"score\": 14, \"why\": \"Excellent content layering with explicit triggers ('Do NOT open `coverage-matrix.md` except for...' and conditional reading table) and 'Do NOT load' guidance, fitting the 'Perfect' band.\"},\n  \"D6\": {\"score\": 13, \"why\": \"Matches low-freedom scripting for commands and high-freedom analytical guidance to the procedural fragility of governance auditing, aligning with the 'Good calibration for most scenarios' band.\"},\n  \"D7\": {\"score\": 9, \"why\": \"Clearly follows the established 'Mindset' pattern with strong NEVER lists and high-level decision frameworks, fitting the 'Masterful application of appropriate pattern' band with minor deviation in length.\"},\n  \"D8\": {\"score\": 14, \"why\": \"Provides actionable decision rules, a scenario routing table, error handling ('inconclusive' is the one write-up to refuse), and edge case coverage, meeting the 'Comprehensive coverage' band.\"}\n}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 16.0,
+        "D2": 12.0,
+        "D3": 10.0,
+        "D4": 14.0,
+        "D5": 13.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "The skill provides pure knowledge delta with expert-level insights on OWASP AST09 No Governance, including detailed decision rules and distinctions between logging and compliance-grade audit evidence.",
+        "D2": "The skill transfers expert thinking patterns and necessary domain-specific procedures, such as the distinction between different AST categories and the manual pass steps for auditing.",
+        "D3": "The skill includes specific NEVER lists with reasoning, such as 'Do NOT open `scripts/detector.py` looking for a check' and 'Do NOT open `coverage-matrix.md` except for specific scenarios.'",
+        "D4": "The description is comprehensive, specifying WHAT the skill does, WHEN to use it, and including relevant KEYWORDS such as 'OWASP AST09', 'compliance-grade skill audit trail', and 'EU AI Act Article 12 logging obligations'.",
+        "D5": "The skill implements good content layering with clear mandatory triggers and explicit guidance on what to read and what not to load, though it could improve by adding more conditional triggers.",
+        "D6": "The level of specificity is appropriate for the task\u2019s fragility, providing exact steps for auditing and clear distinctions between different scenarios.",
+        "D7": "The skill follows the Knowledge pattern well, providing detailed guidelines and decision trees, though with minor deviations in structure.",
+        "D8": "The skill provides clear guidance for common cases and includes decision trees and fallbacks, though it could improve by covering more edge cases and error handling scenarios."
+      },
+      "total": 100.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 16,\n    \"why\": \"The skill provides pure knowledge delta with expert-level insights on OWASP AST09 No Governance, including detailed decision rules and distinctions between logging and compliance-grade audit evidence.\"\n  },\n  \"D2\": {\n    \"score\": 12,\n    \"why\": \"The skill transfers expert thinking patterns and necessary domain-specific procedures, such as the distinction between different AST categories and the manual pass steps for auditing.\"\n  },\n  \"D3\": {\n    \"score\": 10,\n    \"why\": \"The skill includes specific NEVER lists with reasoning, such as 'Do NOT open `scripts/detector.py` looking for a check' and 'Do NOT open `coverage-matrix.md` except for specific scenarios.'\"\n  },\n  \"D4\": {\n    \"score\": 14,\n    \"why\": \"The description is comprehensive, specifying WHAT the skill does, WHEN to use it, and including relevant KEYWORDS such as 'OWASP AST09', 'compliance-grade skill audit trail', and 'EU AI Act Article 12 logging obligations'.\"\n  },\n  \"D5\": {\n    \"score\": 13,\n    \"why\": \"The skill implements good content layering with clear mandatory triggers and explicit guidance on what to read and what not to load, though it could improve by adding more conditional triggers.\"\n  },\n  \"D6\": {\n    \"score\": 13,\n    \"why\": \"The level of specificity is appropriate for the task\u2019s fragility, providing exact steps for auditing and clear distinctions between different scenarios.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows the Knowledge pattern well, providing detailed guidelines and decision trees, though with minor deviations in structure.\"\n  },\n  \"D8\": {\n    \"score\": 13,\n    \"why\": \"The skill provides clear guidance for common cases and includes decision trees and fallbacks, though it could improve by covering more edge cases and error handling scenarios.\"\n  }\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 12.0,
+        "D4": 14.0,
+        "D5": 15.0,
+        "D6": 13.0,
+        "D7": 8.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "Rules 1-3 on bilateral admission/outcome receipts joined by attempt_id and policy_version bound at decision time are non-obvious expert claims with almost no restated basics, placing it in the 16-20 'pure knowledge delta' band.",
+        "D2": "The skill pairs a thinking frame ('distinguishing which claim a body of evidence supports') with domain-specific procedures like the four-join manual pass, matching the 12-15 'expert-level: shapes thinking AND provides procedures' band.",
+        "D3": "Rule 2's 'Treat \"no outcome receipt\" as ambiguous, not as confirmation of a block' and the 'Do NOT open scripts/detector.py' warning are specific with reasoning, fitting the 8-11/12-15 boundary of 'expert-grade anti-patterns with WHY'.",
+        "D4": "The description states WHAT (skill inventory, orphaned skills, audit trail) and WHEN ('Use when designing or auditing...', 'when a skill lives inside a SaaS copilot...') with concrete keywords like 'EU AI Act Article 12', landing in the 14-15 'perfect' band minus a slight edge for length over crispness.",
+        "D5": "The 'Read only what the finding needs' routing table plus explicit 'Do NOT open coverage-matrix.md except for a binding tier...' is exactly the 'MANDATORY triggers embedded in workflow' plus 'Do NOT Load' pattern the 14-15 band describes.",
+        "D6": "Judgment-heavy decision rules (medium freedom, e.g. rule 4's discovery-method reasoning) are paired with a firm zero-detector stance rather than false rigidity, matching the 11-13 'good calibration for most scenarios' band, just short of perfect since some rules (e.g. rule 7 on fan-in) read more prescriptive than the surrounding judgment calls warrant.",
+        "D7": "The routing table plus 'Distinguishing AST09 from its neighbors' section is a Navigation-pattern skill with Process-like decision rules bolted on, a clear-but-hybrid application landing in the 7-8 'clear pattern with minor deviations' band.",
+        "D8": "The 'manual pass' section gives four concrete, orderable steps with explicit fallback framing ('Steps 1-3 returning nothing is the ordinary first-pass outcome and is a result'), matching the 11-13 'clear guidance for common cases' band."
+      },
+      "total": 106.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Rules 1-3 on bilateral admission/outcome receipts joined by attempt_id and policy_version bound at decision time are non-obvious expert claims with almost no restated basics, placing it in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"The skill pairs a thinking frame ('distinguishing which claim a body of evidence supports') with domain-specific procedures like the four-join manual pass, matching the 12-15 'expert-level: shapes thinking AND provides procedures' band.\"}, \"D3\": {\"score\": 12, \"why\": \"Rule 2's 'Treat \\\"no outcome receipt\\\" as ambiguous, not as confirmation of a block' and the 'Do NOT open scripts/detector.py' warning are specific with reasoning, fitting the 8-11/12-15 boundary of 'expert-grade anti-patterns with WHY'.\"}, \"D4\": {\"score\": 14, \"why\": \"The description states WHAT (skill inventory, orphaned skills, audit trail) and WHEN ('Use when designing or auditing...', 'when a skill lives inside a SaaS copilot...') with concrete keywords like 'EU AI Act Article 12', landing in the 14-15 'perfect' band minus a slight edge for length over crispness.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Read only what the finding needs' routing table plus explicit 'Do NOT open coverage-matrix.md except for a binding tier...' is exactly the 'MANDATORY triggers embedded in workflow' plus 'Do NOT Load' pattern the 14-15 band describes.\"}, \"D6\": {\"score\": 13, \"why\": \"Judgment-heavy decision rules (medium freedom, e.g. rule 4's discovery-method reasoning) are paired with a firm zero-detector stance rather than false rigidity, matching the 11-13 'good calibration for most scenarios' band, just short of perfect since some rules (e.g. rule 7 on fan-in) read more prescriptive than the surrounding judgment calls warrant.\"}, \"D7\": {\"score\": 8, \"why\": \"The routing table plus 'Distinguishing AST09 from its neighbors' section is a Navigation-pattern skill with Process-like decision rules bolted on, a clear-but-hybrid application landing in the 7-8 'clear pattern with minor deviations' band.\"}, \"D8\": {\"score\": 13, \"why\": \"The 'manual pass' section gives four concrete, orderable steps with explicit fallback framing ('Steps 1-3 returning nothing is the ordinary first-pass outcome and is a result'), matching the 11-13 'clear guidance for common cases' band.\"}}\n"
+    }
+  ],
+  "aggregate": {
+    "n": 17,
+    "mean": 107.4,
+    "median": 108.0,
+    "min": 96.0,
+    "max": 120.0,
+    "range": 24.0,
+    "stdev": 6.44,
+    "lower_bound": 101.0,
+    "judgments": [
+      102.0,
+      120.0,
+      108.0,
+      109.0,
+      108.0,
+      103.0,
+      102.0,
+      117.0,
+      106.0,
+      109.0,
+      108.0,
+      108.0,
+      96.0,
+      119.0,
+      105.0,
+      100.0,
+      106.0
+    ],
+    "method": "multi-round-independent-pooled",
+    "rubric_sha": "3027f20f3181758385a1bb8c022d4041dfb4de84",
+    "rubric_content_sha256": "737ef3628f0e11353114c3bd05a1c9d0c448dbfec1ae85db839253cbe93198b6",
+    "dim_n": 17,
+    "dim_means": {
+      "D1": 17.8,
+      "D2": 13.1,
+      "D3": 12.3,
+      "D4": 14.6,
+      "D5": 13.6,
+      "D6": 13.6,
+      "D7": 8.8,
+      "D8": 13.5
+    }
+  },
+  "verdict": "BLOCKED",
+  "verdict_reason": "dimension means below floor: D3"
+}
