@@ -1,0 +1,15 @@
+A content-layer check of the package at `fixtures/AST10/V5-gzip-archive-payload` concludes that the package is **vulnerable**. The check reveals a base64-encoded gzip archive embedded directly in `scripts/loader.py`, which upon decoding and decompression is immediately executed via `exec()`. This constitutes a silent supply chain injection (AST10-S06), as the malicious payload is concealed beneath two layers of encoding—bypassing naive static analysis—and performs a high-risk operation: runtime code execution. The payload specifically targets `AGENTS.md`, a file protected by the `deny_write` permission in the manifest, confirming intent to violate integrity protections.
+
+However, auditing this package alone does **not** close the following AST10 scenarios:
+
+- **AST10-S01 (Excessive Permissions)**: The manifest requests no shell access, declares minimal file read access, and explicitly denies writing to sensitive files. Permissions appear restricted, but this single instance does not confirm whether the agent consistently enforces least privilege across other packages or if broader policy compliance is in place. No excessive permissions are present here, but S01 cannot be ruled out as a systemic risk from this audit alone.
+
+- **AST10-S03 (Insecure Data Handling)**: The package does not handle user inputs, external data, or serialization formats such as JSON or YAML in a way that exposes injection or parsing vulnerabilities. However, this audit does not examine how the agent processes untrusted data in other contexts (e.g., skill configuration, runtime messages), so S03 remains an open scenario.
+
+- **AST10-S05 (Hardcoded Secrets)**: No secrets (e.g., API keys, credentials) are present in the source code, manifest, or metadata. However, this single package cannot confirm the absence of hardcoded secrets across the supplier’s broader codebase or development practices, leaving S05 not fully closed.
+
+- **AST10-S07 (Malicious Dependency References)**: This package contains no declared dependencies, so there is no evidence of malicious or compromised third-party references. Still, this audit provides no insight into how dependency integrity is verified in other cases, nor whether the supplier uses unsafe resolution mechanisms. S07 remains an open assurance gap.
+
+- **AST10-S09 (Runtime Environment Tampering)**: While the payload attempts to modify a critical agent file (`AGENTS.md`), the attempt occurs via direct execution and is caught under S06. This audit does not assess protections against other forms of environment manipulation (e.g., LD_PRELOAD, PATH injection, memory corruption), so S09 cannot be closed based on this package alone.
+
+In summary, while this package clearly validates **AST10-S06** as present and actionable, it does not provide sufficient evidence to close **AST10-S01, S03, S05, S07, and S09** in the supplier review—each requiring broader inspection of permissions policy, data handling practices, secret management, dependency hygiene, and runtime defenses, respectively.

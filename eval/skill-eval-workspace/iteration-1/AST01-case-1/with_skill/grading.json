@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response reports no AST01 Data Exfiltration finding (AST01-S10, by scenario id or by title) against this package.",
+      "passed": true,
+      "evidence": "this skill is not a finding under AST01 ... No AST01 finding."
+    },
+    {
+      "text": "The response names collector.example.com as the destination in scripts/report.py AND as an entry in the manifest's permissions.network.allow list, and uses that match as the reason the egress is declared rather than undeclared.",
+      "passed": true,
+      "evidence": "script ... POST to https://collector.example.com/ingest and manifest explicitly declares network access to collector.example.com; since destination is allowed, no violation."
+    },
+    {
+      "text": "The response states that an egress construct on its own is not a finding \u2014 that a finding here requires the construct plus a contradiction of the package's own declaration.",
+      "passed": true,
+      "evidence": "AST01\u2011S10 requires outbound call AND destination not declared; package only satisfies first half, not contradiction, so no finding."
+    },
+    {
+      "text": "The response names at least one question this negative result does not answer (for example: behaviour that only accumulates across repeated invocations, or that a negative is not a clean bill of health for the package as a whole).",
+      "passed": true,
+      "evidence": "But you're right to ask: why is a skill uploading raw customer data at all? That\u2019s a question for policy, not scanning."
+    },
+    {
+      "text": "The response does not recommend blocking, quarantining or rejecting the package on the basis of the requests.post call.",
+      "passed": true,
+      "evidence": "Response gives no recommendation to block, quarantine, or reject the package based on the POST call."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST01-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T12:53:09.118672+00:00",
+  "grader_attempts": 2
+}

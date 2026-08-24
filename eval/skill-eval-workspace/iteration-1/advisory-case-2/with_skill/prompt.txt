@@ -1,0 +1,358 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+>>>>>>>>>> BEGIN INSTALLED SKILL: advisory <<<<<<<<<<
+The skill below is installed in this session. Treat it as your operating instructions for this request: follow its decision rules, use its vocabulary, and respect the limits it states about what it can and cannot decide.
+
+---
+name: advisory
+description: "Route a free-text agent-skill security finding to the one OWASP AST01-AST10 category that owns its root cause, separate that origin from the contributing control failures that co-fired with it, and hand off to that category's skill with an honest statement of what a check there can and cannot confirm. Use when a finding arrives as prose rather than as a package to scan, when two AST categories both plausibly fit, when a scanner gap and a payload appear in the same report, when a finding names a symptom louder than its cause, or when you need to know whether the category you are about to route to ships any check at all."
+permissions:
+  network: false
+  shell: false
+  write: false
+risk_tier: L0
+---
+
+# Advisory - routing a finding to the category that owns it
+
+Pattern: Process. Three phases - name the origin, resolve the co-fires, hand off - at
+medium freedom, with the two halves of that freedom named below. Deliberately *not*
+Navigation, despite this being a router: a ten-row table of links is what this file used
+to be, and a table of links cannot answer the only question that is ever hard here.
+
+The governing rule, and the reason a link table fails: **the whitepaper's decision tree
+sorts a finding by its symptom; a finding is owned by its origin.** Those two agree on
+an unambiguous finding and diverge on almost every interesting one, because the loudest
+thing in an incident report is usually the control that failed to catch the problem, not
+the condition that created it.
+
+## Orientation - read this much, then take one path
+
+**Fires when** the input is a *finding in prose* - a ticket, a pentest line item, a
+disclosure, a scanner's own output read as a sentence - and the open question is which
+AST category owns it.
+
+**Decides** four things: which single AST id is the origin; which co-fired categories are
+contributing failures and who owns each; which file to hand the finding to; and what that
+target can honestly confirm.
+
+**Does not decide** whether the finding is true. This skill never opens the package under
+discussion. It has no detector, declares no scenario, and is excluded from every `--tier`
+filter and every F1 denominator in this repository (spec.md S-002); it is scored on
+whether the routing and the guidance are *right*, not on whether anything was detected.
+
+**Freedom, stated explicitly, because the two halves of this task are not the same
+kind of work:**
+
+| Half | Freedom | Why |
+| --- | --- | --- |
+| **Category assignment** | Low - follow the rules, do not improvise | The seams between categories are already fixed, once each, in the ten sibling `skills/AST*/SKILL.md` files under *Distinguishing ASTnn from its neighbors*. Re-deriving a seam from first principles produces a second, conflicting doctrine, and the two will disagree on the next finding. Where this file and a sibling seam conflict, the sibling wins and this file is the bug. |
+| **Evidence weighting** | Medium - judgement is the job | Deciding *which* of two conditions had to be true first, whether the reporter's phrasing names a cause or an effect, and whether a second category has a genuinely different fix owner are all readings of thin, often second-hand text. No rule closes them. Phase 2 gives you the tests to apply, not the answers. |
+
+Treat a routing call you cannot justify under Phase 2 as unrouted. `ast_id: null` with a
+request for manual triage is a correct output of this skill, not a failure of it.
+
+### When this is the wrong entry point
+
+| You are holding | Do this instead |
+| --- | --- |
+| A skill package, not a finding | Go straight to the category skill, or run the repo's audit/dogfood path. Routing a package means scanning it, and nothing here scans. |
+| A finding whose category you already know | Skip this file entirely; open `skills/<ASTnn>/SKILL.md` and use its own orientation table. This file adds nothing once the category is settled. |
+| A finding about an MCP server, a bare tool, or a host plugin | Out of scope. AST01-AST10 apply to the skill form specifically - the whitepaper draws that boundary itself in its Skill / Tool / MCP server / Plugin section, and MCP servers belong to the MCP Top 10. Return null. |
+| A coverage number, an F1, or a binding tier | `docs/f1-report.md`, the target's `coverage-matrix.md`, and `scenarios/registry.yaml`. The tier table in Phase 3 is a routing summary, not the authority. |
+| The question "did this package do X?" | A detector. `skills/<ASTnn>/scripts/detector.py`, through the repo CLI. |
+
+## Phase 1 - name the origin
+
+Ask what had to *already be true* for the finding to be possible. That question is not
+the whitepaper tree's question, and the difference is the point: the tree asks what the
+finding looks like, and a control failure usually looks louder than the condition it
+failed to contain.
+
+| For this finding to be possible, this had to already be true | Origin |
+| --- | --- |
+| The artifact shipped with the payload inside it | **AST01** |
+| A distribution path admitted the artifact without being able to tell | **AST02** |
+| A grant the artifact holds honestly is wider than its function needs | **AST03** |
+| The declaration and the artifact do not describe the same thing | **AST04** |
+| The artifact is clean and the content it reaches at runtime is not | **AST05** |
+| No boundary existed to contain whatever ran | **AST06** |
+| The bytes that ran are not the bytes that were approved | **AST07** |
+| A control that was meant to catch one of the above did not | **AST08** - but read rule 2.2 first; this is almost never the origin |
+| Nobody was in a position to know the artifact existed | **AST09** - but read rule 2.3 |
+| A property survived authoring but not the port to another runtime | **AST10** |
+
+**Fast path.** If exactly one row fits and the finding does not also name a control that
+failed, that row is the origin. Skip Phase 2 and go to the hand-off. Most findings that
+arrive already worded by an engineer who reproduced the problem behave this way; the
+ones that arrive worded by whoever noticed the alert do not.
+
+## Phase 2 - when more than one row fits
+
+### 2.1 The fix-owner test decides origin versus contributing
+
+The whitepaper settles exactly one instance of this: a malicious skill that also evaded a
+scanner is recorded as AST01, with the scanner gap as a contributing control failure. The
+generalisation it does not state, and the one you need for the other forty-odd pairings:
+
+> **Name both fixes and both owners. The fix that would have *prevented* the finding
+> belongs to the origin; the fix that would only have *caught* it belongs to a
+> contributing failure.**
+
+A preventer and a catcher are usually owned by different people - the skill author or the
+admitting registry versus whoever operates the scanner, the inventory, or the update
+policy - and that ownership split is what makes the distinction worth recording rather
+than a matter of taste. Two consequences:
+
+- **A contributing entry that carries no owner and no action is decoration.** Drop it.
+  Listing AST08 beside every finding because a scanner exists somewhere adds a line to
+  the report and no work to anyone's queue.
+- **Different owners do not license a second primary.** `skills/AST10/SKILL.md` is the one
+  sibling that says "record both", for a stripped `deny_write` field that is
+  simultaneously a porting-tool defect and an exposure the skill author must review. That
+  is compatible with the one-origin rule, not an exception to it: two owners, two actions,
+  one origin. The thing branch 5 forbids is two categories each claiming to be the root
+  cause, because then each owner can reasonably believe the other holds it.
+
+### 2.2 AST08 is the origin only when the scanner is the artifact under review
+
+`skills/AST08/SKILL.md` states its own trigger: AST08 fires when the thing under review is
+*a scanner or a scan result* - its coverage claim, its verdict vocabulary, its suppression
+list, its published detection rate, or a demonstrated bypass of it. Everything else routes
+AST08 to contributing.
+
+This is the single most common misroute, and the shipped router makes it, reproducibly:
+
+```console
+$ node cli/bin/cli.js route "the skill was granted write access to production secrets and our scanner never flagged it"
+Primary category: AST08 — Poor Scanning
+Matched phrase:   "scanner"
+Rule order:       4 of 10 (whitepaper branches 1-4 first, then the six extended categories)
+
+Contributing control failures (branch 5 — recorded, never a second primary):
+  AST03   Over-Privileged Skills            extended rule, matched "write access"
+```
+(header and guidance lines elided; `python3 skills/advisory/scripts/triage.py "<finding>"`
+prints the same decision as JSON.)
+
+The over-broad grant is the preventable condition; the missed detection is the catcher.
+The correct record is AST03 origin, AST08 contributing, owned by whoever runs the scanner.
+Rule 2.5 explains why the script inverts it.
+
+### 2.3 AST09 is the origin only when there was never a baseline
+
+Same shape, opposite direction. `skills/AST09/SKILL.md` fixes the seam against AST07: AST07
+is missing *version* control - an installed skill drifted from a known-good version. AST09
+is missing *installation* control - the skill was never approved, inventoried, or reviewed,
+so there is no known-good baseline for it to have drifted from. A skill with no governance
+record at all cannot meaningfully be scored for update drift.
+
+So: an approved skill that drifted is AST07 origin with an AST09 contributing entry if the
+drift also went unnoticed. A skill nobody ever approved is AST09 origin, and the drift
+question does not arise. And against AST06, from the same seam: the technical failure to
+enforce isolation at one deployment is AST06; the fleet's inability to *see* that
+deployment at all is AST09. Both can be true; they are fixed by different people.
+
+The router inverts this one too, on the other classic phrasing:
+
+```console
+$ node cli/bin/cli.js route "an orphaned skill from an offboarded employee still has admin credentials"
+Primary category: AST03 — Over-Privileged Skills
+Matched phrase:   "admin credential"
+
+Contributing control failures (branch 5 — recorded, never a second primary):
+  AST09   No Governance                     extended rule, matched "orphaned skill"
+```
+
+The missing deprovisioning step is what had to be true; the credential's scope is what
+made it matter. AST09 is the origin here even if the grant was perfectly sized for the
+skill's function while the installer was still employed - in which case AST03 does not
+apply at all and the contributing line should be dropped under rule 2.1.
+
+### 2.4 The seams that are genuinely confusable in practice
+
+These four seams account for nearly every contested call. Each is settled once in a sibling
+file; the settlement is restated here only far enough to route, plus the routing
+consequence the sibling does not draw.
+
+**AST01 vs AST04 - what had to execute, not which file it lives in.** Both can occupy the
+same `SKILL.md`, so "it was in the metadata file" decides nothing. AST04's scenarios
+require a *parser* to deserialize the metadata, which happens before any prose is read as
+instruction; AST01's payload fires because the agent read sentences and obeyed them. The
+consequence that matters when you get this wrong: AST04's shipped checks are narrow by
+design - the YAML loader scan reads `.py` only, and frontmatter is extracted only when the
+file opens with `---` on the very first byte. A prose payload misrouted to AST04 therefore
+lands on checks that are *silent by construction*, and that silence reads as a pass. A
+misroute here does not produce a wrong answer; it produces a confident clean bill.
+
+**AST02 vs AST07 - the compromise event versus the missing verification.** Maintainer
+Account Takeover sits exactly on this seam and `skills/AST02/SKILL.md` and
+`skills/AST07/SKILL.md` split it the same way: the takeover is AST02, and an agent
+auto-applying the resulting update with no verification is the AST07 half of the same
+incident. Two owners - registry and publisher security versus the installing
+organisation's update policy - which is precisely the 2.1 test coming out clean. Note
+which way the shipped router resolves this: a finding naming both a compromised publisher
+account and a hot-reload returns AST02 primary with AST07 contributing, and that ordering
+is right, because the takeover is the preventer.
+
+**AST03 vs AST04 vs AST06 - the permission trio.** AST04 is the manifest *lying*; AST03 is
+the manifest *honest and too broad*; AST06 is *no boundary at all*, which makes every
+manifest claim moot for that deployment because there is nothing left to over-grant
+against. The order of elimination is therefore AST06 first (is there a boundary?), then
+AST04 (does the declaration match?), then AST03 (is the honest declaration too wide?).
+Running that order backwards is how a host-mode finding gets filed as an over-broad
+manifest and fixed by tightening a manifest that the runtime never enforces.
+
+**AST05 vs AST07 - which thing drifted.** AST07 is the skill's own version changing. AST05
+is the identical drift phenomenon applied to content the skill merely *references*, which
+can change while the skill stays byte-identical and every version-based integrity check
+passes. If pinning the skill's own hash would not have prevented the finding, it is AST05.
+
+### 2.5 The router's rule order is branch precedence, not a root-cause ranking
+
+`scripts/triage.py` evaluates ten ordered rules and the first match wins as primary. The
+order is `AST01, AST02, AST04, AST08` - the whitepaper's four numbered branches, in the
+document's own order - and then `AST03, AST05, AST06, AST07, AST09, AST10` as extended
+rules, which carry `branch: None` and a `basis` string saying so. The four branch numbers
+are reported; the six extensions never claim one.
+
+That ordering is faithful to the source document and is *not* a claim about which category
+is more likely to be the root cause. Whenever the primary is one of the four branch
+categories and an extended rule also fired, the script has ranked branch precedence above
+origin, and Phase 2 has to re-decide it by hand. Reversing the order inside the script
+would be worse, not better: it would silently overrule the tree the module exists to
+implement. The correction belongs in the reading, which is why the module also exposes
+`matched_rules()` - every rule that fired, its matched phrase, and its branch number - so
+the re-decision is made against the evidence rather than against a category label.
+
+### 2.6 An empty `contributing` list is not evidence of an unambiguous finding
+
+The rules match lower-cased substrings. An inserted word breaks a phrase, and nothing
+reports the near miss:
+
+```console
+$ node cli/bin/cli.js route "skills run with full host file system access and write access to secrets"
+Primary category: AST03 — Over-Privileged Skills
+Matched phrase:   "write access"
+
+Contributing control failures (branch 5 — recorded, never a second primary):
+  (none)
+```
+
+AST06's phrase list carries `full file system access` and `host access`; the sentence
+above contains neither literal, so a host-mode finding routes to AST03 with an empty
+contributing list and no indication that a second category was ever close. Read
+`contributing: []` as "no other *phrase* matched", never as "no other category applies" -
+and never let it stand in for the Phase 1 origin question, which you still owe every
+finding.
+
+## Phase 3 - hand off
+
+### What routing to each category actually buys the reporter
+
+Derived from `scenarios/registry.yaml` (62 scenarios, authoritative on tier) and the
+shipped `DETECTORS` tables. This decides what you may *promise*, never where to route.
+
+| Origin | Decidable from the package alone | What the hand-off can return |
+| --- | --- | --- |
+| **AST01** | 10 of 11 (7 static, 3 judged) | A scenario-level verdict for most of the category; only Cognitive Degradation is out of reach. |
+| **AST02** | 1 of 4 - Config-File Hijacking | A verdict *iff* the finding is config-file hijacking. Registry flooding, dependency confusion, and account takeover return nothing. |
+| **AST03** | 2 of 5 - Identity File Backdoors (static), one judged | One scenario verdict. The remaining checks are artifact signals, not coverage. |
+| **AST04** | 6 of 7 | A scenario-level verdict for five, subject to the narrowness in rule 2.4. |
+| **AST05** | 1 of 6, and it is judged, not static | Signals only. The category publishes **no scenario-level F1 at all**; every shipped check is `artifact-signal-only`. |
+| **AST06** | 1 of 5 - Host Escape | One verdict. The other four are deployment facts no package carries. |
+| **AST07** | **0 of 3** | **Nothing.** `declared-and-uncovered`: `DETECTORS` is empty, the fixture corpus has zero cases, no F1 is published. |
+| **AST08** | 6 of 8 (4 static, 2 judged) | A verdict about the *scanner*, never about the payload it missed. |
+| **AST09** | **0 of 7** | **Nothing.** `declared-and-uncovered`, on the same three counts as AST07. |
+| **AST10** | 1 of 6 - Silent Supply Chain Injection | One verdict. The other five are porting and cross-registry facts. |
+
+A hand-off to AST07 or AST09 goes to a person and a process. Say so when you make it.
+Those two categories are uncovered because their scenarios are temporal or
+organisational, not because the work is unfinished, and padding a corpus to manufacture a
+number for them is the failure this repository declines by name.
+
+### The record to hand over
+
+1. **Origin AST id, and the one sentence of evidence that settled it** - the condition
+   from the Phase 1 table that had to be true, in the reporter's own facts.
+2. **Target**: `skills/<ASTnn>/SKILL.md`. Enter through *its* orientation table and do not
+   re-triage there. Its routing rows exist to catch a *mis*-route arriving from outside;
+   treating them as a second opinion on a call you already made under Phase 2 is how one
+   finding acquires two categories.
+3. **Contributing entries, each with an owner and an action.** No owner, no line.
+4. **What the target can confirm**, from the table above, stated before anyone runs
+   anything - so that a silence from an empty tier is never read back as a clean result.
+5. **If unrouted**: `ast_id: null` and escalate. Do not narrow a vague finding by guessing;
+   ask the reporter which condition was true.
+
+## NEVER
+
+- **NEVER split one finding across two primary categories to make coverage look broader.**
+  Two primaries means two owners, each of whom can reasonably believe the other holds the
+  root cause, and the preventing fix gets scheduled by neither. It also turns any
+  per-category tally into a count of symptoms rather than of causes.
+- **NEVER route to a category whose detectable tier is empty and imply a check will
+  confirm it.** AST07 and AST09 ship no detector, no fixture case, and no F1. A ticket
+  closed pending a scan that will never run is worse than an open ticket.
+- **NEVER let the loudest symptom outrank the origin.** "Our scanner missed it" and "the
+  credential was admin-scoped" are the two phrasings that most reliably capture a primary
+  they do not own; both are verified misroutes of the shipped router above.
+- **NEVER read `contributing: []` as an unambiguous finding.** It reports that no second
+  *phrase* matched. See rule 2.6 for a host-mode finding that produces exactly that output.
+- **NEVER accept an AST08 primary when an extended rule also fired.** The tree's branch
+  order put it there; rule 2.2 decides whether it belongs there.
+- **NEVER route toward the category with the better tooling.** AST01 and AST04 ship the
+  most checks, so a finding pushed into either is the most likely to come back
+  "confirmed" - in the wrong place, with the real condition unexamined and no one looking
+  for the false negative.
+- **NEVER quote a category's F1 as confidence in a routing decision.** F1 measures a
+  fixture corpus, not this finding, and for AST03, AST05, and AST06 part or all of the
+  published number is `artifact-signal-only` - a precondition proxy this repository
+  forbids labelling as scenario coverage.
+- **NEVER invent an AST id for something that is not a skill.** An MCP server, a bare
+  tool, or a host plugin is outside AST01-AST10 by the whitepaper's own scope split.
+  `triage()` returns null for unmatched text; the null is the answer.
+
+## Mechanism, and Layer 3
+
+The routing rules live in `scripts/triage.py` as one ordered table of
+`(ast_id, category, phrases, guidance)` - no mechanism in this file, per the repository's
+split between knowledge and implementation. `triage()` returns the primary, the
+contributing list, the matched phrase, and the branch number; `matched_rules()` returns
+every rule that fired, so a routing decision can be audited rather than trusted. The
+manifest declares `shell: false`, so treat the script as the mechanised form of these
+rules and not as a prerequisite: the Phase 1 table and Phase 2 tests are sufficient by
+hand, and on a host that does execute it the script is a first draft of the primary, to be
+re-decided under Phase 2.
+
+**Load on condition, never by default.**
+
+- `skills/<ASTnn>/SKILL.md` for the routed category - **always**, as the hand-off itself.
+  **Do NOT** open the other nine to compare; the Phase 1 table is the routing answer, and
+  reading a second category's file to see whether it "also fits" is how a finding acquires
+  a second primary.
+- `scripts/triage.py` - **load before** adding a phrase, reproducing a misroute at the rule
+  level, or explaining why a specific rule fired. **Do NOT** load it to learn the ordering
+  or the branch numbers; rule 2.5 carries both.
+- The target's `coverage-matrix.md` - **load before** quoting a tier, a coverage claim, or
+  an F1 for that category. **Do NOT** load it to route: the Phase 3 table settles what a
+  hand-off can promise, and per-scenario evidence is not a routing input.
+- `scenarios/registry.yaml` - **load only** when a tier claim is contested. It is
+  authoritative and the Phase 3 table is a summary of it; if they disagree, the registry
+  is right and the table is the defect.
+- **Do NOT load any of them** to answer "which category owns this finding". This file
+  closes that question on its own.
+
+The four-branch decision tree itself is not reproduced here. It is in the whitepaper's
+*Classifying and Triaging Findings* section and verbatim in the module docstring of
+`scripts/triage.py`; this file is the part that the tree does not say.
+
+>>>>>>>>>> END INSTALLED SKILL: advisory <<<<<<<<<<
+
+--- BEGIN REQUEST ---
+Triage this for our tracker. I need one origin AST id, any contributing entries with an owner and an action against each, and an honest statement of what the receiving category can actually confirm. Finding as written by the auditor: "A skill installed in 2024 by an engineer who left the company in March is still running under a service principal with tenant-wide admin consent. Nobody could tell us who approved the install, and it does not appear in any inventory we were shown." 
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

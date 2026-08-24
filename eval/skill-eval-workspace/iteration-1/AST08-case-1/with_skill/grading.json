@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response concludes that neither the .docx nor the symlink is a finding, and gives a measured reason for each \u2014 a single-level archive with an ordinary compression ratio, and a symlink whose target resolves inside the package.",
+      "passed": false,
+      "evidence": "The response says '.docx is a normal, small document (311 bytes, ordinary compression)' but does not mention it being a single\u2011level archive."
+    },
+    {
+      "text": "The response reports the verdict against an explicitly stated scope (PASS, or PASS/INCOMPLETE with the incompleteness named) rather than as an unqualified 'clean' or 'no findings'.",
+      "passed": true,
+      "evidence": "It states 'the correct verdict is **PASS**' as the verdict."
+    },
+    {
+      "text": "The response names at least one specific thing the check did not or could not cover, such as the declared uncompressed size in the zip central directory being attacker-controlled, or the archive never having been decompressed.",
+      "passed": false,
+      "evidence": "The response only mentions a robustness gap; it does not name a specific thing the check could not cover such as attacker\u2011controlled uncompressed size."
+    },
+    {
+      "text": "The response states the general rule that the presence of a carrier \u2014 an archive, a symlink, an external URL, a credential reference \u2014 is not by itself a conviction.",
+      "passed": true,
+      "evidence": "It says 'The presence of archives or symlinks alone is not grounds for blocking or flagging.'"
+    },
+    {
+      "text": "The response names at least two of the concrete limits that were evaluated (for example archive nesting depth, member count, compression ratio, file count, file size, padding-run length, path escape, or symlink escape) rather than asserting the package is within limits without saying which.",
+      "passed": true,
+      "evidence": "It lists 'excessive nesting, file count, or path escapes' and mentions compression ratio, naming concrete limits."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST08-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T13:02:49.627913+00:00",
+  "grader_attempts": 1
+}

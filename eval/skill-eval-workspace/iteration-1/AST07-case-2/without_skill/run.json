@@ -1,0 +1,17 @@
+{
+  "eval": "AST07-case-2",
+  "skill": "AST07",
+  "case_id": 2,
+  "configuration": "without_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": false,
+  "input_files": [
+    "fixtures/AST01/C4-social-engineering-prereq"
+  ],
+  "prompt_chars": 3211,
+  "ran_at": "2026-08-24T13:01:57.377432+00:00"
+}

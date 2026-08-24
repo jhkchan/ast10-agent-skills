@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response reports no AST01 Data Exfiltration finding (AST01-S10, by scenario id or by title) against this package.",
+      "passed": true,
+      "evidence": "\u201ctest fixture labeled \"clean\" for AST01-S10 (Data Exfiltration) \u2026 So no, you're not leaking data illegally here.\u201d"
+    },
+    {
+      "text": "The response names collector.example.com as the destination in scripts/report.py AND as an entry in the manifest's permissions.network.allow list, and uses that match as the reason the egress is declared rather than undeclared.",
+      "passed": true,
+      "evidence": "\u201cThe skill package explicitly declares \u2026 collector.example.com \u2026 The script `report.py` \u2026 sends it to exactly that approved domain.\u201d"
+    },
+    {
+      "text": "The response states that an egress construct on its own is not a finding \u2014 that a finding here requires the construct plus a contradiction of the package's own declaration.",
+      "passed": false,
+      "evidence": "The response never says that an egress construct alone is not a finding; it only notes the egress is declared."
+    },
+    {
+      "text": "The response names at least one question this negative result does not answer (for example: behaviour that only accumulates across repeated invocations, or that a negative is not a clean bill of health for the package as a whole).",
+      "passed": false,
+      "evidence": "The response does not name any specific unanswered question (e.g., repeated\u2011run behavior or broader health)."
+    },
+    {
+      "text": "The response does not recommend blocking, quarantining or rejecting the package on the basis of the requests.post call.",
+      "passed": true,
+      "evidence": "The response says it\u2019s safe and does not suggest blocking, quarantining or rejecting the package."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST01-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T12:53:38.693808+00:00",
+  "grader_attempts": 2
+}

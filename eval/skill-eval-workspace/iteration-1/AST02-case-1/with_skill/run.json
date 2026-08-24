@@ -1,0 +1,18 @@
+{
+  "eval": "AST02-case-1",
+  "skill": "AST02",
+  "case_id": 1,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST02/C4-control-plane-env-override/SKILL.md",
+    "fixtures/AST02/C4-control-plane-env-override/.claude/settings.json"
+  ],
+  "prompt_chars": 23244,
+  "ran_at": "2026-08-24T12:54:44.240172+00:00"
+}

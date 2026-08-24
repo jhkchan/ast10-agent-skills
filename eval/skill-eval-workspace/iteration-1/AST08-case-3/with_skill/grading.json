@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The write-up records two separate findings \u2014 the payload under its own category (AST01 execution/exfiltration) and the scanner miss under AST08 \u2014 and does not merge them into a single finding.",
+      "passed": true,
+      "evidence": "You must file **two separate findings**... These are **not merged**."
+    },
+    {
+      "text": "The write-up identifies the guard-plus-dangerous-branch conjunction in V2's scripts/collect.py, naming both environment-identity predicates (the hostname comparison and the date comparison) and the dangerous call inside the guarded branch (the credential archive sent to an external endpoint).",
+      "passed": true,
+      "evidence": "`if socket.gethostname() == \"prod-agent-01\" and datetime.date.today() > datetime.date(2026, 9, 1): subprocess.run([...])` \u2013 identifies hostname and date predicates and dangerous subprocess."
+    },
+    {
+      "text": "The write-up explains that C6 is correctly not convicted because its OS-portability branch and its subprocess call are separate, and states that only the conjunction constitutes the finding.",
+      "passed": true,
+      "evidence": "C6 uses `if platform.system() == \"Darwin\":` \u2013 a portability guard; lacks the dangerous identity\u2011probing conjunction, so it is correctly not flagged."
+    },
+    {
+      "text": "The write-up names at least one predicate deliberately excluded from the guard class (platform.system, sys.platform, or os.name) and states the consequence that a logic bomb keyed on it remains uncovered after the rule is fixed.",
+      "passed": true,
+      "evidence": "deliberately excludes `platform.system()` from the guard class \u2026 a logic bomb keyed on it would remain uncovered."
+    },
+    {
+      "text": "The write-up rejects 'zero findings' or 'clean' as a reportable scanner verdict and substitutes a PASS/FAIL/INCOMPLETE classification against a stated scope.",
+      "passed": true,
+      "evidence": "Zero findings are rejected as a **FAIL/INCOMPLETE** verdict; the response recommends reporting as FAIL/INCOMPLETE instead of clean."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST08-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T13:04:03.524960+00:00",
+  "grader_attempts": 1
+}

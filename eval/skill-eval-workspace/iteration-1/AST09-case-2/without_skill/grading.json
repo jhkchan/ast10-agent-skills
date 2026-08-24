@@ -1,0 +1,48 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response answers that the design does not yet provide compliance-grade audit evidence, and separates having logging from having independently verifiable evidence.",
+      "passed": true,
+      "evidence": "This design is strong but not yet compliance\u2011grade under AST09. Without these, the logs may be deemed insufficient as standalone audit evidence."
+    },
+    {
+      "text": "The response identifies operator control over the record \u2014 the correction-row path or the platform team's write access \u2014 as the specific defect, rather than pointing at retention, backups, or field coverage.",
+      "passed": true,
+      "evidence": "allowing any insertion after\u2011the\u2011fact without external audit trail undermines trust in immutability"
+    },
+    {
+      "text": "The response requires two separate records per execution attempt: one produced before execution recording what was authorised, and one produced after recording what actually happened.",
+      "passed": false,
+      "evidence": "The response does not mention requiring two separate records per execution attempt."
+    },
+    {
+      "text": "The response requires a shared identifier joining those two records and says what an auditor can only establish because of it.",
+      "passed": false,
+      "evidence": "No mention of a shared identifier joining two records is present."
+    },
+    {
+      "text": "The response requires the policy version in effect to be captured inside the signed record at decision time rather than reconstructed after the fact.",
+      "passed": false,
+      "evidence": "The answer never states that policy_version must be captured in a signed record at decision time."
+    },
+    {
+      "text": "The response warns that a missing outcome record is not evidence the action was blocked, and names at least one benign cause that produces an identical pattern.",
+      "passed": false,
+      "evidence": "The response does not warn that a missing outcome record is not proof of a blocked action nor give a benign cause."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 4,
+    "total": 6,
+    "pass_rate": 0.3333
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:05:34.905093+00:00",
+  "grader_attempts": 1
+}

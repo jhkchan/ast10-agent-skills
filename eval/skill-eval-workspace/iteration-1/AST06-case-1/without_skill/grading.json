@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output reports a Host Escape finding and names the bundled-script persistence call site (the sudo/launchd write into /Library/LaunchDaemons) as the evidence.",
+      "passed": true,
+      "evidence": "clear case of host escape via unrestricted `sudo` usage: the `install.py` script copies a plist to `/Library/LaunchDaemons`\u2026"
+    },
+    {
+      "text": "The output states that the declared write scope is narrow and therefore that the manifest/write-scope disjunct is silent for this package, explaining why the manifest linter passed it.",
+      "passed": false,
+      "evidence": "The response mentions the narrow declared scope but does not state the manifest/write\u2011scope disjunct is silent or explain why the linter passed."
+    },
+    {
+      "text": "The output states that the planted persistence survives removal of the skill.",
+      "passed": true,
+      "evidence": "establishing persistent code execution ... even after uninstall"
+    },
+    {
+      "text": "The output does not offer narrowing or tightening the declared write scope as the remediation for the host-escape finding.",
+      "passed": true,
+      "evidence": "Remediation suggests enhancing the linter to flag sudo usage, not narrowing the declared write scope"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:00:08.776126+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The write-up records two separate findings \u2014 the payload under its own category (AST01 execution/exfiltration) and the scanner miss under AST08 \u2014 and does not merge them into a single finding.",
+      "passed": false,
+      "evidence": "The response does not mention two separate findings or categories AST01 and AST08; it only calls it a missed critical vulnerability."
+    },
+    {
+      "text": "The write-up identifies the guard-plus-dangerous-branch conjunction in V2's scripts/collect.py, naming both environment-identity predicates (the hostname comparison and the date comparison) and the dangerous call inside the guarded branch (the credential archive sent to an external endpoint).",
+      "passed": true,
+      "evidence": "the code checks whether the hostname is `prod-agent-01` *and* whether the current date is after September 1, 2026... exfiltrate the `~/.aws/credentials` file via `curl`."
+    },
+    {
+      "text": "The write-up explains that C6 is correctly not convicted because its OS-portability branch and its subprocess call are separate, and states that only the conjunction constitutes the finding.",
+      "passed": false,
+      "evidence": "The response says C6 contains no malicious behavior and does not explain separate OS\u2011portability branch and subprocess call or that only the conjunction is the finding."
+    },
+    {
+      "text": "The write-up names at least one predicate deliberately excluded from the guard class (platform.system, sys.platform, or os.name) and states the consequence that a logic bomb keyed on it remains uncovered after the rule is fixed.",
+      "passed": false,
+      "evidence": "The response mentions `platform.system()` but does not state it is excluded from the guard class nor that a logic bomb keyed on it stays uncovered."
+    },
+    {
+      "text": "The write-up rejects 'zero findings' or 'clean' as a reportable scanner verdict and substitutes a PASS/FAIL/INCOMPLETE classification against a stated scope.",
+      "passed": false,
+      "evidence": "The response calls zero findings a false negative but does not reject 'zero findings' as a verdict nor substitute a PASS/FAIL/INCOMPLETE classification."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST08-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:04:17.058639+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,17 @@
+{
+  "eval": "AST08-case-1",
+  "skill": "AST08",
+  "case_id": 1,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST08/C7-scanner-host-hazard"
+  ],
+  "prompt_chars": 18169,
+  "ran_at": "2026-08-24T13:02:39.648064+00:00"
+}

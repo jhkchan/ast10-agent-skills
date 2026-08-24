@@ -1,0 +1,19 @@
+{
+  "eval": "advisory-case-3",
+  "skill": "advisory",
+  "case_id": 3,
+  "configuration": "without_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": false,
+  "input_files": [
+    "fixtures/AST10/C2-encoded-shell-payload/SKILL.md",
+    "fixtures/AST10/C2-encoded-shell-payload/skill.usf.yaml",
+    "fixtures/AST10/C2-encoded-shell-payload/scripts/postinstall.py"
+  ],
+  "prompt_chars": 3691,
+  "ran_at": "2026-08-24T13:08:59.826553+00:00"
+}

@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response answers that SOUL.md is not protected by this manifest and declines to endorse sign-off on the strength of the validator warning.",
+      "passed": true,
+      "evidence": "No, SOUL.md is not actually protected in this manifest... The warning ... is only relevant when both rules apply... Instead of relying on the warning, you should check..."
+    },
+    {
+      "text": "The response explains the disagreement in terms of how the two entries are matched \u2014 basename versus exact path form \u2014 rather than only asserting that the manifest is wrong.",
+      "passed": false,
+      "evidence": "The response only mentions exact path matching and does not discuss basename versus exact path form."
+    },
+    {
+      "text": "The response recommends a verification step that does not rely on the warning text, such as directly resolving whether a write to SOUL.md is allowed.",
+      "passed": true,
+      "evidence": "Instead of relying on the warning, you should check: ... Whether any file path matched by write is also matched by deny_write."
+    },
+    {
+      "text": "The response gives a concrete manifest edit that makes the deny_write entry cover the path actually granted.",
+      "passed": false,
+      "evidence": "The response suggests updating deny_write but does not provide a concrete manifest edit."
+    },
+    {
+      "text": "The response states the precedence rule being applied, including that deny_write resolution is most-specific-wins rather than first-match.",
+      "passed": false,
+      "evidence": "The response does not state the precedence rule or mention most-specific-wins versus first-match."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 3,
+    "total": 5,
+    "pass_rate": 0.4
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST10-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:07:36.262900+00:00",
+  "grader_attempts": 1
+}

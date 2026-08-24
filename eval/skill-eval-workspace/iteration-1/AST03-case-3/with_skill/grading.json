@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to assign a named AST03 scenario id to the wildcard-egress observation.",
+      "passed": false,
+      "evidence": "The response assigns a scenario ID: \"The finding should be filed under **AST03-S03**\"."
+    },
+    {
+      "text": "The response explains the refusal by saying the unbounded allowlist is an artifact signal or proxy rather than coverage of a named scenario, and that filing it under a scenario id would be an overclaim.",
+      "passed": false,
+      "evidence": "The response does not refuse; it assigns an ID and never mentions an overclaim."
+    },
+    {
+      "text": "The response still reports the wildcard allowlist as a real finding worth escalating, rather than clearing the package.",
+      "passed": false,
+      "evidence": "The response does not explicitly say the finding is worth escalating; it only advises filing under an ID."
+    },
+    {
+      "text": "The response names both AST03-S01 and AST06-S02 as scenarios this signal does not establish, and states for each what additional evidence would be needed (a purpose-versus-scope judgement for the first, the host's sandbox and co-located services for the second).",
+      "passed": false,
+      "evidence": "The response never mentions AST03-S01 or AST06-S02."
+    },
+    {
+      "text": "The response notes that shell is declared false in this manifest, so the shell-plus-unbounded-egress combination does not apply.",
+      "passed": true,
+      "evidence": "It notes \"shell is disabled and no other triggers are present,\" indicating shell is false and the combination does not apply."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST03-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T12:57:02.002600+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output names metadata.yaml and scripts/loader.py as two distinct pieces of evidence, not as one finding with one location.",
+      "passed": true,
+      "evidence": "The `loader.py` script uses `yaml.load()` ... and `metadata.yaml` contains `!!python/object/apply:os.system ['id']`."
+    },
+    {
+      "text": "The output identifies the `!!python/object/apply` tag in metadata.yaml as the code-executing payload AND identifies the `yaml.load(...)` call with no `Loader=` argument in scripts/loader.py as the unsafe call site.",
+      "passed": true,
+      "evidence": "Identifies `!!python/object/apply` in `metadata.yaml` as the payload and the `yaml.load()` call with no `Loader=` argument in `loader.py` as unsafe."
+    },
+    {
+      "text": "The output prescribes `yaml.safe_load` or `SafeLoader` as the acceptable loader and does not present `FullLoader`, `UnsafeLoader`, or a bare `yaml.load()` as an acceptable remediation.",
+      "passed": true,
+      "evidence": "Prescribes using `yaml.safe_load()` or `Loader=yaml.SafeLoader` and never mentions `FullLoader` or a bare `yaml.load()` as a fix."
+    },
+    {
+      "text": "The output states that remediating only one of the two halves leaves the other defect in place, i.e. it counts at least two required changes.",
+      "passed": false,
+      "evidence": "The response lists three fixes but does not explicitly state that fixing only one half leaves the other defect in place."
+    },
+    {
+      "text": "The output attributes the finding to metadata.yaml and scripts/loader.py rather than to the SKILL.md frontmatter of this package.",
+      "passed": true,
+      "evidence": "Attributes the vulnerability to `metadata.yaml` and `scripts/loader.py` and does not refer to the SKILL.md frontmatter."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST04-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T12:57:38.831977+00:00",
+  "grader_attempts": 1
+}

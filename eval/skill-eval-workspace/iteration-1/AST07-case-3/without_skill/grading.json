@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response attributes the described drift to AST05 (drift in externally referenced content) rather than to AST07, and says so explicitly rather than merely mentioning AST05 in passing.",
+      "passed": false,
+      "evidence": "The response never mentions AST05; it only refers to AST07."
+    },
+    {
+      "text": "The response rejects tightening or hardening the version pin as the remediation, and gives as the reason that the package's own pin held byte-for-byte so a stronger pin closes nothing.",
+      "passed": false,
+      "evidence": "The response recommends additional pinning, not rejecting a tighter version pin, and gives no reason about a byte\u2011for\u2011byte pin."
+    },
+    {
+      "text": "The response observes that this package declares no content hash (it ships no skill.usf.yaml manifest) and attributes that finding to AST01's content-hash-missing check rather than counting it as AST07 coverage.",
+      "passed": false,
+      "evidence": "The response does not mention skill.usf.yaml, content\u2011hash\u2011missing, or AST01."
+    },
+    {
+      "text": "The response does not report a detected, confirmed, or convicted AST07 finding for this package, and reports AST07 as declared-and-uncovered.",
+      "passed": false,
+      "evidence": "The response mentions AST07 only as a likely flag; it does not state a declared\u2011and\u2011uncovered status."
+    },
+    {
+      "text": "The response names the remediation that actually applies to the referenced content \u2014 pinning, wrapping or boundary-marking the fetched material \u2014 rather than only rejecting the proposed one.",
+      "passed": true,
+      "evidence": "The response advises pinning loader logic and wrapping untrusted content as the remediation."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:02:34.047885+00:00",
+  "grader_attempts": 1
+}

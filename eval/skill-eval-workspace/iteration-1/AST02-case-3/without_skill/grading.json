@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response states that a registry membership lookup does not verify a signature, and separately does not establish that the registry's own history has not been rewritten \u2014 treating membership, signing and log integrity as distinct questions.",
+      "passed": true,
+      "evidence": "it doesn\u2019t ensure the authenticity ... unless the index itself is cryptographically signed ... without validating the trust chain (e.g., who published it, signing keys, transparency log inclusion)"
+    },
+    {
+      "text": "The response names at least two of Registry Flooding, Dependency Confusion and Maintainer Account Takeover as not decidable from a single package artifact.",
+      "passed": true,
+      "evidence": "cannot reliably determine whether a skill originated from a flooded namespace versus a compromised maintainer account"
+    },
+    {
+      "text": "The response explains that a maintainer-account takeover yields a release that passes signature verification, because the attacker holds the legitimate publishing key.",
+      "passed": false,
+      "evidence": "the response does not mention that a takeover yields a release that passes signature verification or that the attacker holds the legitimate key"
+    },
+    {
+      "text": "The response recommends at least one control located outside the package itself \u2014 for example a signature covering a canonical digest of the skill file plus every declared resource, inclusion or consistency proofs against a monitored log root, or a revocation path \u2014 rather than proposing a deeper scan of the package as the fix.",
+      "passed": true,
+      "evidence": "you\u2019d need to combine the scanner with a policy engine that enforces namespace ownership rules and verifies cryptographic signatures from trusted maintainers"
+    },
+    {
+      "text": "The response does not claim that a package scanner can detect registry flooding or maintainer-account takeover from the package's contents.",
+      "passed": true,
+      "evidence": "a package scanner alone cannot reliably determine whether a skill originated from a flooded namespace versus a compromised maintainer account"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST02-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T12:55:56.795831+00:00",
+  "grader_attempts": 1
+}

@@ -26,8 +26,7 @@ The three are never averaged and never plotted together. A `pass_rate` on this p
 
 | Iteration | Coverage | Agent under test | Grader | with_skill | without_skill | Δ pass_rate |
 | --- | --- | --- | --- | --- | --- | --- |
-| iteration-1 | 1 of 33 | `bedrock/qwen3-235b` | `bedrock/gpt-oss-120b` | 1.00 | 0.80 | +0.20 |
-| iteration-2 | 1 of 33 | `bedrock/qwen3-235b` | `bedrock/gpt-oss-120b` | 1.00 | 0.20 | +0.80 |
+| iteration-1 | 33 of 33 | `bedrock/qwen3-235b` | `bedrock/gpt-oss-120b` | 0.78 | 0.41 | +0.37 |
 
 The agent under test and the grader are always different models, enforced rather than encouraged: `eval/skill_evals.py` exits rather than let one model grade its own output, and both names are written into every `timing.json`, every `grading.json` and every `benchmark.json`.
 
@@ -35,8 +34,39 @@ The agent under test and the grader are always different models, enforced rather
 
 | Iteration | Eval | with_skill | without_skill | Δ | Graded by |
 | --- | --- | --- | --- | --- | --- |
-| iteration-1 | `AST01-case-2` | 1.00 | 0.80 | +0.20 | `eval/skill_evals.py` |
-| iteration-2 | `AST01-case-3` | 1.00 | 0.20 | +0.80 | `eval/skill_eval_grade.py` |
+| iteration-1 | `AST01-case-1` | 1.00 | 0.60 | +0.40 | `eval/skill_evals.py` |
+| iteration-1 | `AST01-case-2` | 1.00 | 1.00 | +0.00 | `eval/skill_evals.py` |
+| iteration-1 | `AST01-case-3` | 1.00 | 0.20 | +0.80 | `eval/skill_evals.py` |
+| iteration-1 | `AST02-case-1` | 0.75 | 0.75 | +0.00 | `eval/skill_evals.py` |
+| iteration-1 | `AST02-case-2` | 0.80 | 0.80 | +0.00 | `eval/skill_evals.py` |
+| iteration-1 | `AST02-case-3` | 1.00 | 0.80 | +0.20 | `eval/skill_evals.py` |
+| iteration-1 | `AST03-case-1` | 0.60 | 0.60 | +0.00 | `eval/skill_evals.py` |
+| iteration-1 | `AST03-case-2` | 0.60 | 0.60 | +0.00 | `eval/skill_evals.py` |
+| iteration-1 | `AST03-case-3` | 0.20 | 0.00 | +0.20 | `eval/skill_evals.py` |
+| iteration-1 | `AST04-case-1` | 1.00 | 0.80 | +0.20 | `eval/skill_evals.py` |
+| iteration-1 | `AST04-case-2` | 0.75 | 0.75 | +0.00 | `eval/skill_evals.py` |
+| iteration-1 | `AST04-case-3` | 0.75 | 0.50 | +0.25 | `eval/skill_evals.py` |
+| iteration-1 | `AST05-case-1` | 1.00 | 0.40 | +0.60 | `eval/skill_evals.py` |
+| iteration-1 | `AST05-case-2` | 0.75 | 0.25 | +0.50 | `eval/skill_evals.py` |
+| iteration-1 | `AST05-case-3` | 1.00 | 0.60 | +0.40 | `eval/skill_evals.py` |
+| iteration-1 | `AST06-case-1` | 0.50 | 0.75 | -0.25 | `eval/skill_evals.py` |
+| iteration-1 | `AST06-case-2` | 1.00 | 0.50 | +0.50 | `eval/skill_evals.py` |
+| iteration-1 | `AST06-case-3` | 1.00 | 0.00 | +1.00 | `eval/skill_evals.py` |
+| iteration-1 | `AST07-case-1` | 0.80 | 0.00 | +0.80 | `eval/skill_evals.py` |
+| iteration-1 | `AST07-case-2` | 0.60 | 0.00 | +0.60 | `eval/skill_evals.py` |
+| iteration-1 | `AST07-case-3` | 0.40 | 0.20 | +0.20 | `eval/skill_evals.py` |
+| iteration-1 | `AST08-case-1` | 0.60 | 0.20 | +0.40 | `eval/skill_evals.py` |
+| iteration-1 | `AST08-case-2` | 0.50 | 0.50 | +0.00 | `eval/skill_evals.py` |
+| iteration-1 | `AST08-case-3` | 1.00 | 0.20 | +0.80 | `eval/skill_evals.py` |
+| iteration-1 | `AST09-case-1` | 1.00 | 0.20 | +0.80 | `eval/skill_evals.py` |
+| iteration-1 | `AST09-case-2` | 1.00 | 0.33 | +0.67 | `eval/skill_evals.py` |
+| iteration-1 | `AST09-case-3` | 0.80 | 0.00 | +0.80 | `eval/skill_evals.py` |
+| iteration-1 | `AST10-case-1` | 0.80 | 0.60 | +0.20 | `eval/skill_evals.py` |
+| iteration-1 | `AST10-case-2` | 0.80 | 0.40 | +0.40 | `eval/skill_evals.py` |
+| iteration-1 | `AST10-case-3` | 1.00 | 0.40 | +0.60 | `eval/skill_evals.py` |
+| iteration-1 | `advisory-case-1` | 0.83 | 0.17 | +0.67 | `eval/skill_evals.py` |
+| iteration-1 | `advisory-case-2` | 0.80 | 0.20 | +0.60 | `eval/skill_evals.py` |
+| iteration-1 | `advisory-case-3` | 0.20 | 0.20 | +0.00 | `eval/skill_evals.py` |
 
 ## What these numbers do not say
 

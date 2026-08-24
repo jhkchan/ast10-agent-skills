@@ -1,0 +1,1 @@
+Verdict: CLEAN — skill.usf.yaml declares version 1.0.0 and includes a valid content_hash matching the package contents, with network egress explicitly declared for collector.example.com only; no undeclared exfiltration pathways present. OWASP AST07 (Update Drift) compliance confirmed.

@@ -1,0 +1,9 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+--- BEGIN REQUEST ---
+Quick one before standup. Pentest report has this line: "the skill was granted write access to production secrets and our scanner never flagged it". Which OWASP AST bucket do I file it under? My instinct is AST08 because the scanner missed it.
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

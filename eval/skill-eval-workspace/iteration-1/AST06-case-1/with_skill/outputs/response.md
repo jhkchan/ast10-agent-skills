@@ -1,0 +1,8 @@
+File an **AST06-S01 Host Escape** finding.  
+
+The skill executes a `sudo cp` and `launchctl load` to install a launch daemon into `/Library/LaunchDaemons`, a known host persistence location, via a direct call site in a bundled script. This satisfies the first disjunct of AST06-S01 — a bundled-script call site planting host persistence — regardless of the declared `write` scope.  
+
+The manifest linter is not at fault for missing this; it correctly validated the declared scope. But **scope declarations are irrelevant when no isolation boundary enforces them**. The skill runs with `shell: allowed: true`, and the agent runtime executes it in host context, meaning the declared `write` list has no operational restriction. The real issue is that the agent allows unrestricted shell execution that can reach host persistence locations — a failure of isolation, not of manifest declaration.  
+
+Tell the linter owner:  
+“Your tool is working as designed for AST03 (Over-Privileged Skills), but this is an AST06 (Weak Isolation) case. The problem isn't the declared scope — it's that the agent runtime doesn't sandbox by default, so shell commands execute with full host access regardless of manifest constraints. The linter should not attempt to catch this class of issue; instead, raise a flag if `shell: allowed: true` appears without a corresponding `sandbox: true` declaration in the agent config, to signal that the deployment may be running in host mode. That shift — from validating scope to detecting missing containment — would align the linter with AST06’s decision rule: isolation is a binary architectural default, not a tunable policy.”

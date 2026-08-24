@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response states that a registry membership lookup does not verify a signature, and separately does not establish that the registry's own history has not been rewritten \u2014 treating membership, signing and log integrity as distinct questions.",
+      "passed": true,
+      "evidence": "Your approach ... only answers \"Is this digest listed?\" You are missing: \"Is this digest actually signed by the publisher?\" and \"Has the registry log been rewritten?\""
+    },
+    {
+      "text": "The response names at least two of Registry Flooding, Dependency Confusion and Maintainer Account Takeover as not decidable from a single package artifact.",
+      "passed": true,
+      "evidence": "Registry Flooding: ... a single package scanner sees only one artifact and cannot detect... Maintainer Account Takeover: ... there is no in-package signal to detect this."
+    },
+    {
+      "text": "The response explains that a maintainer-account takeover yields a release that passes signature verification, because the attacker holds the legitimate publishing key.",
+      "passed": true,
+      "evidence": "a release from a compromised account (with valid keys) is byte\u2011for\u2011byte identical to one from a legitimate owner. Signature verification passes cleanly."
+    },
+    {
+      "text": "The response recommends at least one control located outside the package itself \u2014 for example a signature covering a canonical digest of the skill file plus every declared resource, inclusion or consistency proofs against a monitored log root, or a revocation path \u2014 rather than proposing a deeper scan of the package as the fix.",
+      "passed": true,
+      "evidence": "Enforce signatures over the full bundle... Implement granular revocation (per key, per version, per publisher) and consult a revocation endpoint at install time."
+    },
+    {
+      "text": "The response does not claim that a package scanner can detect registry flooding or maintainer-account takeover from the package's contents.",
+      "passed": true,
+      "evidence": "Package Scanners Cannot Detect Registry Flooding or Maintainer Account Takeover"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST02-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T12:55:36.691934+00:00",
+  "grader_attempts": 1
+}

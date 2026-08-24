@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response reports the AST07 status as declared-and-uncovered (or an equivalent 'not decidable from this package' status) and does not report the category as pass, clean, no findings, or an equivalent all-clear.",
+      "passed": true,
+      "evidence": "`declared-and-uncovered`; do not close the ticket on the basis of pinning alone."
+    },
+    {
+      "text": "The response explicitly declines to treat the declared sha256 content hash as evidence that no malicious update occurred, and supports that with a reason about authorship of the bytes or about an operator accepting a new hash.",
+      "passed": true,
+      "evidence": "The presence of a hash pin does not prove absence of compromise\u2014it only prevents drift in the absence of operator action."
+    },
+    {
+      "text": "The response names all three AST07 attack scenarios \u2014 Malicious Update, Rollback Attack, and Hot-Reload Abuse \u2014 and states for each that a single point-in-time package cannot decide it.",
+      "passed": true,
+      "evidence": "(Malicious Update, Rollback Attack, Hot-Reload Abuse), meaning no static detector can confirm whether ..."
+    },
+    {
+      "text": "For each of the three scenarios the response names at least one concrete piece of off-artifact evidence that would be required, such as a signed release-transparency or operator-held version-to-hash-to-publisher-key record, a resolver decision record paired with an operator-intent record, or host reload telemetry paired with directory ownership.",
+      "passed": false,
+      "evidence": "Response lists generic evidence (predecessor evidence, resolver decision records, reload telemetry) but does not assign a specific piece to each of the three scenarios."
+    },
+    {
+      "text": "The response does not tell the user the ticket can be closed on the strength of the pin.",
+      "passed": true,
+      "evidence": "do not close the ticket on the basis of pinning alone."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T13:01:24.686878+00:00",
+  "grader_attempts": 1
+}

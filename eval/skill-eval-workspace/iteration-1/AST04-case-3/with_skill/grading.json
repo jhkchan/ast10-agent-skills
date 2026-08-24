@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output reports no AST04 permission-understating finding and states that every host reached in scripts/fetch.sh appears on the manifest's declared allowlist.",
+      "passed": true,
+      "evidence": "There is no permission understating \u2014 the declared permissions match the observed egress behavior. The script fetch.sh makes two curl calls to api.weather.example, a host fully covered by the manifest\u2019s network allowlist."
+    },
+    {
+      "text": "The output does not treat the presence of curl, an egress call, or `shell: true` as itself an AST04 finding.",
+      "passed": true,
+      "evidence": "The fixture declares `shell: true` and `network.allow: [api.weather.example]` and does not treat the presence of curl or shell as a finding."
+    },
+    {
+      "text": "The output qualifies the pass by naming at least one AST04 question that package bytes cannot settle \u2014 brand impersonation (needs an external trademark or vendor-namespace corpus) and/or the staged loader (payload resolves off-artifact at install).",
+      "passed": false,
+      "evidence": "The response does not mention brand impersonation or the staged loader, only says \"no other AST04 scenario applies.\""
+    },
+    {
+      "text": "If the output raises the breadth of the declared `shell: true` at all, it attributes that to AST03 over-privilege rather than to AST04 misdeclaration.",
+      "passed": true,
+      "evidence": "The response does not raise the breadth of `shell: true`; it simply states it is necessary, without attributing to AST03."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST04-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T12:58:11.275127+00:00",
+  "grader_attempts": 1
+}

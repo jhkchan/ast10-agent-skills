@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output reports no Host Escape finding for this package.",
+      "passed": true,
+      "evidence": "Verdict: **The sudo call alone is not disqualifying under AST06 Host Escape**, ... Therefore, ... they are not exploited for host escape or persistent access."
+    },
+    {
+      "text": "The output states that the sudo call is not itself the finding, giving as the reason that no call site targets a host persistence location and that a shell or privilege grant is a capability rather than the act the scenario requires.",
+      "passed": false,
+      "evidence": "The response does not mention that no call site targets a host persistence location or that the sudo privilege grant is merely a capability rather than the required act."
+    },
+    {
+      "text": "The output names at least three AST06 concerns the package scan could not decide, drawn from bind address, workspace-over-bundled precedence or skill shadowing, hot-reload behaviour, and cross-agent shared state, and attributes them to the deployment rather than to the package.",
+      "passed": false,
+      "evidence": "The response contains no mention of bind address, workspace\u2011over\u2011bundled precedence, skill shadowing, hot\u2011reload behaviour or cross\u2011agent shared state."
+    },
+    {
+      "text": "The output does not present the negative package scan as evidence that the deployment is isolated or that AST06 is closed.",
+      "passed": true,
+      "evidence": "The response never presents the negative package scan as evidence that the deployment is isolated or that AST06 is closed."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:00:50.836326+00:00",
+  "grader_attempts": 1
+}

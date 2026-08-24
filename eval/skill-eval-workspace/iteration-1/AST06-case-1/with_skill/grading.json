@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output reports a Host Escape finding and names the bundled-script persistence call site (the sudo/launchd write into /Library/LaunchDaemons) as the evidence.",
+      "passed": true,
+      "evidence": "File an **AST06-S01 Host Escape** finding\u2026 installs a launch daemon into `/Library/LaunchDaemons` via a bundled\u2011script call site."
+    },
+    {
+      "text": "The output states that the declared write scope is narrow and therefore that the manifest/write-scope disjunct is silent for this package, explaining why the manifest linter passed it.",
+      "passed": false,
+      "evidence": "The response never says the declared write scope is narrow or that the write\u2011scope disjunct is silent."
+    },
+    {
+      "text": "The output states that the planted persistence survives removal of the skill.",
+      "passed": false,
+      "evidence": "The response contains no statement that the installed launch daemon persists after the skill is removed."
+    },
+    {
+      "text": "The output does not offer narrowing or tightening the declared write scope as the remediation for the host-escape finding.",
+      "passed": true,
+      "evidence": "The remediation suggests adding a flag for `shell: allowed: true` without `sandbox: true`; it does not propose narrowing the write scope."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T12:59:59.967231+00:00",
+  "grader_attempts": 1
+}

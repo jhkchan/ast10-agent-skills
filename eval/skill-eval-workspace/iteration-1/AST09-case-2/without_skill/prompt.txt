@@ -1,0 +1,9 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+--- BEGIN REQUEST ---
+Audit our skill audit-logging design against AST09 before I take it to the external auditor next week. Every skill execution appends one row to a Postgres table — agent_id, skill name, action, timestamp, outcome — writes go through an append-only trigger, and the platform team can insert a correction row with a reason code when something is logged wrong. Retention is 400 days and the table is backed up nightly. Does this give us compliance-grade audit evidence, and if not, what exactly is missing?
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

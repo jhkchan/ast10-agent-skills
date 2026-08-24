@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response concludes the package is not a Silent Supply Chain Injection finding and does not recommend blocking, quarantining, or refusing to install it.",
+      "passed": true,
+      "evidence": "Yes, this skill is **not dodgy** \u2014 it is safe to install ... You\u2019re good to install it."
+    },
+    {
+      "text": "The response reports what at least one blob actually decodes to in concrete terms \u2014 a JSON configuration object with timeout/locale/format keys, or a 1x1 PNG image \u2014 rather than describing it only as an encoded or obfuscated string.",
+      "passed": true,
+      "evidence": "The base64 string in `scripts/postinstall.py` decodes to a JSON object: {\"timeout_seconds\":30,\"locale\":\"en-GB\",\"format\":\"markdown\"} ... tiny PNG icon (1x1 pixel)."
+    },
+    {
+      "text": "The response states that the presence of encoding is not by itself the finding, and gives at least one reason a legitimate or format-conformant package carries encoded data.",
+      "passed": true,
+      "evidence": "Critically, **encoding alone is not the finding** \u2014 many legitimate payloads (icons, config, checksums) are encoded."
+    },
+    {
+      "text": "The response names the specific condition that would have made this a finding: decoded content matching a payload behaviour, or a decoded literal reaching an execution sink such as exec, eval, or subprocess.",
+      "passed": true,
+      "evidence": "the real concern is whether decoded content reaches execution ... neither blob leads to shell execution or any dynamic eval."
+    },
+    {
+      "text": "The response does not present its verdict as clearing the package for AST10 overall; it either scopes the verdict to the injection scenario or states that the porting and cross-registry scenarios are not decidable from a single package.",
+      "passed": false,
+      "evidence": "You\u2019re good to install it. ... consistent with AST10\u2011S06's clean fixture."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST10-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T13:05:59.077403+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,48 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response answers that the design does not yet provide compliance-grade audit evidence, and separates having logging from having independently verifiable evidence.",
+      "passed": true,
+      "evidence": "Your current audit-logging design does **not** provide compliance-grade audit evidence ... because it fails to meet ... independently verifiable ..."
+    },
+    {
+      "text": "The response identifies operator control over the record \u2014 the correction-row path or the platform team's write access \u2014 as the specific defect, rather than pointing at retention, backups, or field coverage.",
+      "passed": true,
+      "evidence": "\ud83d\udd3a **2. Operator-Controlled Corrections Break Independence** ... logs an operator can modify are **not** compliance\u2011grade evidence."
+    },
+    {
+      "text": "The response requires two separate records per execution attempt: one produced before execution recording what was authorised, and one produced after recording what actually happened.",
+      "passed": true,
+      "evidence": "\ud83d\udd3a **1. No Signed Admission & Outcome Receipts Linked by `attempt_id`** ... Two **cryptographically signed** receipts \u2014 one *before* execution (admission) ... and one *after* (outcome)."
+    },
+    {
+      "text": "The response requires a shared identifier joining those two records and says what an auditor can only establish because of it.",
+      "passed": true,
+      "evidence": "joined by a unique `attempt_id` ... so an auditor can confirm the admitted action and the executed action were the same action."
+    },
+    {
+      "text": "The response requires the policy version in effect to be captured inside the signed record at decision time rather than reconstructed after the fact.",
+      "passed": true,
+      "evidence": "\ud83d\udd3a **3. No `policy_version` Bound at Decision Time** ... admission receipt must include the exact `policy_version` used ... captured at decision time, signed."
+    },
+    {
+      "text": "The response warns that a missing outcome record is not evidence the action was blocked, and names at least one benign cause that produces an identical pattern.",
+      "passed": true,
+      "evidence": "\ud83d\udd3a **5. Ambiguity Around DENY Decisions** ... a missing outcome receipt is not proof of blockage ... could be a system crash, telemetry loss, or tampering."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T13:05:15.308745+00:00",
+  "grader_attempts": 1
+}

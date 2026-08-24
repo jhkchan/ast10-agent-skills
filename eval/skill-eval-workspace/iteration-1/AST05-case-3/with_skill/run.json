@@ -1,0 +1,20 @@
+{
+  "eval": "AST05-case-3",
+  "skill": "AST05",
+  "case_id": 3,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST05/V5-absent-boundary-marker/SKILL.md",
+    "fixtures/AST05/V5-absent-boundary-marker/scripts/loader.py",
+    "fixtures/AST05/C6-absent-boundary-marker/SKILL.md",
+    "fixtures/AST05/C6-absent-boundary-marker/scripts/loader.py"
+  ],
+  "prompt_chars": 25799,
+  "ran_at": "2026-08-24T12:59:32.230610+00:00"
+}

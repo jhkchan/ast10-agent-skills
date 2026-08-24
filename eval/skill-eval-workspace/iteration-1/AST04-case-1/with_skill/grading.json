@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output names metadata.yaml and scripts/loader.py as two distinct pieces of evidence, not as one finding with one location.",
+      "passed": true,
+      "evidence": "The response refers to `metadata.yaml` and `scripts/loader.py` separately, e.g., \u201cIn `scripts/loader.py`\u2026\u201d, and \u201cThe file `metadata.yaml` contains this:\u201d"
+    },
+    {
+      "text": "The output identifies the `!!python/object/apply` tag in metadata.yaml as the code-executing payload AND identifies the `yaml.load(...)` call with no `Loader=` argument in scripts/loader.py as the unsafe call site.",
+      "passed": true,
+      "evidence": "It calls out the tag\u202f`!!python/object/apply:os.system` in `metadata.yaml` as the payload and notes the `yaml.load()` call with no `Loader=` in `scripts/loader.py` as unsafe."
+    },
+    {
+      "text": "The output prescribes `yaml.safe_load` or `SafeLoader` as the acceptable loader and does not present `FullLoader`, `UnsafeLoader`, or a bare `yaml.load()` as an acceptable remediation.",
+      "passed": true,
+      "evidence": "Prescribes `yaml.SafeLoader` or `yaml.safe_load()` as the fix and never suggests `FullLoader`, `UnsafeLoader`, or a bare `yaml.load()` as acceptable."
+    },
+    {
+      "text": "The output states that remediating only one of the two halves leaves the other defect in place, i.e. it counts at least two required changes.",
+      "passed": true,
+      "evidence": "States that both changes are required \u2014 \u201cBoth must be addressed\u201d and \u201cOne without the other still leaves a defect\u201d, counting at least two changes."
+    },
+    {
+      "text": "The output attributes the finding to metadata.yaml and scripts/loader.py rather than to the SKILL.md frontmatter of this package.",
+      "passed": true,
+      "evidence": "Attributes the issue to `metadata.yaml` and `scripts/loader.py` only; no mention of the SKILL.md frontmatter as the source of the finding."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST04-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T12:57:22.339533+00:00",
+  "grader_attempts": 1
+}

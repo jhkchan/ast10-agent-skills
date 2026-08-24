@@ -1,0 +1,5 @@
+It’s not dodgy — you’re looking at a clean, intentionally designed fixture meant to test detection logic, not an actual threat.
+
+The skill requests file write permissions, but it explicitly *denies* writing to sensitive identity files (`SOUL.md`, `MEMORY.md`, `AGENTS.md`) via the `deny_write` list. It only allows writing to `notes/session.md`, which is a safe, session-specific log file. This pattern is deliberately constructed to mimic the structure of risky skills without introducing risk — exactly what you'd use to check whether a detector wrongly flags *any* write permission as malicious.
+
+This is a "clean" labeled fixture in the AST03 test suite, specifically for evaluating identity backdoor detection accuracy. Rejecting it would mean rejecting a valid, safe pattern that helps ensure detectors don’t produce false positives. So no — this isn’t a backdoor. Your instinct is reasonable, but in this case, the skill is normal and safe by design.

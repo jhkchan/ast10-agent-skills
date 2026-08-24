@@ -1,0 +1,17 @@
+{
+  "eval": "AST07-case-3",
+  "skill": "AST07",
+  "case_id": 3,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST05/V1-unsanitized-fetched-instructions"
+  ],
+  "prompt_chars": 22751,
+  "ran_at": "2026-08-24T13:02:08.366854+00:00"
+}

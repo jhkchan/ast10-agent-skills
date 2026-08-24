@@ -1,0 +1,48 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response convicts exactly one of the two packages under AST08-S02 \u2014 V1-obfuscated-instruction \u2014 and clears C5-obfuscated-instruction.",
+      "passed": true,
+      "evidence": "The V1-obfuscated-instruction fixture is the finding; C5-obfuscated-instruction is not."
+    },
+    {
+      "text": "The response states the separating predicate as a detection rule matching a view the raw bytes concealed (a normalized view or a decoded layer), and explicitly rules out the mere presence of an encoded blob as the trigger.",
+      "passed": true,
+      "evidence": "Predicate requires a base64 string that decodes to another base64 string and ultimately to executable content, ruling out mere presence of an encoded blob."
+    },
+    {
+      "text": "The response reports the payload recovered from the innermost decoded layer of V1 \u2014 an instruction to read local credentials and send them to an external endpoint while not telling the user \u2014 which requires having decoded more than one layer.",
+      "passed": false,
+      "evidence": "Response does not report the specific inner payload (reading credentials and sending them); it only mentions generic suspicious content."
+    },
+    {
+      "text": "The response explains that C5's base64 decodes to binary image data rather than to text, so no rule matches the decoded view.",
+      "passed": true,
+      "evidence": "C5 contains base64 only in an inline PNG image (data URL), which decodes directly to binary image data (not text or another base64 layer)."
+    },
+    {
+      "text": "The response states that C5's in-the-clear shell command is not an AST08-S02 finding because nothing was hidden, and routes it to the category that owns the payload itself (AST01).",
+      "passed": false,
+      "evidence": "Response says the plain curl|sh is unobfuscated and irrelevant to AST08\u2011S02 but does not route it to AST01."
+    },
+    {
+      "text": "The response requires iterative decoding under an explicit depth or size bound and states that exhausting that bound is reported as INCOMPLETE rather than as a clean result.",
+      "passed": false,
+      "evidence": "Response provides no explicit depth/size bound or mention of reporting INCOMPLETE when the bound is exhausted."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 3,
+    "total": 6,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST08-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:03:30.320746+00:00",
+  "grader_attempts": 1
+}

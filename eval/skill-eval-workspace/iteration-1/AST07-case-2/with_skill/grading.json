@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to conclude that a rollback attack occurred, and states that a decreased resolved version is on its own insufficient because it convicts legitimate operator-initiated rollbacks too.",
+      "passed": true,
+      "evidence": "cannot confirm or rule out a Rollback Attack ... a version decrease is not sufficient evidence ... unless you can prove it was unrequested"
+    },
+    {
+      "text": "The response asks for a resolver decision record (the requested constraint, the candidate versions offered, and the version resolved) and separately for an operator-intent record, naming both rather than only one.",
+      "passed": false,
+      "evidence": "asks for previous version, requested constraint, and operator\u2011intent log, but does not request the candidate versions offered"
+    },
+    {
+      "text": "The response states that the team's recollection that nobody requested the downgrade is not a substitute for the operator-intent record.",
+      "passed": false,
+      "evidence": "does not mention the team\u2019s recollection about nobody requesting the downgrade as insufficient"
+    },
+    {
+      "text": "The response states that the package at fixtures/AST01/C4-social-engineering-prereq cannot answer the question because a single package snapshot carries no version history.",
+      "passed": true,
+      "evidence": "does not contain any evidence of its own installation history or prior versions"
+    },
+    {
+      "text": "The response leaves Rollback Attack explicitly undecided rather than reporting it as either confirmed or cleared.",
+      "passed": true,
+      "evidence": "cannot confirm or rule out a Rollback Attack; the incident is left undecided"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T13:01:53.569980+00:00",
+  "grader_attempts": 1
+}

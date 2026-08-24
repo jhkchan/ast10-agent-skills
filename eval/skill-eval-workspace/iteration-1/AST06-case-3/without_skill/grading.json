@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output declines to close the finding on the evidence offered.",
+      "passed": false,
+      "evidence": "Yes, that\u2019s enough to close the AST06 finding."
+    },
+    {
+      "text": "The output states that a sandbox which is optional or available-if-configured is evidence for the finding, because the exposed population is the one running the default execution mode.",
+      "passed": false,
+      "evidence": "The response contains nothing addressing the sandbox\u2011optional evidence claim."
+    },
+    {
+      "text": "The output states that a loopback-bound control interface is not sufficient isolation without authentication, and cites the named precedent (ClawJacked / CVE-2026-32025) or an equivalent documented loopback WebSocket bypass.",
+      "passed": false,
+      "evidence": "The response contains nothing about loopback binding being insufficient nor any CVE citation."
+    },
+    {
+      "text": "The output distinguishes evidence about the product (vendor page, config reference, capability statement) from evidence about the deployment, and states that only the latter can close the finding.",
+      "passed": false,
+      "evidence": "The response does not distinguish product evidence from deployment evidence."
+    },
+    {
+      "text": "The output names the specific evidence that would close it: this deployment runs sandboxed by default with host mode behind a documented explicit opt-in.",
+      "passed": false,
+      "evidence": "The response does not name evidence about default sandboxing or an explicit opt\u2011in host mode."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:01:15.274724+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response rejects the 100% or fleet-wide wording and restates the claim scoped to the population the scanning method can actually reach.",
+      "passed": true,
+      "evidence": "No, the claim is not supportable\u2026 \"We have validated that all agent skills discoverable via endpoint and registry scanning are accounted for\u2026\""
+    },
+    {
+      "text": "The response identifies skills running inside managed SaaS copilots or agent platforms as the population the scan is blind to, and attributes that blindness to architecture rather than to concealment by an attacker.",
+      "passed": true,
+      "evidence": "\"skills deployed inside managed SaaS copilots or agent platforms\u2026 These are architecturally invisible to EDR and registry\u2011based tools, not hidden by obfuscation.\""
+    },
+    {
+      "text": "The response requires the discovery method to be stated inside the reported claim or finding.",
+      "passed": true,
+      "evidence": "\"Per decision rule 4: Discovery method must match where the skill actually lives\u2026 name the systems you did check and explicitly state which discovery methods were used.\""
+    },
+    {
+      "text": "The response names a different, identity- or posture-based discovery method for the unreachable population and lists at least two concrete telemetry sources it would draw on.",
+      "passed": true,
+      "evidence": "\"identity- and telemetry-based discovery (OAuth grants, connected app inventories, NHI activity)\""
+    },
+    {
+      "text": "The response treats an observed permission, scope, or consent change as an event that should trigger inventory and revocation immediately, rather than as routine telemetry to review later.",
+      "passed": false,
+      "evidence": "The response does not mention treating permission, scope, or consent changes as an immediate inventory/revocation trigger."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T13:05:42.063953+00:00",
+  "grader_attempts": 1
+}

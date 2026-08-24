@@ -1,0 +1,7 @@
+The skill is **not dodgy** — it is a clean, intentionally benign fixture designed to test scanner behavior under AST08-S07 (Scanner Host Compromise and Resource Exhaustion). Your scanner’s reaction indicates over-sensitivity, not a genuine threat.
+
+This package includes a `.docx` file and a symlink, which are legitimate package components and not inherently malicious. The `.docx` is a normal, small document (311 bytes, ordinary compression), and the symlink stays within package boundaries — neither triggers AST08-S07’s actual risk criteria, such as decompression bombs, excessive nesting, file count, or path escapes.
+
+Per **decision rule 7**, scanners must not crash or fail on such inputs, but they also must not flag benign use of allowed structures as malicious. The presence of archives or symlinks alone is not grounds for blocking or flagging — only when they violate resource or containment boundaries (e.g., zip bombs, deep recursion, parent-directory traversal) does a finding arise.
+
+Your scanner threw a wobbly, but the correct verdict is **PASS**: no attack is present, and the scanner should handle this without issue. However, the fact that it destabilized suggests a **robustness gap** — it may be vulnerable to scanner-host hazards under adversarial conditions. This should be reviewed, but the skill itself is safe to wave through.

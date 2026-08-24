@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response attributes the described drift to AST05 (drift in externally referenced content) rather than to AST07, and says so explicitly rather than merely mentioning AST05 in passing.",
+      "passed": true,
+      "evidence": "This finding does not belong to AST07 \u2014 it belongs to AST05: Untrusted External Instructions."
+    },
+    {
+      "text": "The response rejects tightening or hardening the version pin as the remediation, and gives as the reason that the package's own pin held byte-for-byte so a stronger pin closes nothing.",
+      "passed": false,
+      "evidence": "The response says do not try to \"pin harder\" but does not give the reason that the package\u2019s pin held byte\u2011for\u2011byte so a stronger pin would close nothing."
+    },
+    {
+      "text": "The response observes that this package declares no content hash (it ships no skill.usf.yaml manifest) and attributes that finding to AST01's content-hash-missing check rather than counting it as AST07 coverage.",
+      "passed": false,
+      "evidence": "The response contains no mention of a missing content hash, skill.usf.yaml, or AST01\u2019s content\u2011hash\u2011missing check."
+    },
+    {
+      "text": "The response does not report a detected, confirmed, or convicted AST07 finding for this package, and reports AST07 as declared-and-uncovered.",
+      "passed": false,
+      "evidence": "The response says no action for AST07 but does not report AST07 as declared\u2011and\u2011uncovered."
+    },
+    {
+      "text": "The response names the remediation that actually applies to the referenced content \u2014 pinning, wrapping or boundary-marking the fetched material \u2014 rather than only rejecting the proposed one.",
+      "passed": true,
+      "evidence": "Wrap the retrieved content in `<untrusted-reference-data>` tags, or pin the expected content hash of the remote runbook, etc."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 3,
+    "total": 5,
+    "pass_rate": 0.4
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T13:02:19.247962+00:00",
+  "grader_attempts": 1
+}

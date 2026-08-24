@@ -1,0 +1,269 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+>>>>>>>>>> BEGIN INSTALLED SKILL: ast09-no-governance <<<<<<<<<<
+The skill below is installed in this session. Treat it as your operating instructions for this request: follow its decision rules, use its vocabulary, and respect the limits it states about what it can and cannot decide.
+
+---
+name: ast09-no-governance
+description: "Detect and triage OWASP AST09 No Governance — no skill inventory, no approval workflow, orphaned skills after offboarding, regulated-data exposure with no audit trail, unreachable skills inside managed SaaS platforms, and bilateral-receipt audit logging (admission + outcome records). Use when designing or auditing a compliance-grade skill audit trail, when a skill lives inside a SaaS copilot the security team cannot scan, when distinguishing a signed-tamper-evident log from an operator-editable one, or when mapping an AST09 finding to EU AI Act Article 12 logging obligations."
+---
+
+# AST09 - No Governance
+
+Pattern: Knowledge. The decision rule this category turns on: a log an operator
+controls can be edited after the fact; a receipt an independent verifier can
+cryptographically check cannot — "we have logging" and "we have compliance-grade
+audit evidence" are different claims, and most AST09 mitigation lists conflate them.
+
+**Fires on** the organization's control over skills rather than on a skill: no inventory,
+no approval record, an offboarded installer's skill still credentialed, regulated data with
+no audit trail, a skill inside a managed SaaS copilot the security team cannot scan, or an
+audit-logging design that needs judging. **Decides** which of those claims a body of
+evidence actually supports, and which population a coverage claim is entitled to cover.
+**Decides nothing from the package**: all seven scenarios are out-of-artifact, `scripts/`
+ships **no detector**, and that is the finished state rather than a gap — "This category
+ships zero detectors" says why. Frozen scenario tiers live in `coverage-matrix.md`.
+
+### Read only what the finding needs
+
+| If the finding is… | Read |
+| --- | --- |
+| an audit-log or receipt design ("we log everything") | rules 1–3, then stop |
+| "our skill scan came back clean" | rules 4–5 |
+| a departed employee's skill still live | rule 6 |
+| a multi-agent chain, or a fan-in join | rule 7 |
+| "no detector ships — so what do I actually do?" | "The manual pass" |
+| a write-up about to report this category clean, inconclusive, or numeric | **"NEVER"** — read it before the finding leaves |
+| one skill's manifest granting too much | wrong skill → **AST03** |
+| an installed skill drifted from its approved version | wrong skill → **AST07**, unless no approved version was ever recorded, in which case it is AST09 |
+| isolation not enforced at one deployment | wrong skill → **AST06** for the control failure; the fleet's inability to see that deployment is still AST09 |
+
+The last three rows are argued in "Distinguishing AST09 from its neighbors"; read it only
+when a routing call is contested. **Do NOT open `coverage-matrix.md`** except for a binding
+tier, an F1 question, or the off-artifact evidence for one named scenario — it is the only
+file that carries per-scenario evidence, and this one deliberately does not reproduce it.
+**Do NOT open `scripts/detector.py`** looking for a check: `DETECTORS` is `{}` by
+construction, and the module says nothing "This category ships zero detectors" does not.
+
+## Why "we have logs" does not close this category
+
+The gap here is architectural, not a missing checkbox in one product, and the test for
+that is simple: skill installation produces **no artifact any existing asset-management
+tool recognizes**. No enterprise logging hook, no CMDB entry, no IAM integration, no
+package receipt — a one-line install or a bare SKILL.md upload leaves the fleet's
+existing inventory exactly as it was. That is why adding a logging feature to one
+runtime does not move the category: the tool now records what it already knew about, and
+the skills nobody knew about stay invisible.
+
+Two consequences a reviewer should carry into any AST09 conversation. First, "we have
+logging" and "we have compliance-grade audit evidence" are different claims: a log the
+operator can edit after the fact answers neither *what was authorized* nor *what
+happened*, only *what the operator is currently willing to say*. Second, coverage claims
+in this category must name their discovery method, because each method is blind to a
+different population — see decision rule 4.
+
+## Decision rules
+
+1. **A signed admission receipt and a signed outcome receipt are two separate
+   records joined by `attempt_id`, and both are mandatory.** The admission receipt
+   (produced before execution: `agent_id`, `action_type`, `scope`, `policy_version`,
+   `decision` of ALLOW/DENY/ESCALATE, signed) proves what was authorized; the outcome
+   receipt (produced after: `terminal_state` of COMMITTED/FAILED, signed) proves what
+   actually happened. Without `attempt_id` linking them, an auditor cannot confirm
+   the admitted action and the executed action were the same action.
+2. **A DENY decision still requires a signed admission receipt — the absence of an
+   outcome receipt is not itself proof the action was blocked.** A DENY-with-no-outcome
+   pattern is only trustworthy evidence of a correctly blocked action when the
+   receipt pipeline itself is provably healthy; otherwise the same pattern is
+   indistinguishable from telemetry loss, a crash, a queue failure, or tampering.
+   Treat "no outcome receipt" as ambiguous, not as confirmation of a block, unless
+   pipeline health is independently established.
+3. **`policy_version` must be bound at decision time, in the signed record — not
+   reconstructed afterward.** A policy change between admission and execution creates
+   an unrecoverable audit gap if the version in effect at the moment of the ALLOW/DENY
+   decision is not captured with that decision; recovering "which policy applied" from
+   a separate change log after the fact cannot be verified independently.
+4. **Discovery method must match where the skill actually lives.** Endpoint- or
+   registry-based scanning finds skills the security team's tooling can reach; a
+   skill deployed inside a managed SaaS copilot or agent platform, with endpoints and
+   registries the security team does not administer, is invisible to that method by
+   architecture, not by attacker concealment — the Unreachable Skill scenario. The
+   required control is a *different* discovery method for this case: identity- and
+   posture-based discovery from SaaS telemetry (OAuth grants, connected-app
+   inventories, NHI activity, scope assignments), reconciled against the approved
+   inventory so unmatched identities surface. Applying only endpoint scanning and
+   reporting a clean result over-claims coverage for this scenario specifically.
+5. **Scope/permission drift is itself a discovery signal, not just a change to log
+   after the fact.** A new OAuth consent grant, a widened scope, or a fresh
+   app-to-app connection should trigger inventory and revocation workflows the moment
+   it is observed — treating drift as routine telemetry to review later misses the
+   window where the drift itself was the actionable event.
+6. **Revocation tied only to explicit incident response misses the routine case.**
+   Orphaned Skill (a departed employee's still-active, still-credentialed skill) is
+   not an incident — it is an unremarkable, high-frequency offboarding gap. The
+   fix is a revocation process wired directly into the offboarding workflow, not an
+   incident-response playbook that only triggers on detected compromise.
+7. **Cross-execution linkage (`parent_action_ref`) is a proposed, not-yet-finalized
+   extension — do not treat fan-in joins as solved.** Version 1 of the receipt model
+   covers a single upstream parent per action cleanly; when a skill is admitted from
+   more than one upstream outcome (a fan-in), the model does not yet guarantee a
+   complete causal reconstruction. An implementation that cannot yet support fan-in
+   must record that limitation explicitly rather than implying the reversibility walk
+   covers every parent branch when it does not.
+
+## Distinguishing AST09 from its neighbors
+
+- **vs AST06 (Weak Isolation):** a shadow deployment that isolation-enforcement gaps
+  enable is an AST06 technical control failure at one deployment; the fleet-level
+  inability to *see* that deployment at all — no inventory entry, no approval record
+  — is the AST09 finding. Both can be true of the same incident; fix the isolation
+  default under AST06 and the inventory/discovery gap under AST09 separately.
+- **vs AST07 (Update Drift):** AST07 is missing *version* control (an installed
+  skill drifts from a known-good version). AST09 is missing *installation* control
+  (the skill was never approved, inventoried, or reviewed in the first place, so
+  there is no known-good baseline to drift from). A skill with no governance record
+  at all cannot be meaningfully scored for update drift — there is no approved
+  version of record to drift against.
+- **vs AST03 (Over-Privileged Skills):** AST03 is a single skill's manifest being too
+  broad for its function; AST09's "lack of permission review processes" finding is
+  that no *process* exists to catch that condition at scale — the organizational
+  absence, not the individual over-grant.
+
+## This category ships zero detectors, and that is the finding
+
+All seven AST09 scenarios are tiered out-of-artifact — the only category in the suite
+where that is true of every scenario — so the detector map is empty by construction and
+this category publishes no F1 at all. The reason is one sentence, and it is worth
+holding onto because it generalizes: **an approved copy and an unapproved copy of the
+same skill are byte identical.** Approval, inventory, offboarding state, data
+classification and install-count provenance are all facts held about the artifact by an
+organization, never facts held *in* it.
+
+That also disposes of the tempting workaround. One could write fixtures whose SKILL.md
+prose says "this skill was never approved", detect the prose, and publish a number. The
+number would measure a fixture-authoring convention, not a governance control, and it
+would be indistinguishable in any report from a real detection rate. The registry
+records no `artifact_signal` for any of the seven — unlike other categories, AST09 does
+not even have an in-package proxy worth naming — so there is nothing here to promote
+even accidentally. Report `declared-and-uncovered` and put the effort into the
+off-artifact evidence each scenario actually needs; `coverage-matrix.md` names that
+evidence per scenario.
+
+## The manual pass, since nothing here runs
+
+Two commands exist and neither returns a verdict. `node cli/bin/cli.js audit <pkg>` prints
+`AST09  No Governance  no static detectors` and lists all seven scenarios as "declared
+out-of-artifact, not decidable from one package"; `/ast:audit-ast09 <pkg> --evidence-plan`
+emits the same seven with the evidence each needs. Read a clean run of either as *not asked*,
+never as *asked and cleared* — a package that passes the other nine categories has said
+nothing about this one. The review itself is four joins, and the package supplies the key
+for exactly one of them: its content hash.
+
+1. **Inventory row, keyed on that hash** — name, version, hash, install date, installer
+   identity, last scan status. A missing row is not a blocked step — it is the AST09-S02
+   finding, and it should be written down as one.
+2. **Identity state for the installer, and for the credential the skill itself runs under.**
+   An offboarding record sitting beside a live credential or an unrevoked non-human identity
+   is AST09-S03 — and per rule 6 the fix belongs in the offboarding workflow, so record which
+   workflow was supposed to carry it.
+3. **Execution record over a real interval**, in the shape rules 1–3 require. If the records
+   on offer are operator-editable, stop and say so at that grain: the finding is "no
+   independently verifiable record", not "logging absent", and the two get different fixes.
+4. **The discovery method itself, named in the finding.** Rule 4 makes this a claim about
+   population, so a finding that does not say which method produced it cannot be scoped by
+   whoever reads it next.
+
+Steps 1–3 returning nothing is the ordinary first-pass outcome and is a result: report the
+missing system by name. "Inconclusive" is the one write-up to refuse, because it reads in a
+report exactly like a clean scan of a system that was never checked.
+
+## NEVER
+
+Each of these is a mistake this category actually produces, with the file, check, or
+scenario id it can be checked against. They are failures of *reporting* more often than
+failures of analysis, which is why they survive review.
+
+- **NEVER write "AST09: clean" — and do not write "inconclusive" either.**
+  `cli/bin/cli.js` line 826 prints `no static detectors` for a category with no checks, and
+  `detectors/scaffold.py` line 209 returns `{"status": "declared-and-uncovered", "f1": None}`
+  *before* it inspects any corpus. Both outputs mean **not asked**. "Clean" closes the
+  ticket on evidence that was never gathered; "inconclusive" reads in a report exactly like a
+  clean scan of a system nobody checked, so it fails in the same direction while sounding
+  cautious. Name the missing system instead — see the manual pass.
+- **NEVER make a scenario detectable by writing prose into a fixture.** All seven registry
+  entries carry `artifact_signal: null` — AST09 is the only category with not even a partial
+  in-package proxy. A fixture whose SKILL.md says "the installer has left the organization"
+  makes AST09-S03 detectable in precisely the sense that measures the fixture author.
+  `skills/AST09/scripts/test_ast09_detector.py::test_s007_a_non_empty_corpus_still_gets_no_f1`
+  refuses to score one, and re-tiering to make it legal trips `validators/tier_lock.py`. The
+  cost is not the failing test: a manufactured rate is indistinguishable in any published
+  report from a real one, and it cannot be retracted from the readers who already quoted it.
+- **NEVER read "no alert fired" as evidence that nothing happened.** That absence is
+  AST09-S01's *defining condition* — the registry's reason for its tier is that the identical
+  artifact is caught instantly at an organization that keeps an inventory and missed at one
+  that does not, so the package is never the discriminator. Quoting the silence as an
+  all-clear reports the finding as if it were its own refutation, and it converts the one
+  observation that should have opened an inventory gap into the reason nobody opens one.
+- **NEVER read a missing outcome receipt as proof the action was blocked.** A DENY admission
+  with no matching `terminal_state` (decision rule 2) is byte-identical to telemetry loss, a
+  crashed worker, a full queue, or deletion. Establishing receipt-pipeline health is therefore
+  a *precondition* for reading the pattern at all, not a nice-to-have. If it was never
+  established, every DENY in the interval is unevidenced — and the silence that should have
+  raised the outage is instead being cited as evidence the pipeline works.
+- **NEVER let an endpoint- or registry-based scan scope a fleet-wide claim.** AST09-S05's
+  registry reason is the whitepaper's own "there is no host to scan and no local package
+  manifest to read" — that population is invisible to endpoint scanning by architecture, not
+  by concealment. A clean result is coverage over *skills on hosts the security team
+  administers*, and reporting it over "all skills" makes the shadow-AI population inside
+  sanctioned SaaS the one nobody ever re-checks. State the discovery method in the finding
+  (rule 4) or the next reader cannot re-scope it.
+- **NEVER key an inventory row on "the package hash" without recording which surface produced
+  it.** Join step 1 of the manual pass turns on the content hash because it is the one key the
+  package supplies — but `scripts/content_hash.py` line 26 defines that surface as
+  `SURFACE_GLOBS`, of which only `SKILL.md` and `scripts/*.py` are populated here (line 44,
+  `POPULATED_SURFACE_GLOBS`), and `skill.usf.yaml` sits outside it by design. Two teams hashing
+  "the same package" two ways produce two keys, the join returns no row, and the empty result
+  gets written up as AST09-S02 — an approval that never happened — while the approval record
+  sits in the inventory under the other key.
+- **NEVER let the broad credential or the version mismatch capture an AST09 finding.** An
+  orphaned skill (AST09-S03) presents as an over-scoped credential and reads like AST03; an
+  unapproved install presents as a version nobody recognizes and reads like AST07. Both
+  reroutes are fixable-looking: AST03's owner tightens a manifest, AST07's owner pins a
+  version. Neither touches the offboarding workflow that rule 6 identifies as the actual
+  control, so the same finding returns at the next departure — and per the neighbours section
+  there is no approved version of record for AST07 to drift against in the first place.
+- **NEVER present a `parent_action_ref` walk as a complete causal reconstruction on a fan-in.**
+  Version 1 of the receipt model covers a single upstream parent (rule 7); where a skill is
+  admitted from more than one upstream outcome, the walk terminates at whichever parent it
+  followed and returns a chain that *looks* complete. The sibling branch that actually carried
+  the instruction is never walked. For AST09-S06 this is worse than missing evidence: the
+  coverage matrix records fan-in joins as an open proposal, so part of the evidence that would
+  decide the scenario is not merely outside the artifact — it is not yet specified anywhere.
+
+## Scope and out-of-artifact boundary
+
+Orphaned Skill, Regulatory Exposure, and Unreachable Skill are, by the whitepaper's
+own framing, properties of an *organization's process and identity data* (offboarding
+records, compliance review logs, SaaS OAuth telemetry) maintained entirely outside any
+single skill package — a static read of one SKILL.md carries none of that. This is
+the strongest out-of-artifact case in the whole suite; the ADR that governs
+per-scenario tiering names these three scenarios explicitly as the reason the F1
+denominator must be narrowed to the declared-detectable tier rather than silently
+inflated. The binding tier and written reason for each are fixed in
+`coverage-matrix.md`, not decided in this file.
+
+## References
+
+Full attack-scenario catalog, the Bilateral Receipt Pattern audit-logging
+specification, and EU AI Act Article 12 relevance are the whitepaper's own AST09
+section (source: the OWASP Agentic Skills Top 10 publication, section AST09 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)). This file is the delta on top of it.
+
+>>>>>>>>>> END INSTALLED SKILL: ast09-no-governance <<<<<<<<<<
+
+--- BEGIN REQUEST ---
+Sanity-check a coverage claim against AST09 before it goes out. Our EDR agent scanned every managed endpoint plus the internal package registry, and every agent skill it found matched an approved inventory entry — zero unmatched. I'm about to report 100% skill governance coverage to the risk committee on Thursday. Is that claim supportable?
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

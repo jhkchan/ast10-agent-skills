@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response concludes that neither the .docx nor the symlink is a finding, and gives a measured reason for each \u2014 a single-level archive with an ordinary compression ratio, and a symlink whose target resolves inside the package.",
+      "passed": false,
+      "evidence": "The response says the .docx is legitimate and the symlink is allowed, but does not mention a single\u2011level archive, compression ratio, or that the symlink target resolves inside the package."
+    },
+    {
+      "text": "The response reports the verdict against an explicitly stated scope (PASS, or PASS/INCOMPLETE with the incompleteness named) rather than as an unqualified 'clean' or 'no findings'.",
+      "passed": false,
+      "evidence": "The response never gives a PASS or scoped verdict; it only says \u201cIt\u2019s noise \u2014 wave it through\u201d and \u201cIt\u2019s a false positive.\u201d"
+    },
+    {
+      "text": "The response names at least one specific thing the check did not or could not cover, such as the declared uncompressed size in the zip central directory being attacker-controlled, or the archive never having been decompressed.",
+      "passed": false,
+      "evidence": "The response does not mention any limitation of the check such as uncompressed size or lack of decompression."
+    },
+    {
+      "text": "The response states the general rule that the presence of a carrier \u2014 an archive, a symlink, an external URL, a credential reference \u2014 is not by itself a conviction.",
+      "passed": false,
+      "evidence": "The response notes detectors overreact to innocuous features but does not explicitly state a rule that carrier presence is not a conviction."
+    },
+    {
+      "text": "The response names at least two of the concrete limits that were evaluated (for example archive nesting depth, member count, compression ratio, file count, file size, padding-run length, path escape, or symlink escape) rather than asserting the package is within limits without saying which.",
+      "passed": true,
+      "evidence": "The response lists \u201cNo padding, no resource exhaustion techniques, no out\u2011of\u2011bounds symlinks,\u201d naming padding and symlink\u2011escape limits."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST08-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:03:00.153013+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response identifies the finding as AST01-S10 Data Exfiltration, by scenario id or by the scenario title.",
+      "passed": true,
+      "evidence": "violates **AST01-S10: Data Exfiltration**, which is the scenario..."
+    },
+    {
+      "text": "The response names collector.attacker-drop.example as the destination hardcoded in the bundled script.",
+      "passed": true,
+      "evidence": "`https://collector.attacker-drop.example/ingest` ... hardcoded destination in `scripts/report.py`"
+    },
+    {
+      "text": "The response names status.example.com as the only host the manifest's network allowlist declares.",
+      "passed": true,
+      "evidence": "declares network access only to `status.example.com` under `permissions.network.allow`."
+    },
+    {
+      "text": "The response states that the finding is the contradiction between the script's destination and the manifest's declaration, not the presence of an outbound HTTP call.",
+      "passed": true,
+      "evidence": "The finding is **not** the presence of network egress, but the **contradiction** between the manifest\u2019s limited declaration and the script\u2019s actual communication..."
+    },
+    {
+      "text": "The response states that the same script would not be an AST01-S10 finding if the destination host appeared in the manifest's declared allowlist.",
+      "passed": true,
+      "evidence": "Add `https://collector.attacker-drop.example` to the `permissions.network.allow` list ... removing the contradiction."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST01-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T12:54:01.991189+00:00",
+  "grader_attempts": 2
+}

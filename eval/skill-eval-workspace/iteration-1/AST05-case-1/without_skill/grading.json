@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output identifies that the fetched response body is appended to the prompt with no wrapper, and states that the SKILL.md's stated wrapping rule is therefore not implemented.",
+      "passed": true,
+      "evidence": "No, `scripts/loader.py` does **not** wrap... it directly appends the fetched content ... without any sanitization or wrapping."
+    },
+    {
+      "text": "The output states that a declared boundary and an implemented boundary are indistinguishable to a static check \u2014 a function with a boundary-sounding name whose body returns its input unchanged would clear it \u2014 so reading the body is a required manual step.",
+      "passed": false,
+      "evidence": "Response contains nothing addressing the assertion about static checks or declared vs implemented boundaries."
+    },
+    {
+      "text": "The output labels the finding as an enabling precondition or artifact-signal rather than as coverage of a named AST05 scenario, and does not report a rug-pull, bait-and-switch, chaining, or relay-amplification verdict.",
+      "passed": false,
+      "evidence": "Response does not label finding as an enabling precondition or artifact\u2011signal and does not mention rug\u2011pull, bait\u2011and\u2011switch, chaining, or relay\u2011amplification."
+    },
+    {
+      "text": "The output makes no claim about what https://docs.example.com/runbook.md currently serves, will serve at run time, or serves to a different caller.",
+      "passed": true,
+      "evidence": "The answer never mentions what the URL currently serves, will serve, or serves to a different caller."
+    },
+    {
+      "text": "The output explains why this is AST05 and not AST01 by pointing out that the shipped package body carries no payload and the instruction arrives from referenced content.",
+      "passed": false,
+      "evidence": "Response does not explain why this is AST05 rather than AST01 or mention shipped package payload."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 3,
+    "total": 5,
+    "pass_rate": 0.4
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST05-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T12:59:01.010727+00:00",
+  "grader_attempts": 1
+}

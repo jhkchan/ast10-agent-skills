@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output reports a risk-tier contradiction and names the declared value `L0` as the under-declaration.",
+      "passed": true,
+      "evidence": "This creates a metadata contradiction: the declared `risk_tier` (L0) is strictly below the derived permission floor (L3)."
+    },
+    {
+      "text": "The output derives the floor from the declared permissions and names both contributing grants \u2014 shell execution and a non-shadowed write entry \u2014 rather than asserting a tier from the prose.",
+      "passed": true,
+      "evidence": "permission block grants `shell: true` and an effective write capability to `reports/summary.md`... must be classified at L3."
+    },
+    {
+      "text": "The output states that a tier declared ABOVE its derived floor is not a finding, i.e. the check is one-directional.",
+      "passed": false,
+      "evidence": "The response contains no statement that a tier declared above its derived floor is not a finding."
+    },
+    {
+      "text": "The output's remediation corrects the declared `risk_tier` rather than reducing or rewriting the permission block.",
+      "passed": true,
+      "evidence": "Fix: Change `risk_tier: L0` to `risk_tier: L3` to align the declared risk level with the permission-derived floor."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST04-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T12:57:47.400818+00:00",
+  "grader_attempts": 1
+}

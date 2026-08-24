@@ -1,0 +1,48 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response names exactly one primary or origin category and it is AST03.",
+      "passed": true,
+      "evidence": "\"**Origin:** AST03 \u2014 Over-Privileged Skills\" and \"`ast_id: AST03`\" indicate a single primary of AST03."
+    },
+    {
+      "text": "The response records AST08 as a contributing control failure rather than as a second primary or a co-equal category.",
+      "passed": true,
+      "evidence": "\"**Contributing failure:** - **AST08** \u2014 Poor Scanning\" shows AST08 recorded as a contributing failure."
+    },
+    {
+      "text": "The response attaches both an owner and an action to the contributing entry.",
+      "passed": false,
+      "evidence": "Response says \"owned by the team operating the scanning pipeline\" (owner) but provides no explicit action for the AST08 entry."
+    },
+    {
+      "text": "The response justifies the origin with a prevent-versus-catch distinction rather than by matching keywords in the finding's wording.",
+      "passed": true,
+      "evidence": "Mentions \"scanner\u2019s failure ... is a *catcher*, not a *preventer*\" reflecting a prevent\u2011versus\u2011catch justification."
+    },
+    {
+      "text": "The response states the condition under which AST08 would instead be the origin: when the scanner, its coverage claim, or a scan result is itself the thing under review.",
+      "passed": true,
+      "evidence": "States \"AST08 only owns the finding when the *scanner itself* is the artifact under review,\" satisfying the condition."
+    },
+    {
+      "text": "The response does not claim to have verified the finding or to have inspected any package.",
+      "passed": true,
+      "evidence": "No claim of verification; only says \"A scan of the package can confirm...\" which is hypothetical, not a statement of having inspected."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 1,
+    "total": 6,
+    "pass_rate": 0.8333
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "advisory-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T13:08:01.561784+00:00",
+  "grader_attempts": 1
+}

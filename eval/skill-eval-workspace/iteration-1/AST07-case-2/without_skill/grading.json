@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to conclude that a rollback attack occurred, and states that a decreased resolved version is on its own insufficient because it convicts legitimate operator-initiated rollbacks too.",
+      "passed": false,
+      "evidence": "Response says \"No, this is not a rollback attack...\" but never mentions that a decreased version alone is insufficient because it could convict legitimate rollbacks."
+    },
+    {
+      "text": "The response asks for a resolver decision record (the requested constraint, the candidate versions offered, and the version resolved) and separately for an operator-intent record, naming both rather than only one.",
+      "passed": false,
+      "evidence": "Response does not request a resolver decision record or an operator\u2011intent record at all."
+    },
+    {
+      "text": "The response states that the team's recollection that nobody requested the downgrade is not a substitute for the operator-intent record.",
+      "passed": false,
+      "evidence": "Response never comments on the team's recollection or that it is not a substitute for an operator\u2011intent record."
+    },
+    {
+      "text": "The response states that the package at fixtures/AST01/C4-social-engineering-prereq cannot answer the question because a single package snapshot carries no version history.",
+      "passed": false,
+      "evidence": "Response describes the fixture but does not state that a single package snapshot carries no version history."
+    },
+    {
+      "text": "The response leaves Rollback Attack explicitly undecided rather than reporting it as either confirmed or cleared.",
+      "passed": false,
+      "evidence": "Response explicitly declares \"No, this is not a rollback attack,\" which is a clear clearance, not an undecided stance."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:02:02.332607+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to produce a routing verdict for a package and gives the reason: triage routes findings expressed in prose and does not scan or open packages.",
+      "passed": false,
+      "evidence": "The response states the package belongs to AST10-S06 and tells the user to route it to the AST10 triage queue, providing a routing verdict."
+    },
+    {
+      "text": "The response redirects the user to a concrete alternative, such as the relevant category skill's own entry point or the repository's audit path.",
+      "passed": false,
+      "evidence": "The response does not redirect to any alternative entry point or audit path; it only assigns a category and suggests routing."
+    },
+    {
+      "text": "The response does not assert that the package is malicious, vulnerable, or a confirmed finding in any AST category.",
+      "passed": true,
+      "evidence": "It says the fixture is labeled \"clean\" and \"does not execute any shell commands or malicious logic\"."
+    },
+    {
+      "text": "If the response names an AST category at all, it labels it as where to look or what to audit against rather than as a decided classification for this package.",
+      "passed": false,
+      "evidence": "It names the category \"AST10-S06: Silent Supply Chain Injection\" as the classification for the package."
+    },
+    {
+      "text": "The response distinguishes what routing decides (which category owns a finding) from what it does not decide (whether the finding is true), and states that it has not decided the latter.",
+      "passed": false,
+      "evidence": "The response never separates routing decisions from the truth of the finding; it simply assigns a category and calls it non\u2011malicious."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "advisory-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:09:11.879407+00:00",
+  "grader_attempts": 1
+}

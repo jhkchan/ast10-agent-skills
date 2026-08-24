@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response identifies the finding as AST03-S03 Identity File Backdoors, by scenario id or by title.",
+      "passed": true,
+      "evidence": "This is an instance of **AST03-S03: Identity File Backdoors**"
+    },
+    {
+      "text": "The response names SOUL.md and MEMORY.md as the identity files the write list grants.",
+      "passed": true,
+      "evidence": "The manifest grants write access to `SOUL.md` and `MEMORY.md` \u2014 identity files"
+    },
+    {
+      "text": "The response names config/credentials.env as the only deny_write entry and states that it does not shadow the identity-file writes.",
+      "passed": false,
+      "evidence": "Response contains no mention of config/credentials.env"
+    },
+    {
+      "text": "The response states that a check asserting only that a deny_write floor exists is insufficient, because the evaluation is per-path rather than a presence test.",
+      "passed": false,
+      "evidence": "Response says the deny_write floor is not sufficient, but does not mention per\u2011path evaluation versus a presence test."
+    },
+    {
+      "text": "The response states that this finding is decidable from the permission manifest alone, without inspecting any bundled script or observing runtime behaviour.",
+      "passed": true,
+      "evidence": "Deciding this **does not require any of the package's scripts**... solely on the permission manifest; runtime behavior is not needed"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST03-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T12:56:38.522948+00:00",
+  "grader_attempts": 1
+}

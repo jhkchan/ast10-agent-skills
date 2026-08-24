@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to record AST09 as a pass, clean, or green for this package.",
+      "passed": true,
+      "evidence": "Do **not** tick AST09 as a pass, and do **not** put \"inconclusive.\""
+    },
+    {
+      "text": "The response also declines the 'inconclusive' wording, or explains why it misleads a reader in the same way 'clean' does.",
+      "passed": true,
+      "evidence": "Do **not** put \"inconclusive.\" ... \"inconclusive\" misleadingly implies the system was checked but results were ambiguous"
+    },
+    {
+      "text": "The response states that no scan of a single package can decide AST09, and gives the reason that approval, inventory and offboarding state are held by the organisation rather than inside the artifact.",
+      "passed": true,
+      "evidence": "AST09 is an organizational control finding, not a package-level one. None of that can be determined by inspecting `fixtures/AST10/C2-encoded-shell-payload`."
+    },
+    {
+      "text": "The response names at least three specific organisational records or checks that would decide it, such as an inventory row keyed on the content hash, the installer's identity and offboarding state, the credential the skill runs under, an execution record over a real interval, or the discovery method used.",
+      "passed": true,
+      "evidence": "You must examine: Whether this skill is recorded in an approved inventory (with installer, date, and hash); Whether the installer\u2019s identity is still active and properly offboarded; Whether execution decisions are logged via bilateral signed receipts; Whether your discovery method ..."
+    },
+    {
+      "text": "The response frames the outcome as a named missing system or process that should be written down as the finding, rather than as a status value, and does not advise closing the ticket on the scanner result.",
+      "passed": true,
+      "evidence": "Document which governance systems are missing or unverified. Closing the ticket ... Do not close the ticket."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-24T13:04:34.847063+00:00",
+  "grader_attempts": 1
+}

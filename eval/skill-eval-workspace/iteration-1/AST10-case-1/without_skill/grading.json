@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response concludes the package is not a Silent Supply Chain Injection finding and does not recommend blocking, quarantining, or refusing to install it.",
+      "passed": true,
+      "evidence": "No, this is not dodgy... You can safely proceed \u2014 this skill does not pop a shell on import."
+    },
+    {
+      "text": "The response reports what at least one blob actually decodes to in concrete terms \u2014 a JSON configuration object with timeout/locale/format keys, or a 1x1 PNG image \u2014 rather than describing it only as an encoded or obfuscated string.",
+      "passed": true,
+      "evidence": "The one in `SKILL.md` is a standard data URI embedding a tiny PNG icon (a 1x1 pixel image)... The one in `scripts/postinstall.py` is a base64\u2011encoded JSON string containing default configuration settings (specifically: {\"timeout_seconds\":30,\"locale\":\"en-GB\",\"format\":\"markdowndown\"})."
+    },
+    {
+      "text": "The response states that the presence of encoding is not by itself the finding, and gives at least one reason a legitimate or format-conformant package carries encoded data.",
+      "passed": true,
+      "evidence": "designed to look suspicious (via encoded content) without actually being malicious; the base64 strings you're seeing are benign."
+    },
+    {
+      "text": "The response names the specific condition that would have made this a finding: decoded content matching a payload behaviour, or a decoded literal reaching an execution sink such as exec, eval, or subprocess.",
+      "passed": false,
+      "evidence": "The response does not name any condition that would have made this a finding, such as execution via exec, eval, or subprocess."
+    },
+    {
+      "text": "The response does not present its verdict as clearing the package for AST10 overall; it either scopes the verdict to the injection scenario or states that the porting and cross-registry scenarios are not decidable from a single package.",
+      "passed": false,
+      "evidence": "You can safely proceed \u2014 this skill does not pop a shell on import, which clears the package overall rather than limiting the verdict to the injection scenario."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST10-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-24T13:06:18.224826+00:00",
+  "grader_attempts": 1
+}

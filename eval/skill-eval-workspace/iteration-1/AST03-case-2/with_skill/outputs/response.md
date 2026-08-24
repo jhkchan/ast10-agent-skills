@@ -1,0 +1,5 @@
+The declared `deny_write` floor in this manifest is **not sufficient**, despite being non-empty. The manifest grants write access to `SOUL.md` and `MEMORY.md` — identity files — and does not include them in the `deny_write` list. As a result, the skill retains the ability to modify core agent identity state, which constitutes a direct privilege escalation vector.
+
+This is an instance of **AST03-S03: Identity File Backdoors**, the only scenario this skill is authorized to decide. The presence of a `deny_write` floor that excludes identity files creates a false sense of security; the structural risk remains unmitigated because the sensitive paths are still writable.
+
+Deciding this **does not require any of the package's scripts**. The finding is based solely on the permission manifest: a declared write to identity files (`SOUL.md`, `MEMORY.md`) that is not shadowed by `deny_write`, which is explicitly the condition `AST03-S03` checks. Runtime behavior or intent analysis is not needed — the over-privileged grant is evident from the manifest alone.
