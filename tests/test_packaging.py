@@ -22,7 +22,14 @@ What each group asserts, and why it is worth a test:
     — non-empty is the floor, not the bar. The attribution claims are load-
     bearing for a repo named after a standards body it is not part of, so the
     non-endorsement disclaimer and the three provenance records (whitepaper,
-    vendored pipeline, pinned rubric) are asserted by content.
+    vendored pipeline, vendored skill-judge rubric) are asserted by content.
+    Attribution rots the same way a number does, and worse: a notice that
+    misdescribes what it redistributes is a licence problem, not a typo. So
+    the notices are checked against the tree they describe (`vendor/skill-
+    judge/` existing forbids NOTICE from calling the rubric un-vendored), and
+    the README is checked for the credit itself — the work, its author, its
+    licence, its URL — because burying a rubric's credit in NOTICE while
+    publishing its scores on the front page is credit by silence.
 """
 
 from __future__ import annotations
@@ -44,6 +51,11 @@ CODEOWNERS_PATH = REPO_ROOT / "CODEOWNERS"
 NOTICE_PATH = REPO_ROOT / "NOTICE"
 THIRD_PARTY_PATH = REPO_ROOT / "THIRD_PARTY_LICENSES.md"
 GITIGNORE_PATH = REPO_ROOT / ".gitignore"
+README_PATH = REPO_ROOT / "README.md"
+VENDORED_RUBRIC = REPO_ROOT / "vendor" / "skill-judge" / "SKILL.md"
+
+#: The project this repository implements and is named after. Linked, not just named.
+OWASP_PROJECT_URL = "https://owasp.org/www-project-agentic-skills-top-10/"
 
 FRONTMATTER_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 
@@ -376,10 +388,135 @@ def test_third_party_licenses_covers_every_attributed_component():
         assert needle in text, f"THIRD_PARTY_LICENSES.md does not record {needle}"
 
 
-def test_third_party_licenses_is_honest_that_the_rubric_is_not_vendored():
+def test_notice_describes_the_rubric_as_vendored_once_the_tree_is_there():
+    """The failure this guards actually happened.
+
+    NOTICE section 2 was written when the rubric was pinned by SHA and nothing
+    more, and said so: "not vendored as a tree", "no copy of its text ships
+    here". Then `vendor/skill-judge/SKILL.md` landed — the rubric redistributed
+    verbatim — and the notice was not touched. A redistribution notice that
+    misdescribes what was redistributed is the wrong kind of wrong for an MIT
+    obligation, so the two are tied together here: while the tree exists,
+    NOTICE must not deny it.
+    """
+    if not VENDORED_RUBRIC.is_file():
+        pytest.skip("no vendored rubric tree; NOTICE's pin-only description would be correct")
+    text = NOTICE_PATH.read_text(encoding="utf-8")
+    flat = " ".join(text.split()).lower()
+    for denial in (
+        "not vendored as a tree",
+        "is not vendored",
+        "not yet vendored",
+        "no copy of its text ships",
+        "no copy of the rubric text ships",
+        "the rubric tree itself is not vendored",
+    ):
+        assert denial not in flat, (
+            f"vendor/skill-judge/SKILL.md exists, but NOTICE still says {denial!r}. "
+            "The rubric is redistributed here; NOTICE must describe the copy, not deny it."
+        )
+    assert "vendor/skill-judge/SKILL.md" in text, "NOTICE must name the vendored rubric file"
+    assert "vendor/skill-judge/LICENSE" in text, (
+        "MIT requires the license text to travel with the copy; NOTICE must say where it is"
+    )
+    assert "vendor/skill-judge/PROVENANCE.md" in text
+
+
+def test_notice_keeps_the_two_rubric_pins_distinct():
+    """`RUBRIC_SHA` and `RUBRIC_CONTENT_SHA256` are different instruments.
+
+    One names an upstream commit and cannot be recomputed here; the other
+    hashes the vendored bytes and is recomputed by `tests/test_rubric_pin.py`
+    on every run. Collapsing them into "the pin" is how a notice starts
+    claiming a verification the repo does not perform.
+    """
+    from scripts.ship_floor import RUBRIC_CONTENT_SHA256, RUBRIC_SHA
+
+    text = NOTICE_PATH.read_text(encoding="utf-8")
+    assert RUBRIC_SHA in text
+    assert RUBRIC_CONTENT_SHA256 in text, "NOTICE must record the content hash of the vendored bytes"
+    flat = " ".join(text.split()).lower()
+    assert "upstream commit" in flat, "NOTICE must say RUBRIC_SHA is an upstream commit id"
+    assert "cannot be" in flat and "recomputed" in flat, (
+        "NOTICE must say the upstream commit id is not recomputable from inside this repo"
+    )
+    assert "tests/test_rubric_pin.py" in text, (
+        "NOTICE must name what recomputes RUBRIC_CONTENT_SHA256, or the pin is decorative"
+    )
+
+
+def test_third_party_licenses_describes_the_vendored_rubric_tree():
     text = THIRD_PARTY_PATH.read_text(encoding="utf-8")
-    assert "not vendored" in text.lower()
-    assert "**No copy of the rubric text ships in this repository.**" in text
+    flat = " ".join(text.split()).lower()
+    if VENDORED_RUBRIC.is_file():
+        for denial in (
+            "no copy of the rubric text ships in this repository",
+            "not vendored as a tree",
+            "pinned but not vendored",
+            "is tracked as follow-up work",
+        ):
+            assert denial not in flat, f"THIRD_PARTY_LICENSES.md still says {denial!r}"
+        for needle in (
+            "vendor/skill-judge/SKILL.md",
+            "vendor/skill-judge/LICENSE",
+            "vendor/skill-judge/PROVENANCE.md",
+        ):
+            assert needle in text, f"THIRD_PARTY_LICENSES.md does not record {needle}"
+
+
+def test_readme_credits_skill_judge_by_work_author_and_licence():
+    """The rubric is the substance of every quality claim the README makes.
+
+    The eight dimensions, the 120 points and the per-dimension floors the ship
+    gate enforces are skill-judge's definitions, not this project's. A README
+    that publishes those numbers while naming the rubric only inside a
+    filename (`docs/skill-judge-dashboard.md`) is taking credit by silence, so
+    the credit is asserted by its parts: the work, the upstream, the author,
+    the licence, the vendored path, and the content pin that makes a score
+    attributable to specific rubric bytes.
+    """
+    text = README_PATH.read_text(encoding="utf-8")
+    flat = " ".join(text.split())
+    for needle, why in (
+        ("skill-judge", "the work's name"),
+        ("softaworks/agent-toolkit", "the upstream project"),
+        ("Leonardo Flores", "the copyright holder"),
+        ("MIT", "the licence the rubric ships under"),
+        ("vendor/skill-judge/SKILL.md", "where the vendored rubric lives"),
+        ("RUBRIC_CONTENT_SHA256", "the content pin a score is attributable through"),
+    ):
+        assert needle in flat, f"README.md must name {needle!r} — {why} — when crediting the rubric"
+    assert "https://github.com/softaworks/agent-toolkit" in flat, "the credit must be clickable, not just a slug"
+
+
+def test_readme_does_not_overclaim_the_skill_judge_relationship():
+    """Vendoring and applying someone's rubric is not authoring it, and is not
+    their endorsement — the same distinction the OWASP disclaimer draws."""
+    flat = " ".join(README_PATH.read_text(encoding="utf-8").split()).lower()
+    for overclaim in (
+        "our rubric",
+        "this repository's rubric",
+        "endorsed by softaworks",
+        "in partnership with softaworks",
+    ):
+        assert overclaim not in flat, f"README.md must not claim: {overclaim!r}"
+    assert "did not author it" in flat, "the README must say outright that this repo did not author the rubric"
+
+
+def test_readme_links_the_owasp_project_page():
+    """The repository is named after a project it never linked.
+
+    First mention in the opening paragraph and again in the non-endorsement
+    section, which is exactly where a reader goes looking for the real thing.
+    """
+    lines = README_PATH.read_text(encoding="utf-8").splitlines()
+    hits = [i for i, line in enumerate(lines) if OWASP_PROJECT_URL in line]
+    assert hits, f"README.md never links {OWASP_PROJECT_URL}"
+    assert hits[0] < 10, f"the first mention must carry the link; found the earliest at line {hits[0] + 1}"
+    disclaimer = next(i for i, line in enumerate(lines) if "Not an OWASP project" in line)
+    assert any(i > disclaimer for i in hits), (
+        "the 'Not an OWASP project' section must link the real project a reader is being sent to"
+    )
 
 
 def test_rubric_sha_in_the_docs_matches_the_constant_that_enforces_it():

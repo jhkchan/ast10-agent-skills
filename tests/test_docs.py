@@ -299,20 +299,124 @@ def _manifest_f1_state(category: str) -> str:
     return str(published)
 
 
+#: One chunk of a manifest `published_f1` string: a scope, a value, and the
+#: corpus size it was measured over, behind whatever parenthetical detail the
+#: manifest chose to carry in front of `n=`.
+F1_CHUNK_RE = re.compile(r"^(?P<scope>[a-z][a-z-]+)\s+(?P<value>\d(?:\.\d+)?)\s*\((?:[^)]*,\s*)?n=(?P<n>\d+)\)$")
+
+#: The only two scopes an F1 may be published under. `mixed-proxy` is a
+#: category-level word for "both of these", never a scope a number carries.
+F1_SCOPES = frozenset({"scenario-level", "artifact-signal-only"})
+
+
+def _manifest_f1_parts(category: str) -> list[tuple[str, float, int]]:
+    """(scope, value, n) triples for one category, parsed out of the manifest.
+
+    The parse is the point. The README prints every F1 in one shape, and a
+    normalisation that is typed rather than derived is exactly the drift these
+    tests exist to catch. Two things are re-derived on the way through: the
+    per-scope corpus sizes must sum to the manifest's own `cases_present`, so a
+    split that stops accounting for the whole corpus fails here instead of
+    being published, and every scope must be one the labels define.
+    """
+    entry = _manifest_category(category)
+    published = entry.get("published_f1")
+    cases = int((entry.get("registry_coverage") or {}).get("cases_present") or 0)
+    if published in (None, "null"):
+        return []
+    if isinstance(published, (int, float)):
+        # AST10 alone stores a bare float; its scope lives in the sibling field.
+        scope = str(entry.get("f1_scope") or "").strip()
+        assert scope in F1_SCOPES, f"{category} publishes a bare F1 with no scope to label it: {scope!r}"
+        return [(scope, float(published), cases)]
+    parts: list[tuple[str, float, int]] = []
+    for chunk in str(published).split(";"):
+        match = F1_CHUNK_RE.match(chunk.strip())
+        assert match, f"{category}: unparsable published_f1 chunk {chunk.strip()!r}"
+        parts.append((match["scope"], float(match["value"]), int(match["n"])))
+    unknown = {scope for scope, _, _ in parts} - F1_SCOPES
+    assert not unknown, f"{category}: published_f1 uses undefined scope(s) {sorted(unknown)}"
+    accounted = sum(n for *_, n in parts)
+    assert accounted == cases, (
+        f"{category}: published_f1 accounts for n={accounted}, but the manifest records {cases} labeled cases"
+    )
+    return parts
+
+
+def _normalised_f1(category: str) -> str:
+    """The README's single presentation of an F1: `scope value (n=N)`, joined by ` + `."""
+    parts = _manifest_f1_parts(category)
+    if not parts:
+        return f"`{_manifest_f1_state(category)}`"
+    return " + ".join(f"`{scope} {value:.2f} (n={n})`" for scope, value, n in parts)
+
+
 @pytest.mark.parametrize("category", AST_IDS)
 def test_readme_skills_table_matches_the_fixture_manifest(category):
-    """A README that drifts from the manifests is worse than no README."""
-    rows = [line for line in README.read_text(encoding="utf-8").splitlines() if line.startswith(f"| {category} |")]
-    assert len(rows) == 1, f"README skills table needs exactly one {category} row"
-    state = _manifest_f1_state(category)
-    assert f"`{state}`" in rows[0], f"README says something other than {state!r} for {category}: {rows[0]}"
+    """A README that drifts from the manifests is worse than no README.
+
+    Two assertions, because the section presents each F1 twice on purpose. The
+    measured-results table prints every number in one shape so the column can
+    be scanned — `1.000`, `1.00` and a bare `1.0` were three renderings of the
+    same claim — and the skill's own block quotes the manifest string verbatim,
+    parenthetical and all, so the normalisation stays auditable. Both sides are
+    derived from `fixtures/manifest.yaml` here; neither is typed.
+    """
+    normalised = _normalised_f1(category)
+    cell = _results_row(category)[1]
+    assert cell == normalised, f"README's F1 cell for {category} is {cell!r}; the manifest normalises to {normalised!r}"
+    verbatim = _manifest_f1_state(category)
+    assert f"`{verbatim}`" in _readme_detail_block(category), (
+        f"{category}'s block must quote fixtures/manifest.yaml verbatim: `{verbatim}`"
+    )
 
 
 def test_readme_skills_table_covers_every_skill():
-    text = README.read_text(encoding="utf-8")
+    """Both tables, because the section splits identity from measurement."""
+    roster = _readme_table(README_ROSTER_COLUMNS)
+    results = _readme_table(README_RESULTS_COLUMNS)
     for category in AST_IDS:
-        assert f"| {category} |" in text
-    assert "`advisory`" in text
+        assert category in roster, f"README skills roster has no {category} row"
+        declared = _skill_name(category)
+        assert roster[category][1] == f"`{declared}`", (
+            f"the roster names {roster[category][1]} for {category}; SKILL.md declares {declared!r}"
+        )
+    assert {row[1] for row in roster.values()} == set(results), (
+        "the roster and the measured-results table must list the same eleven skills"
+    )
+    assert f"`{_skill_name('advisory')}`" in results
+
+
+@pytest.mark.parametrize("category", AST_IDS)
+def test_every_category_keeps_its_long_form_detector_description(category):
+    """The roster cell is a one-liner; the paragraph it summarises must survive.
+
+    This is the guard on the relocation. The long per-detector prose used to sit
+    inside the table — one 60-to-90-word paragraph per cell, which is what made
+    the section unreadable — and now sits in a per-skill block under the roster.
+    A block deleted or emptied would leave the front page publishing a check
+    roster it never describes, which is worse than the wall of text was.
+    """
+    block = _readme_detail_block(category)
+    assert f"<code>{_skill_name(category)}</code>" in block, f"{category}'s block must name the skill it describes"
+    assert f"skills/{category}/coverage-matrix.md" in block, (
+        f"{category}'s block must point at its scenario-by-scenario matrix"
+    )
+    words = len(re.sub(r"<[^>]+>", " ", block).split())
+    assert words >= 40, f"{category}'s block is {words} words — the long-form description is gone"
+
+
+def test_the_advisory_row_publishes_no_f1_because_it_has_no_corpus():
+    """`advisory` is judged, never measured, and the table must not blur that."""
+    data = yaml.safe_load(FIXTURE_MANIFEST.read_text(encoding="utf-8")) or {}
+    assert "advisory" not in (data.get("categories") or {}), (
+        "advisory now has a fixture corpus; the README must publish its F1 like every other skill"
+    )
+    cell = _results_row("advisory")[1]
+    assert not re.search(r"\d", cell), f"advisory publishes no F1; its cell must carry no number, got {cell!r}"
+    assert "no F1" in _readme_detail_block("advisory"), (
+        "advisory's block must say outright that it publishes no F1, not leave the dash unexplained"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -460,6 +564,7 @@ PATH_ROOTS = frozenset(
     {
         "skills",
         "scenarios",
+        "vendor",
         "fixtures",
         "detectors",
         "validators",
@@ -702,24 +807,83 @@ def _derived_detector_state(category: str) -> str:
     return "implemented"
 
 
-def _readme_row(category: str) -> list[str]:
-    rows = [line for line in README.read_text(encoding="utf-8").splitlines() if line.startswith(f"| {category} |")]
-    assert len(rows) == 1, f"README skills table needs exactly one {category} row"
-    return [cell.strip() for cell in rows[0].strip().strip("|").split("|")]
+def _readme_pipe_tables() -> list[tuple[tuple[str, ...], dict[str, list[str]]]]:
+    """Every pipe table in README.md as (header tuple, rows keyed by first cell).
+
+    Parsed by header rather than by line prefix, because the skills section now
+    splits its data across two tables and both of them key on a skill. A
+    `startswith("| AST01 |")` scan cannot tell them apart; a header can.
+    """
+    tables: list[tuple[tuple[str, ...], dict[str, list[str]]]] = []
+    header: tuple[str, ...] | None = None
+    for line in README.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            header = None
+            continue
+        cells = tuple(cell.strip() for cell in stripped.strip("|").split("|"))
+        if header is None:
+            header = cells
+            tables.append((header, {}))
+            continue
+        if set("".join(cells)) <= set("-:"):
+            continue  # the |---|---| rule under the header
+        assert len(cells) == len(header), f"README table '{' | '.join(header)}' has a {len(cells)}-cell row: {stripped}"
+        tables[-1][1][cells[0]] = list(cells)
+    return tables
 
 
-#: Column order of the README skills table, so a row that gains or loses a cell
-#: fails loudly instead of silently shifting what every index below refers to.
-README_SKILL_COLUMNS = ("AST", "Skill", "decides", "Detector state", "F1", "Judged")
+#: The two tables the skills section splits its data across, by exact header.
+#: A column renamed, added or dropped fails here loudly instead of silently
+#: shifting what every index below refers to.
+README_ROSTER_COLUMNS = ("AST", "Skill", "What the detector decides", "Detector state")
+README_RESULTS_COLUMNS = ("Skill", "F1 (measured)", "Judged (run 5)")
+
+
+def _readme_table(columns: tuple[str, ...]) -> dict[str, list[str]]:
+    matching = [rows for header, rows in _readme_pipe_tables() if header == columns]
+    assert len(matching) == 1, (
+        f"README.md must carry exactly one table headed '{' | '.join(columns)}', found {len(matching)}"
+    )
+    return matching[0]
+
+
+def _skill_name(directory: str) -> str:
+    """The installed skill name, from the package's own frontmatter."""
+    body = (SKILLS_DIR / directory / "SKILL.md").read_text(encoding="utf-8")
+    match = re.search(r"^name:\s*(\S+)\s*$", body, re.M)
+    assert match, f"skills/{directory}/SKILL.md declares no name in its frontmatter"
+    return match.group(1)
+
+
+def _roster_row(category: str) -> list[str]:
+    rows = _readme_table(README_ROSTER_COLUMNS)
+    assert category in rows, f"README skills roster has no {category} row"
+    return rows[category]
+
+
+def _results_row(directory: str) -> list[str]:
+    rows = _readme_table(README_RESULTS_COLUMNS)
+    key = f"`{_skill_name(directory)}`"
+    assert key in rows, f"README measured-results table has no {key} row"
+    return rows[key]
+
+
+def _readme_detail_block(label: str) -> str:
+    """The one `<details>` block README.md devotes to a skill, by its bold label."""
+    blocks = re.findall(r"<details>.*?</details>", README.read_text(encoding="utf-8"), re.S)
+    hits = [b for b in blocks if f"<b>{label}</b>" in b]
+    assert len(hits) == 1, f"README.md must carry exactly one <details> block for {label}, found {len(hits)}"
+    return hits[0]
 
 
 @pytest.mark.parametrize("category", AST_IDS)
 def test_readme_detector_state_matches_the_state_derived_from_the_manifests(category):
     """The blocking finding, as a test: no row may describe a check that does not exist."""
     state = _derived_detector_state(category)
-    cells = _readme_row(category)
-    assert len(cells) == len(README_SKILL_COLUMNS), (
-        f"{category} row must be {' | '.join(README_SKILL_COLUMNS)}, got {len(cells)} cells"
+    cells = _roster_row(category)
+    assert len(cells) == len(README_ROSTER_COLUMNS), (
+        f"{category} row must be {' | '.join(README_ROSTER_COLUMNS)}, got {len(cells)} cells"
     )
     assert cells[3] == f"`{state}`", (
         f"README says detector state {cells[3]!r} for {category}; the manifests derive {state!r}"
@@ -735,26 +899,27 @@ def _recorded_verdict(skill: str) -> tuple[str, float] | None:
     return payload["verdict"], payload["aggregate"]["mean"]
 
 
-@pytest.mark.parametrize("category", AST_IDS)
-def test_readme_judged_column_matches_the_recorded_scorecards(category):
+@pytest.mark.parametrize("skill", (*AST_IDS, "advisory"))
+def test_readme_judged_column_matches_the_recorded_scorecards(skill):
     """The front page may not publish a verdict the gate did not produce.
 
     Same rule as the detector-state column, applied to the other measurement the
-    table now carries: the value is derived from `eval/scorecards/`, never typed.
+    section carries: the value is derived from `eval/scorecards/`, never typed.
     A README that says SHIP where the scorecard says BLOCKED is the most costly
     possible drift, because it is the one claim a reader takes at face value and
-    never checks.
+    never checks. `advisory` is checked here too — it holds a scorecard like
+    every other skill and is one of the eleven the ship count counts.
     """
-    recorded = _recorded_verdict(category)
-    cell = _readme_row(category)[5]
+    recorded = _recorded_verdict(skill)
+    cell = _results_row(skill)[2]
     if recorded is None:
         assert "not judged" in cell.lower(), (
-            f"{category} has no scorecard in eval/scorecards/; its Judged cell must say so, got {cell!r}"
+            f"{skill} has no scorecard in eval/scorecards/; its Judged cell must say so, got {cell!r}"
         )
         return
     verdict, mean = recorded
-    assert verdict in cell, f"README says {cell!r} for {category}; eval/scorecards/ records {verdict}"
-    assert f"{mean}" in cell, f"README's Judged cell for {category} omits the recorded pooled mean {mean}"
+    assert verdict in cell, f"README says {cell!r} for {skill}; eval/scorecards/ records {verdict}"
+    assert f"{mean}" in cell, f"README's Judged cell for {skill} omits the recorded pooled mean {mean}"
 
 
 def test_readme_ship_count_matches_the_recorded_scorecards():
@@ -781,7 +946,7 @@ def test_readme_declared_and_uncovered_rows_promise_no_detection(category):
     """A category with no shipped check may not be described in the present tense."""
     if _derived_detector_state(category) != "declared-and-uncovered":
         return
-    decides = _readme_row(category)[2]
+    decides = _roster_row(category)[2]
     assert "No check ships" in decides, (
         f"{category} ships no detector check; its README cell must say so outright, not describe detection: {decides!r}"
     )
@@ -799,7 +964,7 @@ def _detector_check_count(category: str) -> int:
 @pytest.mark.parametrize("category", AST_IDS)
 def test_readme_check_count_matches_the_detector_module(category):
     """ "Ten checks:" has to be ten checks. Counting them is one import away."""
-    decides = _readme_row(category)[2]
+    decides = _roster_row(category)[2]
     actual = _detector_check_count(category)
     match = re.match(r"\*?\*?([A-Za-z]+) checks?\b", decides)
     word = match.group(1).lower() if match else None
@@ -956,7 +1121,12 @@ def test_docs_describe_the_content_hash_surface_the_code_defines():
     for pattern in SURFACE_GLOBS:
         assert f"`{pattern}`" in flat, f"docs/architecture.md must name surface glob {pattern!r}"
     if UNPOPULATED_SURFACE_GLOBS:
-        assert "match **no file in this repository**" in flat, (
+        # The verb is deliberately outside the match. When `evals/evals.json`
+        # moved into POPULATED_SURFACE_GLOBS the prose went from "two of those
+        # four patterns match" to "one of those four patterns matches", and an
+        # assertion that pinned the plural failed on correct documentation.
+        # What has to be present is the claim, not its subject-verb agreement.
+        assert "**no file in this repository**" in flat, (
             "docs/architecture.md must say which surface globs match nothing here"
         )
     assert set(POPULATED_SURFACE_GLOBS) | set(UNPOPULATED_SURFACE_GLOBS) == set(SURFACE_GLOBS)
@@ -1406,7 +1576,7 @@ def test_the_readme_rows_sum_to_the_shipped_check_count():
     """The table is the only place the total is derivable, so its parts must add up."""
     stated = 0
     for category in AST_IDS:
-        match = re.match(r"\*?\*?([A-Za-z]+) checks?\b", _readme_row(category)[2])
+        match = re.match(r"\*?\*?([A-Za-z]+) checks?\b", _roster_row(category)[2])
         if match:
             stated += NUMBER_WORDS.get(match.group(1).lower(), 0)
     assert stated == sum(_detector_check_count(c) for c in AST_IDS)

@@ -8,7 +8,7 @@ someone else owns.
 | --- | --- | --- | --- | --- |
 | 0 | OWASP Agentic Skills Top 10 whitepaper | source material | see below | OWASP project + contributors |
 | 1 | `scripts/ship_floor.py`, `scripts/content_hash.py`, `scripts/eval_counts.py` | vendored copy, commit-pinned | Apache-2.0 | 2026 Votee AI |
-| 2 | skill-judge 8-dimension rubric | pinned by SHA, not vendored | MIT | (c) 2026 Leonardo Flores |
+| 2 | skill-judge 8-dimension rubric (`vendor/skill-judge/`) | vendored verbatim, commit- and content-pinned | MIT | (c) 2026 Leonardo Flores |
 | 3 | `PyYAML`, `jsonschema`, `cryptography` | installed dependency | MIT / MIT / Apache-2.0 OR BSD-3-Clause | upstream |
 
 ## Source material — the OWASP Agentic Skills Top 10 whitepaper
@@ -145,51 +145,72 @@ dependency that nothing records is the AST02 shape this repo is about.
 All three are inside the acceptable license families above, so no compatibility
 review is outstanding.
 
-## Rubric pin — skill-judge (not vendored as a tree)
+## Vendored rubric — skill-judge (MIT)
 
 | Field | Value |
 | --- | --- |
-| Work | skill-judge, the 8-dimension agent-skill grading rubric (`skills/skill-judge`) |
-| Upstream | [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) |
+| Work | skill-judge, the 8-dimension agent-skill grading rubric (upstream path `skills/skill-judge` — not a path in this repository; the copy lives at `vendor/skill-judge/`) |
+| Upstream | [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/tree/main/skills/skill-judge) |
 | Copyright | (c) 2026 Leonardo Flores |
 | License | MIT |
-| Pinned at | `3027f20f3181758385a1bb8c022d4041dfb4de84` |
-| Where the pin lives | `scripts/ship_floor.py`, constant `RUBRIC_SHA` |
-| Enforced by | `ship_floor.py` rejects any recorded `aggregate.rubric_sha` that differs |
+| Vendored at | [`vendor/skill-judge/SKILL.md`](vendor/skill-judge/SKILL.md), verbatim, unmodified |
+| License text shipped | [`vendor/skill-judge/LICENSE`](vendor/skill-judge/LICENSE) — MIT, (c) 2026 Leonardo Flores |
+| Provenance record | [`vendor/skill-judge/PROVENANCE.md`](vendor/skill-judge/PROVENANCE.md) |
+| Upstream commit pin | `3027f20f3181758385a1bb8c022d4041dfb4de84` — `RUBRIC_SHA` in `scripts/ship_floor.py` |
+| Content pin | `737ef3628f0e11353114c3bd05a1c9d0c448dbfec1ae85db839253cbe93198b6` — `RUBRIC_CONTENT_SHA256`, same file |
+| Enforced by | `ship_floor.py` rejects any recorded `aggregate.rubric_sha` that differs; `tests/test_rubric_pin.py` recomputes the content hash from the vendored bytes; `scripts/judge_harness.py` refuses to build a prompt when they disagree |
 
 The rubric is the substance behind this repo's ship gate: the per-dimension
 floors `FLOORS` enumerates (`D1:17, D2:13, D3:13, D4:13, D5:13, D6:13, D7:8,
 D8:13`) are that rubric's dimensions, and spec.md's contract is that skills are
-"scored ... against the pinned 8-dimension skill-judge rubric." It is
-attributed here in full even though only its identifying hash is embedded.
+"scored ... against the pinned 8-dimension skill-judge rubric."
 
-**No copy of the rubric text ships in this repository.** `RUBRIC_SHA`
-constrains *which version* a recorded `scores.json` may claim to have been
-judged against; it does not reproduce the rubric. The upstream eval-harness
-repository this project vendors its scoring pipeline from does carry a
-`vendor/skill-judge/` tree, which is how the SHA is known. Vendoring an
-equivalent tree here — with the MIT license text alongside it, as MIT requires
-of a copy — is tracked as follow-up work and is not silently assumed done. Until
-then, a reader who wants the rubric text goes to the upstream above.
+**The rubric text does ship in this repository**, verbatim, at
+`vendor/skill-judge/SKILL.md`. That makes this a redistribution, not merely a
+citation, so the MIT obligation attaches in full: the license text and the
+copyright notice ship beside the copy, in `vendor/skill-judge/LICENSE`, and
+`vendor/skill-judge/PROVENANCE.md` records where the bytes came from. The
+vendored bytes are unmodified and must stay so — an edit would break the content
+pin and invalidate every recorded score at once.
+
+**The two pins are different instruments and neither substitutes for the
+other.** `RUBRIC_SHA` is the *upstream commit id*: it names which revision of
+`softaworks/agent-toolkit` the rubric came from, and nothing inside this
+repository can recompute it, so on its own it is a claim rather than a check.
+`RUBRIC_CONTENT_SHA256` is the sha256 of the vendored bytes: it *is*
+recomputable here, and `tests/test_rubric_pin.py` recomputes it on every run.
+Vendoring is what closed the gap — before it, the only pin was the one that
+could not be verified from inside the tree.
 
 softaworks/agent-toolkit does not endorse and is not affiliated with this
-repository.
+repository. This project vendors and applies the rubric; it did not author it.
 
 ## Audit metadata
 
-- **Audit date:** 2026-08-23 (supersedes the 2026-08-21 T-2.2 pass; scope
-  widened from the vendored files alone to every third-party component,
-  including the source-material and rubric attributions)
+- **Audit date:** 2026-08-24 (supersedes the 2026-08-23 pass, which recorded the
+  skill-judge rubric as a bare SHA pin with no tree beside it; the tree has since
+  landed, so this pass re-describes what is actually redistributed. That in turn
+  superseded the 2026-08-21 T-2.2 pass, which scoped only the vendored files)
 - **Scope:** `scripts/ship_floor.py`, `scripts/content_hash.py`,
-  `scripts/eval_counts.py` (vendored); the skill-judge `RUBRIC_SHA` pin; the
+  `scripts/eval_counts.py` and `vendor/skill-judge/` (vendored); the
+  skill-judge `RUBRIC_SHA` and `RUBRIC_CONTENT_SHA256` pins; the
   OWASP Agentic Skills Top 10 whitepaper as source material; `PyYAML`,
   `jsonschema`, `cryptography` as installed dependencies
 - **This repo's license:** Apache-2.0 (root `LICENSE`, Copyright 2026 Jacky
   Chan) — present and asserted, no longer pending
 - **Scan result:** PASS — every license family present (Apache-2.0 for the
-  vendored pipeline and this repo; MIT for the pinned rubric and two
+  vendored pipeline and this repo; MIT for the vendored rubric and two
   dependencies; Apache-2.0 OR BSD-3-Clause for `cryptography`) sits inside the
   acceptable set above and is mutually compatible. No copyleft component is
   present, so no reciprocal obligation attaches.
-- **Outstanding:** the skill-judge rubric tree is pinned but not vendored (see
-  above). This is a completeness gap in the audit, recorded rather than closed.
+- **Redistribution obligations:** two components are redistributed rather than
+  merely depended on. Apache-2.0 section 4 for `scripts/ship_floor.py`,
+  `content_hash.py` and `eval_counts.py` is met by the holder, license and pinned
+  commit recorded above plus the root `LICENSE` and `NOTICE`. MIT is met for
+  `vendor/skill-judge/SKILL.md` by `vendor/skill-judge/LICENSE` shipping the
+  license text and copyright notice beside the copy.
+- **Outstanding:** none. The one gap the previous pass recorded — a rubric
+  identified only by a hash nobody here could check — is closed: the tree ships
+  at `vendor/skill-judge/` with its license and provenance, and
+  `tests/test_rubric_pin.py` verifies the bytes against `RUBRIC_CONTENT_SHA256`
+  on every run.

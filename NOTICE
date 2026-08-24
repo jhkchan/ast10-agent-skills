@@ -88,25 +88,57 @@ THIRD_PARTY_LICENSES.md. The upstream eval-harness repository does not endorse
 and is not affiliated with this repository.
 
 --------------------------------------------------------------------------------
-2. skill-judge rubric — pinned by SHA, not vendored as a tree (MIT)
+2. skill-judge rubric — vendored verbatim at vendor/skill-judge/ (MIT)
 --------------------------------------------------------------------------------
 
-scripts/ship_floor.py's RUBRIC_SHA constant
-(3027f20f3181758385a1bb8c022d4041dfb4de84) pins a version of the 8-dimension
-skill-judge rubric that every recorded scores.json must have been judged
-against. The rubric is the substance of the per-dimension floors this repo's
-ship gate enforces, so it is attributed here even though only its identifying
-hash is embedded.
+The 8-dimension, 120-point skill-judge rubric is REDISTRIBUTED IN THIS
+REPOSITORY, verbatim, as vendor/skill-judge/SKILL.md. It is not this project's
+work. It defines the dimensions D1-D8, their point weights, and the
+per-dimension floors that scripts/ship_floor.py's FLOORS enforces, and every
+recorded scores.json in eval/ is a judgment against it — so it is the substance
+behind every quality claim this repository makes.
 
-  Work:      skill-judge (skills/skill-judge)
+  Work:      skill-judge (upstream path skills/skill-judge; the copy in THIS
+             repository is at vendor/skill-judge/)
   Source:    softaworks/agent-toolkit
-             (https://github.com/softaworks/agent-toolkit)
+             https://github.com/softaworks/agent-toolkit/tree/main/skills/skill-judge
   Copyright: (c) 2026 Leonardo Flores
   License:   MIT License
-  Pinned at: 3027f20f3181758385a1bb8c022d4041dfb4de84
 
-The rubric tree itself is NOT vendored into this repository — no copy of its
-text ships here. RUBRIC_SHA only constrains which rubric version a recorded
-aggregate may claim; see THIRD_PARTY_LICENSES.md, "Rubric pin (not yet vendored
-as a tree)". softaworks/agent-toolkit does not endorse and is not affiliated
-with this repository.
+Redistributed under the MIT License. As MIT requires of a copy, the full
+license text and the copyright notice ship beside the copy:
+
+  vendor/skill-judge/SKILL.md       the rubric, byte-for-byte as upstream
+  vendor/skill-judge/LICENSE        the MIT License, (c) 2026 Leonardo Flores
+  vendor/skill-judge/PROVENANCE.md  upstream path, commit, content hash, git
+                                    blob id, and why it is vendored here
+
+No modification has been made to the vendored rubric bytes, and none may be:
+editing them breaks the content pin below and would silently invalidate every
+recorded score at once.
+
+TWO DISTINCT PINS constrain the rubric, and they are not interchangeable.
+
+  RUBRIC_SHA = 3027f20f3181758385a1bb8c022d4041dfb4de84
+      The UPSTREAM COMMIT id that last touched the rubric in
+      softaworks/agent-toolkit. It identifies the revision. It CANNOT be
+      recomputed from anything inside this repository — no local artifact
+      reproduces an upstream commit id — so on its own it is a claim, not a
+      check. scripts/ship_floor.py rejects any recorded aggregate.rubric_sha
+      that differs from it.
+
+  RUBRIC_CONTENT_SHA256 =
+      737ef3628f0e11353114c3bd05a1c9d0c448dbfec1ae85db839253cbe93198b6
+      The sha256 of the vendored bytes at vendor/skill-judge/SKILL.md. It CAN
+      be recomputed locally, and tests/test_rubric_pin.py recomputes it from
+      the file on every run; scripts/judge_harness.py refuses to build a
+      judging prompt when the bytes on disk do not hash to it.
+
+Both constants live in scripts/ship_floor.py. Together they say: this score was
+graded against these exact bytes, and these bytes are that exact upstream
+revision. Vendoring is what turned the first claim into something a reader can
+verify without leaving the repository.
+
+softaworks/agent-toolkit does not endorse and is not affiliated with this
+repository. See THIRD_PARTY_LICENSES.md, "Vendored rubric — skill-judge
+(MIT)", for the audit record.
