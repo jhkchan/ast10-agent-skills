@@ -665,16 +665,69 @@ def _readme_row(category: str) -> list[str]:
     return [cell.strip() for cell in rows[0].strip().strip("|").split("|")]
 
 
+#: Column order of the README skills table, so a row that gains or loses a cell
+#: fails loudly instead of silently shifting what every index below refers to.
+README_SKILL_COLUMNS = ("AST", "Skill", "decides", "Detector state", "F1", "Judged")
+
+
 @pytest.mark.parametrize("category", AST_IDS)
 def test_readme_detector_state_matches_the_state_derived_from_the_manifests(category):
     """The blocking finding, as a test: no row may describe a check that does not exist."""
     state = _derived_detector_state(category)
     cells = _readme_row(category)
-    assert len(cells) == 5, (
-        f"{category} row must be AST | Skill | decides | Detector state | F1, got {len(cells)} cells"
+    assert len(cells) == len(README_SKILL_COLUMNS), (
+        f"{category} row must be {' | '.join(README_SKILL_COLUMNS)}, got {len(cells)} cells"
     )
     assert cells[3] == f"`{state}`", (
         f"README says detector state {cells[3]!r} for {category}; the manifests derive {state!r}"
+    )
+
+
+def _recorded_verdict(skill: str) -> tuple[str, float] | None:
+    """The gate's own verdict and pooled mean for one skill, straight off disk."""
+    card = REPO_ROOT / "eval" / "scorecards" / f"{skill}.json"
+    if not card.is_file():
+        return None
+    payload = json.loads(card.read_text(encoding="utf-8"))
+    return payload["verdict"], payload["aggregate"]["mean"]
+
+
+@pytest.mark.parametrize("category", AST_IDS)
+def test_readme_judged_column_matches_the_recorded_scorecards(category):
+    """The front page may not publish a verdict the gate did not produce.
+
+    Same rule as the detector-state column, applied to the other measurement the
+    table now carries: the value is derived from `eval/scorecards/`, never typed.
+    A README that says SHIP where the scorecard says BLOCKED is the most costly
+    possible drift, because it is the one claim a reader takes at face value and
+    never checks.
+    """
+    recorded = _recorded_verdict(category)
+    cell = _readme_row(category)[5]
+    if recorded is None:
+        assert "not judged" in cell.lower(), (
+            f"{category} has no scorecard in eval/scorecards/; its Judged cell must say so, got {cell!r}"
+        )
+        return
+    verdict, mean = recorded
+    assert verdict in cell, f"README says {cell!r} for {category}; eval/scorecards/ records {verdict}"
+    assert f"{mean}" in cell, f"README's Judged cell for {category} omits the recorded pooled mean {mean}"
+
+
+def test_readme_ship_count_matches_the_recorded_scorecards():
+    """ "Nine of the eleven skills clear the ship rule" has to be nine, and eleven.
+
+    Counted from the scorecards rather than from the table, so the prose and the
+    rows cannot drift apart or drift together in the same wrong direction.
+    """
+    cards = sorted((REPO_ROOT / "eval" / "scorecards").glob("*.json"))
+    if not cards:
+        pytest.skip("no scorecards recorded — nothing for the README to count")
+    shipped = sum(1 for c in cards if json.loads(c.read_text(encoding="utf-8"))["verdict"] == "SHIP")
+    words = {n: w for n, w in enumerate("zero one two three four five six seven eight nine ten eleven".split())}
+    flat = _flat(README)
+    assert f"{words[shipped].capitalize()} of the {words[len(cards)]} skills clear the ship rule" in flat, (
+        f"{shipped} of {len(cards)} recorded skills clear the ship rule; README.md must say so in those words"
     )
 
 

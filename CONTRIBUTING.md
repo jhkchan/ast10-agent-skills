@@ -252,7 +252,7 @@ judgments. A provider that could not be reached is declared in
 `config/audit.yml` with a recorded reason — never silently averaged as zero and
 never dropped without a record.
 
-**Before you run it: the prompt was rebuilt on 2026-08-23, and two of the three
+**Before you run it: the prompt was rebuilt on 2026-08-23, and two of the four
 recorded runs predate it.** The judge is now sent the pinned rubric's
 per-dimension scoring bands verbatim (it was previously sent only the dimension
 names) and must return a one-sentence justification per dimension; a judgement
@@ -260,10 +260,21 @@ that will not explain itself is recorded as malformed and excluded from the
 pool. That is a change of instrument, so **do not diff a fresh run against
 `eval/scorecards-run1/` or `eval/scorecards-run2/` and do not trend them
 together** — those two are the pre-rebuild archives and stay exactly as
-recorded. `eval/scorecards/` is run 3, the first run under the rebuilt prompt
-and the corpus the dashboard publishes; a fresh run is comparable to it and is
-what replaces it. No gate constant moved with the prompt; see the callout at the
-top of `docs/skill-judge-dashboard.md`.
+recorded. `eval/scorecards/` is run 4, the corpus the dashboard publishes, and
+`eval/scorecards-run3/` is its archived predecessor under the same prompt; a
+fresh run is comparable to both and is what replaces the live one. No gate
+constant moved with the prompt, and none moved with the run that took the board
+from one shippable skill to nine; see the callout at the top of
+`docs/skill-judge-dashboard.md`.
+
+**Archive the live corpus before you overwrite it.** `cp -r eval/scorecards
+eval/scorecards-run<N>` first, then record. Runs 3 and 4 were scored by the same
+prompt, which is what let the anti-pattern pass be measured as a controlled
+change rather than asserted — that comparison only exists because the previous
+corpus was kept. `tests/scripts/test_judge_harness.py` derives which archives
+predate the justification contract from the judgments themselves, so a new
+archive needs its name added to `ARCHIVED_POST_CONTRACT_CORPORA` and a `README.md`
+of its own, and the suite will tell you if you forget.
 
 ---
 

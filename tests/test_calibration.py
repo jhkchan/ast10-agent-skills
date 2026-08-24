@@ -269,16 +269,46 @@ def test_adr_bias_figures_match_the_computed_biases(computed):
 # ---------------------------------------------------------------------------
 
 
+def _worked_example(computed) -> dict:
+    """The skill the ADR's arithmetic must be worked on — found, never named.
+
+    The ADR's case is "a skill with nothing against it but the lower bound", so
+    the worked example has to be a skill in exactly that state: Grade A on the
+    mean, every dimension floor clear, and BLOCKED anyway. Version 1.1 hard-coded
+    `AST04`, which then shipped — and the pinned arithmetic became a sentence the
+    ADR could only satisfy by stating something false (`108.9 < 105`). Deriving
+    it means the assertion keeps testing the claim rather than the skill that
+    happened to illustrate it, and it fails loudly if no such skill exists, since
+    an ADR arguing from a case with no instances is the thing worth catching.
+    """
+    blocked_by_the_bound = []
+    for path in sorted(SCORECARDS.glob("*.json")):
+        card = json.loads(path.read_text(encoding="utf-8"))
+        agg = card.get("aggregate")
+        if not agg or card["verdict"] == "SHIP":
+            continue
+        floors_clear = all(agg["dim_means"][d] >= floor for d, floor in FLOORS.items())
+        if floors_clear and agg["mean"] >= POOLED_TARGET and agg["lower_bound"] < POOLED_LOWER_BOUND:
+            blocked_by_the_bound.append(card["skill"])
+    assert len(blocked_by_the_bound) == 1, (
+        "ADR-0005 argues from a skill blocked by the lower bound and nothing else; "
+        f"eval/scorecards/ holds {len(blocked_by_the_bound)} such skills ({blocked_by_the_bound}). "
+        "With none, the ADR has no worked example and its Negative consequences need rewriting; "
+        "with several, this test cannot know which one the document should use."
+    )
+    return next(r for r in computed["skills"] if r["skill"] == blocked_by_the_bound[0])
+
+
 @pytest.fixture(scope="module")
 def summary(computed):
     data = dict(computed["summary"])
-    data["ast04"] = next(r for r in computed["skills"] if r["skill"] == "AST04")
+    data["worked_example"] = _worked_example(computed)
     return data
 
 
 def _panel_phrases(summary: dict) -> list[str]:
     """Every prose figure the ADR's argument depends on, as the ADR must state it."""
-    ast04 = summary["ast04"]
+    worked = summary["worked_example"]
     return [
         f"pooled mean of **{summary['pooled_mean']}**",
         f"**{summary['bias_spread']}-point spread**",
@@ -287,8 +317,9 @@ def _panel_phrases(summary: dict) -> list[str]:
         f"**{summary['implied_mean_bar_min']} to {summary['implied_mean_bar_max']}**",
         f"{summary['implied_pct_min']}% to {summary['implied_pct_max']}%",
         f"{summary['pooled_target']} ({summary['target_pct']}%)",
-        f"{ast04['mean']} - {ast04['sigma']} = {ast04['lower_bound']} < {POOLED_LOWER_BOUND}",
-        f"{ast04['mean']} - {ast04['sigma']}/",
+        f"`{worked['skill']}`",
+        f"{worked['mean']} - {worked['sigma']} = {worked['lower_bound']} < {POOLED_LOWER_BOUND}",
+        f"{worked['mean']} - {worked['sigma']}/",
     ]
 
 

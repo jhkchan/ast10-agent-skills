@@ -299,8 +299,10 @@ entry, exactly as a crashed provider is. Both properties date from 2026-08-23 an
 breaking: **scores measured under this prompt are not comparable to `eval/scorecards-run1/` or
 `eval/scorecards-run2/`**, which were produced by a prompt that sent only the dimension names
 and forbade prose. Those two directories are kept unmodified as the record of the earlier
-instrument. `eval/scorecards/` is **run 3**, the first corpus scored under this prompt and the
-one every published figure comes from — see the callout at the top of
+instrument. `eval/scorecards/` is **run 4**, the corpus every published figure comes from, and
+`eval/scorecards-run3/` is the archived run scored under this same prompt — the two differ only
+in eight `SKILL.md` files, which is what makes them a controlled pair rather than two
+snapshots. See the callout at the top of
 [`skill-judge-dashboard.md`](skill-judge-dashboard.md).
 
 The ship rule itself — mean ≥ 108, mean − σ ≥ 105, per-dimension floors, ≥ 4 pooled rounds

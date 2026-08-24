@@ -21,12 +21,16 @@ can explain is not evidence, and the pre-2026-08-23 flat shape is rejected
 precisely so that a judge cannot opt out of explaining and still bind.
 
 **Which corpus is which.** ``eval/scorecards-run1/`` and
-``eval/scorecards-run2/`` were both scored before either change and are frozen;
-``eval/scorecards/`` is run 3, the first run under the rubric-grounded prompt
-and the justification contract. Section 4 holds one test per side: the archives
-must stay unexplainable by today's parser, and the current corpus must satisfy
-it for every pooled judgment. Those two facts are what make the runs
-distinguishable by inspection rather than by memory.
+``eval/scorecards-run2/`` were both scored before either change and are frozen.
+``eval/scorecards-run3/`` and ``eval/scorecards/`` were both written under the
+rubric-grounded prompt and the justification contract; the second is the live
+corpus, currently run 4. Section 4 holds one test per side: the pre-contract
+archives must stay unexplainable by today's parser, and every post-contract
+corpus -- archived or live -- must satisfy it for every pooled judgment. Those
+two facts are what make the runs distinguishable by inspection rather than by
+memory, and note that "archived" and "predates the contract" stopped being the
+same property the moment run 3 was archived: which is which is measured from the
+judgments, never read off a name in this file.
 """
 
 from __future__ import annotations
@@ -512,12 +516,25 @@ def test_every_adapter_malformed_publishes_failed_not_a_zero_pool(tmp_path):
 #: makes that immutability checkable rather than merely intended.
 ARCHIVED_CORPORA = ["scorecards-run1", "scorecards-run2"]
 
+#: Runs recorded UNDER the rubric-grounded prompt and then archived. They are
+#: frozen like the two above and unlike them in the one way that matters here:
+#: their judgments carry justifications, so today's parser accepts them. The
+#: distinction "archived" and the distinction "predates the contract" stopped
+#: being the same distinction the moment run 3 was archived, and this constant
+#: is the difference. Every corpus in it must satisfy the same contract the
+#: live one does.
+ARCHIVED_POST_CONTRACT_CORPORA = ["scorecards-run3"]
+
 #: The run the repository currently publishes, produced by the rubric-grounded
 #: prompt under the justification contract.
 CURRENT_CORPUS = "scorecards"
 
+#: Every corpus today's parser must be able to explain: the live one and any
+#: archive recorded under the same contract.
+POST_CONTRACT_CORPORA = [CURRENT_CORPUS, *ARCHIVED_POST_CONTRACT_CORPORA]
 
-@pytest.mark.parametrize("directory", [CURRENT_CORPUS, *ARCHIVED_CORPORA])
+
+@pytest.mark.parametrize("directory", [*POST_CONTRACT_CORPORA, *ARCHIVED_CORPORA])
 def test_the_recorded_scorecards_are_still_readable_by_their_readers(directory):
     """The prompt changed; the audit trail did not.
 
@@ -592,21 +609,27 @@ def test_the_archived_corpora_predate_the_justification_contract(directory):
         assert "flat contract" in message, where
 
 
-def test_the_current_scorecards_honour_the_justification_contract():
+@pytest.mark.parametrize("directory", POST_CONTRACT_CORPORA)
+def test_the_post_contract_scorecards_honour_the_justification_contract(directory):
     """The old test's premise, inverted into a guard that faces forward.
 
     ``parse_judgment`` refuses a judgement whose dimensions are unexplained, and
     ``run_judge`` drops such a judgement into the audit trail rather than the
     pool. Both are assertions about a live run. This is the assertion about what
-    was actually banked: every pooled judgment in ``eval/scorecards/`` carries a
-    distinct, non-empty justification for every dimension it scored, and its
-    recorded ``raw_response`` still parses -- reproducing exactly the scores and
+    was actually banked: every pooled judgment carries a distinct, non-empty
+    justification for every dimension it scored, and its recorded
+    ``raw_response`` still parses -- reproducing exactly the scores and
     justifications stored beside it. A judgement that was let into the pool
     without a reason, or a stored score that has drifted from the bytes it came
     from, fails here.
+
+    Parametrised over the archives too, not just the live corpus. Archiving a run
+    used to move it out of this check's reach, which meant the strongest thing
+    said about a corpus stopped being said the moment it became history -- and
+    history is exactly where a silent rewrite would be hardest to notice.
     """
-    for card_name, row in _recorded_rows(CURRENT_CORPUS):
-        where = f"{CURRENT_CORPUS}/{card_name}:{row['provider']}"
+    for card_name, row in _recorded_rows(directory):
+        where = f"{directory}/{card_name}:{row['provider']}"
         justifications = row.get("justifications")
         assert isinstance(justifications, dict), f"{where} was pooled with no justifications block"
         assert set(justifications) == set(DIMENSIONS), f"{where} justifies {sorted(justifications)}"
@@ -649,6 +672,7 @@ CORPUS_PROSE = (
     "eval/scorecards/README.md",
     "eval/scorecards-run1/README.md",
     "eval/scorecards-run2/README.md",
+    "eval/scorecards-run3/README.md",
     "scripts/judge_harness.py",
 )
 
@@ -721,9 +745,14 @@ def test_which_corpora_are_archived_is_read_off_the_judgments_not_off_this_file(
         f"the corpora that carry no justifications are {pre}, but this file archives {sorted(ARCHIVED_CORPORA)} — "
         "a run was recorded or archived without repointing ARCHIVED_CORPORA"
     )
-    assert post == [CURRENT_CORPUS], (
+    assert post == sorted(POST_CONTRACT_CORPORA), (
         f"the corpora written under the justification contract are {post}, but this file publishes "
-        f"{CURRENT_CORPUS!r} as the current one"
+        f"{sorted(POST_CONTRACT_CORPORA)} — a run was recorded or archived without repointing "
+        "CURRENT_CORPUS or ARCHIVED_POST_CONTRACT_CORPORA"
+    )
+    assert CURRENT_CORPUS not in ARCHIVED_POST_CONTRACT_CORPORA, "the live corpus is not one of its own archives"
+    assert set(ARCHIVED_POST_CONTRACT_CORPORA).isdisjoint(ARCHIVED_CORPORA), (
+        "a corpus cannot both predate the justification contract and have been written under it"
     )
 
 

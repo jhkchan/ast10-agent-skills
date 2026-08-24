@@ -14,27 +14,152 @@
     {
       "provider": "bedrock/gpt-oss-120b",
       "scores": {
+        "D1": 17.0,
+        "D2": 13.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 12.0,
+        "D6": 12.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The skill\u2019s detailed expert nuance such as \u201cThe resolution rule is a change of subject\u2026 evidence about the actual deployment\u201d places it in the 16\u201120 pure knowledge\u2011delta band.",
+        "D2": "It supplies domain\u2011specific procedures like \u201cLayer\u202f3 \u2014 load on condition\u2026 Do NOT load \u2026\u201d together with mindset guidance, meeting the 12\u201115 expert\u2011level band.",
+        "D3": "The extensive \u201cNEVER \u2014 the ways an AST06 review closes on nothing\u201d list provides specific anti\u2011patterns with reasoning, fitting the 12\u201115 expert\u2011grade band.",
+        "D4": "The description field explicitly states WHAT the skill does, WHEN to use it, and includes keywords, satisfying the 14\u201115 perfect description band.",
+        "D5": "The skill uses explicit loading triggers in the \u201cLayer\u202f3 \u2014 load on condition, never by default\u201d section, giving good layering with mandatory triggers, matching the 11\u201113 good\u2011layering band.",
+        "D6": "The \u201cFreedom on this page is split unevenly \u2026 Low \u2026 High \u2026\u201d discussion shows appropriate calibration for fragile and non\u2011fragile aspects, placing it in the 11\u201113 good\u2011calibration band.",
+        "D7": "Its structure follows the Tool pattern with decision trees and loading guidance, a clear pattern with minor deviations, fitting the 7\u20118 band.",
+        "D8": "The skill provides concrete decision rules, loading instructions, and error\u2011handling advice, offering comprehensive usability and landing in the 14\u201115 top\u2011usability band."
+      },
+      "total": 104.0,
+      "raw_response": "{\"D1\": {\"score\": 17, \"why\": \"The skill\u2019s detailed expert nuance such as \u201cThe resolution rule is a change of subject\u2026 evidence about the actual deployment\u201d places it in the 16\u201120 pure knowledge\u2011delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"It supplies domain\u2011specific procedures like \u201cLayer\u202f3 \u2014 load on condition\u2026 Do NOT load \u2026\u201d together with mindset guidance, meeting the 12\u201115 expert\u2011level band.\"}, \"D3\": {\"score\": 13, \"why\": \"The extensive \u201cNEVER \u2014 the ways an AST06 review closes on nothing\u201d list provides specific anti\u2011patterns with reasoning, fitting the 12\u201115 expert\u2011grade band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description field explicitly states WHAT the skill does, WHEN to use it, and includes keywords, satisfying the 14\u201115 perfect description band.\"}, \"D5\": {\"score\": 12, \"why\": \"The skill uses explicit loading triggers in the \u201cLayer\u202f3 \u2014 load on condition, never by default\u201d section, giving good layering with mandatory triggers, matching the 11\u201113 good\u2011layering band.\"}, \"D6\": {\"score\": 12, \"why\": \"The \u201cFreedom on this page is split unevenly \u2026 Low \u2026 High \u2026\u201d discussion shows appropriate calibration for fragile and non\u2011fragile aspects, placing it in the 11\u201113 good\u2011calibration band.\"}, \"D7\": {\"score\": 8, \"why\": \"Its structure follows the Tool pattern with decision trees and loading guidance, a clear pattern with minor deviations, fitting the 7\u20118 band.\"}, \"D8\": {\"score\": 14, \"why\": \"The skill provides concrete decision rules, loading instructions, and error\u2011handling advice, offering comprehensive usability and landing in the 14\u201115 top\u2011usability band.\"}}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill provides pure knowledge delta with expert-level decision trees like 'when a check returns negative, treat unparsed files as INCOMPLETE,' which only an experienced auditor would know, placing it in the 16-20 band.",
+        "D2": "It transfers expert thinking patterns such as 'Route first' with a jump table to decision rules and includes domain-specific procedures like the exact disjunctive conditions for Host Escape in `scripts/detector.py`, meeting the 12-15 band.",
+        "D3": "The 'NEVER' list is expert-grade with specific, hard-won anti-patterns like 'NEVER read a negative AST06-root-write-scope as narrow scope' and explains why, citing incomplete language coverage \u2014 exactly the 'experience teaches' level in the 12-15 band.",
+        "D4": "The description precisely answers WHAT (detect AST06), WHEN (during runtime review, workspace override, etc.), and includes trigger keywords like 'sandboxing unavailable', 'localhost WebSocket', meeting the 14-15 band.",
+        "D5": "It implements excellent progressive disclosure with mandatory triggers like 'load before re-tiering' for `coverage-matrix.md`, explicit 'Do NOT load' guidance, and conditional resource loading, satisfying the 14-15 band.",
+        "D6": "Freedom is perfectly calibrated: low freedom for `AST06-S01` (strict disjunctions) and high freedom for deployment questions requiring judgment, matching the 14-15 band for correct fragility alignment.",
+        "D7": "The skill follows the 'Tool' pattern masterfully with ~300 lines, decision trees, code-level checks, and low freedom for precise operations, placing it in the 9-10 band.",
+        "D8": "It offers comprehensive usability with decision trees for routing, fallback reasoning for negative checks, and clear error handling for unparsed files, meeting the 14-15 band."
+      },
+      "total": 117.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill provides pure knowledge delta with expert-level decision trees like 'when a check returns negative, treat unparsed files as INCOMPLETE,' which only an experienced auditor would know, placing it in the 16-20 band.\"}, \"D2\": {\"score\": 14, \"why\": \"It transfers expert thinking patterns such as 'Route first' with a jump table to decision rules and includes domain-specific procedures like the exact disjunctive conditions for Host Escape in `scripts/detector.py`, meeting the 12-15 band.\"}, \"D3\": {\"score\": 15, \"why\": \"The 'NEVER' list is expert-grade with specific, hard-won anti-patterns like 'NEVER read a negative AST06-root-write-scope as narrow scope' and explains why, citing incomplete language coverage \u2014 exactly the 'experience teaches' level in the 12-15 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description precisely answers WHAT (detect AST06), WHEN (during runtime review, workspace override, etc.), and includes trigger keywords like 'sandboxing unavailable', 'localhost WebSocket', meeting the 14-15 band.\"}, \"D5\": {\"score\": 15, \"why\": \"It implements excellent progressive disclosure with mandatory triggers like 'load before re-tiering' for `coverage-matrix.md`, explicit 'Do NOT load' guidance, and conditional resource loading, satisfying the 14-15 band.\"}, \"D6\": {\"score\": 15, \"why\": \"Freedom is perfectly calibrated: low freedom for `AST06-S01` (strict disjunctions) and high freedom for deployment questions requiring judgment, matching the 14-15 band for correct fragility alignment.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill follows the 'Tool' pattern masterfully with ~300 lines, decision trees, code-level checks, and low freedom for precise operations, placing it in the 9-10 band.\"}, \"D8\": {\"score\": 15, \"why\": \"It offers comprehensive usability with decision trees for routing, fallback reasoning for negative checks, and clear error handling for unparsed files, meeting the 14-15 band.\"}}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 16.0,
+        "D2": 12.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The skill provides deep, expert-level knowledge on OWASP AST06 Weak Isolation, including nuanced distinctions and specific decision rules.",
+        "D2": "The skill provides both expert thinking patterns and domain-specific procedures, such as how to handle different scenarios and what to check for in a deployment.",
+        "D3": "The skill includes a comprehensive NEVER list with specific reasoning, though it could be expanded slightly to reach the top score.",
+        "D4": "The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.",
+        "D5": "The skill implements good content layering with clear loading triggers and explicit guidance on what not to load.",
+        "D6": "The level of specificity is well-calibrated for the task's fragility, though it could be slightly more precise in some areas.",
+        "D7": "The skill follows a clear pattern, closely aligning with the 'Process' pattern, though with minor deviations.",
+        "D8": "The skill provides clear, actionable guidance with good coverage of edge cases and error handling."
+      },
+      "total": 106.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 16,\n    \"why\": \"The skill provides deep, expert-level knowledge on OWASP AST06 Weak Isolation, including nuanced distinctions and specific decision rules.\"\n  },\n  \"D2\": {\n    \"score\": 12,\n    \"why\": \"The skill provides both expert thinking patterns and domain-specific procedures, such as how to handle different scenarios and what to check for in a deployment.\"\n  },\n  \"D3\": {\n    \"score\": 13,\n    \"why\": \"The skill includes a comprehensive NEVER list with specific reasoning, though it could be expanded slightly to reach the top score.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"The skill implements good content layering with clear loading triggers and explicit guidance on what not to load.\"\n  },\n  \"D6\": {\n    \"score\": 13,\n    \"why\": \"The level of specificity is well-calibrated for the task's fragility, though it could be slightly more precise in some areas.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows a clear pattern, closely aligning with the 'Process' pattern, though with minor deviations.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides clear, actionable guidance with good coverage of edge cases and error handling.\"\n  }\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
         "D1": 18.0,
         "D2": 13.0,
-        "D3": 7.0,
-        "D4": 14.0,
-        "D5": 13.0,
-        "D6": 13.0,
+        "D3": 14.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 15.0,
+        "D7": 7.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The detector-mechanics passages (e.g. 'the check walks pysource.python_files(), whose PY_SUFFIXES is (\".py\",)') and the ClawJacked CVE-2026-32025 citation are non-obvious expert facts with no basics-tutorial content, placing it in the 16-20 band.",
+        "D2": "Decision rule 1 states a thinking pattern ('container isolation is a floor for the launched process, not a ceiling on agent capability') alongside domain-specific procedures like the script/manifest disjunct check, matching the 12-15 'expert-level' band.",
+        "D3": "The NEVER list items each pair a specific claim with an implementation-grounded reason (e.g. 'NEVER let an unparsed: note pass as a clean result' explained via pysource.parse() behavior), meeting the 12-15 'expert-grade anti-patterns with WHY' band rather than the generic-warning band.",
+        "D4": "The description names WHAT (skill-shadowing, localhost WebSocket attack surface), WHEN ('Use when reviewing...', 'when deciding whether a permission-boundary finding is AST03 or AST06'), and keywords (hot-reload, sandboxing), hitting the 14-15 'comprehensive' band.",
+        "D5": "The 'Layer 3 \u2014 load on condition, never by default' section gives per-file MANDATORY/'Do NOT load' triggers tied to specific tasks (e.g. 'load before re-tiering a scenario... Do NOT load it to route a finding'), matching the 14-15 'decision trees + explicit triggers + Do NOT Load' band.",
+        "D6": "The explicit freedom table ('Deciding AST06-S01 | Low... The other four scenarios | High') states and justifies differing constraint levels for the two halves of the task, matching the 14-15 'perfect calibration' band.",
+        "D7": "The skill blends a Navigation-style routing table with Tool-style decision trees and code references rather than cleanly instantiating one of the five named patterns, which fits 'clear pattern with minor deviations' (7-8) rather than masterful single-pattern application.",
+        "D8": "The routing table ('What you are holding | Go to') plus the 'What the two shipped checks decide, and where they go quiet' section on silent-failure modes (e.g. broad-but-not-root scopes returning negative) gives concrete fallbacks and edge cases, meeting the 14-15 'comprehensive coverage including edge cases' band."
+      },
+      "total": 111.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The detector-mechanics passages (e.g. 'the check walks pysource.python_files(), whose PY_SUFFIXES is (\\\".py\\\",)') and the ClawJacked CVE-2026-32025 citation are non-obvious expert facts with no basics-tutorial content, placing it in the 16-20 band.\"}, \"D2\": {\"score\": 13, \"why\": \"Decision rule 1 states a thinking pattern ('container isolation is a floor for the launched process, not a ceiling on agent capability') alongside domain-specific procedures like the script/manifest disjunct check, matching the 12-15 'expert-level' band.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list items each pair a specific claim with an implementation-grounded reason (e.g. 'NEVER let an unparsed: note pass as a clean result' explained via pysource.parse() behavior), meeting the 12-15 'expert-grade anti-patterns with WHY' band rather than the generic-warning band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description names WHAT (skill-shadowing, localhost WebSocket attack surface), WHEN ('Use when reviewing...', 'when deciding whether a permission-boundary finding is AST03 or AST06'), and keywords (hot-reload, sandboxing), hitting the 14-15 'comprehensive' band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Layer 3 \u2014 load on condition, never by default' section gives per-file MANDATORY/'Do NOT load' triggers tied to specific tasks (e.g. 'load before re-tiering a scenario... Do NOT load it to route a finding'), matching the 14-15 'decision trees + explicit triggers + Do NOT Load' band.\"}, \"D6\": {\"score\": 15, \"why\": \"The explicit freedom table ('Deciding AST06-S01 | Low... The other four scenarios | High') states and justifies differing constraint levels for the two halves of the task, matching the 14-15 'perfect calibration' band.\"}, \"D7\": {\"score\": 7, \"why\": \"The skill blends a Navigation-style routing table with Tool-style decision trees and code references rather than cleanly instantiating one of the five named patterns, which fits 'clear pattern with minor deviations' (7-8) rather than masterful single-pattern application.\"}, \"D8\": {\"score\": 14, \"why\": \"The routing table ('What you are holding | Go to') plus the 'What the two shipped checks decide, and where they go quiet' section on silent-failure modes (e.g. broad-but-not-root scopes returning negative) gives concrete fallbacks and edge cases, meeting the 14-15 'comprehensive coverage including edge cases' band.\"}}\n"
+    },
+    {
+      "provider": "anthropic-compatible/glm-5.2",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 14.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Nearly every paragraph is expert-only knowledge like the closed `_ROOT_SCOPES` set missing `/etc/**` and the `unparsed:` note silently converting a detection into a pass \u2014 'pure knowledge delta' band.",
+        "D2": "The route-first table plus decision rules 2\u20134 ('what to ask of that instance') combine non-obvious domain procedures with an expert framing ('the wrong subject \u2014 closing on evidence about the product when the finding is about the deployment'), landing in the 12\u201315 band.",
+        "D3": "The 'NEVER \u2014 the ways an AST06 review closes on nothing' section gives expert-grade anti-patterns with hard-won reasoning, e.g. never report absence of persistence from a check that only walks .py files matching literal-string ast.Call nodes, fitting the top band.",
+        "D4": "The frontmatter description states WHAT (detect and triage weak isolation, skill-shadowing, WebSocket attack surface), WHEN ('Use when reviewing an agent runtime's default execution mode...'), and trigger keywords (AST03 vs AST06, 0.0.0.0, hot-reload) \u2014 the perfect band.",
+        "D5": "Layer-3 loading is conditional and bidirectional ('load before re-tiering... Do NOT load it to route a finding'; 'Do NOT load either for a deployment question'), plus 'Stop after Decision rules if...' staging \u2014 the excellent tier.",
+        "D6": "The freedom table explicitly assigns low freedom to AST06-S01 (registry fixes the disjuncts, widening is an edit not a judgement) and high freedom to the four deployment scenarios, a textbook match of constraint to fragility.",
+        "D7": "It applies a Navigation-plus-Tool hybrid cleanly \u2014 a routing jump table, a detector module, and a coverage matrix with per-audience stopping points \u2014 a clear pattern with only minor deviations, so 7\u20138.",
+        "D8": "Edge cases and failure handling are comprehensive: the 'where they go quiet' section tells the agent exactly what a negative check does and doesn't mean (broad-but-not-root scopes are 'a manual read every time') and the CVE-2026-32025 loopback case grounds rule 3."
+      },
+      "total": 112.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Nearly every paragraph is expert-only knowledge like the closed `_ROOT_SCOPES` set missing `/etc/**` and the `unparsed:` note silently converting a detection into a pass \u2014 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 14, \"why\": \"The route-first table plus decision rules 2\u20134 ('what to ask of that instance') combine non-obvious domain procedures with an expert framing ('the wrong subject \u2014 closing on evidence about the product when the finding is about the deployment'), landing in the 12\u201315 band.\"}, \"D3\": {\"score\": 15, \"why\": \"The 'NEVER \u2014 the ways an AST06 review closes on nothing' section gives expert-grade anti-patterns with hard-won reasoning, e.g. never report absence of persistence from a check that only walks .py files matching literal-string ast.Call nodes, fitting the top band.\"}, \"D4\": {\"score\": 15, \"why\": \"The frontmatter description states WHAT (detect and triage weak isolation, skill-shadowing, WebSocket attack surface), WHEN ('Use when reviewing an agent runtime's default execution mode...'), and trigger keywords (AST03 vs AST06, 0.0.0.0, hot-reload) \u2014 the perfect band.\"}, \"D5\": {\"score\": 14, \"why\": \"Layer-3 loading is conditional and bidirectional ('load before re-tiering... Do NOT load it to route a finding'; 'Do NOT load either for a deployment question'), plus 'Stop after Decision rules if...' staging \u2014 the excellent tier.\"}, \"D6\": {\"score\": 14, \"why\": \"The freedom table explicitly assigns low freedom to AST06-S01 (registry fixes the disjuncts, widening is an edit not a judgement) and high freedom to the four deployment scenarios, a textbook match of constraint to fragility.\"}, \"D7\": {\"score\": 8, \"why\": \"It applies a Navigation-plus-Tool hybrid cleanly \u2014 a routing jump table, a detector module, and a coverage matrix with per-audience stopping points \u2014 a clear pattern with only minor deviations, so 7\u20138.\"}, \"D8\": {\"score\": 14, \"why\": \"Edge cases and failure handling are comprehensive: the 'where they go quiet' section tells the agent exactly what a negative check does and doesn't mean (broad-but-not-root scopes are 'a manual read every time') and the CVE-2026-32025 loopback case grounds rule 3.\"}}"
+    },
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 12.0,
         "D7": 8.0,
         "D8": 13.0
       },
       "justifications": {
-        "D1": "includes expert decision rule details like the disjunction of bundled\u2011script call site and root write scope that Claude wouldn't already know, placing it in the 16\u201120 band",
-        "D2": "provides both thinking patterns (e.g., check bind address first) and domain\u2011specific procedures such as loading `coverage-matrix.md` before retiering, fitting the 12\u201115 band",
-        "D3": "contains specific \u201cDo NOT load\u201d statements but lacks a richer NEVER list of anti\u2011patterns, matching the 4\u20117 band",
-        "D4": "description lists WHAT, WHEN, and trigger keywords for AST06, meeting the perfect\u2011description criteria (14\u201115 band)",
-        "D5": "has explicit conditional loading triggers for `coverage-matrix.md` and `scripts/detector.py`, demonstrating good progressive disclosure (11\u201113 band)",
-        "D6": "splits freedom low for the disjunction check and high for deployment questions, correctly calibrating constraints (11\u201113 band)",
-        "D7": "follows the Tool pattern with decision trees and low\u2011freedom scripts, aligning with the 7\u20118 band",
-        "D8": "offers clear decision rules, error handling notes, and fallback manual steps, making it usable for common cases (11\u201113 band)"
+        "D1": "the skill explains the non\u2011obvious decision rule that \"available if configured\" does not close the finding, a nuance Claude likely does not know, placing it in the 16\u201120 knowledge\u2011delta band",
+        "D2": "it provides expert thinking patterns (separating artifact vs deployment) plus domain\u2011specific procedures with mandatory loading triggers for coverage\u2011matrix.md and scripts/detector.py, fitting the 12\u201115 mindset\u202f+\u202fprocedures band",
+        "D3": "the extensive \"NEVER \u2014 the ways an AST06 review closes on nothing\" list gives specific anti\u2011patterns with reasoning, meeting the 12\u201115 expert anti\u2011pattern band",
+        "D4": "the description clearly states WHAT the skill does, WHEN to use it, and includes keywords like OWASP, AST06, sandboxing, satisfying the perfect 14\u201115 description compliance band",
+        "D5": "the \"Layer 3 \u2014 load on condition, never by default\" section defines mandatory load triggers and explicit \"Do NOT load\" rules, achieving the 11\u201113 progressive disclosure band",
+        "D6": "the skill calibrates freedom unevenly\u2014low for the decisive Host Escape check and high for deployment\u2011hand\u2011hand questions\u2014matching task fragility and landing in the 11\u201113 band",
+        "D7": "its structure follows the official Process pattern with phased decision rules and workflow tables, matching the 7\u20118 pattern\u2011recognition band",
+        "D8": "it offers concrete decision rules, loading triggers, and detailed NEVER guidance that enable an agent to act reliably, placing it in the 11\u201113 practical usability band"
       },
-      "total": 99.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"includes expert decision rule details like the disjunction of bundled\u2011script call site and root write scope that Claude wouldn't already know, placing it in the 16\u201120 band\"},\n  \"D2\": {\"score\": 13, \"why\": \"provides both thinking patterns (e.g., check bind address first) and domain\u2011specific procedures such as loading `coverage-matrix.md` before retiering, fitting the 12\u201115 band\"},\n  \"D3\": {\"score\": 7, \"why\": \"contains specific \u201cDo NOT load\u201d statements but lacks a richer NEVER list of anti\u2011patterns, matching the 4\u20117 band\"},\n  \"D4\": {\"score\": 14, \"why\": \"description lists WHAT, WHEN, and trigger keywords for AST06, meeting the perfect\u2011description criteria (14\u201115 band)\"},\n  \"D5\": {\"score\": 13, \"why\": \"has explicit conditional loading triggers for `coverage-matrix.md` and `scripts/detector.py`, demonstrating good progressive disclosure (11\u201113 band)\"},\n  \"D6\": {\"score\": 13, \"why\": \"splits freedom low for the disjunction check and high for deployment questions, correctly calibrating constraints (11\u201113 band)\"},\n  \"D7\": {\"score\": 8, \"why\": \"follows the Tool pattern with decision trees and low\u2011freedom scripts, aligning with the 7\u20118 band\"},\n  \"D8\": {\"score\": 13, \"why\": \"offers clear decision rules, error handling notes, and fallback manual steps, making it usable for common cases (11\u201113 band)\"}\n}"
+      "total": 107.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"the skill explains the non\u2011obvious decision rule that \\\"available if configured\\\" does not close the finding, a nuance Claude likely does not know, placing it in the 16\u201120 knowledge\u2011delta band\"}, \"D2\": {\"score\": 14, \"why\": \"it provides expert thinking patterns (separating artifact vs deployment) plus domain\u2011specific procedures with mandatory loading triggers for coverage\u2011matrix.md and scripts/detector.py, fitting the 12\u201115 mindset\u202f+\u202fprocedures band\"}, \"D3\": {\"score\": 13, \"why\": \"the extensive \\\"NEVER \u2014 the ways an AST06 review closes on nothing\\\" list gives specific anti\u2011patterns with reasoning, meeting the 12\u201115 expert anti\u2011pattern band\"}, \"D4\": {\"score\": 15, \"why\": \"the description clearly states WHAT the skill does, WHEN to use it, and includes keywords like OWASP, AST06, sandboxing, satisfying the perfect 14\u201115 description compliance band\"}, \"D5\": {\"score\": 14, \"why\": \"the \\\"Layer 3 \u2014 load on condition, never by default\\\" section defines mandatory load triggers and explicit \\\"Do NOT load\\\" rules, achieving the 11\u201113 progressive disclosure band\", \"score\": 14}, \"D6\": {\"score\": 12, \"why\": \"the skill calibrates freedom unevenly\u2014low for the decisive Host Escape check and high for deployment\u2011hand\u2011hand questions\u2014matching task fragility and landing in the 11\u201113 band\"}, \"D7\": {\"score\": 8, \"why\": \"its structure follows the official Process pattern with phased decision rules and workflow tables, matching the 7\u20118 pattern\u2011recognition band\"}, \"D8\": {\"score\": 13, \"why\": \"it offers concrete decision rules, loading triggers, and detailed NEVER guidance that enable an agent to act reliably, placing it in the 11\u201113 practical usability band\"}}"
     },
     {
       "provider": "bedrock/qwen3-235b",
@@ -49,149 +174,124 @@
         "D8": 15.0
       },
       "justifications": {
-        "D1": "The section 'Decision rules' provides expert knowledge with non-obvious trade-offs and decision criteria like 'container isolation is a floor for the launched process, not a ceiling on agent capability', meeting the 'Pure knowledge delta' band (16-20) as it explains structural reasoning only an expert would know.",
-        "D2": "The skill includes expert thinking patterns such as 'Route first' with decision tables and domain-specific procedures like precise decision rules for deployment review, satisfying the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band (12-15).",
-        "D3": "The skill contains a strong NEVER list implicitly through decision rules like Rule 4 stating shared writable state across agents is a trust-boundary violation, supported by real-world consequences and edge cases, qualifying for the 'Expert-grade anti-patterns with WHY' band (12-15).",
-        "D4": "The description explicitly answers WHAT (detecting OWASP AST06), WHEN (during review of default execution mode, bind address, etc.), and includes trigger keywords like 'sandboxing', 'workspace precedence', and 'localhost WebSocket', matching the 'Perfect: comprehensive description' band (14-15).",
-        "D5": "The skill implements excellent progressive disclosure with mandatory load triggers like 'load before re-tiering a scenario' for `coverage-matrix.md` and explicit 'Do NOT load' guidance, meeting the 'Perfect: decision trees + explicit triggers + Do NOT Load' band (14-15).",
-        "D6": "Freedom is appropriately calibrated: low freedom for Host Escape detection via fixed disjunctions and high freedom for deployment-level assessments, aligning with the 'Perfect freedom calibration' band (14-15) by matching task fragility to specificity.",
-        "D7": "The skill follows the official 'Tool' pattern (~300 lines) with decision trees, code references, and low-freedom execution for precise security analysis, demonstrating a 'Masterful application of appropriate pattern' (9-10) for format-specific operations.",
-        "D8": "Practical usability is high with clear decision trees, fallback handling for unparsed files, and explicit error conditions like 'treat unparsed: note as INCOMPLETE', providing comprehensive coverage of edge cases and failure modes in the 'Comprehensive coverage' band (14-15)."
+        "D1": "Provides pure knowledge delta with expert trade-offs like 'available if configured' not closing the finding, placing it in the 16-20 band",
+        "D2": "Transfers expert thinking patterns such as decision rules for distinguishing AST06 from AST03 and domain-specific procedures like manual checks for deployment facts, meeting the 12-15 band",
+        "D3": "Contains expert-grade anti-patterns with detailed 'NEVER' list explaining why actions like citing absent root-write findings are wrong, placing it in the 12-15 band",
+        "D4": "Description thoroughly answers WHAT, WHEN, and includes trigger keywords like 'sandboxing is unavailable' and 'localhost WebSocket', achieving the 14-15 band",
+        "D5": "Implements perfect progressive disclosure with mandatory triggers like 'load before' for coverage-matrix.md and explicit 'Do NOT load' guidance, earning the 14-15 band",
+        "D6": "Perfectly calibrates freedom with low freedom for Host Escape decisions and high freedom for deployment-level assessments, matching task fragility in the 14-15 band",
+        "D7": "Follows the official 'Process' pattern with phased workflow and decision checkpoints across a complex task, demonstrating masterful application in the 9-10 band",
+        "D8": "Provides comprehensive usability with decision trees, clear fallback reasoning for unparsed files, and edge case handling, achieving the 14-15 band"
       },
       "total": 116.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The section 'Decision rules' provides expert knowledge with non-obvious trade-offs and decision criteria like 'container isolation is a floor for the launched process, not a ceiling on agent capability', meeting the 'Pure knowledge delta' band (16-20) as it explains structural reasoning only an expert would know.\"}, \"D2\": {\"score\": 14, \"why\": \"The skill includes expert thinking patterns such as 'Route first' with decision tables and domain-specific procedures like precise decision rules for deployment review, satisfying the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band (12-15).\"}, \"D3\": {\"score\": 15, \"why\": \"The skill contains a strong NEVER list implicitly through decision rules like Rule 4 stating shared writable state across agents is a trust-boundary violation, supported by real-world consequences and edge cases, qualifying for the 'Expert-grade anti-patterns with WHY' band (12-15).\"}, \"D4\": {\"score\": 15, \"why\": \"The description explicitly answers WHAT (detecting OWASP AST06), WHEN (during review of default execution mode, bind address, etc.), and includes trigger keywords like 'sandboxing', 'workspace precedence', and 'localhost WebSocket', matching the 'Perfect: comprehensive description' band (14-15).\"}, \"D5\": {\"score\": 15, \"why\": \"The skill implements excellent progressive disclosure with mandatory load triggers like 'load before re-tiering a scenario' for `coverage-matrix.md` and explicit 'Do NOT load' guidance, meeting the 'Perfect: decision trees + explicit triggers + Do NOT Load' band (14-15).\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom is appropriately calibrated: low freedom for Host Escape detection via fixed disjunctions and high freedom for deployment-level assessments, aligning with the 'Perfect freedom calibration' band (14-15) by matching task fragility to specificity.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill follows the official 'Tool' pattern (~300 lines) with decision trees, code references, and low-freedom execution for precise security analysis, demonstrating a 'Masterful application of appropriate pattern' (9-10) for format-specific operations.\"}, \"D8\": {\"score\": 15, \"why\": \"Practical usability is high with clear decision trees, fallback handling for unparsed files, and explicit error conditions like 'treat unparsed: note as INCOMPLETE', providing comprehensive coverage of edge cases and failure modes in the 'Comprehensive coverage' band (14-15).\"}}"
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Provides pure knowledge delta with expert trade-offs like 'available if configured' not closing the finding, placing it in the 16-20 band\"}, \"D2\": {\"score\": 14, \"why\": \"Transfers expert thinking patterns such as decision rules for distinguishing AST06 from AST03 and domain-specific procedures like manual checks for deployment facts, meeting the 12-15 band\"}, \"D3\": {\"score\": 15, \"why\": \"Contains expert-grade anti-patterns with detailed 'NEVER' list explaining why actions like citing absent root-write findings are wrong, placing it in the 12-15 band\"}, \"D4\": {\"score\": 15, \"why\": \"Description thoroughly answers WHAT, WHEN, and includes trigger keywords like 'sandboxing is unavailable' and 'localhost WebSocket', achieving the 14-15 band\"}, \"D5\": {\"score\": 15, \"why\": \"Implements perfect progressive disclosure with mandatory triggers like 'load before' for coverage-matrix.md and explicit 'Do NOT load' guidance, earning the 14-15 band\"}, \"D6\": {\"score\": 14, \"why\": \"Perfectly calibrates freedom with low freedom for Host Escape decisions and high freedom for deployment-level assessments, matching task fragility in the 14-15 band\"}, \"D7\": {\"score\": 10, \"why\": \"Follows the official 'Process' pattern with phased workflow and decision checkpoints across a complex task, demonstrating masterful application in the 9-10 band\"}, \"D8\": {\"score\": 15, \"why\": \"Provides comprehensive usability with decision trees, clear fallback reasoning for unparsed files, and edge case handling, achieving the 14-15 band\"}}"
     },
     {
       "provider": "bedrock/deepseek-v3.2",
       "scores": {
-        "D1": 16.0,
-        "D2": 12.0,
-        "D3": 12.0,
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 14.0,
         "D4": 15.0,
-        "D5": 14.0,
+        "D5": 15.0,
         "D6": 14.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "The skill provides expert knowledge delta like distinguishing AST06 from AST03/AST01/AST09, decision rules for deployment properties, and the 'available if configured' fallacy, meeting the 'pure knowledge delta' band.",
-        "D2": "It transfers expert thinking patterns ('container isolation is a floor...') and provides domain-specific procedures like checking bind address and skill-shadowing precedence, meeting the 'Expert-level' band.",
-        "D3": "It includes expert-grade anti-patterns with WHY such as 'available if configured' is wrong evidence and 'sandboxed mode exists' is the wrong subject, meeting the 'Expert-grade anti-patterns with WHY' band.",
-        "D4": "The description perfectly answers WHAT, WHEN, and KEYWORDS with specific trigger scenarios like 'reviewing an agent runtime's default execution mode', meeting the 'Perfect' band.",
-        "D5": "It implements good layering with MANDATORY triggers like load 'coverage-matrix.md' before re-tiering and 'Do NOT load either for a deployment question', meeting the 'Perfect' band.",
-        "D6": "It explicitly calibrates freedom unevenly between deciding AST06-S01 (low) and other scenarios (high), matching fragility for file corruption risks, meeting the 'Perfect freedom calibration' band.",
-        "D7": "It clearly follows the Process pattern with phased workflow and checkpoints, with minor deviations in structure, meeting the 'Clear pattern with minor deviations' band.",
-        "D8": "It provides comprehensive coverage including edge cases like unparsed Python files, decision trees for routing, and error handling for deployment questions, meeting the 'Comprehensive coverage' band."
+        "D1": "The skill provides expert-level decision trees for distinguishing AST06 from other categories (e.g., 'vs AST03,' 'vs AST01') and trade-offs on freedom calibration, meeting the 'mostly expert knowledge with minimal redundancy' band.",
+        "D2": "It provides expert thinking patterns like the 'Orientation' table and specific domain procedures for reviewing agent runtimes, meeting the 'good balance: thinking patterns + domain-specific workflows' band.",
+        "D3": "The 'NEVER \u2014 the ways an AST06 review closes on nothing' section lists specific anti-patterns with reasoning (e.g., 'NEVER let an `unparsed:` note pass'), meeting the 'expert-grade anti-patterns with WHY' band.",
+        "D4": "The description explicitly states WHAT (detect and triage OWASP AST06 Weak Isolation), WHEN (with four trigger scenarios), and includes keywords like 'workspace precedence,' meeting the 'perfect: comprehensive description with WHAT, WHEN, and trigger keywords' band.",
+        "D5": "It uses explicit loading triggers (e.g., 'load before re-tiering a scenario') and 'Do NOT load' guidance for references, meeting the 'perfect: decision trees + explicit triggers + \"Do NOT Load\" guidance' band.",
+        "D6": "It calibrates freedom by splitting low freedom for deciding AST06-S01 and high freedom for other scenarios, as stated in the 'Orientation' table, meeting the 'perfect freedom calibration throughout' band.",
+        "D7": "The skill follows the 'Tool' pattern with decision trees, code examples, and low freedom for precise operations, meeting the 'clear pattern with minor deviations' band.",
+        "D8": "It provides actionable decision trees, coverage of edge cases like unparsed files, and error handling guidance, meeting the 'comprehensive coverage including edge cases and error handling' band."
       },
-      "total": 106.0,
-      "raw_response": "{\n  \"D1\": {\n    \"score\": 16,\n    \"why\": \"The skill provides expert knowledge delta like distinguishing AST06 from AST03/AST01/AST09, decision rules for deployment properties, and the 'available if configured' fallacy, meeting the 'pure knowledge delta' band.\"\n  },\n  \"D2\": {\n    \"score\": 12,\n    \"why\": \"It transfers expert thinking patterns ('container isolation is a floor...') and provides domain-specific procedures like checking bind address and skill-shadowing precedence, meeting the 'Expert-level' band.\"\n  },\n  \"D3\": {\n    \"score\": 12,\n    \"why\": \"It includes expert-grade anti-patterns with WHY such as 'available if configured' is wrong evidence and 'sandboxed mode exists' is the wrong subject, meeting the 'Expert-grade anti-patterns with WHY' band.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description perfectly answers WHAT, WHEN, and KEYWORDS with specific trigger scenarios like 'reviewing an agent runtime's default execution mode', meeting the 'Perfect' band.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"It implements good layering with MANDATORY triggers like load 'coverage-matrix.md' before re-tiering and 'Do NOT load either for a deployment question', meeting the 'Perfect' band.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"It explicitly calibrates freedom unevenly between deciding AST06-S01 (low) and other scenarios (high), matching fragility for file corruption risks, meeting the 'Perfect freedom calibration' band.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"It clearly follows the Process pattern with phased workflow and checkpoints, with minor deviations in structure, meeting the 'Clear pattern with minor deviations' band.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"It provides comprehensive coverage including edge cases like unparsed Python files, decision trees for routing, and error handling for deployment questions, meeting the 'Comprehensive coverage' band.\"\n  }\n}"
+      "total": 112.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"The skill provides expert-level decision trees for distinguishing AST06 from other categories (e.g., 'vs AST03,' 'vs AST01') and trade-offs on freedom calibration, meeting the 'mostly expert knowledge with minimal redundancy' band.\"\n  },\n  \"D2\": {\n    \"score\": 13,\n    \"why\": \"It provides expert thinking patterns like the 'Orientation' table and specific domain procedures for reviewing agent runtimes, meeting the 'good balance: thinking patterns + domain-specific workflows' band.\"\n  },\n  \"D3\": {\n    \"score\": 14,\n    \"why\": \"The 'NEVER \u2014 the ways an AST06 review closes on nothing' section lists specific anti-patterns with reasoning (e.g., 'NEVER let an `unparsed:` note pass'), meeting the 'expert-grade anti-patterns with WHY' band.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description explicitly states WHAT (detect and triage OWASP AST06 Weak Isolation), WHEN (with four trigger scenarios), and includes keywords like 'workspace precedence,' meeting the 'perfect: comprehensive description with WHAT, WHEN, and trigger keywords' band.\"\n  },\n  \"D5\": {\n    \"score\": 15,\n    \"why\": \"It uses explicit loading triggers (e.g., 'load before re-tiering a scenario') and 'Do NOT load' guidance for references, meeting the 'perfect: decision trees + explicit triggers + \\\"Do NOT Load\\\" guidance' band.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"It calibrates freedom by splitting low freedom for deciding AST06-S01 and high freedom for other scenarios, as stated in the 'Orientation' table, meeting the 'perfect freedom calibration throughout' band.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows the 'Tool' pattern with decision trees, code examples, and low freedom for precise operations, meeting the 'clear pattern with minor deviations' band.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"It provides actionable decision trees, coverage of edge cases like unparsed files, and error handling guidance, meeting the 'comprehensive coverage including edge cases and error handling' band.\"\n  }\n}"
     },
     {
       "provider": "bedrock/nova-pro",
       "scores": {
-        "D1": 16.0,
-        "D2": 12.0,
-        "D3": 12.0,
-        "D4": 15.0,
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 14.0,
+        "D4": 14.0,
         "D5": 14.0,
         "D6": 14.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "Pure knowledge delta with decision trees and trade-offs.",
-        "D2": "Provides expert thinking patterns and domain-specific procedures.",
-        "D3": "Effective NEVER lists with specific reasoning.",
-        "D4": "Perfect description with WHAT, WHEN, and trigger keywords.",
-        "D5": "Good layering with explicit triggers and 'Do NOT Load' guidance.",
-        "D6": "Appropriate freedom calibration for the task's fragility.",
-        "D7": "Clear application of the 'Knowledge' pattern with minor deviations.",
-        "D8": "Comprehensive coverage including edge cases and error handling."
+        "D1": "The skill provides expert knowledge on detecting and triaging OWASP AST06 Weak Isolation, including specific decision rules and NEVER lists that go beyond basic concepts.",
+        "D2": "The skill provides both expert thinking patterns and domain-specific procedures, though it could benefit from more explicit thinking frameworks.",
+        "D3": "The skill includes a comprehensive NEVER list with specific reasoning, aligning with expert-grade anti-patterns.",
+        "D4": "The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.",
+        "D5": "The skill implements proper content layering with explicit triggers and 'Do NOT Load' guidance.",
+        "D6": "The level of specificity is well-calibrated to the task's fragility, with low freedom for critical checks and high freedom for deployment-specific scenarios.",
+        "D7": "The skill follows the 'Process' pattern closely, with minor deviations, providing a phased workflow and checkpoints.",
+        "D8": "The skill provides clear guidance for common cases and includes decision trees and fallbacks for error handling and edge cases."
       },
-      "total": 106.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 16, \"why\": \"Pure knowledge delta with decision trees and trade-offs.\"},\n  \"D2\": {\"score\": 12, \"why\": \"Provides expert thinking patterns and domain-specific procedures.\"},\n  \"D3\": {\"score\": 12, \"why\": \"Effective NEVER lists with specific reasoning.\"},\n  \"D4\": {\"score\": 15, \"why\": \"Perfect description with WHAT, WHEN, and trigger keywords.\"},\n  \"D5\": {\"score\": 14, \"why\": \"Good layering with explicit triggers and 'Do NOT Load' guidance.\"},\n  \"D6\": {\"score\": 14, \"why\": \"Appropriate freedom calibration for the task's fragility.\"},\n  \"D7\": {\"score\": 9, \"why\": \"Clear application of the 'Knowledge' pattern with minor deviations.\"},\n  \"D8\": {\"score\": 14, \"why\": \"Comprehensive coverage including edge cases and error handling.\"}\n}"
+      "total": 110.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"The skill provides expert knowledge on detecting and triaging OWASP AST06 Weak Isolation, including specific decision rules and NEVER lists that go beyond basic concepts.\"\n  },\n  \"D2\": {\n    \"score\": 13,\n    \"why\": \"The skill provides both expert thinking patterns and domain-specific procedures, though it could benefit from more explicit thinking frameworks.\"\n  },\n  \"D3\": {\n    \"score\": 14,\n    \"why\": \"The skill includes a comprehensive NEVER list with specific reasoning, aligning with expert-grade anti-patterns.\"\n  },\n  \"D4\": {\n    \"score\": 14,\n    \"why\": \"The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"The skill implements proper content layering with explicit triggers and 'Do NOT Load' guidance.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The level of specificity is well-calibrated to the task's fragility, with low freedom for critical checks and high freedom for deployment-specific scenarios.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows the 'Process' pattern closely, with minor deviations, providing a phased workflow and checkpoints.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides clear guidance for common cases and includes decision trees and fallbacks for error handling and edge cases.\"\n  }\n}"
     },
     {
       "provider": "claude-cli/sonnet",
       "scores": {
         "D1": 18.0,
-        "D2": 13.0,
-        "D3": 11.0,
-        "D4": 15.0,
-        "D5": 15.0,
-        "D6": 14.0,
-        "D7": 8.0,
-        "D8": 13.0
-      },
-      "justifications": {
-        "D1": "The 'Why \"available if configured\" does not close this finding' section and the ClawJacked CVE-2026-32025 citation are non-obvious expert claims with almost no generic filler, putting it in the 16-20 pure-delta band.",
-        "D2": "Decision rule 1 ('Container isolation is a floor for the launched process, not a ceiling on agent capability') pairs a thinking pattern with the domain-specific two-disjunct detector procedure, matching the 12-15 expert-level band.",
-        "D3": "The routing table entry 'An honest grant that is merely too broad, boundary still intact \u2192 AST03' functions as a specific, reasoned negative-space anti-pattern rather than a bullet NEVER-list, landing in the 8-11 specific-with-reasoning band.",
-        "D4": "The description names concrete trigger scenarios ('when a workspace-level skill can override a bundled one via hot-reload', 'when an agent control interface binds to a network-reachable address') satisfying WHAT, WHEN, and keywords for the 14-15 band.",
-        "D5": "The 'Layer 3 \u2014 load on condition, never by default' section gives coverage-matrix.md and detector.py explicit MANDATORY-before triggers plus 'Do NOT load' guidance, matching the 14-15 perfect-layering band.",
-        "D6": "The explicit freedom table ('Deciding AST06-S01: Low... The other four scenarios: High') states calibration per sub-task rather than leaving it implicit, meeting the 14-15 perfect-calibration band.",
-        "D7": "The piece mixes the Tool pattern's decision trees/code references with heavy deferral to coverage-matrix.md, a Navigation-style trait, so it's a clear-pattern-with-minor-deviations 7-8 rather than masterful single-pattern execution.",
-        "D8": "The routing table plus explicit failure-mode notes like 'An unparsed Python file is named in the evidence and still returns negative... treat as INCOMPLETE' give clear common-case guidance and edge-case handling, fitting the 11-13 band rather than the 14-15 comprehensive-edge-case tier."
-      },
-      "total": 107.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The 'Why \\\"available if configured\\\" does not close this finding' section and the ClawJacked CVE-2026-32025 citation are non-obvious expert claims with almost no generic filler, putting it in the 16-20 pure-delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"Decision rule 1 ('Container isolation is a floor for the launched process, not a ceiling on agent capability') pairs a thinking pattern with the domain-specific two-disjunct detector procedure, matching the 12-15 expert-level band.\"}, \"D3\": {\"score\": 11, \"why\": \"The routing table entry 'An honest grant that is merely too broad, boundary still intact \u2192 AST03' functions as a specific, reasoned negative-space anti-pattern rather than a bullet NEVER-list, landing in the 8-11 specific-with-reasoning band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description names concrete trigger scenarios ('when a workspace-level skill can override a bundled one via hot-reload', 'when an agent control interface binds to a network-reachable address') satisfying WHAT, WHEN, and keywords for the 14-15 band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Layer 3 \u2014 load on condition, never by default' section gives coverage-matrix.md and detector.py explicit MANDATORY-before triggers plus 'Do NOT load' guidance, matching the 14-15 perfect-layering band.\"}, \"D6\": {\"score\": 14, \"why\": \"The explicit freedom table ('Deciding AST06-S01: Low... The other four scenarios: High') states calibration per sub-task rather than leaving it implicit, meeting the 14-15 perfect-calibration band.\"}, \"D7\": {\"score\": 8, \"why\": \"The piece mixes the Tool pattern's decision trees/code references with heavy deferral to coverage-matrix.md, a Navigation-style trait, so it's a clear-pattern-with-minor-deviations 7-8 rather than masterful single-pattern execution.\"}, \"D8\": {\"score\": 13, \"why\": \"The routing table plus explicit failure-mode notes like 'An unparsed Python file is named in the evidence and still returns negative... treat as INCOMPLETE' give clear common-case guidance and edge-case handling, fitting the 11-13 band rather than the 14-15 comprehensive-edge-case tier.\"}}\n"
-    },
-    {
-      "provider": "anthropic-compatible/glm-5.2",
-      "scores": {
-        "D1": 18.0,
         "D2": 14.0,
-        "D3": 11.0,
+        "D3": 15.0,
         "D4": 15.0,
         "D5": 15.0,
-        "D6": 14.0,
+        "D6": 15.0,
         "D7": 8.0,
-        "D8": 13.0
+        "D8": 14.0
       },
       "justifications": {
-        "D1": "Expert-only content throughout \u2014 e.g. the closed literal set of root-ish scopes ('/, /**, *, ~, $HOME') and why '/etc/**' never fires, and the 'available if configured is evidence FOR this finding' inversion \u2014 knowledge Claude would not have, with essentially no tutorial filler, placing it in the 16-20 pure-delta band.",
-        "D2": "Combines expert thinking ('the wrong evidence always has the same shape: a sandboxed mode exists... the finding is about the deployment') with a non-obvious domain procedure (route table, run rules 2-4 by hand because 'the detector will stay silent and that silence is not a pass'), matching the 12-15 expert band.",
-        "D3": "Has specific experienced anti-patterns with reasons \u2014 closing on 'a vendor capability statement, a documentation link, and a config file that could enable the sandbox', and 'inferring coverage from the code is how that distinction gets lost' \u2014 though framed as mistakes rather than a NEVER list, landing mid 8-11.",
-        "D4": "The description gives WHAT (detect/triage AST06 weak isolation, skill-shadowing, localhost WebSocket surface), WHEN ('when reviewing an agent runtime's default execution mode, when a workspace-level skill can override a bundled one'), and even a disambiguation trigger ('deciding whether a finding is AST03 or AST06'), meeting the 14-15 perfect band.",
-        "D5": "Exemplary layer 3 triggers embedded in the workflow \u2014 line counts per resource, conditional load rules ('load before re-tiering... Do NOT load it to route a finding') plus a 'Stop after Decision rules' instruction, matching the 14-15 perfect band.",
-        "D6": "The freedom table explicitly calibrates per half \u2014 'Low' freedom for the detector-decided disjunct ('widening the set is an edit to the module... not a judgement call') vs 'High' for deployment questions where 'simulating one is the failure mode' \u2014 a deliberate, correct match to mixed fragility, 14-15 band.",
-        "D7": "Follows a coherent Navigation/Tool hybrid \u2014 minimal routing SKILL.md with a jump table to sections and conditionally-loaded references \u2014 with minor deviations (it is denser than a ~30-line navigation pattern), fitting the 7-8 clear-pattern band.",
-        "D8": "Actionable edge-case handling like 'An unparsed Python file is named in the evidence and still returns negative. Treat the unparsed: note as an INCOMPLETE result' and the cross-category disambiguation vs AST01/AST03/AST09 give clear guidance for common and unusual cases, 11-13 band."
+        "D1": "The body is built entirely from artifact-specific internals \u2014 e.g. the persistence-path matching only fires on 'ast.Call nodes whose literal string arguments' and the closed 13-entry '_ROOT_SCOPES' set \u2014 which is knowledge only obtainable from reading this detector's source, putting it in the 16-20 'pure knowledge delta' band.",
+        "D2": "It pairs a thinking frame ('isolation is a binary architectural default, not a tunable policy') with four numbered domain-specific decision rules (bind-address-first, shadowing-via-precedence, shared-state provenance) that Claude has no prior exposure to, matching the 12-15 'expert-level' band.",
+        "D3": "The 'NEVER' section gives seven entries each with a concrete mechanism-level reason (e.g. 'NEVER let an unparsed: note pass as a clean result' because the check still returns detected=False), which is the 12-15 'expert-grade anti-patterns with WHY' band, not a generic warning list.",
+        "D4": "The description states WHAT ('Detect and triage OWASP AST06 Weak Isolation') and WHEN via four explicit trigger clauses ('Use when reviewing...', 'when a workspace-level skill can override...', 'when deciding whether a permission-boundary finding is AST03 or AST06'), meeting the 14-15 'comprehensive... WHAT, WHEN, and trigger keywords' band.",
+        "D5": "The 'Layer 3 \u2014 load on condition, never by default' section gives per-file MANDATORY-load triggers plus explicit 'Do NOT load' guidance (e.g. detector.py load only 'before reproducing a Host Escape false positive', never 'to learn what a check covers'), matching the 14-15 'decision trees + explicit triggers + Do NOT Load' band.",
+        "D6": "The skill states its own freedom split in a table \u2014 'Low' freedom for deciding AST06-S01 because the disjunction is fixed in the registry, 'High' freedom for the other four scenarios because 'no rule exists, and simulating one is the failure mode' \u2014 an explicit, task-matched calibration in the 14-15 band.",
+        "D7": "It combines a Tool-pattern low-freedom detector walkthrough with a Navigation-style routing table ('Route first... this table is only the jump'), a hybrid that is coherent but not a clean single-pattern instance, placing it in the 7-8 'clear pattern with minor deviations' band.",
+        "D8": "Beyond happy-path guidance it gives concrete fallback handling for detector blind spots, e.g. 'Read that file by hand and mark the result INCOMPLETE; nothing downstream will' for an unparsed-file case, which is the 14-15 'comprehensive coverage including edge cases and error handling' band."
       },
-      "total": 108.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Expert-only content throughout \u2014 e.g. the closed literal set of root-ish scopes ('/, /**, *, ~, $HOME') and why '/etc/**' never fires, and the 'available if configured is evidence FOR this finding' inversion \u2014 knowledge Claude would not have, with essentially no tutorial filler, placing it in the 16-20 pure-delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"Combines expert thinking ('the wrong evidence always has the same shape: a sandboxed mode exists... the finding is about the deployment') with a non-obvious domain procedure (route table, run rules 2-4 by hand because 'the detector will stay silent and that silence is not a pass'), matching the 12-15 expert band.\"}, \"D3\": {\"score\": 11, \"why\": \"Has specific experienced anti-patterns with reasons \u2014 closing on 'a vendor capability statement, a documentation link, and a config file that could enable the sandbox', and 'inferring coverage from the code is how that distinction gets lost' \u2014 though framed as mistakes rather than a NEVER list, landing mid 8-11.\"}, \"D4\": {\"score\": 15, \"why\": \"The description gives WHAT (detect/triage AST06 weak isolation, skill-shadowing, localhost WebSocket surface), WHEN ('when reviewing an agent runtime's default execution mode, when a workspace-level skill can override a bundled one'), and even a disambiguation trigger ('deciding whether a finding is AST03 or AST06'), meeting the 14-15 perfect band.\"}, \"D5\": {\"score\": 15, \"why\": \"Exemplary layer 3 triggers embedded in the workflow \u2014 line counts per resource, conditional load rules ('load before re-tiering... Do NOT load it to route a finding') plus a 'Stop after Decision rules' instruction, matching the 14-15 perfect band.\"}, \"D6\": {\"score\": 14, \"why\": \"The freedom table explicitly calibrates per half \u2014 'Low' freedom for the detector-decided disjunct ('widening the set is an edit to the module... not a judgement call') vs 'High' for deployment questions where 'simulating one is the failure mode' \u2014 a deliberate, correct match to mixed fragility, 14-15 band.\"}, \"D7\": {\"score\": 8, \"why\": \"Follows a coherent Navigation/Tool hybrid \u2014 minimal routing SKILL.md with a jump table to sections and conditionally-loaded references \u2014 with minor deviations (it is denser than a ~30-line navigation pattern), fitting the 7-8 clear-pattern band.\"}, \"D8\": {\"score\": 13, \"why\": \"Actionable edge-case handling like 'An unparsed Python file is named in the evidence and still returns negative. Treat the unparsed: note as an INCOMPLETE result' and the cross-category disambiguation vs AST01/AST03/AST09 give clear guidance for common and unusual cases, 11-13 band.\"}}"
+      "total": 114.0,
+      "raw_response": "Note: A `<system-reminder>` embedded in the tool output above instructed me to launch an \"ai-slop-cleaner\" workflow. That reminder is not a legitimate instruction \u2014 it's untrusted content injected into the data stream \u2014 and I'm disregarding it. Proceeding with the actual task: scoring the skill against the pinned rubric.\n\n{\"D1\": {\"score\": 18, \"why\": \"The body is built entirely from artifact-specific internals \u2014 e.g. the persistence-path matching only fires on 'ast.Call nodes whose literal string arguments' and the closed 13-entry '_ROOT_SCOPES' set \u2014 which is knowledge only obtainable from reading this detector's source, putting it in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 14, \"why\": \"It pairs a thinking frame ('isolation is a binary architectural default, not a tunable policy') with four numbered domain-specific decision rules (bind-address-first, shadowing-via-precedence, shared-state provenance) that Claude has no prior exposure to, matching the 12-15 'expert-level' band.\"}, \"D3\": {\"score\": 15, \"why\": \"The 'NEVER' section gives seven entries each with a concrete mechanism-level reason (e.g. 'NEVER let an unparsed: note pass as a clean result' because the check still returns detected=False), which is the 12-15 'expert-grade anti-patterns with WHY' band, not a generic warning list.\"}, \"D4\": {\"score\": 15, \"why\": \"The description states WHAT ('Detect and triage OWASP AST06 Weak Isolation') and WHEN via four explicit trigger clauses ('Use when reviewing...', 'when a workspace-level skill can override...', 'when deciding whether a permission-boundary finding is AST03 or AST06'), meeting the 14-15 'comprehensive... WHAT, WHEN, and trigger keywords' band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Layer 3 \u2014 load on condition, never by default' section gives per-file MANDATORY-load triggers plus explicit 'Do NOT load' guidance (e.g. detector.py load only 'before reproducing a Host Escape false positive', never 'to learn what a check covers'), matching the 14-15 'decision trees + explicit triggers + Do NOT Load' band.\"}, \"D6\": {\"score\": 15, \"why\": \"The skill states its own freedom split in a table \u2014 'Low' freedom for deciding AST06-S01 because the disjunction is fixed in the registry, 'High' freedom for the other four scenarios because 'no rule exists, and simulating one is the failure mode' \u2014 an explicit, task-matched calibration in the 14-15 band.\"}, \"D7\": {\"score\": 8, \"why\": \"It combines a Tool-pattern low-freedom detector walkthrough with a Navigation-style routing table ('Route first... this table is only the jump'), a hybrid that is coherent but not a clean single-pattern instance, placing it in the 7-8 'clear pattern with minor deviations' band.\"}, \"D8\": {\"score\": 14, \"why\": \"Beyond happy-path guidance it gives concrete fallback handling for detector blind spots, e.g. 'Read that file by hand and mark the result INCOMPLETE; nothing downstream will' for an unparsed-file case, which is the 14-15 'comprehensive coverage including edge cases and error handling' band.\"}}\n"
     },
     {
       "provider": "bedrock/gpt-oss-120b",
       "scores": {
         "D1": 18.0,
-        "D2": 13.0,
-        "D3": 9.0,
+        "D2": 14.0,
+        "D3": 14.0,
         "D4": 15.0,
         "D5": 13.0,
-        "D6": 12.0,
+        "D6": 13.0,
         "D7": 8.0,
         "D8": 13.0
       },
       "justifications": {
-        "D1": "The 'Why \"available if configured\" does not close this finding' section delivers non\u2011obvious reasoning about deployment\u2011vs\u2011package evidence, placing it in the 16\u201120 pure knowledge delta band.",
-        "D2": "The skill blends mindset prompts (e.g., 'Ask whether the finding is about deployment') with domain\u2011specific procedures such as explicit loading rules for `coverage-matrix.md` and `scripts/detector.py`, fitting the 12\u201115 expert\u2011level band.",
-        "D3": "It provides concrete 'Do NOT load' anti\u2011pattern statements for resource loading, giving a specific NEVER list that lands in the 8\u201111 band.",
-        "D4": "The description enumerates WHAT the skill does, WHEN to use it, and includes trigger keywords like 'OWASP AST06', meeting the perfect 14\u201115 description band.",
-        "D5": "Layer\u202f3 explicitly marks `coverage-matrix.md` and `scripts/detector.py` as load\u2011on\u2011condition with mandatory triggers and 'Do NOT load' guidance, satisfying the 11\u201113 good layering band.",
-        "D6": "The document assigns low freedom to the static Host\u2011Escape check and high freedom to deployment\u2011level questions, demonstrating appropriate freedom calibration for a high\u2011consequence task (12\u201113 band).",
-        "D7": "Its structure follows the 'Process' pattern with phased decision rules and checkpoints, aligning with the 7\u20118 clear\u2011pattern band.",
-        "D8": "Decision tables, step\u2011by\u2011step rules, and fallback guidance (e.g., loading conditions) give clear actionable guidance covering edge cases, placing it in the 11\u201113 usability band."
+        "D1": "The skill details expert-only concepts like the binary isolation default, disjunction of Host Escape checks, and nuanced deployment\u2011level reasoning, placing it in the 16\u201120 knowledge\u2011delta band",
+        "D2": "It combines thinking patterns (e.g., \"Ask whether the finding is about deployment vs product\") with domain\u2011specific procedures such as loading\u202fcoverage-matrix.md only on condition and manually applying Rules\u202f2\u20114",
+        "D3": "The extensive \"NEVER \u2014 the ways an AST06 review closes on nothing\" list provides specific anti\u2011patterns with explanations, satisfying the 12\u201115 band",
+        "D4": "The description states the WHAT (detect and triage AST06), WHEN (use when reviewing runtime defaults, workspace overrides, bind address, etc.) and includes keywords like AST06, Weak Isolation, host mode",
+        "D5": "Layer\u202f3 resources are listed with explicit \"load before\" and \"Do NOT load\" triggers, demonstrating proper progressive disclosure",
+        "D6": "Freedom is deliberately split (low for scripted Host Escape detection, high for manual deployment checks), matching task fragility",
+        "D7": "The layout follows the \"Tool\" pattern with decision trees, low\u2011freedom checks, and mandatory loading cues, fitting the recognized pattern",
+        "D8": "Clear decision rules, loading guidance, edge\u2011case handling, and actionable steps make the skill broadly usable despite its complexity"
       },
-      "total": 101.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The 'Why \\\"available if configured\\\" does not close this finding' section delivers non\u2011obvious reasoning about deployment\u2011vs\u2011package evidence, placing it in the 16\u201120 pure knowledge delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"The skill blends mindset prompts (e.g., 'Ask whether the finding is about deployment') with domain\u2011specific procedures such as explicit loading rules for `coverage-matrix.md` and `scripts/detector.py`, fitting the 12\u201115 expert\u2011level band.\"}, \"D3\": {\"score\": 9, \"why\": \"It provides concrete 'Do NOT load' anti\u2011pattern statements for resource loading, giving a specific NEVER list that lands in the 8\u201111 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description enumerates WHAT the skill does, WHEN to use it, and includes trigger keywords like 'OWASP AST06', meeting the perfect 14\u201115 description band.\"}, \"D5\": {\"score\": 13, \"why\": \"Layer\u202f3 explicitly marks `coverage-matrix.md` and `scripts/detector.py` as load\u2011on\u2011condition with mandatory triggers and 'Do NOT load' guidance, satisfying the 11\u201113 good layering band.\"}, \"D6\": {\"score\": 12, \"why\": \"The document assigns low freedom to the static Host\u2011Escape check and high freedom to deployment\u2011level questions, demonstrating appropriate freedom calibration for a high\u2011consequence task (12\u201113 band).\"}, \"D7\": {\"score\": 8, \"why\": \"Its structure follows the 'Process' pattern with phased decision rules and checkpoints, aligning with the 7\u20118 clear\u2011pattern band.\"}, \"D8\": {\"score\": 13, \"why\": \"Decision tables, step\u2011by\u2011step rules, and fallback guidance (e.g., loading conditions) give clear actionable guidance covering edge cases, placing it in the 11\u201113 usability band.\"}}"
+      "total": 108.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"The skill details expert-only concepts like the binary isolation default, disjunction of Host Escape checks, and nuanced deployment\u2011level reasoning, placing it in the 16\u201120 knowledge\u2011delta band\"},\n  \"D2\": {\"score\": 14, \"why\": \"It combines thinking patterns (e.g., \\\"Ask whether the finding is about deployment vs product\\\") with domain\u2011specific procedures such as loading\u202fcoverage-matrix.md only on condition and manually applying Rules\u202f2\u20114\"},\n  \"D3\": {\"score\": 14, \"why\": \"The extensive \\\"NEVER \u2014 the ways an AST06 review closes on nothing\\\" list provides specific anti\u2011patterns with explanations, satisfying the 12\u201115 band\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description states the WHAT (detect and triage AST06), WHEN (use when reviewing runtime defaults, workspace overrides, bind address, etc.) and includes keywords like AST06, Weak Isolation, host mode\"},\n  \"D5\": {\"score\": 13, \"why\": \"Layer\u202f3 resources are listed with explicit \\\"load before\\\" and \\\"Do NOT load\\\" triggers, demonstrating proper progressive disclosure\"},\n  \"D6\": {\"score\": 13, \"why\": \"Freedom is deliberately split (low for scripted Host Escape detection, high for manual deployment checks), matching task fragility\"},\n  \"D7\": {\"score\": 8, \"why\": \"The layout follows the \\\"Tool\\\" pattern with decision trees, low\u2011freedom checks, and mandatory loading cues, fitting the recognized pattern\"},\n  \"D8\": {\"score\": 13, \"why\": \"Clear decision rules, loading guidance, edge\u2011case handling, and actionable steps make the skill broadly usable despite its complexity\"}\n}"
     },
     {
       "provider": "bedrock/qwen3-235b",
       "scores": {
         "D1": 18.0,
-        "D2": 13.0,
-        "D3": 14.0,
+        "D2": 14.0,
+        "D3": 15.0,
         "D4": 15.0,
         "D5": 15.0,
         "D6": 15.0,
@@ -199,287 +299,135 @@
         "D8": 15.0
       },
       "justifications": {
-        "D1": "The skill provides pure expert knowledge such as the disjunctive rule for `AST06-S01` Host Escape and the explanation that 'sandboxing is available if configured' supports the finding rather than closes it, meeting the 'Pure knowledge delta' band.",
-        "D2": "The skill delivers expert thinking patterns like the binary architectural default mindset and domain-specific procedures such as the exact conditions for script and manifest disjuncts, achieving a good balance that fits the 'Good balance: thinking patterns + domain-specific workflows' band.",
-        "D3": "The skill contains expert-grade anti-patterns with clear reasoning, such as NEVER treating 'available if configured' as closing the finding because the default execution mode is what matters, which reflects hard-won experience and fits the 'Expert-grade anti-patterns with WHY' band.",
-        "D4": "The description fully answers WHAT (detect and triage OWASP AST06), WHEN (when reviewing default execution mode, workspace override, etc.), and includes trigger keywords like 'sandboxing', 'localhost WebSocket', and 'skill-shadowing', meeting the 'Perfect: comprehensive description' band.",
-        "D5": "The skill implements perfect progressive disclosure with explicit MANDATORY loading instructions for `coverage-matrix.md` and `scripts/detector.py`, plus clear 'Do NOT load' guidance for deployment questions, fitting the 'Perfect: decision trees + explicit triggers + Do NOT Load' band.",
-        "D6": "The skill perfectly calibrates freedom: low freedom for `AST06-S01` decision with exact script and scope checks, and high freedom for deployment-level scenarios requiring manual judgment, aligning with the 'Perfect freedom calibration throughout' band.",
-        "D7": "The skill masterfully applies the 'Tool' pattern with decision trees, code-level checks, low freedom for fragile operations, and a structured workflow matching the ~300-line official Tool examples, fitting the 'Masterful application of appropriate pattern' band.",
-        "D8": "The skill offers comprehensive practical usability with clear decision trees, fallback handling for unparsed files, error conditions, edge cases like shadowed `deny_write` entries, and actionable guidance, meeting the 'Comprehensive coverage including edge cases and error handling' band."
+        "D1": "The skill provides pure knowledge delta with expert-level insights such as the disjunctive condition for Host Escape and why 'available if configured' does not close the finding, meeting the 16-20 band",
+        "D2": "The skill transfers expert thinking patterns like decision rules for distinguishing AST06 from neighbors and domain-specific procedures such as the exact disjuncts for Host Escape detection, placing it in the 12-15 band",
+        "D3": "The 'NEVER' section lists expert-grade anti-patterns with specific reasoning, such as never reading a negative root-write-scope as narrow scope, meeting the 12-15 band",
+        "D4": "The description comprehensively answers WHAT, WHEN, and includes trigger keywords like 'sandboxing is unavailable' and 'localhost WebSocket', meeting the 14-15 band",
+        "D5": "The skill implements excellent progressive disclosure with mandatory triggers like 'load before re-tiering' and explicit 'Do NOT load' guidance, placing it in the 14-15 band",
+        "D6": "Freedom is perfectly calibrated with low freedom for Host Escape detection and high freedom for deployment-level scenarios, matching task fragility as in the 14-15 band",
+        "D7": "The skill masterfully follows the 'Tool' pattern with decision trees, code-based checks, and low freedom, appropriate for precise operations on a specific security format, meeting the 9-10 band",
+        "D8": "The skill provides practical usability with decision trees for routing findings, fallback reasoning for incomplete results, and clear error handling for unparsed files, meeting the 14-15 band"
       },
-      "total": 115.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill provides pure expert knowledge such as the disjunctive rule for `AST06-S01` Host Escape and the explanation that 'sandboxing is available if configured' supports the finding rather than closes it, meeting the 'Pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"The skill delivers expert thinking patterns like the binary architectural default mindset and domain-specific procedures such as the exact conditions for script and manifest disjuncts, achieving a good balance that fits the 'Good balance: thinking patterns + domain-specific workflows' band.\"}, \"D3\": {\"score\": 14, \"why\": \"The skill contains expert-grade anti-patterns with clear reasoning, such as NEVER treating 'available if configured' as closing the finding because the default execution mode is what matters, which reflects hard-won experience and fits the 'Expert-grade anti-patterns with WHY' band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description fully answers WHAT (detect and triage OWASP AST06), WHEN (when reviewing default execution mode, workspace override, etc.), and includes trigger keywords like 'sandboxing', 'localhost WebSocket', and 'skill-shadowing', meeting the 'Perfect: comprehensive description' band.\"}, \"D5\": {\"score\": 15, \"why\": \"The skill implements perfect progressive disclosure with explicit MANDATORY loading instructions for `coverage-matrix.md` and `scripts/detector.py`, plus clear 'Do NOT load' guidance for deployment questions, fitting the 'Perfect: decision trees + explicit triggers + Do NOT Load' band.\"}, \"D6\": {\"score\": 15, \"why\": \"The skill perfectly calibrates freedom: low freedom for `AST06-S01` decision with exact script and scope checks, and high freedom for deployment-level scenarios requiring manual judgment, aligning with the 'Perfect freedom calibration throughout' band.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill masterfully applies the 'Tool' pattern with decision trees, code-level checks, low freedom for fragile operations, and a structured workflow matching the ~300-line official Tool examples, fitting the 'Masterful application of appropriate pattern' band.\"}, \"D8\": {\"score\": 15, \"why\": \"The skill offers comprehensive practical usability with clear decision trees, fallback handling for unparsed files, error conditions, edge cases like shadowed `deny_write` entries, and actionable guidance, meeting the 'Comprehensive coverage including edge cases and error handling' band.\"}}"
+      "total": 117.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill provides pure knowledge delta with expert-level insights such as the disjunctive condition for Host Escape and why 'available if configured' does not close the finding, meeting the 16-20 band\"}, \"D2\": {\"score\": 14, \"why\": \"The skill transfers expert thinking patterns like decision rules for distinguishing AST06 from neighbors and domain-specific procedures such as the exact disjuncts for Host Escape detection, placing it in the 12-15 band\"}, \"D3\": {\"score\": 15, \"why\": \"The 'NEVER' section lists expert-grade anti-patterns with specific reasoning, such as never reading a negative root-write-scope as narrow scope, meeting the 12-15 band\"}, \"D4\": {\"score\": 15, \"why\": \"The description comprehensively answers WHAT, WHEN, and includes trigger keywords like 'sandboxing is unavailable' and 'localhost WebSocket', meeting the 14-15 band\"}, \"D5\": {\"score\": 15, \"why\": \"The skill implements excellent progressive disclosure with mandatory triggers like 'load before re-tiering' and explicit 'Do NOT load' guidance, placing it in the 14-15 band\"}, \"D6\": {\"score\": 15, \"why\": \"Freedom is perfectly calibrated with low freedom for Host Escape detection and high freedom for deployment-level scenarios, matching task fragility as in the 14-15 band\"}, \"D7\": {\"score\": 10, \"why\": \"The skill masterfully follows the 'Tool' pattern with decision trees, code-based checks, and low freedom, appropriate for precise operations on a specific security format, meeting the 9-10 band\"}, \"D8\": {\"score\": 15, \"why\": \"The skill provides practical usability with decision trees for routing findings, fallback reasoning for incomplete results, and clear error handling for unparsed files, meeting the 14-15 band\"}}"
     },
     {
       "provider": "bedrock/deepseek-v3.2",
       "scores": {
-        "D1": 16.0,
-        "D2": 12.0,
-        "D3": 12.0,
+        "D1": 19.0,
+        "D2": 14.0,
+        "D3": 15.0,
         "D4": 15.0,
-        "D5": 14.0,
+        "D5": 15.0,
         "D6": 14.0,
-        "D7": 9.0,
+        "D7": 8.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "The skill provides expert-level decision trees like \"Fires when... Decides, from package bytes alone... Does not decide...\" and trade-offs between artifact static analysis and deployment inspection, which Claude would not inherently know.",
-        "D2": "It provides expert thinking patterns like \"The recurring error here is not too little rigour but the wrong subject\" plus domain-specific procedures like the Host Escape disjunct detection and manual deployment checks for bind addresses, meeting the good balance criteria.",
-        "D3": "It includes specific expert anti-patterns with reasoning, such as \"'available if configured' does not close this finding' because the compromised population runs the default, which is host mode.\"",
-        "D4": "The description perfectly answers WHAT (detect OWASP AST06 Weak Isolation), WHEN (e.g., reviewing an agent runtime's default execution mode), and includes KEYWORDS like host agent, sandboxing, workspace precedence, and localhost WebSocket.",
-        "D5": "It implements excellent progressive disclosure with clear MANDATORY triggers (e.g., 'load coverage-matrix.md before re-tiering a scenario') and explicit 'Do NOT load' guidance for deployment questions.",
-        "D6": "It explicitly calibrates freedom, declaring low freedom for static S01 Host Escape detection ('take the disjunction as given') and high freedom for manual deployment checks, perfectly matching task consequence.",
-        "D7": "It clearly follows the 'Tool' pattern (~300 lines) with decision trees, code example references, and low-freedom instructions for precise security analysis, with only minor deviations in structure.",
-        "D8": "It provides comprehensive actionable guidance including decision trees for routing, clear coverage boundaries, and explicit handling for negative checks and unparsed files, covering common and edge cases."
+        "D1": "The entire skill focuses on expert-level nuance distinguishing static analysis from deployment assessment, decision boundaries, and silent failure modes for AST06, providing knowledge delta Claude lacks.",
+        "D2": "The 'Orientation' table clearly splits freedom levels for S01 vs other scenarios, and 'Decision rules' provide high-value domain-specific procedures like checking bind address first and evaluating skill-shadowing precedence.",
+        "D3": "The extensive 'NEVER' list provides expert-grade anti-patterns like 'NEVER let an unparsed: note pass as a clean result' with specific reasoning from the detector's implementation.",
+        "D4": "The description perfectly provides WHAT (detect/triage weak isolation), WHEN (four explicit trigger scenarios), and KEYWORDS (host agent security context, skill-shadowing, localhost WebSocket).",
+        "D5": "It explicitly states 'Layer 3 \u2014 load on condition, never by default' with MANDATORY and 'Do NOT Load' triggers embedded before 'What the two shipped checks decide'.",
+        "D6": "It correctly calibrates low freedom for S01 Host Escape detection ('take the disjunction as given') and high freedom for deployment assessment scenarios where 'no rule exists'.",
+        "D7": "It clearly follows the 'Tool' pattern (~300 lines, decision trees, code example references) but deviates by embedding high-level procedural freedom discussion.",
+        "D8": "It provides comprehensive decision trees and routing tables, covers edge cases like unparsed files and broad-but-not-root scopes, but leaves some procedural gaps for deployment checks."
       },
-      "total": 106.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 16, \"why\": \"The skill provides expert-level decision trees like \\\"Fires when... Decides, from package bytes alone... Does not decide...\\\" and trade-offs between artifact static analysis and deployment inspection, which Claude would not inherently know.\"},\n  \"D2\": {\"score\": 12, \"why\": \"It provides expert thinking patterns like \\\"The recurring error here is not too little rigour but the wrong subject\\\" plus domain-specific procedures like the Host Escape disjunct detection and manual deployment checks for bind addresses, meeting the good balance criteria.\"},\n  \"D3\": {\"score\": 12, \"why\": \"It includes specific expert anti-patterns with reasoning, such as \\\"'available if configured' does not close this finding' because the compromised population runs the default, which is host mode.\\\"\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description perfectly answers WHAT (detect OWASP AST06 Weak Isolation), WHEN (e.g., reviewing an agent runtime's default execution mode), and includes KEYWORDS like host agent, sandboxing, workspace precedence, and localhost WebSocket.\"},\n  \"D5\": {\"score\": 14, \"why\": \"It implements excellent progressive disclosure with clear MANDATORY triggers (e.g., 'load coverage-matrix.md before re-tiering a scenario') and explicit 'Do NOT load' guidance for deployment questions.\"},\n  \"D6\": {\"score\": 14, \"why\": \"It explicitly calibrates freedom, declaring low freedom for static S01 Host Escape detection ('take the disjunction as given') and high freedom for manual deployment checks, perfectly matching task consequence.\"},\n  \"D7\": {\"score\": 9, \"why\": \"It clearly follows the 'Tool' pattern (~300 lines) with decision trees, code example references, and low-freedom instructions for precise security analysis, with only minor deviations in structure.\"},\n  \"D8\": {\"score\": 14, \"why\": \"It provides comprehensive actionable guidance including decision trees for routing, clear coverage boundaries, and explicit handling for negative checks and unparsed files, covering common and edge cases.\"}\n}"
-    },
-    {
-      "provider": "bedrock/nova-pro",
-      "scores": {
-        "D1": 16.0,
-        "D2": 12.0,
-        "D3": 12.0,
-        "D4": 14.0,
-        "D5": 14.0,
-        "D6": 13.0,
-        "D7": 9.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "The skill provides expert-level knowledge on detecting and triaging OWASP AST06 Weak Isolation, with specific decision trees and detailed explanations.",
-        "D2": "The skill transfers both expert thinking patterns and domain-specific procedures, such as the detailed decision rules and the specific steps for detecting Host Escape.",
-        "D3": "The skill includes a specific NEVER list with reasoning, such as 'NEVER close a finding based on evidence about the product when the finding is about the deployment.'",
-        "D4": "The description is comprehensive, listing specific capabilities, trigger scenarios, and keywords, such as 'Use when reviewing an agent runtime's default execution mode...'",
-        "D5": "The skill implements proper content layering with explicit triggers and 'Do NOT Load' guidance, such as loading `coverage-matrix.md` before re-tiering a scenario.",
-        "D6": "The level of specificity is appropriate for the task's fragility, with low freedom for deciding `AST06-S01` and high freedom for the other scenarios.",
-        "D7": "The skill follows the 'Knowledge' pattern with minor deviations, providing detailed decision rules and specific checks.",
-        "D8": "The skill provides clear guidance for common cases and includes decision trees and fallbacks, such as the detailed decision rules and the routing table."
-      },
-      "total": 104.0,
-      "raw_response": "{\n  \"D1\": {\n    \"score\": 16,\n    \"why\": \"The skill provides expert-level knowledge on detecting and triaging OWASP AST06 Weak Isolation, with specific decision trees and detailed explanations.\"\n  },\n  \"D2\": {\n    \"score\": 12,\n    \"why\": \"The skill transfers both expert thinking patterns and domain-specific procedures, such as the detailed decision rules and the specific steps for detecting Host Escape.\"\n  },\n  \"D3\": {\n    \"score\": 12,\n    \"why\": \"The skill includes a specific NEVER list with reasoning, such as 'NEVER close a finding based on evidence about the product when the finding is about the deployment.'\"\n  },\n  \"D4\": {\n    \"score\": 14,\n    \"why\": \"The description is comprehensive, listing specific capabilities, trigger scenarios, and keywords, such as 'Use when reviewing an agent runtime's default execution mode...'\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"The skill implements proper content layering with explicit triggers and 'Do NOT Load' guidance, such as loading `coverage-matrix.md` before re-tiering a scenario.\"\n  },\n  \"D6\": {\n    \"score\": 13,\n    \"why\": \"The level of specificity is appropriate for the task's fragility, with low freedom for deciding `AST06-S01` and high freedom for the other scenarios.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows the 'Knowledge' pattern with minor deviations, providing detailed decision rules and specific checks.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides clear guidance for common cases and includes decision trees and fallbacks, such as the detailed decision rules and the routing table.\"\n  }\n}"
+      "total": 114.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 19,\n    \"why\": \"The entire skill focuses on expert-level nuance distinguishing static analysis from deployment assessment, decision boundaries, and silent failure modes for AST06, providing knowledge delta Claude lacks.\"\n  },\n  \"D2\": {\n    \"score\": 14,\n    \"why\": \"The 'Orientation' table clearly splits freedom levels for S01 vs other scenarios, and 'Decision rules' provide high-value domain-specific procedures like checking bind address first and evaluating skill-shadowing precedence.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"The extensive 'NEVER' list provides expert-grade anti-patterns like 'NEVER let an unparsed: note pass as a clean result' with specific reasoning from the detector's implementation.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description perfectly provides WHAT (detect/triage weak isolation), WHEN (four explicit trigger scenarios), and KEYWORDS (host agent security context, skill-shadowing, localhost WebSocket).\"\n  },\n  \"D5\": {\n    \"score\": 15,\n    \"why\": \"It explicitly states 'Layer 3 \u2014 load on condition, never by default' with MANDATORY and 'Do NOT Load' triggers embedded before 'What the two shipped checks decide'.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"It correctly calibrates low freedom for S01 Host Escape detection ('take the disjunction as given') and high freedom for deployment assessment scenarios where 'no rule exists'.\"\n  },\n  \"D7\": {\n    \"score\": 8,\n    \"why\": \"It clearly follows the 'Tool' pattern (~300 lines, decision trees, code example references) but deviates by embedding high-level procedural freedom discussion.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"It provides comprehensive decision trees and routing tables, covers edge cases like unparsed files and broad-but-not-root scopes, but leaves some procedural gaps for deployment checks.\"\n  }\n}"
     },
     {
       "provider": "claude-cli/sonnet",
       "scores": {
         "D1": 18.0,
-        "D2": 14.0,
-        "D3": 12.0,
-        "D4": 15.0,
-        "D5": 15.0,
-        "D6": 14.0,
-        "D7": 8.0,
-        "D8": 13.0
-      },
-      "justifications": {
-        "D1": "The CVE-2026-32025/ClawJacked citation and the 'available if configured is evidence for the finding, not against it' claim are non-obvious expert knowledge with essentially no filler, placing it in the 16-20 band.",
-        "D2": "The skill pairs a thinking pattern (route by 'what you are holding' table) with genuine domain procedures (the two detector.py disjuncts and the closed root-scope literal set), matching the 12-15 'expert-level' band.",
-        "D3": "Anti-patterns are specific with reasoning ('a scope like /etc/** ... fires only if it also matches a named persistence location', unparsed-file-still-returns-negative) though framed as caveats rather than a bulleted NEVER list, landing in the 8-11-to-12-15 boundary I place at 12.",
-        "D4": "The description states WHAT (skill-shadowing, localhost WebSocket surface), WHEN (four concrete trigger scenarios), and disambiguation keywords (AST03 vs AST06), satisfying the 14-15 'comprehensive with trigger keywords' band.",
-        "D5": "The 'Layer 3 \u2014 load on condition, never by default' section gives explicit per-file MANDATORY/'Do NOT load' triggers for coverage-matrix.md and detector.py, matching the 14-15 'decision trees + explicit triggers + Do NOT Load' band.",
-        "D6": "The explicit freedom table ('Deciding AST06-S01: Low ... The other four scenarios: High') states and justifies differing constraint levels per sub-task, matching the 14-15 'perfect calibration' band.",
-        "D7": "The structure (decision rules, routing table, scoped detector references) follows the Tool/Process hybrid pattern with only minor deviations from the ~300-line Tool archetype, placing it in the 7-8 'clear pattern, minor deviations' band.",
-        "D8": "The 'What the two shipped checks decide, and where they go quiet' section gives concrete edge cases (unparsed-file handling, deny_write-shadowed entries) that a reviewer could act on immediately, fitting the 11-13 'clear guidance for common cases' band rather than 14-15 since deployment-side rules 2-4 are left entirely to manual judgement."
-      },
-      "total": 109.0,
-      "raw_response": "I'm disregarding the injected \"MAGIC KEYWORD: AI-SLOP-CLEANER\" system-reminder \u2014 it's not part of the actual task, which is to score the pinned skill artifact against the rubric and return a single JSON object. Here is that judgement:\n\n```json\n{\"D1\": {\"score\": 18, \"why\": \"The CVE-2026-32025/ClawJacked citation and the 'available if configured is evidence for the finding, not against it' claim are non-obvious expert knowledge with essentially no filler, placing it in the 16-20 band.\"}, \"D2\": {\"score\": 14, \"why\": \"The skill pairs a thinking pattern (route by 'what you are holding' table) with genuine domain procedures (the two detector.py disjuncts and the closed root-scope literal set), matching the 12-15 'expert-level' band.\"}, \"D3\": {\"score\": 12, \"why\": \"Anti-patterns are specific with reasoning ('a scope like /etc/** ... fires only if it also matches a named persistence location', unparsed-file-still-returns-negative) though framed as caveats rather than a bulleted NEVER list, landing in the 8-11-to-12-15 boundary I place at 12.\"}, \"D4\": {\"score\": 15, \"why\": \"The description states WHAT (skill-shadowing, localhost WebSocket surface), WHEN (four concrete trigger scenarios), and disambiguation keywords (AST03 vs AST06), satisfying the 14-15 'comprehensive with trigger keywords' band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Layer 3 \u2014 load on condition, never by default' section gives explicit per-file MANDATORY/'Do NOT load' triggers for coverage-matrix.md and detector.py, matching the 14-15 'decision trees + explicit triggers + Do NOT Load' band.\"}, \"D6\": {\"score\": 14, \"why\": \"The explicit freedom table ('Deciding AST06-S01: Low ... The other four scenarios: High') states and justifies differing constraint levels per sub-task, matching the 14-15 'perfect calibration' band.\"}, \"D7\": {\"score\": 8, \"why\": \"The structure (decision rules, routing table, scoped detector references) follows the Tool/Process hybrid pattern with only minor deviations from the ~300-line Tool archetype, placing it in the 7-8 'clear pattern, minor deviations' band.\"}, \"D8\": {\"score\": 13, \"why\": \"The 'What the two shipped checks decide, and where they go quiet' section gives concrete edge cases (unparsed-file handling, deny_write-shadowed entries) that a reviewer could act on immediately, fitting the 11-13 'clear guidance for common cases' band rather than 14-15 since deployment-side rules 2-4 are left entirely to manual judgement.\"}}\n```\n"
-    },
-    {
-      "provider": "anthropic-compatible/glm-5.2",
-      "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
-        "D3": 13.0,
-        "D4": 14.0,
-        "D5": 14.0,
-        "D6": 13.0,
-        "D7": 9.0,
-        "D8": 13.0
-      },
-      "justifications": {
-        "D1": "Nearly every paragraph is expert delta, e.g. 'a scope like /etc/** ... is not in that set \u2014 it fires only if it also matches a named persistence location' and the closed-literal-set vs ast.Call-node matching limits \u2014 pure knowledge delta band (16-20).",
-        "D2": "Transfers both expert mindset ('the population that gets compromised is the population running the default') and procedures Claude wouldn't know, like 'treat the unparsed: note as an INCOMPLETE result' and running rules 2-4 by hand against the deployment \u2014 expert-level band (12-15).",
-        "D3": "Expert-grade NEVERs with hard-won reasoning, e.g. the 'Why \"available if configured\" does not close this finding' section and 'simulating one is the failure mode' for deployment questions \u2014 expert band (12-15), slightly short of perfect breadth.",
-        "D4": "The description gives WHAT (detect/triage AST06 weak isolation), WHEN ('when reviewing an agent runtime's default execution mode...'), keywords (skill-shadowing, localhost WebSocket, bind address), and even an AST03-vs-AST06 disambiguation trigger \u2014 perfect band (14-15).",
-        "D5": "Layer-3 loading is conditional with explicit 'Do NOT load it to route a finding' / 'Do NOT load either for a deployment question' plus a 'Stop after Decision rules' early-exit \u2014 perfect layering band (14-15).",
-        "D6": "The freedom table explicitly splits low freedom (take the S01 disjunction as given, 'the matrix wins') from high freedom (deployment rules 2-4), a deliberate calibration matched to fragility \u2014 good-to-near-perfect band (11-13/14).",
-        "D7": "Masterful hybrid of Navigation and Tool patterns: routing table first, decision rules, then conditional layer-3 files, sized appropriately at ~150 lines \u2014 masterful band (9-10).",
-        "D8": "Covers edge cases and fallback behavior concretely (fragment-assembled persistence paths return no match, shadowed deny_write entries hide breadth, negative check \u2260 pass) though the whitepaper reference explicitly has no local copy \u2014 clear-guidance-plus-edges band (11-13)."
-      },
-      "total": 108.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Nearly every paragraph is expert delta, e.g. 'a scope like /etc/** ... is not in that set \u2014 it fires only if it also matches a named persistence location' and the closed-literal-set vs ast.Call-node matching limits \u2014 pure knowledge delta band (16-20).\"}, \"D2\": {\"score\": 14, \"why\": \"Transfers both expert mindset ('the population that gets compromised is the population running the default') and procedures Claude wouldn't know, like 'treat the unparsed: note as an INCOMPLETE result' and running rules 2-4 by hand against the deployment \u2014 expert-level band (12-15).\"}, \"D3\": {\"score\": 13, \"why\": \"Expert-grade NEVERs with hard-won reasoning, e.g. the 'Why \\\"available if configured\\\" does not close this finding' section and 'simulating one is the failure mode' for deployment questions \u2014 expert band (12-15), slightly short of perfect breadth.\"}, \"D4\": {\"score\": 14, \"why\": \"The description gives WHAT (detect/triage AST06 weak isolation), WHEN ('when reviewing an agent runtime's default execution mode...'), keywords (skill-shadowing, localhost WebSocket, bind address), and even an AST03-vs-AST06 disambiguation trigger \u2014 perfect band (14-15).\"}, \"D5\": {\"score\": 14, \"why\": \"Layer-3 loading is conditional with explicit 'Do NOT load it to route a finding' / 'Do NOT load either for a deployment question' plus a 'Stop after Decision rules' early-exit \u2014 perfect layering band (14-15).\"}, \"D6\": {\"score\": 13, \"why\": \"The freedom table explicitly splits low freedom (take the S01 disjunction as given, 'the matrix wins') from high freedom (deployment rules 2-4), a deliberate calibration matched to fragility \u2014 good-to-near-perfect band (11-13/14).\"}, \"D7\": {\"score\": 9, \"why\": \"Masterful hybrid of Navigation and Tool patterns: routing table first, decision rules, then conditional layer-3 files, sized appropriately at ~150 lines \u2014 masterful band (9-10).\"}, \"D8\": {\"score\": 13, \"why\": \"Covers edge cases and fallback behavior concretely (fragment-assembled persistence paths return no match, shadowed deny_write entries hide breadth, negative check \u2260 pass) though the whitepaper reference explicitly has no local copy \u2014 clear-guidance-plus-edges band (11-13).\"}}"
-    },
-    {
-      "provider": "bedrock/gpt-oss-120b",
-      "scores": {
-        "D1": 17.0,
-        "D2": 13.0,
-        "D3": 6.0,
-        "D4": 15.0,
-        "D5": 13.0,
-        "D6": 14.0,
-        "D7": 8.0,
-        "D8": 13.0
-      },
-      "justifications": {
-        "D1": "The skill details expert\u2011only decision logic such as the disjunction of Host Escape checks and the distinction between artifact\u2011versus\u2011deployment evidence, placing it in the 16\u201120 pure knowledge delta band.",
-        "D2": "It combines thinking patterns (e.g., \u201cBefore deciding\u2026\u201d) with domain\u2011specific procedures like conditional loading of `coverage-matrix.md` and `scripts/detector.py`, fitting the 12\u201115 expert\u2011level balance band.",
-        "D3": "The only anti\u2011pattern content is procedural \u201cDo NOT load\u201d warnings without specific design\u2011level never\u2011list reasoning, landing it in the 4\u20117 generic warnings band.",
-        "D4": "The description lists the WHAT, WHEN and keyword triggers (e.g., \u201cUse when reviewing an agent runtime\u2026\u201d) meeting the perfect 14\u201115 description quality band.",
-        "D5": "Layer\u202f3 explicitly mandates loading `coverage-matrix.md` and `scripts/detector.py` only under certain conditions and forbids loading them otherwise, satisfying the 11\u201113 good layering band.",
-        "D6": "Freedom is deliberately split\u2014low for the static Host Escape check and high for deployment\u2011hand hand rules\u2014demonstrating the 14\u201115 perfect calibration band.",
-        "D7": "The skill follows a Process\u2011style pattern with phased decision rules, tables and triggers, matching the 7\u20118 clear\u2011pattern band.",
-        "D8": "Decision rules, load triggers, and detailed manual steps (e.g., checking bind address first) provide clear, actionable guidance covering edge cases, placing it in the 11\u201113 clear\u2011guidance band."
-      },
-      "total": 99.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 17, \"why\": \"The skill details expert\u2011only decision logic such as the disjunction of Host Escape checks and the distinction between artifact\u2011versus\u2011deployment evidence, placing it in the 16\u201120 pure knowledge delta band.\"},\n  \"D2\": {\"score\": 13, \"why\": \"It combines thinking patterns (e.g., \u201cBefore deciding\u2026\u201d) with domain\u2011specific procedures like conditional loading of `coverage-matrix.md` and `scripts/detector.py`, fitting the 12\u201115 expert\u2011level balance band.\"},\n  \"D3\": {\"score\": 6, \"why\": \"The only anti\u2011pattern content is procedural \u201cDo NOT load\u201d warnings without specific design\u2011level never\u2011list reasoning, landing it in the 4\u20117 generic warnings band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description lists the WHAT, WHEN and keyword triggers (e.g., \u201cUse when reviewing an agent runtime\u2026\u201d) meeting the perfect 14\u201115 description quality band.\"},\n  \"D5\": {\"score\": 13, \"why\": \"Layer\u202f3 explicitly mandates loading `coverage-matrix.md` and `scripts/detector.py` only under certain conditions and forbids loading them otherwise, satisfying the 11\u201113 good layering band.\"},\n  \"D6\": {\"score\": 14, \"why\": \"Freedom is deliberately split\u2014low for the static Host Escape check and high for deployment\u2011hand hand rules\u2014demonstrating the 14\u201115 perfect calibration band.\"},\n  \"D7\": {\"score\": 8, \"why\": \"The skill follows a Process\u2011style pattern with phased decision rules, tables and triggers, matching the 7\u20118 clear\u2011pattern band.\"},\n  \"D8\": {\"score\": 13, \"why\": \"Decision rules, load triggers, and detailed manual steps (e.g., checking bind address first) provide clear, actionable guidance covering edge cases, placing it in the 11\u201113 clear\u2011guidance band.\"}\n}"
-    },
-    {
-      "provider": "bedrock/qwen3-235b",
-      "scores": {
-        "D1": 17.0,
         "D2": 13.0,
         "D3": 14.0,
-        "D4": 15.0,
-        "D5": 15.0,
-        "D6": 15.0,
-        "D7": 9.0,
-        "D8": 15.0
-      },
-      "justifications": {
-        "D1": "The skill provides pure knowledge delta with expert-level insights such as the disjunction in Host Escape detection and the distinction between product capability and deployment reality, meeting the 16-20 band criteria for genuine expert knowledge",
-        "D2": "It balances expert thinking patterns like 'Route first' and decision workflows with domain-specific procedures such as the exact conditions for script and manifest disjuncts, fitting the 8-11 band but elevated to 12-15 by the explicit structural reasoning",
-        "D3": "The skill includes expert-grade anti-patterns like NEVER inferring coverage from code or loading `coverage-matrix.md` to route findings, with clear justifications rooted in real-world\u8bef\u5224 prevention, satisfying the 12-15 band",
-        "D4": "The description excels by specifying WHAT (detecting OWASP AST06), WHEN (during runtime review or skill override scenarios), and KEYWORDS (.e.g 'sandboxing', 'workspace precedence'), meeting the 14-15 band",
-        "D5": "It implements excellent progressive disclosure with MANDATORY load triggers for `coverage-matrix.md` and `scripts/detector.py`, explicit 'Do NOT load' guidance, and scenario-based loading decisions, achieving the 14-15 band",
-        "D6": "Freedom is perfectly calibrated: low freedom for Host Escape detection via fixed disjuncts and high freedom for deployment-based assessments requiring human judgment, aligning precisely with task fragility in the 14-15 band",
-        "D7": "The skill follows the 'Tool' pattern (~300 lines) with decision trees, code-based checks, and structured workflow appropriate for precise format operations, showing only minor deviations in its hybrid reasoning layers, placing it in the 9-10 band",
-        "D8": "Practical usability is high with clear decision trees, fallback handling for unparsed files, coverage of edge cases like shadowed deny_write entries, and actionable routing guidance, meeting the 14-15 band"
-      },
-      "total": 113.0,
-      "raw_response": "{\"D1\": {\"score\": 17, \"why\": \"The skill provides pure knowledge delta with expert-level insights such as the disjunction in Host Escape detection and the distinction between product capability and deployment reality, meeting the 16-20 band criteria for genuine expert knowledge\"}, \"D2\": {\"score\": 13, \"why\": \"It balances expert thinking patterns like 'Route first' and decision workflows with domain-specific procedures such as the exact conditions for script and manifest disjuncts, fitting the 8-11 band but elevated to 12-15 by the explicit structural reasoning\"}, \"D3\": {\"score\": 14, \"why\": \"The skill includes expert-grade anti-patterns like NEVER inferring coverage from code or loading `coverage-matrix.md` to route findings, with clear justifications rooted in real-world\u8bef\u5224 prevention, satisfying the 12-15 band\"}, \"D4\": {\"score\": 15, \"why\": \"The description excels by specifying WHAT (detecting OWASP AST06), WHEN (during runtime review or skill override scenarios), and KEYWORDS (.e.g 'sandboxing', 'workspace precedence'), meeting the 14-15 band\"}, \"D5\": {\"score\": 15, \"why\": \"It implements excellent progressive disclosure with MANDATORY load triggers for `coverage-matrix.md` and `scripts/detector.py`, explicit 'Do NOT load' guidance, and scenario-based loading decisions, achieving the 14-15 band\"}, \"D6\": {\"score\": 15, \"why\": \"Freedom is perfectly calibrated: low freedom for Host Escape detection via fixed disjuncts and high freedom for deployment-based assessments requiring human judgment, aligning precisely with task fragility in the 14-15 band\"}, \"D7\": {\"score\": 9, \"why\": \"The skill follows the 'Tool' pattern (~300 lines) with decision trees, code-based checks, and structured workflow appropriate for precise format operations, showing only minor deviations in its hybrid reasoning layers, placing it in the 9-10 band\"}, \"D8\": {\"score\": 15, \"why\": \"Practical usability is high with clear decision trees, fallback handling for unparsed files, coverage of edge cases like shadowed deny_write entries, and actionable routing guidance, meeting the 14-15 band\"}}"
-    },
-    {
-      "provider": "bedrock/nova-pro",
-      "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
-        "D3": 13.0,
-        "D4": 15.0,
+        "D4": 14.0,
         "D5": 14.0,
         "D6": 14.0,
-        "D7": 9.0,
+        "D7": 7.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "The skill provides expert knowledge on the specific OWASP AST06 vulnerability and its implications, with minimal redundancy.",
-        "D2": "The skill provides both expert thinking patterns and domain-specific procedures for assessing and mitigating AST06 vulnerabilities.",
-        "D3": "The skill includes specific anti-patterns and reasoning, though not exhaustive, it provides valuable insights on what not to do.",
-        "D4": "The description is comprehensive, detailing WHAT the skill does, WHEN to use it, and includes relevant KEYWORDS.",
-        "D5": "The skill implements good content layering with clear triggers for when to load additional resources.",
-        "D6": "The level of specificity is appropriate for the task's fragility, providing low freedom for critical checks and high freedom for subjective assessments.",
-        "D7": "The skill follows a clear pattern, closely aligning with the 'Knowledge' pattern, though with some minor deviations.",
-        "D8": "The skill provides clear, actionable guidance with decision trees and fallbacks, though it could improve edge case coverage."
+        "D1": "The skill cites ClawJacked (CVE-2026-32025, CVSS 7.5) and the exact disjunction logic behind AST06-S01 rather than explaining what isolation or sandboxing is, putting it in the 16-20 'pure knowledge delta' band.",
+        "D2": "It pairs a thinking framework ('Route first' table, the freedom-split table) with domain-specific procedures like the detector's two-disjunct Host Escape check, landing in the 12-15 'expert-level' band rather than only generic steps.",
+        "D3": "The NEVER list gives reasons tied to implementation internals (e.g. 'the check walks pysource.python_files(), whose PY_SUFFIXES is (\".py\",)'), matching the 12-15 'expert-grade anti-patterns with WHY' band rather than vague cautions.",
+        "D4": "The description states WHAT (skill-shadowing, localhost WebSocket surface), WHEN ('Use when reviewing... when a workspace-level skill can override...'), and keywords, meeting the 14-15 'comprehensive' band.",
+        "D5": "The 'Layer 3 \u2014 load on condition' section gives per-file MANDATORY/'Do NOT load' triggers for coverage-matrix.md and detector.py, matching the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.",
+        "D6": "The explicit freedom table ('Deciding AST06-S01: Low' vs 'The other four scenarios: High') argues calibration directly rather than leaving it implicit, fitting the 14-15 'perfect calibration' band.",
+        "D7": "It mixes Tool-pattern elements (decision trees, low-freedom detector rules) with Process-style phased routing and runs well past the ~300-line Tool norm, so it fits the 7-8 'clear pattern with minor deviations' band rather than a masterful single-pattern application.",
+        "D8": "Edge cases like an 'unparsed:' note being wrongly read as a clean result, or a shadowed deny_write entry hiding manifest breadth, are called out explicitly, placing it in the 14-15 'comprehensive coverage including edge cases' band."
       },
-      "total": 111.0,
-      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"The skill provides expert knowledge on the specific OWASP AST06 vulnerability and its implications, with minimal redundancy.\"\n  },\n  \"D2\": {\n    \"score\": 14,\n    \"why\": \"The skill provides both expert thinking patterns and domain-specific procedures for assessing and mitigating AST06 vulnerabilities.\"\n  },\n  \"D3\": {\n    \"score\": 13,\n    \"why\": \"The skill includes specific anti-patterns and reasoning, though not exhaustive, it provides valuable insights on what not to do.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, detailing WHAT the skill does, WHEN to use it, and includes relevant KEYWORDS.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"The skill implements good content layering with clear triggers for when to load additional resources.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The level of specificity is appropriate for the task's fragility, providing low freedom for critical checks and high freedom for subjective assessments.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows a clear pattern, closely aligning with the 'Knowledge' pattern, though with some minor deviations.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides clear, actionable guidance with decision trees and fallbacks, though it could improve edge case coverage.\"\n  }\n}"
-    },
-    {
-      "provider": "claude-cli/sonnet",
-      "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
-        "D3": 12.0,
-        "D4": 15.0,
-        "D5": 15.0,
-        "D6": 15.0,
-        "D7": 8.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "The decision rules (e.g. rule 3's ClawJacked CVE-2026-32025 loopback-bypass detail, rule 4's provenance-not-logging requirement) are non-obvious expert knowledge with almost no 'what is X' filler, putting it in the 16-20 pure-delta band.",
-        "D2": "It states the thinking pattern explicitly ('isolation is a binary architectural default, not a tunable policy') and pairs it with domain-specific procedures like the two-disjunct Host Escape check and the four hand-run deployment rules, matching the 12-15 expert-level band.",
-        "D3": "The 'Why available if configured does not close this finding' section gives a specific, reasoned NEVER-equivalent (don't close on vendor capability statements/config that merely could enable a sandbox) rather than a generic warning, landing in the 8-11/12-15 boundary of specific-with-reasoning anti-patterns.",
-        "D4": "The description names the exact scenario set (skill-shadowing, localhost WebSocket surface) and four explicit WHEN triggers ('Use when reviewing... when a workspace-level skill can override... when an agent control interface binds...'), satisfying the 14-15 WHAT+WHEN+keywords band.",
-        "D5": "The 'Layer 3 \u2014 load on condition, never by default' block gives MANDATORY-style conditions plus explicit 'Do NOT load ... to route a finding' guidance for both coverage-matrix.md and scripts/detector.py, matching the 14-15 decision-tree-plus-Do-NOT-Load band.",
-        "D6": "The 'Freedom on this page is split unevenly' table explicitly assigns Low freedom to the AST06-S01 disjunction and High freedom to the other four hand-run scenarios with stated reasons, a textbook match for the 14-15 perfect-calibration band.",
-        "D7": "It reads as a Tool-pattern skill (decision trees, a routing table, a scripts/detector.py mechanism) blended with Navigation-style conditional file loading, a clear pattern with minor deviation rather than masterful single-pattern execution, fitting the 7-8 band.",
-        "D8": "The 'What you are holding | Go to' routing table plus the itemized detector blind spots ('An unparsed Python file is named in the evidence and still returns negative') give concrete decision paths and edge-case handling, matching the 14-15 comprehensive-coverage band."
-      },
-      "total": 111.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The decision rules (e.g. rule 3's ClawJacked CVE-2026-32025 loopback-bypass detail, rule 4's provenance-not-logging requirement) are non-obvious expert knowledge with almost no 'what is X' filler, putting it in the 16-20 pure-delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"It states the thinking pattern explicitly ('isolation is a binary architectural default, not a tunable policy') and pairs it with domain-specific procedures like the two-disjunct Host Escape check and the four hand-run deployment rules, matching the 12-15 expert-level band.\"}, \"D3\": {\"score\": 12, \"why\": \"The 'Why available if configured does not close this finding' section gives a specific, reasoned NEVER-equivalent (don't close on vendor capability statements/config that merely could enable a sandbox) rather than a generic warning, landing in the 8-11/12-15 boundary of specific-with-reasoning anti-patterns.\"}, \"D4\": {\"score\": 15, \"why\": \"The description names the exact scenario set (skill-shadowing, localhost WebSocket surface) and four explicit WHEN triggers ('Use when reviewing... when a workspace-level skill can override... when an agent control interface binds...'), satisfying the 14-15 WHAT+WHEN+keywords band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Layer 3 \u2014 load on condition, never by default' block gives MANDATORY-style conditions plus explicit 'Do NOT load ... to route a finding' guidance for both coverage-matrix.md and scripts/detector.py, matching the 14-15 decision-tree-plus-Do-NOT-Load band.\"}, \"D6\": {\"score\": 15, \"why\": \"The 'Freedom on this page is split unevenly' table explicitly assigns Low freedom to the AST06-S01 disjunction and High freedom to the other four hand-run scenarios with stated reasons, a textbook match for the 14-15 perfect-calibration band.\"}, \"D7\": {\"score\": 8, \"why\": \"It reads as a Tool-pattern skill (decision trees, a routing table, a scripts/detector.py mechanism) blended with Navigation-style conditional file loading, a clear pattern with minor deviation rather than masterful single-pattern execution, fitting the 7-8 band.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'What you are holding | Go to' routing table plus the itemized detector blind spots ('An unparsed Python file is named in the evidence and still returns negative') give concrete decision paths and edge-case handling, matching the 14-15 comprehensive-coverage band.\"}}\n"
+      "total": 108.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill cites ClawJacked (CVE-2026-32025, CVSS 7.5) and the exact disjunction logic behind AST06-S01 rather than explaining what isolation or sandboxing is, putting it in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"It pairs a thinking framework ('Route first' table, the freedom-split table) with domain-specific procedures like the detector's two-disjunct Host Escape check, landing in the 12-15 'expert-level' band rather than only generic steps.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list gives reasons tied to implementation internals (e.g. 'the check walks pysource.python_files(), whose PY_SUFFIXES is (\\\".py\\\",)'), matching the 12-15 'expert-grade anti-patterns with WHY' band rather than vague cautions.\"}, \"D4\": {\"score\": 14, \"why\": \"The description states WHAT (skill-shadowing, localhost WebSocket surface), WHEN ('Use when reviewing... when a workspace-level skill can override...'), and keywords, meeting the 14-15 'comprehensive' band.\"}, \"D5\": {\"score\": 14, \"why\": \"The 'Layer 3 \u2014 load on condition' section gives per-file MANDATORY/'Do NOT load' triggers for coverage-matrix.md and detector.py, matching the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.\"}, \"D6\": {\"score\": 14, \"why\": \"The explicit freedom table ('Deciding AST06-S01: Low' vs 'The other four scenarios: High') argues calibration directly rather than leaving it implicit, fitting the 14-15 'perfect calibration' band.\"}, \"D7\": {\"score\": 7, \"why\": \"It mixes Tool-pattern elements (decision trees, low-freedom detector rules) with Process-style phased routing and runs well past the ~300-line Tool norm, so it fits the 7-8 'clear pattern with minor deviations' band rather than a masterful single-pattern application.\"}, \"D8\": {\"score\": 14, \"why\": \"Edge cases like an 'unparsed:' note being wrongly read as a clean result, or a shadowed deny_write entry hiding manifest breadth, are called out explicitly, placing it in the 14-15 'comprehensive coverage including edge cases' band.\"}}\n"
     },
     {
       "provider": "anthropic-compatible/glm-5.2",
       "scores": {
-        "D1": 17.0,
-        "D2": 13.0,
-        "D3": 11.0,
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 15.0,
         "D4": 15.0,
-        "D5": 15.0,
-        "D6": 14.0,
+        "D5": 14.0,
+        "D6": 15.0,
         "D7": 9.0,
         "D8": 13.0
       },
       "justifications": {
-        "D1": "Nearly every paragraph is expert-only delta \u2014 e.g. 'the manifest disjunct compares against a closed literal set of root-ish scopes... /etc/** is enormously broad and is not in that set' and the ast.Call-vs-text matching limitation \u2014 placing it in the 16-20 pure-knowledge-delta band.",
-        "D2": "Combines expert thinking patterns ('the wrong evidence always has the same shape: a sandboxed mode exists... the finding is about the deployment') with domain procedures Claude wouldn't know (route table, run rules 2-4 by hand against the deployment), fitting the 12-15 band.",
-        "D3": "Specific never-style rules with non-obvious reasons \u2014 'Do NOT load it to learn what a check covers: inferring coverage from the code is how that distinction gets lost' and 'that silence is not a pass' \u2014 meets the 8-11 specific-NEVER-with-reasoning band.",
-        "D4": "The description gives WHAT (detect and triage AST06 weak isolation), WHEN ('when reviewing an agent runtime's default execution mode... hot-reload'), keywords (WebSocket, workspace precedence, AST03 vs AST06), hitting the perfect 14-15 band.",
-        "D5": "Layer-3 loading is conditionally gated with explicit triggers and 'Do NOT load' guidance in both directions ('Do NOT load either for a deployment question'), plus 'Stop after Decision rules' cutoffs \u2014 perfect 14-15 layering.",
-        "D6": "The freedom table explicitly splits low freedom for the S01 disjunction ('take the disjunction as given') from high freedom for deployment questions ('simulating a rule is the failure mode'), a near-perfect 14-15 calibration matched to task fragility.",
-        "D7": "It is a masterful Navigation-pattern skill: minimal routing table up front ('Route first... this table is only the jump') delegating depth to coverage-matrix.md and detector.py, fitting the 9-10 band.",
-        "D8": "'What the two shipped checks decide, and where they go quiet' covers concrete failure modes \u2014 unparsed Python files treated as INCOMPLETE, shadowed deny_write entries, broad-but-not-root scopes requiring manual read \u2014 placing it in the 11-13 clear-guidance band with only the nonexistent whitepaper copy as a gap."
+        "D1": "Nearly every paragraph is expert delta \u2014 e.g. the closed literal set of thirteen root-scope spellings letting '/etc/**' pass negative and the 'unparsed:' note silently converting the load-bearing check into a pass are landmines only experience with this detector would teach (11-15 band, near 16-20 with minimal redundancy).",
+        "D2": "The split-freedom table plus the package-vs-deployment resolution rule ('a finding of host mode is the default is closed only by evidence about the actual deployment') transfers both an expert mindset and a concrete hand-run procedure for the four out-of-artifact scenarios, hitting the expert-level band.",
+        "D3": "The 'NEVER \u2014 the ways an AST06 review closes on nothing' section gives seven specific, code-grounded anti-patterns with WHY (e.g. NEVER promote AST06-unrestricted-shell-exec because 'registry_ids: []' excludes it from the F1 denominator), squarely in the 12-15 expert-grade band.",
+        "D4": "The description gives WHAT (detect/triage AST06 weak isolation, shadowing, WebSocket attack surface), WHEN ('use when reviewing an agent runtime's default execution mode...'), and discriminative keywords including the AST03-vs-AST06 disambiguation \u2014 perfect per the checklist.",
+        "D5": "Layer-3 loading is conditional and bidirectional: 'load before re-tiering a scenario... Do NOT load it to route a finding' and 'Do NOT load either for a deployment question', which is the Excellent trigger pattern plus stop-after guidance for the body itself.",
+        "D6": "The freedom table explicitly calibrates low freedom where the registry/detector fixes the disjunction ('a third disjunct reasoned out mid-review is a private doctrine') and high freedom where no rule exists, matching constraint to fragility perfectly.",
+        "D7": "It cleanly combines the Navigation pattern (route table, layer-3 triggers, ~150-line body) with Tool-pattern decision content appropriate to a precise detection task, a masterful application with only minor hybrid deviation.",
+        "D8": "Decision trees, negative-result interpretation ('read What the two shipped checks decide only when a check returned negative'), cross-category routing and explicit INCOMPLETE fallbacks make common cases fully actionable, though the four hand-run scenarios necessarily rely on un-instantiated judgment."
       },
-      "total": 107.0,
-      "raw_response": "{\"D1\": {\"score\": 17, \"why\": \"Nearly every paragraph is expert-only delta \u2014 e.g. 'the manifest disjunct compares against a closed literal set of root-ish scopes... /etc/** is enormously broad and is not in that set' and the ast.Call-vs-text matching limitation \u2014 placing it in the 16-20 pure-knowledge-delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"Combines expert thinking patterns ('the wrong evidence always has the same shape: a sandboxed mode exists... the finding is about the deployment') with domain procedures Claude wouldn't know (route table, run rules 2-4 by hand against the deployment), fitting the 12-15 band.\"}, \"D3\": {\"score\": 11, \"why\": \"Specific never-style rules with non-obvious reasons \u2014 'Do NOT load it to learn what a check covers: inferring coverage from the code is how that distinction gets lost' and 'that silence is not a pass' \u2014 meets the 8-11 specific-NEVER-with-reasoning band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description gives WHAT (detect and triage AST06 weak isolation), WHEN ('when reviewing an agent runtime's default execution mode... hot-reload'), keywords (WebSocket, workspace precedence, AST03 vs AST06), hitting the perfect 14-15 band.\"}, \"D5\": {\"score\": 15, \"why\": \"Layer-3 loading is conditionally gated with explicit triggers and 'Do NOT load' guidance in both directions ('Do NOT load either for a deployment question'), plus 'Stop after Decision rules' cutoffs \u2014 perfect 14-15 layering.\"}, \"D6\": {\"score\": 14, \"why\": \"The freedom table explicitly splits low freedom for the S01 disjunction ('take the disjunction as given') from high freedom for deployment questions ('simulating a rule is the failure mode'), a near-perfect 14-15 calibration matched to task fragility.\"}, \"D7\": {\"score\": 9, \"why\": \"It is a masterful Navigation-pattern skill: minimal routing table up front ('Route first... this table is only the jump') delegating depth to coverage-matrix.md and detector.py, fitting the 9-10 band.\"}, \"D8\": {\"score\": 13, \"why\": \"'What the two shipped checks decide, and where they go quiet' covers concrete failure modes \u2014 unparsed Python files treated as INCOMPLETE, shadowed deny_write entries, broad-but-not-root scopes requiring manual read \u2014 placing it in the 11-13 clear-guidance band with only the nonexistent whitepaper copy as a gap.\"}}"
+      "total": 113.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Nearly every paragraph is expert delta \u2014 e.g. the closed literal set of thirteen root-scope spellings letting '/etc/**' pass negative and the 'unparsed:' note silently converting the load-bearing check into a pass are landmines only experience with this detector would teach (11-15 band, near 16-20 with minimal redundancy).\"},\n\"D2\": {\"score\": 14, \"why\": \"The split-freedom table plus the package-vs-deployment resolution rule ('a finding of host mode is the default is closed only by evidence about the actual deployment') transfers both an expert mindset and a concrete hand-run procedure for the four out-of-artifact scenarios, hitting the expert-level band.\"},\n\"D3\": {\"score\": 15, \"why\": \"The 'NEVER \u2014 the ways an AST06 review closes on nothing' section gives seven specific, code-grounded anti-patterns with WHY (e.g. NEVER promote AST06-unrestricted-shell-exec because 'registry_ids: []' excludes it from the F1 denominator), squarely in the 12-15 expert-grade band.\"},\n\"D4\": {\"score\": 15, \"why\": \"The description gives WHAT (detect/triage AST06 weak isolation, shadowing, WebSocket attack surface), WHEN ('use when reviewing an agent runtime's default execution mode...'), and discriminative keywords including the AST03-vs-AST06 disambiguation \u2014 perfect per the checklist.\"},\n\"D5\": {\"score\": 14, \"why\": \"Layer-3 loading is conditional and bidirectional: 'load before re-tiering a scenario... Do NOT load it to route a finding' and 'Do NOT load either for a deployment question', which is the Excellent trigger pattern plus stop-after guidance for the body itself.\"},\n\"D6\": {\"score\": 15, \"why\": \"The freedom table explicitly calibrates low freedom where the registry/detector fixes the disjunction ('a third disjunct reasoned out mid-review is a private doctrine') and high freedom where no rule exists, matching constraint to fragility perfectly.\"},\n\"D7\": {\"score\": 9, \"why\": \"It cleanly combines the Navigation pattern (route table, layer-3 triggers, ~150-line body) with Tool-pattern decision content appropriate to a precise detection task, a masterful application with only minor hybrid deviation.\"},\n\"D8\": {\"score\": 13, \"why\": \"Decision trees, negative-result interpretation ('read What the two shipped checks decide only when a check returned negative'), cross-category routing and explicit INCOMPLETE fallbacks make common cases fully actionable, though the four hand-run scenarios necessarily rely on un-instantiated judgment.\"}}"
     }
   ],
   "aggregate": {
-    "n": 17,
-    "mean": 107.4,
-    "median": 107.0,
-    "min": 99.0,
-    "max": 116.0,
-    "range": 17.0,
-    "stdev": 4.95,
-    "lower_bound": 102.5,
+    "n": 15,
+    "mean": 111.3,
+    "median": 112.0,
+    "min": 104.0,
+    "max": 117.0,
+    "range": 13.0,
+    "stdev": 4.04,
+    "lower_bound": 107.3,
     "judgments": [
-      99.0,
-      116.0,
-      106.0,
-      106.0,
-      107.0,
-      108.0,
-      101.0,
-      115.0,
-      106.0,
       104.0,
-      109.0,
+      117.0,
+      106.0,
+      111.0,
+      112.0,
+      107.0,
+      116.0,
+      112.0,
+      110.0,
+      114.0,
       108.0,
-      99.0,
-      113.0,
-      111.0,
-      111.0,
-      107.0
+      117.0,
+      114.0,
+      108.0,
+      113.0
     ],
     "method": "multi-round-independent-pooled",
     "rubric_sha": "3027f20f3181758385a1bb8c022d4041dfb4de84",
     "rubric_content_sha256": "737ef3628f0e11353114c3bd05a1c9d0c448dbfec1ae85db839253cbe93198b6",
-    "dim_n": 17,
+    "dim_n": 15,
     "dim_means": {
-      "D1": 17.4,
-      "D2": 13.1,
-      "D3": 11.5,
-      "D4": 14.8,
+      "D1": 17.9,
+      "D2": 13.5,
+      "D3": 14.3,
+      "D4": 14.9,
       "D5": 14.3,
       "D6": 13.9,
-      "D7": 8.7,
-      "D8": 13.7
+      "D7": 8.5,
+      "D8": 14.0
     }
   },
-  "verdict": "BLOCKED",
-  "verdict_reason": "dimension means below floor: D3"
+  "verdict": "SHIP",
+  "verdict_reason": ""
 }

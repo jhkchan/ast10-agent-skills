@@ -1,0 +1,433 @@
+{
+  "skill": "AST03",
+  "rounds": 3,
+  "providers": [
+    "bedrock/gpt-oss-120b",
+    "bedrock/qwen3-235b",
+    "bedrock/deepseek-v3.2",
+    "bedrock/nova-pro",
+    "claude-cli/sonnet",
+    "anthropic-compatible/glm-5.2"
+  ],
+  "providers_unavailable": [],
+  "judgments": [
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 9.0,
+        "D4": 15.0,
+        "D5": 12.0,
+        "D6": 12.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The skill includes expert decision rules like \u201cBind authorization to the approved task, not to the tool\u201d and non\u2011obvious trade\u2011offs, placing it in the 16\u201120 knowledge\u2011delta band.",
+        "D2": "It mixes thinking patterns (e.g., \u201cBefore each action, verify \u2026\u201d) with domain\u2011specific procedures such as the mandatory loading rules for `coverage-matrix.md`, fitting the 12\u201115 D2 band.",
+        "D3": "It provides specific anti\u2011patterns like the \u201cDo NOT load `coverage\u2011matrix.md`\u201d and the \u201cNever decides whether a grant is broad for this skill\u2019s function\u201d statements, putting it in the 8\u201111 band.",
+        "D4": "The front\u2011matter description states what the skill does, when to use it, and includes trigger keywords, meeting the 14\u201115 description\u2011quality band.",
+        "D5": "The body contains explicit loading triggers (e.g., **MANDATORY before you report a negative** and \u201cDo NOT load `scripts/detector.py`\u201d), demonstrating proper progressive disclosure and scoring 11\u201113.",
+        "D6": "Because over\u2011privileged detection is high\u2011risk, the skill prescribes low\u2011freedom mandatory checks while still allowing judgment in the decision rules, fitting the 11\u201113 calibration band.",
+        "D7": "Its structure follows the official \u201cProcess\u201d pattern with phased workflow and checkpoints, aligning with the 7\u20119 pattern\u2011recognition band.",
+        "D8": "Clear decision trees, concrete loading guidance, and edge\u2011case handling (e.g., unbounded\u2011write\u2011scope blind spot) make the skill readily usable, placing it in the 14\u201115 usability band."
+      },
+      "total": 102.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"The skill includes expert decision rules like \u201cBind authorization to the approved task, not to the tool\u201d and non\u2011obvious trade\u2011offs, placing it in the 16\u201120 knowledge\u2011delta band.\"},\n  \"D2\": {\"score\": 13, \"why\": \"It mixes thinking patterns (e.g., \u201cBefore each action, verify \u2026\u201d) with domain\u2011specific procedures such as the mandatory loading rules for `coverage-matrix.md`, fitting the 12\u201115 D2 band.\"},\n  \"D3\": {\"score\": 9, \"why\": \"It provides specific anti\u2011patterns like the \u201cDo NOT load `coverage\u2011matrix.md`\u201d and the \u201cNever decides whether a grant is broad for this skill\u2019s function\u201d statements, putting it in the 8\u201111 band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The front\u2011matter description states what the skill does, when to use it, and includes trigger keywords, meeting the 14\u201115 description\u2011quality band.\"},\n  \"D5\": {\"score\": 12, \"why\": \"The body contains explicit loading triggers (e.g., **MANDATORY before you report a negative** and \u201cDo NOT load `scripts/detector.py`\u201d), demonstrating proper progressive disclosure and scoring 11\u201113.\"},\n  \"D6\": {\"score\": 12, \"why\": \"Because over\u2011privileged detection is high\u2011risk, the skill prescribes low\u2011freedom mandatory checks while still allowing judgment in the decision rules, fitting the 11\u201113 calibration band.\"},\n  \"D7\": {\"score\": 9, \"why\": \"Its structure follows the official \u201cProcess\u201d pattern with phased workflow and checkpoints, aligning with the 7\u20119 pattern\u2011recognition band.\"},\n  \"D8\": {\"score\": 14, \"why\": \"Clear decision trees, concrete loading guidance, and edge\u2011case handling (e.g., unbounded\u2011write\u2011scope blind spot) make the skill readily usable, placing it in the 14\u201115 usability band.\"}\n}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill demonstrates pure knowledge delta with expert-level decision rules like 'Bind authorization to the approved task, not to the tool' that only an expert would know, meeting the 'Pure knowledge delta' band (16-20) by avoiding all red flags and delivering non-obvious trade-offs and edge cases from real-world experience.",
+        "D2": "The skill provides expert-level thinking patterns like asking whether a grant is broad on its face versus for its function, and includes critical domain-specific procedures such as reviewing write scopes as LPCI trigger surfaces, which Claude wouldn't know, meeting the highest band (12-15) for both mindset and necessary domain procedures.",
+        "D3": "The anti-pattern list contains expert-grade prohibitions like 'NEVER trust a caller instead of re-verifying' with deep reasoning rooted in confused-deputy attacks and real-world escalation paths, meeting the 'Expert-grade anti-patterns with WHY' band (12-15) because these insights come from hard-won experience.",
+        "D4": "The description perfectly answers WHAT (detecting over-privileged skills), WHEN (when reviewing manifests or mapping injections to permissions), and includes trigger keywords like 'OWASP AST03', '.md files', and 'LPCI', meeting the 'Perfect' band (14-15) with comprehensive, actionable trigger scenarios.",
+        "D5": "The skill implements excellent progressive disclosure with mandatory load instructions like 'MANDATORY before you report a negative' and explicit 'Do NOT load' guidance for `coverage-matrix.md` and `scripts/detector.py`, meeting the 'Perfect' band (14-15) through conditional triggers and scenario-based loading rules.",
+        "D6": "The skill shows perfect freedom calibration by enforcing low freedom for fragile permission operations with rigid decision rules like 'Bind authorization to the approved task' while allowing judgment only where necessary, matching the 'Perfect freedom calibration' band (14-15) given the high-consequence nature of access control.",
+        "D7": "The skill masterfully follows the official 'Tool' pattern (~300 lines) with decision trees, code-level precision, and low freedom for format-specific operations on permission manifests, meeting the 'Masterful application of appropriate pattern' band (9-10) by aligning with the fragile, exact nature of security tooling.",
+        "D8": "The skill provides comprehensive usability through decision trees that route findings to correct categories, fallback logic for ambiguous cases using the CLI router, and explicit handling of edge cases like false positives in USF manifests, meeting the 'Comprehensive coverage' band (14-15) with actionable, tested guidance."
+      },
+      "total": 116.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill demonstrates pure knowledge delta with expert-level decision rules like 'Bind authorization to the approved task, not to the tool' that only an expert would know, meeting the 'Pure knowledge delta' band (16-20) by avoiding all red flags and delivering non-obvious trade-offs and edge cases from real-world experience.\"}, \"D2\": {\"score\": 14, \"why\": \"The skill provides expert-level thinking patterns like asking whether a grant is broad on its face versus for its function, and includes critical domain-specific procedures such as reviewing write scopes as LPCI trigger surfaces, which Claude wouldn't know, meeting the highest band (12-15) for both mindset and necessary domain procedures.\"}, \"D3\": {\"score\": 15, \"why\": \"The anti-pattern list contains expert-grade prohibitions like 'NEVER trust a caller instead of re-verifying' with deep reasoning rooted in confused-deputy attacks and real-world escalation paths, meeting the 'Expert-grade anti-patterns with WHY' band (12-15) because these insights come from hard-won experience.\"}, \"D4\": {\"score\": 15, \"why\": \"The description perfectly answers WHAT (detecting over-privileged skills), WHEN (when reviewing manifests or mapping injections to permissions), and includes trigger keywords like 'OWASP AST03', '.md files', and 'LPCI', meeting the 'Perfect' band (14-15) with comprehensive, actionable trigger scenarios.\"}, \"D5\": {\"score\": 14, \"why\": \"The skill implements excellent progressive disclosure with mandatory load instructions like 'MANDATORY before you report a negative' and explicit 'Do NOT load' guidance for `coverage-matrix.md` and `scripts/detector.py`, meeting the 'Perfect' band (14-15) through conditional triggers and scenario-based loading rules.\"}, \"D6\": {\"score\": 15, \"why\": \"The skill shows perfect freedom calibration by enforcing low freedom for fragile permission operations with rigid decision rules like 'Bind authorization to the approved task' while allowing judgment only where necessary, matching the 'Perfect freedom calibration' band (14-15) given the high-consequence nature of access control.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill masterfully follows the official 'Tool' pattern (~300 lines) with decision trees, code-level precision, and low freedom for format-specific operations on permission manifests, meeting the 'Masterful application of appropriate pattern' band (9-10) by aligning with the fragile, exact nature of security tooling.\"}, \"D8\": {\"score\": 15, \"why\": \"The skill provides comprehensive usability through decision trees that route findings to correct categories, fallback logic for ambiguous cases using the CLI router, and explicit handling of edge cases like false positives in USF manifests, meeting the 'Comprehensive coverage' band (14-15) with actionable, tested guidance.\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 15.0,
+        "D2": 12.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 13.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "Every paragraph (e.g., 'Permission vocabularies differ and a check that reads only one is silently dead' citing three spellings) is expert knowledge not obvious to Claude, placing it in the 'Mostly expert knowledge with minimal redundancy' band.",
+        "D2": "It provides expert thinking patterns ('Bind authorization to the approved task, not to the tool') and domain-specific procedures (audit flow and quiet list rules Claude wouldn't know), achieving the 'Expert-level: shapes thinking AND provides procedures' band.",
+        "D3": "The 'NEVER decides' and 'Do NOT load' sections form a specific NEVER list with reasoning drawn from real-world security experience, aligning with the 'Expert-grade anti-patterns with WHY' band.",
+        "D4": "The description perfectly answers WHAT, WHEN, and includes trigger keywords (e.g., 'when reviewing a permission manifest') as specified in the 'Perfect: comprehensive description' band.",
+        "D5": "It uses clear 'MANDATORY' loading triggers for references (e.g., before reporting a negative) and explicit 'Do NOT load' guidance, placing it in the 'Good layering with MANDATORY triggers present' band.",
+        "D6": "It matches low freedom (exact decision rules, 'NEVER decides') to the high-consequence security audit task perfectly, as defined in the 'Perfect freedom calibration throughout' band.",
+        "D7": "It masterfully applies the 'Mindset' pattern (~50 lines, strong NEVER list, thinking > technique) as recommended for security judgment tasks, with minimal deviation.",
+        "D8": "It provides clear decision trees ('Route first'), actionable decision rules, and coverage of edge cases (the quiet list), aligning with the 'Clear guidance for common cases' band."
+      },
+      "total": 104.0,
+      "raw_response": "{\"D1\": {\"score\": 15, \"why\": \"Every paragraph (e.g., 'Permission vocabularies differ and a check that reads only one is silently dead' citing three spellings) is expert knowledge not obvious to Claude, placing it in the 'Mostly expert knowledge with minimal redundancy' band.\"}, \"D2\": {\"score\": 12, \"why\": \"It provides expert thinking patterns ('Bind authorization to the approved task, not to the tool') and domain-specific procedures (audit flow and quiet list rules Claude wouldn't know), achieving the 'Expert-level: shapes thinking AND provides procedures' band.\"}, \"D3\": {\"score\": 13, \"why\": \"The 'NEVER decides' and 'Do NOT load' sections form a specific NEVER list with reasoning drawn from real-world security experience, aligning with the 'Expert-grade anti-patterns with WHY' band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description perfectly answers WHAT, WHEN, and includes trigger keywords (e.g., 'when reviewing a permission manifest') as specified in the 'Perfect: comprehensive description' band.\"}, \"D5\": {\"score\": 13, \"why\": \"It uses clear 'MANDATORY' loading triggers for references (e.g., before reporting a negative) and explicit 'Do NOT load' guidance, placing it in the 'Good layering with MANDATORY triggers present' band.\"}, \"D6\": {\"score\": 14, \"why\": \"It matches low freedom (exact decision rules, 'NEVER decides') to the high-consequence security audit task perfectly, as defined in the 'Perfect freedom calibration throughout' band.\"}, \"D7\": {\"score\": 9, \"why\": \"It masterfully applies the 'Mindset' pattern (~50 lines, strong NEVER list, thinking > technique) as recommended for security judgment tasks, with minimal deviation.\"}, \"D8\": {\"score\": 13, \"why\": \"It provides clear decision trees ('Route first'), actionable decision rules, and coverage of edge cases (the quiet list), aligning with the 'Clear guidance for common cases' band.\"}}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 12.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Pure knowledge delta with expert-level decision trees and trade-offs.",
+        "D2": "Good balance of thinking patterns and domain-specific workflows.",
+        "D3": "Expert-grade anti-patterns with specific reasons.",
+        "D4": "Perfect description with WHAT, WHEN, and trigger keywords.",
+        "D5": "Good layering with MANDATORY triggers and 'Do NOT Load' guidance.",
+        "D6": "Perfect freedom calibration matching the task's fragility.",
+        "D7": "Clear pattern with minor deviations from the 'Knowledge' pattern.",
+        "D8": "Comprehensive coverage including edge cases and error handling."
+      },
+      "total": 109.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"Pure knowledge delta with expert-level decision trees and trade-offs.\"},\n  \"D2\": {\"score\": 13, \"why\": \"Good balance of thinking patterns and domain-specific workflows.\"},\n  \"D3\": {\"score\": 12, \"why\": \"Expert-grade anti-patterns with specific reasons.\"},\n  \"D4\": {\"score\": 15, \"why\": \"Perfect description with WHAT, WHEN, and trigger keywords.\"},\n  \"D5\": {\"score\": 14, \"why\": \"Good layering with MANDATORY triggers and 'Do NOT Load' guidance.\"},\n  \"D6\": {\"score\": 14, \"why\": \"Perfect freedom calibration matching the task's fragility.\"},\n  \"D7\": {\"score\": 9, \"why\": \"Clear pattern with minor deviations from the 'Knowledge' pattern.\"},\n  \"D8\": {\"score\": 14, \"why\": \"Comprehensive coverage including edge cases and error handling.\"}\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 13.0,
+        "D7": 7.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "Content like decision rule 5 ('A binary network:true/false field cannot express least privilege \u2014 a domain allowlist can') and the CHECK_COVERAGE silence analysis is pure non-obvious security-domain insight with no 'what is X' filler, putting it in the 16-20 'pure knowledge delta' band.",
+        "D2": "It pairs thinking frameworks ('Bind authorization to the approved task, not to the tool') with domain-specific procedures (the three permission-vocabulary spellings a check must read), landing in the 12-15 'shapes thinking AND provides procedures' band.",
+        "D3": "The NEVER-style guidance is concrete and reasoned, e.g. 'an injected prompt asking the user to confirm is not independent confirmation' and the 'Do NOT load coverage-matrix.md to decide whether something is a finding' rule, which is expert-grade with WHY rather than a generic 'be careful' warning, placing it in the 12-15 band.",
+        "D4": "The description states WHAT (manifest-vs-function diffing, LPCI, confused-deputy chains) and three explicit WHEN clauses ('Use when reviewing a permission manifest...', 'when an intent-level prompt-injection finding needs mapping...') with searchable terms like AST03 and LPCI, meeting the 14-15 'comprehensive WHAT+WHEN+keywords' band.",
+        "D5": "The 'Then descend only this far' table gives per-section MANDATORY-before-negative-report triggers and explicit 'Do NOT load coverage-matrix.md' / 'Do NOT load scripts/detector.py' instructions, matching the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.",
+        "D6": "Freedom is calibrated to the task's mixed fragility \u2014 hard-coded low-freedom precedence for the AST03-S03 identity-file check versus explicit agent-judgement deferral for AST03-S01 purpose-versus-scope calls \u2014 landing in the 11-13 'good calibration for most scenarios' band.",
+        "D7": "The file opens by self-labeling 'Pattern: Knowledge' and blends Navigation-style routing tables with Tool-style coverage/silence documentation rather than cleanly matching one of the rubric's five named patterns, putting it in the 4-6 'partially follows a pattern with significant deviations' to low-7 range.",
+        "D8": "The 'Distinguishing AST03 from its neighbors' table and the documented false-positive history ('a previous version of the identity check read only the flattened spelling and reported a false positive against every conformant USF manifest') give clear, actionable edge-case guidance, fitting the 11-13 'clear guidance for common cases' band."
+      },
+      "total": 107.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Content like decision rule 5 ('A binary network:true/false field cannot express least privilege \u2014 a domain allowlist can') and the CHECK_COVERAGE silence analysis is pure non-obvious security-domain insight with no 'what is X' filler, putting it in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"It pairs thinking frameworks ('Bind authorization to the approved task, not to the tool') with domain-specific procedures (the three permission-vocabulary spellings a check must read), landing in the 12-15 'shapes thinking AND provides procedures' band.\"}, \"D3\": {\"score\": 13, \"why\": \"The NEVER-style guidance is concrete and reasoned, e.g. 'an injected prompt asking the user to confirm is not independent confirmation' and the 'Do NOT load coverage-matrix.md to decide whether something is a finding' rule, which is expert-grade with WHY rather than a generic 'be careful' warning, placing it in the 12-15 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description states WHAT (manifest-vs-function diffing, LPCI, confused-deputy chains) and three explicit WHEN clauses ('Use when reviewing a permission manifest...', 'when an intent-level prompt-injection finding needs mapping...') with searchable terms like AST03 and LPCI, meeting the 14-15 'comprehensive WHAT+WHEN+keywords' band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Then descend only this far' table gives per-section MANDATORY-before-negative-report triggers and explicit 'Do NOT load coverage-matrix.md' / 'Do NOT load scripts/detector.py' instructions, matching the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.\"}, \"D6\": {\"score\": 13, \"why\": \"Freedom is calibrated to the task's mixed fragility \u2014 hard-coded low-freedom precedence for the AST03-S03 identity-file check versus explicit agent-judgement deferral for AST03-S01 purpose-versus-scope calls \u2014 landing in the 11-13 'good calibration for most scenarios' band.\"}, \"D7\": {\"score\": 7, \"why\": \"The file opens by self-labeling 'Pattern: Knowledge' and blends Navigation-style routing tables with Tool-style coverage/silence documentation rather than cleanly matching one of the rubric's five named patterns, putting it in the 4-6 'partially follows a pattern with significant deviations' to low-7 range.\"}, \"D8\": {\"score\": 13, \"why\": \"The 'Distinguishing AST03 from its neighbors' table and the documented false-positive history ('a previous version of the identity check read only the flattened spelling and reported a false positive against every conformant USF manifest') give clear, actionable edge-case guidance, fitting the 11-13 'clear guidance for common cases' band.\"}}\n"
+    },
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 9.0,
+        "D4": 14.0,
+        "D5": 12.0,
+        "D6": 13.0,
+        "D7": 8.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "the detailed Decision rules (e.g., rule\u202f3 on confused\u2011deputy chains) provide expert-level insights not covered by Claude\u2019s baseline, placing it in the 16\u201120 knowledge\u2011delta band.",
+        "D2": "it teaches the thinking pattern 'Bind authorization to the approved task, not to the tool' and procedural steps like loading `coverage-matrix.md` only when citing a tier, fitting the 8\u201111 balance band.",
+        "D3": "the explicit 'Do NOT load `coverage-matrix.md`' and 'Do NOT load `scripts/detector.py`' directives form a specific anti\u2011pattern list with rationale, landing in the 8\u201111 band.",
+        "D4": "the description states WHAT the skill does, WHEN to use it, and includes trigger keywords such as 'permission manifest' and 'over\u2011privileged', achieving the 14\u201115 description quality band.",
+        "D5": "the References table provides mandatory loading triggers and clear 'Do NOT load' guidance, demonstrating proper progressive disclosure (11\u201113 band).",
+        "D6": "mandatory checks and prohibitions (e.g., never load certain files) enforce low\u2011freedom appropriate for fragile permission\u2011audit tasks, placing it in the 11\u201113 band.",
+        "D7": "the skill\u2019s structured phases, decision\u2011rule list, and mandatory checkpoints align with the official 'Process' pattern, fitting the 7\u20118 pattern\u2011recognition band.",
+        "D8": "the decision\u2011rule table, loading triggers, and coverage of edge cases give clear, actionable guidance, supporting a 13\u201115 usability band."
+      },
+      "total": 100.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"the detailed Decision rules (e.g., rule\u202f3 on confused\u2011deputy chains) provide expert-level insights not covered by Claude\u2019s baseline, placing it in the 16\u201120 knowledge\u2011delta band.\"},\n  \"D2\": {\"score\": 13, \"why\": \"it teaches the thinking pattern 'Bind authorization to the approved task, not to the tool' and procedural steps like loading `coverage-matrix.md` only when citing a tier, fitting the 8\u201111 balance band.\"},\n  \"D3\": {\"score\": 9, \"why\": \"the explicit 'Do NOT load `coverage-matrix.md`' and 'Do NOT load `scripts/detector.py`' directives form a specific anti\u2011pattern list with rationale, landing in the 8\u201111 band.\"},\n  \"D4\": {\"score\": 14, \"why\": \"the description states WHAT the skill does, WHEN to use it, and includes trigger keywords such as 'permission manifest' and 'over\u2011privileged', achieving the 14\u201115 description quality band.\"},\n  \"D5\": {\"score\": 12, \"why\": \"the References table provides mandatory loading triggers and clear 'Do NOT load' guidance, demonstrating proper progressive disclosure (11\u201113 band).\"},\n  \"D6\": {\"score\": 13, \"why\": \"mandatory checks and prohibitions (e.g., never load certain files) enforce low\u2011freedom appropriate for fragile permission\u2011audit tasks, placing it in the 11\u201113 band.\"},\n  \"D7\": {\"score\": 8, \"why\": \"the skill\u2019s structured phases, decision\u2011rule list, and mandatory checkpoints align with the official 'Process' pattern, fitting the 7\u20118 pattern\u2011recognition band.\"},\n  \"D8\": {\"score\": 13, \"why\": \"the decision\u2011rule table, loading triggers, and coverage of edge cases give clear, actionable guidance, supporting a 13\u201115 usability band.\"}\n}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 20.0,
+        "D2": 15.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 15.0,
+        "D7": 9.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill demonstrates a pure knowledge delta with expert insights such as 'a manifest-compliant call can still be an authorization violation' and 'identity-file write is a privilege escalation vector independent of task domain,' which are non-obvious, real-world trade-offs only an expert would know, meeting the 16-20 band.",
+        "D2": "The skill provides expert-level thinking patterns like 'Bind authorization to the approved task, not to the tool' and domain-specific procedures such as the exact conditions under which the identity-file check fires, meeting the 12-15 band for shaping thinking AND providing procedures Claude wouldn't know.",
+        "D3": "The skill includes expert-grade anti-patterns such as 'NEVER trust a caller instead of re-verifying' with detailed justifications tied to confused-deputy chains, meeting the 12-15 band because these are specific, hard-won lessons only experience teaches.",
+        "D4": "The description perfectly answers WHAT, WHEN, and includes searchable keywords like 'OWASP AST03', 'permission manifests', and 'LPCI', making it comprehensive and triggering exactly when to use it, meeting the 14-15 band.",
+        "D5": "The skill implements perfect progressive disclosure with layered loading triggers such as 'MANDATORY before you report a negative' and explicit 'Do NOT load' guidance for `coverage-matrix.md` and `scripts/detector.py`, meeting the 14-15 band.",
+        "D6": "The skill shows perfect freedom calibration by using low freedom for fragile operations like manifest vs. behavior diffing with exact script references and mandatory rules, appropriate for high-consequence permission handling, meeting the 14-15 band.",
+        "D7": "The skill follows the 'Tool' pattern (~300 lines) with decision trees, code examples, and low freedom for precise operations on specific formats, showing masterful application with only minor deviations, meeting the 9-10 band.",
+        "D8": "The skill provides comprehensive usability with actionable decision trees, clear fallback logic in route handling, and edge-case coverage such as false positives in USF manifests, meeting the 14-15 band for clear, effective use by an Agent."
+      },
+      "total": 119.0,
+      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"The skill demonstrates a pure knowledge delta with expert insights such as 'a manifest-compliant call can still be an authorization violation' and 'identity-file write is a privilege escalation vector independent of task domain,' which are non-obvious, real-world trade-offs only an expert would know, meeting the 16-20 band.\"}, \"D2\": {\"score\": 15, \"why\": \"The skill provides expert-level thinking patterns like 'Bind authorization to the approved task, not to the tool' and domain-specific procedures such as the exact conditions under which the identity-file check fires, meeting the 12-15 band for shaping thinking AND providing procedures Claude wouldn't know.\"}, \"D3\": {\"score\": 15, \"why\": \"The skill includes expert-grade anti-patterns such as 'NEVER trust a caller instead of re-verifying' with detailed justifications tied to confused-deputy chains, meeting the 12-15 band because these are specific, hard-won lessons only experience teaches.\"}, \"D4\": {\"score\": 15, \"why\": \"The description perfectly answers WHAT, WHEN, and includes searchable keywords like 'OWASP AST03', 'permission manifests', and 'LPCI', making it comprehensive and triggering exactly when to use it, meeting the 14-15 band.\"}, \"D5\": {\"score\": 15, \"why\": \"The skill implements perfect progressive disclosure with layered loading triggers such as 'MANDATORY before you report a negative' and explicit 'Do NOT load' guidance for `coverage-matrix.md` and `scripts/detector.py`, meeting the 14-15 band.\"}, \"D6\": {\"score\": 15, \"why\": \"The skill shows perfect freedom calibration by using low freedom for fragile operations like manifest vs. behavior diffing with exact script references and mandatory rules, appropriate for high-consequence permission handling, meeting the 14-15 band.\"}, \"D7\": {\"score\": 9, \"why\": \"The skill follows the 'Tool' pattern (~300 lines) with decision trees, code examples, and low freedom for precise operations on specific formats, showing masterful application with only minor deviations, meeting the 9-10 band.\"}, \"D8\": {\"score\": 15, \"why\": \"The skill provides comprehensive usability with actionable decision trees, clear fallback logic in route handling, and edge-case coverage such as false positives in USF manifests, meeting the 14-15 band for clear, effective use by an Agent.\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 16.0,
+        "D2": 12.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill provides expert security analysis decision rules and attack-surface distinctions not in general knowledge, placing it in the 16-20 'pure knowledge delta' band.",
+        "D2": "The detailed decision rules and route table provide expert thinking patterns and domain-specific audit procedures Claude wouldn't know, fitting the 12-15 'expert-level thinking and procedures' band.",
+        "D3": "The skill includes strong, expert anti-patterns like 'A binary network: true/false field cannot express least privilege' with reasoning, placing it in the 12-15 band.",
+        "D4": "The description perfectly answers WHAT, WHEN, and KEYWORDS with specific trigger scenarios and concrete terms, meeting the 14-15 'perfect description' criteria.",
+        "D5": "The skill uses excellent MANDATORY reading triggers embedded in workflow steps and 'Do NOT load' guidance, achieving perfect 14-15 progressive disclosure.",
+        "D6": "The skill calibrates freedom well with low-freedom mandatory checks for fragile permission audits and medium-freedom decision rules, fitting the 14-15 'perfect calibration' band.",
+        "D7": "The skill follows the 'Mindset' pattern with strong NEVER lists and high freedom for conceptual security analysis, with minor deviations, placing it in the 9-10 band.",
+        "D8": "The skill provides comprehensive decision trees, clear route logic, and explicit quiet-list guidance for edge cases and error handling, meeting the 14-15 comprehensive usability criteria."
+      },
+      "total": 109.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 16, \"why\": \"The skill provides expert security analysis decision rules and attack-surface distinctions not in general knowledge, placing it in the 16-20 'pure knowledge delta' band.\"},\n  \"D2\": {\"score\": 12, \"why\": \"The detailed decision rules and route table provide expert thinking patterns and domain-specific audit procedures Claude wouldn't know, fitting the 12-15 'expert-level thinking and procedures' band.\"},\n  \"D3\": {\"score\": 13, \"why\": \"The skill includes strong, expert anti-patterns like 'A binary network: true/false field cannot express least privilege' with reasoning, placing it in the 12-15 band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description perfectly answers WHAT, WHEN, and KEYWORDS with specific trigger scenarios and concrete terms, meeting the 14-15 'perfect description' criteria.\"},\n  \"D5\": {\"score\": 15, \"why\": \"The skill uses excellent MANDATORY reading triggers embedded in workflow steps and 'Do NOT load' guidance, achieving perfect 14-15 progressive disclosure.\"},\n  \"D6\": {\"score\": 14, \"why\": \"The skill calibrates freedom well with low-freedom mandatory checks for fragile permission audits and medium-freedom decision rules, fitting the 14-15 'perfect calibration' band.\"},\n  \"D7\": {\"score\": 9, \"why\": \"The skill follows the 'Mindset' pattern with strong NEVER lists and high freedom for conceptual security analysis, with minor deviations, placing it in the 9-10 band.\"},\n  \"D8\": {\"score\": 15, \"why\": \"The skill provides comprehensive decision trees, clear route logic, and explicit quiet-list guidance for edge cases and error handling, meeting the 14-15 comprehensive usability criteria.\"}\n}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Provides expert-level decision rules and detailed scenarios that add genuine knowledge delta.",
+        "D2": "Transfers both expert thinking patterns and domain-specific procedures, with specific workflows and critical steps.",
+        "D3": "Contains specific NEVER lists with reasoning, though not fully expert-grade.",
+        "D4": "The description is comprehensive, detailing WHAT, WHEN, and KEYWORDS effectively.",
+        "D5": "Implements good content layering with clear mandatory triggers and explicit loading guidance.",
+        "D6": "Matches the level of specificity appropriately to the task's fragility with precise instructions and decision rules.",
+        "D7": "Follows a clear pattern with minor deviations, aligning well with the 'Knowledge' pattern.",
+        "D8": "Provides clear guidance with decision trees and fallbacks, covering edge cases and error handling effectively."
+      },
+      "total": 111.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"Provides expert-level decision rules and detailed scenarios that add genuine knowledge delta.\"\n  },\n  \"D2\": {\n    \"score\": 14,\n    \"why\": \"Transfers both expert thinking patterns and domain-specific procedures, with specific workflows and critical steps.\"\n  },\n  \"D3\": {\n    \"score\": 13,\n    \"why\": \"Contains specific NEVER lists with reasoning, though not fully expert-grade.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, detailing WHAT, WHEN, and KEYWORDS effectively.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"Implements good content layering with clear mandatory triggers and explicit loading guidance.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"Matches the level of specificity appropriately to the task's fragility with precise instructions and decision rules.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"Follows a clear pattern with minor deviations, aligning well with the 'Knowledge' pattern.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"Provides clear guidance with decision trees and fallbacks, covering edge cases and error handling effectively.\"\n  }\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 11.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 12.0,
+        "D7": 7.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Decision rule 5 ('A binary network: true/false field cannot express least privilege \u2014 a domain allowlist can') and rule 4's identity-file-write red flag are non-obvious expert trade-offs with minimal filler, putting this in the 16-20 'pure knowledge delta' band.",
+        "D2": "Decision rule 3 gives both a thinking pattern (confused-deputy 'breaks at the first skill that trusts a caller') and a concrete domain procedure (independently re-validate the original caller at every hop), landing in the 12-15 'expert-level: shapes thinking AND provides procedures' band.",
+        "D3": "The anecdote 'a previous version of the identity check read only the flattened spelling and reported a false positive against every conformant USF manifest' is a landmine-derived warning with real reasoning, but the file lacks a consolidated NEVER list, so it sits at the top of the 8-11 'specific NEVER list with some reasoning' band rather than 12-15.",
+        "D4": "The description names WHAT (permission manifests, LPCI, confused-deputy chains) and WHEN via three explicit 'Use when...' clauses, matching the 14-15 'comprehensive... WHAT, WHEN, and trigger keywords' band.",
+        "D5": "The 'References' table pairs each resource with an explicit load condition and the body twice states 'Do NOT load coverage-matrix.md' / 'Do NOT load scripts/detector.py' with reasons, meeting the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.",
+        "D6": "The 'Route first' table hands off malicious-by-design or manifest-lying findings to AST01/AST04 while keeping medium-freedom judgment calls (task-scope mismatch) here, showing good but not flawless calibration, placing it in the 11-13 band.",
+        "D7": "The Orientation/Route/Decision-rules/References structure is a Navigation-Process hybrid rather than a clean instance of one of the five named patterns, fitting the 7-8 'clear pattern with minor deviations' band.",
+        "D8": "The 'What the shipped checks decide, and where they go quiet' section enumerates specific failure modes (e.g. 'An explicitly empty deny_write is a stated floor, not an absent one') that a naive reviewer would miss, matching the 14-15 'comprehensive coverage including edge cases' band."
+      },
+      "total": 105.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Decision rule 5 ('A binary network: true/false field cannot express least privilege \u2014 a domain allowlist can') and rule 4's identity-file-write red flag are non-obvious expert trade-offs with minimal filler, putting this in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"Decision rule 3 gives both a thinking pattern (confused-deputy 'breaks at the first skill that trusts a caller') and a concrete domain procedure (independently re-validate the original caller at every hop), landing in the 12-15 'expert-level: shapes thinking AND provides procedures' band.\"}, \"D3\": {\"score\": 11, \"why\": \"The anecdote 'a previous version of the identity check read only the flattened spelling and reported a false positive against every conformant USF manifest' is a landmine-derived warning with real reasoning, but the file lacks a consolidated NEVER list, so it sits at the top of the 8-11 'specific NEVER list with some reasoning' band rather than 12-15.\"}, \"D4\": {\"score\": 15, \"why\": \"The description names WHAT (permission manifests, LPCI, confused-deputy chains) and WHEN via three explicit 'Use when...' clauses, matching the 14-15 'comprehensive... WHAT, WHEN, and trigger keywords' band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'References' table pairs each resource with an explicit load condition and the body twice states 'Do NOT load coverage-matrix.md' / 'Do NOT load scripts/detector.py' with reasons, meeting the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.\"}, \"D6\": {\"score\": 12, \"why\": \"The 'Route first' table hands off malicious-by-design or manifest-lying findings to AST01/AST04 while keeping medium-freedom judgment calls (task-scope mismatch) here, showing good but not flawless calibration, placing it in the 11-13 band.\"}, \"D7\": {\"score\": 7, \"why\": \"The Orientation/Route/Decision-rules/References structure is a Navigation-Process hybrid rather than a clean instance of one of the five named patterns, fitting the 7-8 'clear pattern with minor deviations' band.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'What the shipped checks decide, and where they go quiet' section enumerates specific failure modes (e.g. 'An explicitly empty deny_write is a stated floor, not an absent one') that a naive reviewer would miss, matching the 14-15 'comprehensive coverage including edge cases' band.\"}}\n"
+    },
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 9.0,
+        "D4": 14.0,
+        "D5": 12.0,
+        "D6": 13.0,
+        "D7": 8.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "The expert decision rule \u201cBind authorization to the approved task, not to the tool.\u201d adds knowledge Claude doesn\u2019t already have, placing it in the 16\u201120 band.",
+        "D2": "The \u201cDecision rules\u201d section combines thinking patterns (e.g., evaluating write scope as trigger surface) with domain\u2011specific procedures like mandatory loading checks, fitting the 12\u201115 band.",
+        "D3": "The explicit \u201cDo NOT load `coverage-matrix.md`\u201d and \u201cDo NOT load `scripts/detector.py`\u201d statements form a specific anti\u2011pattern list with reasoning, landing in the 8\u201111 band.",
+        "D4": "The front\u2011matter description states WHAT the skill does, WHEN to use it, and includes trigger keywords, meeting the perfect 14\u201115 description criteria.",
+        "D5": "The \u201cReferences \u2014 what is loadable, and when\u201d table gives clear load triggers and the body stays under 500 lines, satisfying the 11\u201113 progressive disclosure range.",
+        "D6": "The skill enforces low\u2011freedom constraints such as mandatory checks and exact permission scopes, matching the 11\u201113 band for proper freedom calibration.",
+        "D7": "Its phased workflow, mandatory sections and decision tables correspond to the official \u201cProcess\u201d pattern, placing it in the 7\u20118 pattern\u2011recognition range.",
+        "D8": "Decision rules, concrete loading guidance, and edge\u2011case explanations enable an agent to act directly, providing clear usability in the 11\u201113 band."
+      },
+      "total": 100.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"The expert decision rule \u201cBind authorization to the approved task, not to the tool.\u201d adds knowledge Claude doesn\u2019t already have, placing it in the 16\u201120 band.\"},\n  \"D2\": {\"score\": 13, \"why\": \"The \u201cDecision rules\u201d section combines thinking patterns (e.g., evaluating write scope as trigger surface) with domain\u2011specific procedures like mandatory loading checks, fitting the 12\u201115 band.\"},\n  \"D3\": {\"score\": 9, \"why\": \"The explicit \u201cDo NOT load `coverage-matrix.md`\u201d and \u201cDo NOT load `scripts/detector.py`\u201d statements form a specific anti\u2011pattern list with reasoning, landing in the 8\u201111 band.\"},\n  \"D4\": {\"score\": 14, \"why\": \"The front\u2011matter description states WHAT the skill does, WHEN to use it, and includes trigger keywords, meeting the perfect 14\u201115 description criteria.\"},\n  \"D5\": {\"score\": 12, \"why\": \"The \u201cReferences \u2014 what is loadable, and when\u201d table gives clear load triggers and the body stays under 500 lines, satisfying the 11\u201113 progressive disclosure range.\"},\n  \"D6\": {\"score\": 13, \"why\": \"The skill enforces low\u2011freedom constraints such as mandatory checks and exact permission scopes, matching the 11\u201113 band for proper freedom calibration.\"},\n  \"D7\": {\"score\": 8, \"why\": \"Its phased workflow, mandatory sections and decision tables correspond to the official \u201cProcess\u201d pattern, placing it in the 7\u20118 pattern\u2011recognition range.\"},\n  \"D8\": {\"score\": 13, \"why\": \"Decision rules, concrete loading guidance, and edge\u2011case explanations enable an agent to act directly, providing clear usability in the 11\u201113 band.\"}\n}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 16.0,
+        "D2": 12.0,
+        "D3": 12.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The 'Decision rules' section provides expert counter-intuitive analysis like 'Whether a grant is broad *for this skill's function* requires reading the stated purpose against the scope, which is judgement, not a predicate', meeting the 'pure knowledge delta' band.",
+        "D2": "The skill provides expert thinking patterns (six decision rules) and domain-specific procedures like the identity-file write check workflow Claude wouldn't know, meeting the 'expert-level: shapes thinking AND provides procedures Claude wouldn't know' band.",
+        "D3": "The 'What the shipped checks decide, and where they go quiet' section provides specific expert anti-patterns like 'An explicitly empty `deny_write` is a stated floor, not an absent one,' meeting the 'Expert-grade anti-patterns with WHY' band.",
+        "D4": "The description perfectly answers WHAT (detect/triage OWASP AST03), WHEN (three explicit trigger scenarios), and includes KEYWORDS, meeting the 'Perfect: comprehensive description with WHAT, WHEN, and trigger keywords' band.",
+        "D5": "The 'Load it when' table and 'Do NOT load' commands implement excellent layered loading triggers, meeting the 'Good layering with MANDATORY triggers present' band.",
+        "D6": "The skill calibrates freedom perfectly with high-level rules for judgment and low-freedom routes for fragile categorization, meeting the 'Good calibration for most scenarios' band.",
+        "D7": "The skill follows the 'Mindset' pattern (~50 lines of orientation/rules, strong NEVER list) with minor deviations like the route table, meeting the 'Clear pattern with minor deviations' band.",
+        "D8": "The 'What the shipped checks decide, and where they go quiet' section provides comprehensive decision trees, error handling (false positive history), and actionable guidance, meeting the 'Comprehensive coverage including edge cases and error handling' band."
+      },
+      "total": 106.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 16, \"why\": \"The 'Decision rules' section provides expert counter-intuitive analysis like 'Whether a grant is broad *for this skill's function* requires reading the stated purpose against the scope, which is judgement, not a predicate', meeting the 'pure knowledge delta' band.\"},\n  \"D2\": {\"score\": 12, \"why\": \"The skill provides expert thinking patterns (six decision rules) and domain-specific procedures like the identity-file write check workflow Claude wouldn't know, meeting the 'expert-level: shapes thinking AND provides procedures Claude wouldn't know' band.\"},\n  \"D3\": {\"score\": 12, \"why\": \"The 'What the shipped checks decide, and where they go quiet' section provides specific expert anti-patterns like 'An explicitly empty `deny_write` is a stated floor, not an absent one,' meeting the 'Expert-grade anti-patterns with WHY' band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description perfectly answers WHAT (detect/triage OWASP AST03), WHEN (three explicit trigger scenarios), and includes KEYWORDS, meeting the 'Perfect: comprehensive description with WHAT, WHEN, and trigger keywords' band.\"},\n  \"D5\": {\"score\": 14, \"why\": \"The 'Load it when' table and 'Do NOT load' commands implement excellent layered loading triggers, meeting the 'Good layering with MANDATORY triggers present' band.\"},\n  \"D6\": {\"score\": 13, \"why\": \"The skill calibrates freedom perfectly with high-level rules for judgment and low-freedom routes for fragile categorization, meeting the 'Good calibration for most scenarios' band.\"},\n  \"D7\": {\"score\": 9, \"why\": \"The skill follows the 'Mindset' pattern (~50 lines of orientation/rules, strong NEVER list) with minor deviations like the route table, meeting the 'Clear pattern with minor deviations' band.\"},\n  \"D8\": {\"score\": 15, \"why\": \"The 'What the shipped checks decide, and where they go quiet' section provides comprehensive decision trees, error handling (false positive history), and actionable guidance, meeting the 'Comprehensive coverage including edge cases and error handling' band.\"}\n}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 15.0,
+        "D7": 9.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "Provides expert knowledge on over-privileged skills and their detection.",
+        "D2": "Transfers expert thinking patterns and domain-specific procedures for detecting over-privileged skills.",
+        "D3": "Contains specific NEVER lists with reasoning, such as 'NEVER trust a caller without re-verification.'",
+        "D4": "Has a comprehensive description that answers WHAT, WHEN, and KEYWORDS clearly.",
+        "D5": "Implements proper content layering with explicit triggers and 'Do NOT Load' guidance.",
+        "D6": "Calibrates freedom appropriately for the task's fragility, providing specific scripts and exact steps where needed.",
+        "D7": "Follows the 'Knowledge' pattern with minor deviations, providing a clear and structured approach.",
+        "D8": "Provides comprehensive coverage including edge cases and error handling, with actionable guidance."
+      },
+      "total": 113.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"Provides expert knowledge on over-privileged skills and their detection.\"},\n  \"D2\": {\"score\": 14, \"why\": \"Transfers expert thinking patterns and domain-specific procedures for detecting over-privileged skills.\"},\n  \"D3\": {\"score\": 13, \"why\": \"Contains specific NEVER lists with reasoning, such as 'NEVER trust a caller without re-verification.'\"},\n  \"D4\": {\"score\": 15, \"why\": \"Has a comprehensive description that answers WHAT, WHEN, and KEYWORDS clearly.\"},\n  \"D5\": {\"score\": 14, \"why\": \"Implements proper content layering with explicit triggers and 'Do NOT Load' guidance.\"},\n  \"D6\": {\"score\": 15, \"why\": \"Calibrates freedom appropriately for the task's fragility, providing specific scripts and exact steps where needed.\"},\n  \"D7\": {\"score\": 9, \"why\": \"Follows the 'Knowledge' pattern with minor deviations, providing a clear and structured approach.\"},\n  \"D8\": {\"score\": 15, \"why\": \"Provides comprehensive coverage including edge cases and error handling, with actionable guidance.\"}\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 13.0,
+        "D4": 14.0,
+        "D5": 14.0,
+        "D6": 13.0,
+        "D7": 8.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "Decision rule 4 ('a skill of *any* stated function requesting write access to SOUL.md/MEMORY.md/AGENTS.md should be flagged... independent of task domain') and the CHECK_COVERAGE silence analysis are non-obvious expert judgments with almost no basic-concept filler, putting it in the 16-20 'pure knowledge delta' band.",
+        "D2": "It pairs a thinking framework (the Route table plus 'bind authorization to the approved task, not the tool') with a genuine domain procedure (auditing write-scope as the LPCI trigger surface across three manifest spellings), matching the 12-15 'expert-level' band.",
+        "D3": "The NEVER-equivalent rules give concrete mechanism and reason, e.g. 'an injected prompt asking the user to confirm is not independent confirmation', landing in the 12-15 expert-grade band rather than the generic 'be careful' tier.",
+        "D4": "The description states WHAT (manifest-vs-function diffing, LPCI, confused-deputy) and WHEN ('Use when reviewing a permission manifest...', 'when a privileged skill trusts a caller's identity') with searchable keywords, meeting the 14-15 band though slightly less example-rich than the rubric's own 'excellent' sample.",
+        "D5": "The References table gives explicit conditional triggers ('Load coverage-matrix.md when you must cite the authoritative tier') plus an explicit 'Do NOT load scripts/detector.py to learn what the checks decide' instruction, satisfying the 14-15 'decision trees + Do NOT Load guidance' band.",
+        "D6": "The skill matches freedom to fragility by naming exactly one low-freedom static check (AST03-S03 identity-file backdoors) while explicitly deferring purpose-vs-scope judgement (AST03-S01) to agent reasoning, which is the 11-13 'good calibration for most scenarios' band.",
+        "D7": "It reads as a hybrid of the Navigation pattern (a routing table sending readers elsewhere) and the Process pattern (six numbered decision rules, tier lock), a clear-but-blended application landing in the 7-8 'clear pattern with minor deviations' band.",
+        "D8": "The 'What the shipped checks decide, and where they go quiet' section documents a concrete past failure mode ('a previous version of the identity check read only the flattened spelling and reported a false positive against every conformant USF manifest'), which is edge-case/error-handling coverage fitting the 11-13 'clear guidance for common cases' band rather than the top tier since no code example is given."
+      },
+      "total": 106.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Decision rule 4 ('a skill of *any* stated function requesting write access to SOUL.md/MEMORY.md/AGENTS.md should be flagged... independent of task domain') and the CHECK_COVERAGE silence analysis are non-obvious expert judgments with almost no basic-concept filler, putting it in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"It pairs a thinking framework (the Route table plus 'bind authorization to the approved task, not the tool') with a genuine domain procedure (auditing write-scope as the LPCI trigger surface across three manifest spellings), matching the 12-15 'expert-level' band.\"}, \"D3\": {\"score\": 13, \"why\": \"The NEVER-equivalent rules give concrete mechanism and reason, e.g. 'an injected prompt asking the user to confirm is not independent confirmation', landing in the 12-15 expert-grade band rather than the generic 'be careful' tier.\"}, \"D4\": {\"score\": 14, \"why\": \"The description states WHAT (manifest-vs-function diffing, LPCI, confused-deputy) and WHEN ('Use when reviewing a permission manifest...', 'when a privileged skill trusts a caller's identity') with searchable keywords, meeting the 14-15 band though slightly less example-rich than the rubric's own 'excellent' sample.\"}, \"D5\": {\"score\": 14, \"why\": \"The References table gives explicit conditional triggers ('Load coverage-matrix.md when you must cite the authoritative tier') plus an explicit 'Do NOT load scripts/detector.py to learn what the checks decide' instruction, satisfying the 14-15 'decision trees + Do NOT Load guidance' band.\"}, \"D6\": {\"score\": 13, \"why\": \"The skill matches freedom to fragility by naming exactly one low-freedom static check (AST03-S03 identity-file backdoors) while explicitly deferring purpose-vs-scope judgement (AST03-S01) to agent reasoning, which is the 11-13 'good calibration for most scenarios' band.\"}, \"D7\": {\"score\": 8, \"why\": \"It reads as a hybrid of the Navigation pattern (a routing table sending readers elsewhere) and the Process pattern (six numbered decision rules, tier lock), a clear-but-blended application landing in the 7-8 'clear pattern with minor deviations' band.\"}, \"D8\": {\"score\": 13, \"why\": \"The 'What the shipped checks decide, and where they go quiet' section documents a concrete past failure mode ('a previous version of the identity check read only the flattened spelling and reported a false positive against every conformant USF manifest'), which is edge-case/error-handling coverage fitting the 11-13 'clear guidance for common cases' band rather than the top tier since no code example is given.\"}}\n"
+    },
+    {
+      "provider": "anthropic-compatible/glm-5.2",
+      "scores": {
+        "D1": 19.0,
+        "D2": 14.0,
+        "D3": 13.0,
+        "D4": 14.0,
+        "D5": 15.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Nearly every paragraph is pure expert delta \u2014 e.g., the quiet list noting 'a manifest carrying deny_write: /etc/hosts satisfies it while leaving SOUL.md writable' and the three permission spellings causing real false positives \u2014 placing it in the 16-20 pure-knowledge-delta band.",
+        "D2": "The six 'Decision rules' (e.g., 'the reviewable object is the trigger, not the action \u2014 and the trigger is usually not in the package') transfer expert thinking plus domain-specific triage procedure, hitting the 12-15 band.",
+        "D3": "Expert-grade NEVERs with reasons, such as 'Do NOT load coverage-matrix.md to decide whether something is a finding' and 'read all three or your extension will be dead against the manifests that actually ship,' sit in the 12-15 band.",
+        "D4": "The description gives WHAT (manifest-vs-function diffing, LPCI, confused-deputy chains), WHEN ('Use when reviewing a permission manifest against a skill's declared function'), and keywords (OWASP AST03, permission manifest) \u2014 the 14-15 band.",
+        "D5": "Layering is exemplary: an 'Orientation \u2014 read this much, then decide' block, a 'Then descend only this far' table with a MANDATORY trigger, and explicit 'Do NOT load' guidance \u2014 the perfect 14-15 band.",
+        "D6": "Freedom is well matched: rigid tier locks and spelled-out check scopes for the fragile static-detection side ('expect it to close one structural corner of it') while routing judgement calls like purpose-versus-scope to the agent \u2014 good calibration for most scenarios (11-13).",
+        "D7": "It cleanly applies the Navigation pattern ('Pattern: Knowledge... Route first') with route and conditional-load tables plus a tight body \u2014 masterful application of the appropriate pattern (9-10).",
+        "D8": "Comprehensive coverage of edge cases and failure modes, including a documented past false positive ('a previous version of the identity check... reported a false positive against every conformant USF manifest') and escalation guidance \u2014 14-15 band."
+      },
+      "total": 111.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Nearly every paragraph is pure expert delta \u2014 e.g., the quiet list noting 'a manifest carrying deny_write: /etc/hosts satisfies it while leaving SOUL.md writable' and the three permission spellings causing real false positives \u2014 placing it in the 16-20 pure-knowledge-delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"The six 'Decision rules' (e.g., 'the reviewable object is the trigger, not the action \u2014 and the trigger is usually not in the package') transfer expert thinking plus domain-specific triage procedure, hitting the 12-15 band.\"}, \"D3\": {\"score\": 13, \"why\": \"Expert-grade NEVERs with reasons, such as 'Do NOT load coverage-matrix.md to decide whether something is a finding' and 'read all three or your extension will be dead against the manifests that actually ship,' sit in the 12-15 band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description gives WHAT (manifest-vs-function diffing, LPCI, confused-deputy chains), WHEN ('Use when reviewing a permission manifest against a skill's declared function'), and keywords (OWASP AST03, permission manifest) \u2014 the 14-15 band.\"}, \"D5\": {\"score\": 15, \"why\": \"Layering is exemplary: an 'Orientation \u2014 read this much, then decide' block, a 'Then descend only this far' table with a MANDATORY trigger, and explicit 'Do NOT load' guidance \u2014 the perfect 14-15 band.\"}, \"D6\": {\"score\": 13, \"why\": \"Freedom is well matched: rigid tier locks and spelled-out check scopes for the fragile static-detection side ('expect it to close one structural corner of it') while routing judgement calls like purpose-versus-scope to the agent \u2014 good calibration for most scenarios (11-13).\"}, \"D7\": {\"score\": 9, \"why\": \"It cleanly applies the Navigation pattern ('Pattern: Knowledge... Route first') with route and conditional-load tables plus a tight body \u2014 masterful application of the appropriate pattern (9-10).\"}, \"D8\": {\"score\": 14, \"why\": \"Comprehensive coverage of edge cases and failure modes, including a documented past false positive ('a previous version of the identity check... reported a false positive against every conformant USF manifest') and escalation guidance \u2014 14-15 band.\"}}"
+    }
+  ],
+  "aggregate": {
+    "n": 15,
+    "mean": 107.9,
+    "median": 107.0,
+    "min": 100.0,
+    "max": 119.0,
+    "range": 19.0,
+    "stdev": 5.53,
+    "lower_bound": 102.4,
+    "judgments": [
+      102.0,
+      116.0,
+      104.0,
+      109.0,
+      107.0,
+      100.0,
+      119.0,
+      109.0,
+      111.0,
+      105.0,
+      100.0,
+      106.0,
+      113.0,
+      106.0,
+      111.0
+    ],
+    "method": "multi-round-independent-pooled",
+    "rubric_sha": "3027f20f3181758385a1bb8c022d4041dfb4de84",
+    "rubric_content_sha256": "737ef3628f0e11353114c3bd05a1c9d0c448dbfec1ae85db839253cbe93198b6",
+    "dim_n": 15,
+    "dim_means": {
+      "D1": 17.7,
+      "D2": 13.2,
+      "D3": 12.2,
+      "D4": 14.7,
+      "D5": 13.9,
+      "D6": 13.5,
+      "D7": 8.6,
+      "D8": 14.0
+    }
+  },
+  "verdict": "BLOCKED",
+  "verdict_reason": "dimension means below floor: D3"
+}

@@ -48,6 +48,7 @@ same hand:**
 | Decision rules | always: six rules, and the reason this file exists |
 | Distinguishing AST01 from its neighbors | the route above was contested, or one incident spans two categories |
 | Where the shipped checks go quiet | **MANDATORY before you report any negative result.** A pass from `scripts/detector.py` is not a clean verdict until you have read it |
+| NEVER — the readings these ten checks invite | **always, and again before the verdict leaves your hands.** Ten checks under one `AST01-` prefix decide eight scenarios, only seven of them AST01's; each entry names the `CHECK_COVERAGE` entry, registry id or test in this repository that refutes the misreading |
 | Scope and out-of-artifact boundary | the complaint is degradation-shaped — "it was fine, and now the agent behaves differently" |
 
 **Do NOT load `coverage-matrix.md`** to decide whether something is a finding. It is the
@@ -197,6 +198,102 @@ and none of them is recoverable by re-running the scan.
   blob only when one decode yields printable text; a blob that decodes to another
   encoded layer, to gzip, or to non-UTF-8 bytes returns nothing. AST10's check is the
   one that goes deeper — run it before concluding an opaque blob is inert.
+
+## NEVER — the readings these ten checks invite and do not support
+
+Two facts about this module generate every characteristic error below. Every check carries
+an `AST01-` prefix and three of the ten decide no AST01 scenario. Every check is a two-part
+predicate, and each half reads like a finding when it is alone. Each entry names the
+`CHECK_COVERAGE` entry, registry id, or test in this directory that refutes it.
+
+- **NEVER report `AST01-content-hash-missing` as an AST01 finding.** Its `CHECK_COVERAGE`
+  entry is `registry_ids: ["AST05-S01", "AST07-S01"]`, `covers: artifact-signal-only`, and
+  `scenarios/registry.yaml` names it back — it is the `artifact_signal_checks` entry on
+  Author Rug-Pull and on Malicious Update, and coverage of neither, because a hash-pinned
+  skill can still be maliciously updated the moment an operator accepts the new digest.
+  `scenario_detectors` drops it from `SCENARIO_DETECTORS` and from the F1 denominator for
+  that reason, and `test_every_check_separates_the_vulnerable_cases_from_the_clean_ones`
+  names it as one of exactly two checks required to stay inert across all sixteen fixtures.
+  The cost is paid
+  twice: an unpinned but clean skill written up as a malicious one, and a real AST05/AST07
+  pinning gap filed under a category whose owner has no remediation for it.
+- **NEVER read `AST01-content-hash-mismatch` as an AST01 verdict, in either direction.**
+  Its `registry_ids` is `[]` and its `covers` is `category-precondition`, derived — the
+  entry says so — from AST02's mitigation that a signature cover a canonical digest of
+  SKILL.md plus every declared resource file, not from any named scenario. A true positive
+  is a genuine self-contained contradiction and still belongs in no AST01 column. The
+  negative is the more expensive half: with nothing declared, the function returns
+  `detected=False` carrying the evidence `no declared hash to compare`, which is the same
+  boolean a package whose bytes verify returns. Any consumer reading the boolean records
+  "integrity checked" over a comparison that never happened — and the check that would
+  have said so is the one the previous entry forbids filing here.
+- **NEVER count a firing `AST01-obfuscated-payload-exec` toward this category.** Its
+  `registry_ids` is `["AST08-S02"]` Obfuscated Instruction, whose `category:` field in
+  `scenarios/registry.yaml` is AST08 and stays AST08; this module decides it only because
+  the artifact it is decided from is an AST01 package's own bundled script, and
+  `coverage-matrix.md` records the link "rather than reassigned". The `AST01-` prefix is
+  the module's check namespace, not a category assignment. The cost here is arithmetic and
+  it is already visible in the published numbers: the F1 denominator is eight scenarios of
+  which seven are AST01's, the corpus is sixteen cases where AST01's own scenarios entitle
+  it to fourteen, and `F1_SCOPE` reads `mixed-proxy` rather than `scenario-level` for
+  exactly this. Reporting eight AST01 detections overstates the category by one whole
+  scenario and routes a scanner-capability defect away from the owner who can fix it.
+- **NEVER convict on the construct half of a predicate, however alarming it reads.** That
+  detector is built and scored in this repository: `tests/test_corpus_discriminates_mechanism.py`
+  ablates every AST01 check down to its syntax half — no allowlist comparison, no
+  `deny_write` evaluation, no execution sink, no output-template scoping — and measures
+  **F1 0.552, tp 8, fp 13, fn 0** against the shipped checks' 1.000. The thirteen false
+  positives are the clean halves of the eight fixture pairs, each authored as bait for
+  this exact error: the same `curl … | bash` from a host the manifest declares, the same
+  append against the skill's own notes file instead of `SOUL.md`, the same base64 blob
+  decoded to a file instead of into `exec`. Extending a check by dropping its declaration
+  half does not widen coverage, it reproduces those thirteen — and
+  `test_a_syntax_only_ablation_does_not_pass_the_same_corpus` fails the build if a fixture
+  edit ever lets the ablation close the gap.
+- **NEVER acquit on the declaration half either.** `_egress_declared` returns true for
+  every host the instant `network_unbounded` is satisfied — a bare `network: true`, a
+  `policy: allow-all`, one glob anywhere in the allowlist — so `AST01-S02`, `AST01-S09` and
+  `AST01-S10` clear every destination in the package by construction; and with no
+  permissions block there is nothing for `write_allowed` to evaluate, so `AST01-S05` and
+  `AST01-S06` fall back to the bundled-script scan alone. Those negatives are byte-identical
+  to the negatives a genuinely tight manifest produces. The cost is a silence read as an
+  acquittal on precisely the packages that promised the most, and the breadth that caused
+  it belongs to AST03 and AST06 — so if the AST01 negative closes the review, nobody scores
+  it at all.
+- **NEVER let a full pass from `run_all` stand as evidence about runtime accumulation.**
+  All ten checks take the same argument, one `{"manifest": …, "files": …}` snapshot, so no
+  quantity that exists only across invocations is in scope for any of them: retry counts,
+  context growth, how often a skill re-reads its own memory file. Decision rule 4 states
+  this; the prohibition is what makes it survive contact with a write-up. The cost is that
+  `clean` is an acquittal on a question the instrument never asked, and a degradation
+  complaint closed that way stays closed — the two in-reach traces, a diff of the identity
+  artifacts across sessions and the host's own invocation telemetry, get pulled only while
+  the complaint is open. The static result and the domain gap go in the same sentence or
+  neither of them is honest.
+- **NEVER put anything in `AST01-S07`'s column.** Cognitive Degradation and Agent Drift is
+  `tier: out-of-artifact` in the registry, absent from `STATIC_DETECTABLE` and therefore
+  from the F1 denominator, and its `artifact_signal_checks` is the empty list deliberately:
+  the signal the registry does record — unbounded retry or loop constructs, absent
+  output-size budgets — is a shape benign skills exhibit too, and `coverage-matrix.md`
+  writes that it "is **not** coverage of AST01-S07 and must never be reported as such." A
+  package that will degrade a host and one that will not are byte-identical at install
+  time. A retry-loop grep filed under S07 converts "no in-package signal exists" into
+  "checked, clean" and retires the one scenario in this category whose honest state is a
+  published gap; the empty cell is the measurement, and this is the never-pad rule it
+  exists to enforce.
+- **NEVER let the payload's legibility decide the category.** AST01 is the only one of
+  these five that names what the attacker actually did, so a compromised registry, a
+  load-time parser execution, a poisoned referenced runbook and the scanner that missed all
+  three each read as "malicious skill" to a reviewer looking at the payload. The four *stop
+  reading here* rows in *Route first* key on the control that would have stopped it, not on
+  what the payload does, and each misroute costs something specific: a typosquatted name
+  carrying no payload is AST02-only, so filing it here manufactures an AST01 finding out of
+  a delivery problem; an AST05 payload sits in a document the package does not ship, so an
+  AST01 read of the package's bytes clears it correctly while answering the wrong question;
+  and a missed AST01 finding is one AST08 defect, never a second AST01 finding — double-tiering
+  it into both matrices inflates two denominators over one incident. AST08-S02 above is the
+  worked example in the other direction: the instrument that decides a scenario does not get
+  to set its category.
 
 ## Scope and out-of-artifact boundary
 
