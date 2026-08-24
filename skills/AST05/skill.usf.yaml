@@ -83,7 +83,7 @@ signature: "unsigned"
 # outside that surface, which is what stops the hash depending on the field that
 # carries it. Regenerate with:
 #   python3 validators/usf.py --update-content-hash skills/AST05/skill.usf.yaml
-content_hash: "sha256:52cd32f5b39bcfb0df686681f9a8d6f2de1830d847d6f929101d60451a7539a6"
+content_hash: "sha256:b456c8d51af5f09bce900ccd489f1057480878e2531c2df8922323020afff649"
 
 changelog:
   - version: "1.0.0"

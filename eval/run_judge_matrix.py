@@ -102,8 +102,7 @@ def main() -> int:
             res = run_judge(d / "SKILL.md", available, output_path=out, timeout=180.0)
             rounds.append(res)
             n = len(res.get("judgments") or [])
-            print(f"  {d.name} round {r + 1}/{args.rounds}: {res['status']} "
-                  f"({n} judgments, {time.time() - t0:.0f}s)")
+            print(f"  {d.name} round {r + 1}/{args.rounds}: {res['status']} ({n} judgments, {time.time() - t0:.0f}s)")
 
         judgments = [j for r in rounds for j in (r.get("judgments") or [])]
         totals, dimsets = [], []
@@ -141,8 +140,7 @@ def main() -> int:
             "rounds": args.rounds,
             "providers": [getattr(a, "name", str(a)) for a in available],
             "providers_unavailable": [
-                {"provider": getattr(u, "provider", str(u)), "reason": getattr(u, "reason", "")}
-                for u in unavailable
+                {"provider": getattr(u, "provider", str(u)), "reason": getattr(u, "reason", "")} for u in unavailable
             ],
             "judgments": judgments,
             "aggregate": agg,

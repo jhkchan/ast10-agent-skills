@@ -12,6 +12,57 @@ cryptographically meaningful on its own. `scripts/` ships **no detector** for th
 category and the section below explains why that is the finished state; frozen scenario
 tiers live in `coverage-matrix.md`.
 
+## Orientation — read this block first, then take one path
+
+**Fires when** the thing under review is a skill's *version*: how it is pinned, how it
+updates, or a change that landed after the review that approved it.
+
+**Decides, from the package alone, exactly one thing** — whether the declared pin is a
+content hash or a mutable version range (decision rule 1). That is a property of the
+manifest, and it is the whole artifact-decidable surface here.
+
+**Does not decide any named scenario.** Malicious Update, Rollback Attack and Hot-Reload
+Abuse are all tiered out-of-artifact, so this category publishes no F1 and no
+DETECTED/CLEAN verdict. Its verdict vocabulary is one word: `declared-and-uncovered`.
+A run with no findings is not a pass.
+
+**Wrong skill?** Route on the symptom before reading further:
+
+| What you are actually holding | Belongs to |
+| --- | --- |
+| a payload that is malicious on its own merits, in the shipped bytes | AST01 |
+| an absent content-hash field, as a *checkable* finding | AST01's shipped `AST01-content-hash-missing`, declared `artifact-signal-only` — never AST07 coverage |
+| a publishing account that was taken over | AST02 |
+| a pin that held while the *content it references* changed | AST05 |
+| a package nothing re-scanned after the update landed | AST08 |
+
+The table is an index, and it splits two ways. The last three rows are seams — one
+incident producing two separately-fixable findings — and *Distinguishing AST07 from its
+neighbors*, below, argues each one. The two AST01 rows are not seams but ownership: a
+payload and a hash field are both decidable from the bytes, so they belong to the
+category that ships a check for them, and nothing is left behind in AST07.
+
+**Then descend by need — one section each, in reading order:**
+
+- Triaging a pin, or judging a proposed remediation → *Why patch lag and blind
+  auto-update are the same root cause* + *Decision rules*. That is the whole triage
+  path; stop at the end of it.
+- Auditing a real package → *What a reviewer must do by hand*, which is the procedure,
+  because nothing here runs.
+- Recording coverage, an F1, or a scan verdict for this category → *This category ships
+  zero detectors*.
+- Arguing that a tier should move → *Scope and out-of-artifact boundary*, then
+  `coverage-matrix.md`, which is binding where this file is not.
+
+**Do NOT load `scripts/detector.py` looking for a check.** Its detector map is empty by
+design; the zero-detectors section below is the explanation, and reading the module adds
+nothing to it. Load it only to verify that the map is in fact empty.
+
+**Do NOT load `coverage-matrix.md` for triage.** It is corpus, tier-lock and F1
+accounting written for an auditor; decision rule 1 and the routing table above answer
+every triage question without it. Load it when you need the full per-scenario evidence
+enumeration, or when a tier is in dispute.
+
 ## Why patch lag and blind auto-update are the same root cause read two ways
 
 Update Drift presents as two opposite complaints — deployments too slow to patch, and
@@ -101,6 +152,46 @@ directions by tests that pin the module's detector map to its static-detectable 
 that set to the registry: if a tier is ever promoted, the pair fails loudly in the same
 change and a detector is owed. When you read this category's report, the empty cell is
 the finding — do not fill it.
+
+## What a reviewer must do by hand
+
+Nothing fires here, so the audit *is* the reviewer. Four steps, in order. Each names what
+makes an answer sufficient and what to do when you cannot get one — the second half
+matters more, because three of the four steps routinely fail and the failure has to
+survive into the write-up instead of quietly becoming a pass.
+
+1. **Read the two artifact-decidable facts — only one of them is automated.**
+   `node cli/bin/cli.js audit <package>` prints AST07 as `no static detectors` and
+   surfaces the first fact under AST01 as `AST01-content-hash-missing`: whether a
+   content hash is declared at all. The second is rule 1's actual question — whether
+   the update source resolves through a hash or a mutable range — and no shipped check
+   reads it; open the manifest and read it yourself. Neither answer clears or convicts
+   the category. This is the only step that terminates inside the artifact.
+2. **Obtain the predecessor, for Malicious Update.** *Sufficient:* a signed
+   release-transparency entry, or an operator-held record, binding
+   `version → content hash → publisher key` for the version previously installed, plus a
+   behaviour-scoped diff against it. *Insufficient:* the changelog, the version string,
+   or the publisher's own assertion of what changed — all three are written by the party
+   under suspicion. *Cannot get it:* S01 is undecided. Say so; do not downgrade it to
+   "no evidence of compromise".
+3. **Obtain the resolver's decision record, for Rollback Attack.** *Sufficient:* the
+   requested constraint, the candidate set offered, the version resolved — **and** an
+   operator-intent record separating a deliberate pin-back from an imposed one. *Cannot
+   get the intent half:* stop. Rule 2 is the reason: convicting on "version decreased"
+   alone convicts every legitimate rollback, which is a worse outcome than an undecided
+   row.
+4. **Obtain reload telemetry and directory ownership, for Hot-Reload Abuse.**
+   *Sufficient:* all three of a before/after content-hash pair inside one session, a
+   host reload event for that path, and the identity that wrote the file. *Cannot get
+   all three:* the claim overreaches — a hash pair alone proves the bytes changed, not
+   that they took effect without a restart.
+
+**Then write the verdict as `declared-and-uncovered`, naming which of steps 2–4 you could
+not complete and why.** `/ast:audit-ast07 <package> --evidence-plan` emits that shortlist
+in the command's own format if you want it generated rather than written;
+`coverage-matrix.md` enumerates the full evidence set behind each step. The failure this
+procedure exists to prevent is short and common: a reviewer completes step 1, sees a
+`sha256:` pin, and files "AST07: pass".
 
 ## Scope and out-of-artifact boundary — read this before tiering
 

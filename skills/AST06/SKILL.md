@@ -14,6 +14,54 @@ persistence, and a declared write scope reaching filesystem root — plus the de
 shell posture and shared-state write scope. Frozen scenario tiers live in
 `coverage-matrix.md`.
 
+## Orientation — read this much first
+
+**Fires when** you are reviewing an agent runtime's default execution mode, a workspace
+skill that can override a bundled one, a control interface's bind address, or a skill that
+writes state another agent later trusts.
+
+**Decides, from package bytes alone:** one scenario. `AST06-S01` Host Escape, via either
+disjunct — a bundled-script call site planting host persistence, or a declared write scope
+reaching filesystem root.
+
+**Does not decide:** the other four. Bind address, workspace-over-bundled precedence,
+hot-reload behaviour and cross-agent shared state are facts about a *deployment*, and no
+package carries them. For those, decision rules 2–4 are the procedure and you run them by
+hand against the running instance — the detector will stay silent and that silence is not
+a pass.
+
+**Route first.** Reasoning for each cross-category call is in *Distinguishing AST06 from
+its neighbors*; this table is only the jump.
+
+| What you are holding | Go to |
+| --- | --- |
+| A bundled script writing a cron table, systemd unit, shell rc or launch agent | *What the two shipped checks decide* — script disjunct |
+| A declared write scope of `/`, `~`, `$HOME` or `*` | Same section — manifest disjunct |
+| "We ship a sandbox, it's available if you configure it" | *Why "available if configured" does not close this finding* |
+| A `0.0.0.0` or loopback-bound control interface | Rule 3 — by hand, against the deployment |
+| A workspace skill shadowing a bundled one via hot-reload | Rule 2 — by hand |
+| Workspace, memory or browser state one agent writes and another trusts | Rule 4 — by hand |
+| An honest grant that is merely too broad, boundary still intact | **AST03** — there is a boundary to over-grant against |
+| The payload itself | **AST01** — isolation is the amplifier, not the payload |
+| A fleet that cannot see the deployment at all | **AST09** — inventory, not containment |
+
+**Stop after *Decision rules*** if you are producing a verdict or a remediation. Read
+*What the two shipped checks decide, and where they go quiet* only when a check returned
+**negative** and you must decide whether that is a pass or a blind spot.
+
+**Layer 3 — load on condition, never by default.**
+
+- `coverage-matrix.md` (338 lines) — **load before** re-tiering a scenario, quoting a
+  coverage claim, or reporting this category's F1. **Do NOT load** it to route a finding.
+- `scripts/detector.py` (526 lines) — **load before** reproducing a Host Escape false
+  positive or negative, or editing the persistence-path or root-scope tables. **Do NOT
+  load** it to learn what a check covers: `CHECK_COVERAGE` is reproduced per check in
+  `coverage-matrix.md`, and most of what the module ships computes `artifact_signal`s for
+  scenarios it does not decide — inferring coverage from the code is how that distinction
+  gets lost.
+- **Do NOT load either** for a deployment question. Neither file knows the bind address,
+  the precedence order, or the reload behaviour of the instance in front of you.
+
 ## Why "available if configured" does not close this finding
 
 Isolation findings get closed on the wrong evidence more often than any other category

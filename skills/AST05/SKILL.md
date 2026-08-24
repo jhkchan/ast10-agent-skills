@@ -15,6 +15,52 @@ and two reads of how wide the declared fetch surface is. Every one of them is an
 `artifact_signal` proxy, never coverage of a named AST05 scenario — frozen scenario
 tiers and the reason for that live in `coverage-matrix.md`.
 
+## Orientation — read this much first
+
+**Fires when** a skill fetches external documentation and treats it as instruction, when
+referenced content carries no hash pin, when a reviewed skill's external dependency could
+have changed since review, or when a chain injection slipped past every single-node
+review.
+
+**Decides:** nothing at scenario level. Zero of AST05's six scenarios are decidable from
+one package, so this category publishes no scenario-level F1. What ships instead is five
+enabling-precondition checks, each labelled `artifact-signal-only`, and that label travels
+with every number they produce.
+
+**Does not decide:** what a URL serves now, what it will serve at run time, or what it
+serves to someone else. That is the whole category — read *Why review-time inspection
+cannot close this category* before you argue with it.
+
+**Route first.** Reasoning for each cross-category call is in *Distinguishing AST05 from
+its neighbors*; this table is only the jump.
+
+| What you are holding | Go to |
+| --- | --- |
+| A payload in the shipped SKILL.md | **AST01** — wrong skill; there is nothing here yet to review |
+| The identical payload in content the skill only *references* | Stay — rules 1–4 |
+| A skill chain where no single node's review caught it | Rule 5 |
+| A hash pin checked once at install | Rule 1 — a snapshot, not a control |
+| An unverified integrity claim over a *code* dependency | **AST02** — signed package graph, not referenced prose |
+| The skill's own version changing | **AST07** — same drift, different object |
+| Content a scanner may never observe at all | **AST08** — this category widens their gap |
+| A `sanitize()` the static check accepted | *Where the shipped checks go quiet*, first bullet — highest-yield manual step on this page |
+
+**Stop after *Decision rules*** if you are writing a control recommendation; rules 1–6 are
+the controls. Read *Where the shipped checks go quiet* only when a check came back
+**clean** and you must decide whether that clean result means anything.
+
+**Layer 3 — load on condition, never by default.**
+
+- `coverage-matrix.md` (337 lines) — **load before** re-tiering a scenario, quoting a
+  coverage claim, or reporting any number for this category (the proxy corpus figure lives
+  there, and it is not scenario coverage). **Do NOT load** it to route a finding.
+- `scripts/detector.py` (688 lines) — **load before** reproducing a dataflow false
+  positive or negative, or extending the boundary-name or sink-name sets. **Do NOT load**
+  it to learn what a check covers: `CHECK_COVERAGE` is reproduced in `coverage-matrix.md`,
+  and reading the code to infer coverage is exactly how a proxy gets promoted.
+- **Do NOT load either** to decide whether a referenced URL is malicious. Neither file can
+  answer that, and no amount of reading will change it.
+
 ## Why review-time inspection cannot close this category
 
 The reviewed object and the executed object are different objects, and no control in

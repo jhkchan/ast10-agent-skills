@@ -13,6 +13,65 @@ effect with no code signature at all. Mechanism (shell-aware parsing, Unicode
 normalization pipeline, coverage-record emission) lives in `scripts/`; frozen scenario
 tiers live in `coverage-matrix.md`.
 
+## Orientation — read this block first, then take one path
+
+**Fires when** the thing under review is a *scanner or a scan result*: its coverage
+claim, its verdict vocabulary, its suppression list, its published detection rate, or a
+demonstrated bypass of it.
+
+**Decides** four of this category's eight scenarios, one shipped check each — Obfuscated
+Instruction, Context-Dependent Malice, Scanner Host Hazard, Bytecode Cache Poisoning.
+The other four are agent-judgable or out-of-artifact and ship nothing.
+
+**Does not decide whether the underlying payload is malicious.** That belongs to the
+category the payload is an instance of. An AST08 finding is always the *miss* — the
+tool or process gap — never the thing missed.
+
+**Wrong skill?** Route on the symptom before reading further:
+
+| What you are actually holding | Belongs to |
+| --- | --- |
+| a payload, and the open question is whether it is malicious | its own category — AST01 for execution, AST03 for permission, AST04 for metadata. File the miss here, the payload there. |
+| smuggling in frontmatter or manifest fields | AST04, which ships the manifest-side checks; only the scanner's tier-coverage gap (rule 3) is AST08 |
+| a package nothing re-scanned after an update landed | AST07 owns the update; AST08 owns the missing re-scan trigger |
+| whether a destination is a declared, allowed endpoint | AST10's `network.allow`, which is the manifest field rule 6 defers to |
+
+The first three rows are one rule, and *Distinguishing AST08 from its neighbors* states
+it below: classify the missed attack under its own category and the gap that missed it
+under AST08 — two findings, never one merged finding.
+
+**Then descend by need. The decision rules are eight independent rules, not a sequence —
+read the ones your finding touches and skip the rest:**
+
+| Your finding is about | Read |
+| --- | --- |
+| a verb the scanner did not see (quoting, `IFS`, variables; Unicode, invisibles, encoding layers) | rules 1–2 |
+| which part of the package got scanned at all | rule 3 |
+| a suppressed or allowlisted finding | rule 4 |
+| a detection-rate or false-positive-rate claim | rules 5–6 |
+| the scanner being attacked, prompt-injected, or crashed | rule 7 |
+| a `.pyc` that does not match its source | rule 8 |
+
+Around the rules, three sections and one file:
+
+- Choosing what verdict to report at all → *Why a clean scan result is a claim about
+  coverage, not about the skill*, the section immediately below, which is where
+  PASS / FAIL / INCOMPLETE comes from.
+- Reading *this* package's scan output, or quoting one of its checks → *What the four
+  shipped checks decide*, which states each check's exact blind spot in the same breath
+  as what it covers.
+- Asking whether a scenario is checkable from a static package at all → *Scope and
+  out-of-artifact boundary*.
+- Recording a tier, the corpus, or the published F1 → `coverage-matrix.md`.
+
+**Do NOT load `scripts/detector.py` to decide whether something is a finding.** The
+blind-spot section below states every shipped check's boundary in prose; the module is
+~960 lines of mechanism and adds nothing to that judgement. Load it only when you need
+an exact predicate — the precise guard set, the archive limits, the decode bound.
+
+**Do NOT load `coverage-matrix.md` unless the question is tiering, corpus accounting, or
+the published F1.** Nothing in it changes how a finding is triaged.
+
 ## Why a clean scan result is a claim about coverage, not about the skill
 
 Trail of Bits (Jun 3, 2026) bypassed every scanner they tested — ClawHub's stack,

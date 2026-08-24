@@ -5,10 +5,53 @@ description: "Detect and triage OWASP AST03 Over-Privileged Skills — permissio
 
 # AST03 - Over-Privileged Skills
 
-Pattern: Knowledge. The decision rule that recurs through this whole category:
-permission checks that operate at the tool-call level cannot see intent, and intent is
-exactly where the attack lives. Mechanism (manifest-vs-behavior diffing) lives in
-`scripts/`; frozen scenario tiers live in `coverage-matrix.md`.
+Pattern: Knowledge. Read the orientation block, take a route, then descend only as far as
+the route sends you. Mechanism (manifest-vs-behavior diffing) lives in
+`scripts/detector.py`; frozen scenario tiers live in `coverage-matrix.md`.
+
+## Orientation — read this much, then decide whether to read the rest
+
+- **Fires when** a permission *grant* is the object under review: a manifest read against
+  a stated function, a write scope that is the precondition for a later injection, or a
+  privileged skill that trusts its caller instead of re-verifying it.
+- **Decides** exactly one scenario — `AST03-S03` Identity File Backdoors, a declared write
+  reaching `SOUL.md`/`MEMORY.md`/`AGENTS.md` that `deny_write` does not shadow. The other
+  three checks are `artifact-signal-only` or `category-precondition` in the module's own
+  `CHECK_COVERAGE`; reading them as coverage is the overclaim the tier lock exists to stop.
+- **Never decides** whether a grant is broad *for this skill's function*, or whether an
+  injected instruction will later exercise it. Grants are in the manifest; exercises happen
+  in a runtime this package never sees.
+- **Stop now** if the route below sends you elsewhere. The recurring rule underneath this
+  whole category — permission checks at the tool-call level cannot see intent, and intent
+  is where the attack lives — is also the reason its static surface is this narrow.
+
+### Route first
+
+| If the finding is | Go |
+| --- | --- |
+| the skill itself is malicious by design | **AST01** — stop reading here |
+| the manifest *lies* (declares `network: false` while a script calls out) | **AST04** — stop reading here |
+| no permission model runs at all, because host-mode execution has none | **AST06** — stop reading here |
+| a manifest that is honest but too broad, or a delegation chain that trusts its caller | this skill — continue below |
+| an intent-level prompt-injection report that needs mapping onto a concrete over-broad grant | this skill — read decision rule 2 first, then the quiet list |
+| unclear, or it reads like several of these at once | `node cli/bin/cli.js route "<finding text>"` names the primary category and lists contributing control failures separately |
+
+### Then descend only this far
+
+| Section | Read it when |
+| --- | --- |
+| Why this is not "apply least privilege, harder" | you expected the detector to close the category, or you are about to file a purpose-versus-scope judgement as a static finding |
+| Decision rules | always: six rules, and the reason this file exists |
+| Distinguishing AST03 from its neighbors | the route above was contested, or one incident spans two categories |
+| What the shipped checks decide, and where they go quiet | **MANDATORY before you report a negative, and before you extend any check by hand.** The last silence is why a previous version of the identity check false-positived against every conformant USF manifest |
+| Scope and out-of-artifact boundary | you are being asked whether an LPCI trigger will actually fire |
+
+**Do NOT load `coverage-matrix.md`** to decide whether something is a finding. It is the
+tier contract and the F1 denominator; open it only to cite the authoritative tier of a
+named scenario. **Do NOT load `scripts/detector.py`** to learn what the checks decide —
+the quiet list below states each check's scope and each silence in prose, including which
+of the four claim scenario coverage. Read the source only to change it, and read all three
+permission spellings before you do.
 
 ## Why this is not "apply least privilege, harder"
 
@@ -24,7 +67,8 @@ The consequence for tooling, and it is the reason this category's static surface
 narrow: a manifest audit can only find grants that are broad *on their face*. Whether a
 grant is broad *for this skill's function* requires reading the stated purpose against
 the scope, which is judgement, not a predicate — `scenarios/registry.yaml` tiers exactly
-that scenario (`AST03-task-scope-mismatch`) agent-judgable for that reason. Do not expect
+that scenario (`AST03-S01` Weather Assistant Data Exfiltration; the module's old local
+slug `AST03-task-scope-mismatch` was retired for it) agent-judgable for that reason. Do not expect
 the detector to close the category; expect it to close one structural corner of it.
 
 ## Decision rules
@@ -90,7 +134,8 @@ the detector to close the category; expect it to close one structural corner of 
 
 ## What the shipped checks decide, and where they go quiet
 
-Exactly one check here claims scenario coverage: `AST03-S03` Identity File Backdoors — a
+**MANDATORY before you report a negative, and before you extend a check.** Exactly one
+check here claims scenario coverage: `AST03-S03` Identity File Backdoors — a
 declared write naming `SOUL.md`, `MEMORY.md`, or `AGENTS.md` that `deny_write` does not
 shadow, evaluated with USF's most-specific-wins precedence. The other three checks are
 declared `artifact-signal-only` or `category-precondition` in the module's own
@@ -126,9 +171,12 @@ runtime observation this artifact cannot provide standalone. The tier split betw
 exploit that scope at some future trigger" (agent-judgable or out-of-artifact) is
 fixed in `coverage-matrix.md`.
 
-## References
+## References — what is loadable, and when
 
-Full attack-scenario catalog (Weather Assistant Data Exfiltration, Database Admin
-Wipe, Identity File Backdoors, Low-Privilege-Invokes-High-Privilege) and the complete
-preventive-mitigation list are the whitepaper's own AST03 section. This file is the
-delta on top of it.
+| Resource | Load it when |
+| --- | --- |
+| `coverage-matrix.md` | you must cite the authoritative tier of a named AST03 scenario, or the written reason `AST03-S01` is agent-judgable rather than static-detectable |
+| `scripts/detector.py` | you are changing a check — never to find out what one decides, and never without reading all three permission spellings |
+| the whitepaper's own AST03 section | you need the full attack-scenario catalog (Weather Assistant Data Exfiltration, Database Admin Wipe, Identity File Backdoors, Low-Privilege-Invokes-High-Privilege) or the complete preventive-mitigation list |
+
+This file is the delta on top of that section, not a restatement of it.

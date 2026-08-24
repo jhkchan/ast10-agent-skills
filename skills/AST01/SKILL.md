@@ -5,10 +5,48 @@ description: "Detect and triage OWASP AST01 Malicious Skills — hidden payloads
 
 # AST01 - Malicious Skills
 
-Pattern: Knowledge. This file carries the decision rules that separate AST01 from its
-four adjacent categories and the boundary conditions that make each preventive control
-fail; the static-detectable checks it justifies live in `scripts/` (T-3.3) and the
-frozen per-scenario tier list lives in `coverage-matrix.md` (T-3.1), not here.
+Pattern: Knowledge. Read the orientation block, take a route, then descend only as far as
+the route sends you. No mechanism is in this file: the static checks live in
+`scripts/detector.py` and the frozen per-scenario tier list in `coverage-matrix.md`.
+
+## Orientation — read this much, then decide whether to read the rest
+
+- **Fires when** you hold a skill package and are asking whether *its own bytes* carry a
+  payload: pre-install review, triage of something already found, or a category argument
+  against AST02, AST04, AST05 or AST08.
+- **Decides** one question, and only that one: does this package contradict its own
+  declaration? Nothing here convicts a construct on its own.
+- **Never decides** anything that exists only across invocations: drift, degradation,
+  climbing retry counts. There the honest verdict is a domain gap, not `clean`.
+- **Stop now** if the route below sends you elsewhere. The rest of this file will not
+  answer that question and will cost you the context to ask it properly.
+
+### Route first
+
+| If the finding is | Go |
+| --- | --- |
+| a compromised registry, a hijacked maintainer account, a poisoned nested dependency | **AST02** — stop reading here |
+| code execution during *parsing* of the manifest (a legacy YAML loader) | **AST04** — stop reading here |
+| a payload in a document the skill only *references*, absent from the shipped package | **AST05** — stop reading here |
+| a detector that should have caught this and did not | **AST08** — stop reading here |
+| a payload, an install instruction, an identity read or an egress path in this package's own files | this skill — continue below |
+| unclear, or it reads like several of these at once | `node cli/bin/cli.js route "<finding text>"` names the primary category and lists contributing control failures separately |
+
+### Then descend only this far
+
+| Section | Read it when |
+| --- | --- |
+| The predicate shape | you are writing, extending or defending a check — it is why a bare construct match is not a finding |
+| Decision rules | always: six rules, and the reason this file exists |
+| Distinguishing AST01 from its neighbors | the route above was contested, or one incident spans two categories |
+| Where the shipped checks go quiet | **MANDATORY before you report any negative result.** A pass from `scripts/detector.py` is not a clean verdict until you have read it |
+| Scope and out-of-artifact boundary | the complaint is degradation-shaped — "it was fine, and now the agent behaves differently" |
+
+**Do NOT load `coverage-matrix.md`** to decide whether something is a finding. It is the
+tier contract and the F1 denominator; open it only to cite the authoritative tier of a
+named scenario. **Do NOT load `scripts/detector.py`** to learn what the checks decide —
+the quiet list below states every check's scope and every silence in prose. Read the
+source only to change it.
 
 ## The predicate shape every check here uses, and why the obvious one is unusable
 
@@ -99,9 +137,9 @@ that depend on it — see the quiet list below before reading any negative resul
 
 ## Where the shipped checks go quiet, and what each silence owes a reviewer
 
-A negative result from this package means "no in-package contradiction of this shape",
-never "clean". These are the specific silences, and none of them is recoverable by
-re-running the scan.
+**MANDATORY before you report a negative.** A negative result from this package means "no
+in-package contradiction of this shape", never "clean". These are the specific silences,
+and none of them is recoverable by re-running the scan.
 
 - **An unbounded egress declaration disarms the egress family in one move.** When the
   manifest declares `network: true`, `policy: allow-all`, or `allow: ["*"]`, there is
@@ -151,11 +189,15 @@ retry loops, verbose-output patterns) versus classifying the full degradation ch
 agent-judgable or out-of-artifact is fixed in `coverage-matrix.md`, not decided here;
 do not infer a tier from this prose.
 
-## References
+## References — what is loadable, and when
 
-Full attack-scenario catalog, real-world evidence (ClawHavoc campaign, USENIX Security
-2026 measurement study, Snyk ToxicSkills), and the complete preventive-mitigation list
-are the whitepaper's own AST01 section — treat this file as the delta on top of it, not
-a restatement of it. This package ships no `references/` directory: the source it would
-excerpt is the whitepaper, which is not redistributable here, so the pointer is to the
-publication rather than to a local copy of it.
+| Resource | Load it when |
+| --- | --- |
+| `coverage-matrix.md` | you must cite the authoritative tier of a named AST01 scenario, or defend the narrowed F1 denominator |
+| `scripts/detector.py` | you are changing a check — never to find out what one decides |
+| the whitepaper's own AST01 section | you need the full attack-scenario catalog, the real-world evidence (ClawHavoc campaign, USENIX Security 2026 measurement study, Snyk ToxicSkills), or the complete preventive-mitigation list |
+
+Treat this file as the delta on top of that section, not a restatement of it. This package
+ships no `references/` directory: the source it would excerpt is the whitepaper, which is
+not redistributable here, so the pointer is to the publication rather than to a local copy
+of it.

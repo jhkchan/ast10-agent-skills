@@ -18,8 +18,8 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = REPO_ROOT / "skills"
 
-# D5 progressive-disclosure body budget (vendor/skill-judge/SKILL.md:293-320 in the
-# the upstream eval-harness repository sibling repo): "Ideal: < 500 lines".
+# D5 progressive-disclosure body budget, from the vendored rubric that scores this
+# repo: vendor/skill-judge/SKILL.md, "D5: Progressive Disclosure" -- "Ideal: < 500 lines".
 D5_LINE_BUDGET = 500
 
 # Mechanism must live in scripts/ and references/, never in SKILL.md prose

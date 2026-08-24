@@ -9,9 +9,35 @@ Pattern: Knowledge. The decision rule this category turns on: a log an operator
 controls can be edited after the fact; a receipt an independent verifier can
 cryptographically check cannot — "we have logging" and "we have compliance-grade
 audit evidence" are different claims, and most AST09 mitigation lists conflate them.
-`scripts/` ships **no detector** for this category — every scenario is out-of-artifact,
-and the section below explains why that is the finished state; frozen scenario tiers
-live in `coverage-matrix.md`.
+
+**Fires on** the organization's control over skills rather than on a skill: no inventory,
+no approval record, an offboarded installer's skill still credentialed, regulated data with
+no audit trail, a skill inside a managed SaaS copilot the security team cannot scan, or an
+audit-logging design that needs judging. **Decides** which of those claims a body of
+evidence actually supports, and which population a coverage claim is entitled to cover.
+**Decides nothing from the package**: all seven scenarios are out-of-artifact, `scripts/`
+ships **no detector**, and that is the finished state rather than a gap — "This category
+ships zero detectors" says why. Frozen scenario tiers live in `coverage-matrix.md`.
+
+### Read only what the finding needs
+
+| If the finding is… | Read |
+| --- | --- |
+| an audit-log or receipt design ("we log everything") | rules 1–3, then stop |
+| "our skill scan came back clean" | rules 4–5 |
+| a departed employee's skill still live | rule 6 |
+| a multi-agent chain, or a fan-in join | rule 7 |
+| "no detector ships — so what do I actually do?" | "The manual pass" |
+| one skill's manifest granting too much | wrong skill → **AST03** |
+| an installed skill drifted from its approved version | wrong skill → **AST07**, unless no approved version was ever recorded, in which case it is AST09 |
+| isolation not enforced at one deployment | wrong skill → **AST06** for the control failure; the fleet's inability to see that deployment is still AST09 |
+
+The last three rows are argued in "Distinguishing AST09 from its neighbors"; read it only
+when a routing call is contested. **Do NOT open `coverage-matrix.md`** except for a binding
+tier, an F1 question, or the off-artifact evidence for one named scenario — it is the only
+file that carries per-scenario evidence, and this one deliberately does not reproduce it.
+**Do NOT open `scripts/detector.py`** looking for a check: `DETECTORS` is `{}` by
+construction, and the module says nothing "This category ships zero detectors" does not.
 
 ## Why "we have logs" does not close this category
 
@@ -116,6 +142,34 @@ not even have an in-package proxy worth naming — so there is nothing here to p
 even accidentally. Report `declared-and-uncovered` and put the effort into the
 off-artifact evidence each scenario actually needs; `coverage-matrix.md` names that
 evidence per scenario.
+
+## The manual pass, since nothing here runs
+
+Two commands exist and neither returns a verdict. `node cli/bin/cli.js audit <pkg>` prints
+`AST09  No Governance  no static detectors` and lists all seven scenarios as "declared
+out-of-artifact, not decidable from one package"; `/ast:audit-ast09 <pkg> --evidence-plan`
+emits the same seven with the evidence each needs. Read a clean run of either as *not asked*,
+never as *asked and cleared* — a package that passes the other nine categories has said
+nothing about this one. The review itself is four joins, and the package supplies the key
+for exactly one of them: its content hash.
+
+1. **Inventory row, keyed on that hash** — name, version, hash, install date, installer
+   identity, last scan status. A missing row is not a blocked step — it is the AST09-S02
+   finding, and it should be written down as one.
+2. **Identity state for the installer, and for the credential the skill itself runs under.**
+   An offboarding record sitting beside a live credential or an unrevoked non-human identity
+   is AST09-S03 — and per rule 6 the fix belongs in the offboarding workflow, so record which
+   workflow was supposed to carry it.
+3. **Execution record over a real interval**, in the shape rules 1–3 require. If the records
+   on offer are operator-editable, stop and say so at that grain: the finding is "no
+   independently verifiable record", not "logging absent", and the two get different fixes.
+4. **The discovery method itself, named in the finding.** Rule 4 makes this a claim about
+   population, so a finding that does not say which method produced it cannot be scoped by
+   whoever reads it next.
+
+Steps 1–3 returning nothing is the ordinary first-pass outcome and is a result: report the
+missing system by name. "Inconclusive" is the one write-up to refuse, because it reads in a
+report exactly like a clean scan of a system that was never checked.
 
 ## Scope and out-of-artifact boundary
 

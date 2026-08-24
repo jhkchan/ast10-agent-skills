@@ -8,9 +8,40 @@ description: "Detect and triage OWASP AST10 Cross-Platform Reuse — security me
 Pattern: Knowledge. The decision rule this category turns on: AST10 is not a protocol
 problem (MCP already standardizes the transport) — it is that no shared vocabulary for
 *security metadata itself* exists, so identical intent (deny this skill write access to
-identity files) is expressible on one platform and inexpressible on another. Mechanism
-(USF schema validation) lives in `scripts/`, anchored on the schema below; frozen
+identity files) is expressible on one platform and inexpressible on another.
+
+**Fires on** a manifest being validated against the Universal Skill Format, a skill moving
+between runtimes, a permission finding that needs binding to a specific field's precedence
+rule, or an encoded blob in an imported package. **Decides** whether a security-metadata
+*field* is missing, malformed, or silently dropped. **Does not decide** whether a present
+field's *value* is right for the skill it describes — that is the corresponding AST01–AST09
+category, and the two co-occur often enough to be worth recording separately. Frozen
 scenario tiers live in `coverage-matrix.md`.
+
+### Run first, then read only what the finding needs
+
+With a manifest in hand, `python3 validators/usf.py <manifest>` mechanizes rules 1–5:
+deny_write/write coherence, default-deny egress with the `deny: "*"` spelling, host syntax,
+signature and signing-key coherence, and `risk_tier` against the floor derived from the
+declared permissions. With a package in hand, `node cli/bin/cli.js audit <pkg>` runs the one
+shipped check behind rule 9. Read the rule text when a tool's output is contested, and for
+the porting event itself, which no tool observes.
+
+| If the finding is… | Read |
+| --- | --- |
+| a manifest field's meaning or precedence | rules 1–5, then stop |
+| a skill that just changed runtimes | rules 6–8 |
+| an encoded blob, or a scanner result on one | rule 9, then "Where the one shipped check goes quiet" |
+| "is this AST10 or AST0n?" | "Distinguishing AST10 from its neighbors" |
+| a write-up that attributes the Universal Skill Format | "Attribution" — mandatory before you cite it |
+| a value that is wrong rather than a field that is absent | wrong skill → the AST01–AST09 category that owns that value |
+
+**Do NOT open `coverage-matrix.md`** unless you need a binding tier, the F1 denominator, or
+the off-artifact evidence for one named scenario; five of the six scenarios are
+out-of-artifact and this file asserts no tier for them. **Do NOT reach for
+`skills/AST10/scripts/detector.py`** for rules 1–5 — it holds only the rule-9 payload check.
+The manifest semantics are `validators/usf.py` and the schema is
+`schemas/usf-v1.schema.json`.
 
 ## Attribution — read before citing this section
 
@@ -99,6 +130,8 @@ is wrong for the skill's function is the corresponding AST01–AST09 category. T
 frequently co-occur (a stripped `deny_write` field is both an AST10 porting defect and
 an AST01-relevant exposure) — record both, since they are fixed by different actors
 (the porting tool vendor vs. the skill author/reviewer).
+
+## The rule behind the one shipped check
 
 9. **Silent Supply Chain Injection is the one AST10 scenario a single package decides,
    and the decision is made on the decoded bytes, not on the source.** The whitepaper's

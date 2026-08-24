@@ -45,7 +45,7 @@ def test_fixture_content_hash_matches_its_own_files(pkg: pathlib.Path):
     assert expected == actual, (
         f"{pkg.parent.name}/{pkg.name}: content_hash is stale.\n"
         f"  declared: {expected}\n  actual:   {actual}\n"
-        f"Regenerate with: python3 -c \"from scripts.content_hash import content_sha256; "
+        f'Regenerate with: python3 -c "from scripts.content_hash import content_sha256; '
         f"print(content_sha256('{pkg.relative_to(REPO)}'))\""
     )
 

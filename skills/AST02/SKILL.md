@@ -5,10 +5,53 @@ description: "Detect and triage OWASP AST02 Supply Chain Compromise — registry
 
 # AST02 - Supply Chain Compromise
 
-Pattern: Knowledge. Decision rules for where AST02 controls reach and where they
-structurally cannot. The one mechanism a package can decide — an execution path in a
-config file the host auto-reads at project open — lives in `scripts/`; the frozen scenario
-tiers, and the three scenarios no package decides, live in `coverage-matrix.md`.
+Pattern: Knowledge. Read the orientation block, take a route, then descend only as far as
+the route sends you. The one mechanism a package can decide — an execution path in a config
+file the host auto-reads at project open — lives in `scripts/detector.py`; the frozen
+scenario tiers, and the three scenarios no package decides, live in `coverage-matrix.md`.
+
+## Orientation — read this much, then decide whether to read the rest
+
+- **Fires when** the question is *delivery and provenance*: how a skill got onto the
+  machine, whether the thing that arrived is the thing the publisher signed, and whether a
+  config file the host opens unprompted carries an execution path.
+- **Decides** exactly one scenario in-package — `AST02-S03` Config-File Hijacking. One
+  check, deliberately. The rest of the file is the audit reasoning for the controls a
+  reviewer has to check by hand.
+- **Never decides** Registry Flooding, Dependency Confusion or Maintainer Account
+  Takeover. Those are properties of a corpus, a resolver and an account; none is inside
+  the package you are holding, and the emptiness of the matrix *is* the measurement.
+- **Stop now** if the route below sends you elsewhere. This is the category where the
+  in-artifact surface is smallest, so a wrong route wastes the most reading.
+
+### Route first
+
+| If the finding is | Go |
+| --- | --- |
+| a payload's *content* — what the delivered skill actually does | **AST01** — stop reading here |
+| a poisoned document the skill merely reads at runtime, which no hash pin reaches | **AST05** — stop reading here |
+| an agent auto-applying an upstream update without human review, or an unpatched install | **AST07** — stop reading here |
+| a scanner that never walks the recursive dependency tree | **AST08** — stop reading here |
+| provenance, signing, revocation, dependency pinning, or a repo config file that executes on open | this skill — continue below |
+| a Maintainer Account Takeover incident | both — the takeover is AST02, the blind auto-apply is AST07; read the neighbors section, not the whole file |
+| unclear, or it reads like several of these at once | `node cli/bin/cli.js route "<finding text>"` names the primary category and lists contributing control failures separately |
+
+### Then descend only this far
+
+| Section | Read it when |
+| --- | --- |
+| Why this category has almost no in-artifact surface | you are about to claim registry membership as a provenance signal, or to ask why only one check ships |
+| Decision rules | always: six rules, and the reason this file exists |
+| Distinguishing AST02 from its neighbors | the route above was contested, or one incident spans two categories |
+| What the one shipped check decides, and the six ways it goes quiet | **MANDATORY before you report a negative `AST02-S03` result.** Every one of the six returns a negative verdict that is not a clean one |
+| Scope and out-of-artifact boundary | you are being asked to detect a maintainer-account compromise from the artifact |
+
+**Do NOT load `coverage-matrix.md`** to decide whether something is a finding. It is the
+tier contract and the F1 denominator; open it only to cite the authoritative tier of a
+named scenario, or the written reason a scenario is out-of-artifact. **Do NOT load
+`scripts/detector.py`** to learn what the one check decides — the quiet list below states
+its keying, its four firing shapes and its six silences in prose. Read the source only to
+extend the closed path list.
 
 ## Why this category has almost no in-artifact surface
 
@@ -105,7 +148,8 @@ repository was sufficient, with no dialog shown. Within those files the check fi
 four auto-executed shapes only: a hook entry carrying a command, an MCP server entry
 that spawns a process, a control-plane environment override, and a folder-open task.
 
-Each of the following returns a negative verdict that is not a clean one.
+**MANDATORY before you report a negative.** Each of the following returns a negative
+verdict that is not a clean one.
 
 - **The check reads config files shipped *inside the package*. The incident shape is a
   config file in the repository the agent opens.** That repository is not part of any
@@ -143,8 +187,12 @@ that a coverage matrix may tier as agent-judgable rather than static-detectable.
 authoritative tier and its written reason live in `coverage-matrix.md`; this file does
 not pre-empt that lock.
 
-## References
+## References — what is loadable, and when
 
-Full attack-scenario catalog, the real-world config-hijacking evidence, the Trail of
-Bits (Jun 3, 2026) scanner-bypass result, and the preventive-mitigation list are the
-whitepaper's own AST02 section (source: `ast02.md`). This file is the delta on top of it.
+| Resource | Load it when |
+| --- | --- |
+| `coverage-matrix.md` | you must cite the authoritative tier of a named AST02 scenario, or the written reason three of the four are out-of-artifact |
+| `scripts/detector.py` | you are extending the closed config-path list for a new host — never to find out what the check decides |
+| the whitepaper's own AST02 section (source: `ast02.md`) | you need the full attack-scenario catalog, the real-world config-hijacking evidence, the Trail of Bits (Jun 3, 2026) scanner-bypass result, or the preventive-mitigation list |
+
+This file is the delta on top of that section, not a restatement of it.

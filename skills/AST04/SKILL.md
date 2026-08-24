@@ -12,6 +12,50 @@ full permission context. Mechanism (schema validation, unsafe-tag detection, Uni
 normalization) lives in `scripts/`; frozen scenario tiers live in
 `coverage-matrix.md`.
 
+## Orientation — read this much first
+
+**Fires when** you are validating a manifest's parser and schema, cross-checking a
+declared permission against bundled code, triaging a YAML/JSON/TOML load, or judging a
+skill name that reads like a vendor's.
+
+**Decides, from package bytes alone:** five of AST04's seven scenarios — permission
+understating, risk-tier spoofing, YAML code execution, JSON prototype pollution, TOML
+config injection.
+
+**Does not decide:** brand impersonation (needs a trademark corpus no package carries)
+and the staged loader (its payload resolves off-artifact at install). Nothing below
+settles those two; `coverage-matrix.md` holds their tier and the reason for it.
+
+**Route first.** Reasoning for each cross-category call is in *Distinguishing AST04 from
+its neighbors*; this table is only the jump.
+
+| What you are holding | Go to |
+| --- | --- |
+| A tag the parser executed before any prose was read as instruction | *The loader-name trap*, then rules 1–2 |
+| Prose the agent read and obeyed | **AST01** — wrong skill, even in the same SKILL.md |
+| A declared `risk_tier` below its permission floor | Rule 3 |
+| `network: false` shipped beside an egress call to an outside host | Rule 4 |
+| An honest declaration that is merely too broad | **AST03** — breadth is theirs, misdeclaration is ours |
+| Invisible Unicode with nothing decoded yet | Rule 5 — a precondition; the verdict is **AST08**-S02's |
+| A scanner that should have caught any of the above and didn't | **AST08** — a tool gap, not a second AST04 finding |
+
+**Stop after *Decision rules*** if you are producing a verdict. Read *Where the shipped
+checks go quiet* only when a check returned **negative** and you must decide whether that
+is a pass or a blind spot — it is a false-negative map, not background.
+
+**Layer 3 — load on condition, never by default.**
+
+- `coverage-matrix.md` (249 lines) — **load before** re-tiering a scenario, quoting a
+  coverage claim, or reporting an F1 number. **Do NOT load** it to route a finding: the
+  table above is the whole answer.
+- `scripts/detector.py` (555 lines) — **load before** reproducing a false positive or
+  negative at the line level, or editing a pattern table. **Do NOT load** it to learn what
+  a check covers; every check's `CHECK_COVERAGE` claim is reproduced in
+  `coverage-matrix.md`, and inferring coverage from code is how an `artifact_signal` gets
+  quietly promoted into coverage.
+- **Do NOT load either** to answer "is this AST04, and does it fire" — this file closes
+  that on its own.
+
 ## The loader-name trap: why "which loader class does it name" is the wrong question
 
 The tempting shortcut is a safety ladder over PyYAML loader names — `UnsafeLoader` bad,
