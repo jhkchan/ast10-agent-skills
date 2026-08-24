@@ -171,4 +171,4 @@ mode matches) is fixed in `coverage-matrix.md`.
 
 Full attack-scenario catalog (Host Escape, Network Pivot, Localhost Attack Surface)
 and the complete preventive-mitigation list are the whitepaper's own AST06 section
-(source: `ast06.md`). This file is the delta on top of it.
+(source: the OWASP Agentic Skills Top 10 publication, section AST06 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)). This file is the delta on top of it.

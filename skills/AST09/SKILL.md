@@ -187,4 +187,4 @@ inflated. The binding tier and written reason for each are fixed in
 
 Full attack-scenario catalog, the Bilateral Receipt Pattern audit-logging
 specification, and EU AI Act Article 12 relevance are the whitepaper's own AST09
-section (source: `ast09.md`). This file is the delta on top of it.
+section (source: the OWASP Agentic Skills Top 10 publication, section AST09 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)). This file is the delta on top of it.

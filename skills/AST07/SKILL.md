@@ -211,4 +211,4 @@ history.
 ## References
 
 Full attack-scenario catalog and preventive-mitigation list are the whitepaper's own
-AST07 section (source: `ast07.md`). This file is the delta on top of it.
+AST07 section (source: the OWASP Agentic Skills Top 10 publication, section AST07 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)). This file is the delta on top of it.

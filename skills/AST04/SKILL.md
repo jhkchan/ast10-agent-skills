@@ -210,7 +210,7 @@ static-detectable-with-a-supplied-list or agent-judgable is fixed in
 ## References
 
 Full attack-scenario catalog and preventive-mitigation list are the whitepaper's own
-AST04 section (source: `ast04.md`). This file is the delta on top of it. The PyYAML CVE
+AST04 section (source: the OWASP Agentic Skills Top 10 publication, section AST04 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)). This file is the delta on top of it. The PyYAML CVE
 identifiers and the 6.0 mandatory-`Loader` change above are upstream facts, not
 whitepaper content, and are stated here because the whitepaper's own framing of loader
 safety is not sufficient to build a correct check on.

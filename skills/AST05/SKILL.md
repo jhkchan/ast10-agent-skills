@@ -22,8 +22,11 @@ referenced content carries no hash pin, when a reviewed skill's external depende
 have changed since review, or when a chain injection slipped past every single-node
 review.
 
-**Decides:** nothing at scenario level. Zero of AST05's six scenarios are decidable from
-one package, so this category publishes no scenario-level F1. What ships instead is five
+**Decides:** nothing at scenario level. Zero of AST05's six scenarios are *statically* decidable
+from one package, so this category publishes no scenario-level F1. One of the six,
+AST05-S05 Malicious Instructions Embedded in Documents, is tiered agent-judgable — its
+evidence *is* in the package, but deciding it needs semantic judgement rather than a rule,
+so it yields no automatable number either. What ships instead is five
 enabling-precondition checks, each labelled `artifact-signal-only`, and that label travels
 with every number they produce.
 
@@ -190,5 +193,5 @@ number the proxy corpus does publish, are fixed in `coverage-matrix.md`.
 
 Full attack-scenario catalog (including Malicious Instructions Embedded in Documents,
 resource-exhaustion DoS) and the complete preventive-mitigation list are the
-whitepaper's own AST05 section (source: `ast05.md`). This file is the delta on top of
+whitepaper's own AST05 section (source: the OWASP Agentic Skills Top 10 publication, section AST05 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)). This file is the delta on top of
 it.

@@ -45,7 +45,11 @@ the route sends you. No mechanism is in this file: the static checks live in
 **Do NOT load `coverage-matrix.md`** to decide whether something is a finding. It is the
 tier contract and the F1 denominator; open it only to cite the authoritative tier of a
 named scenario. **Do NOT load `scripts/detector.py`** to learn what the checks decide —
-the quiet list below states every check's scope and every silence in prose. Read the
+the quiet list below states each scenario check's scope and every silence in prose. Read the
+source only for the three checks the quiet list does not cover, because they decide no AST01
+scenario: `AST01-content-hash-missing` and `AST01-content-hash-mismatch` are declared
+artifact-signal-only and category-precondition respectively, and `AST01-obfuscated-payload-exec`
+decides AST08-S02, not an AST01 scenario. Otherwise read the
 source only to change it.
 
 ## The predicate shape every check here uses, and why the obvious one is unusable
