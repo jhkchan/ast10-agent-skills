@@ -9,15 +9,17 @@ The generator's two load-bearing promises:
 2. An empty scorecard directory renders as an explicit "no judged run recorded
    yet" state, never as a table of zeros and never by omitting the table.
 
-A third promise starts here, and it belongs to the published page rather than to
-the generator. ADR-0006 changed the gate's second clause after run 4 was
-published, so the committed Results table can no longer be regenerated without
-restating a run-4 verdict in the words of a rule that never judged it. The table
-is frozen until run 5 replaces it, and
-``test_the_committed_results_table_is_run_4_under_the_rule_that_produced_it``
-holds the freeze honest: it re-derives every published verdict through the
-CURRENT gate and fails if any has moved, so "frozen" never quietly becomes
-"stale".
+A third promise belongs to the published page rather than to the generator, and
+it changed shape when run 5 landed. Between ADR-0006 and run 5 the committed
+Results table was run 4's, issued under a clause the gate no longer applies, so
+the table was FROZEN and the assertion was that the freeze hid nothing. Run 5 was
+scored under the rule in force, so the table is a regeneration again and
+``--check`` is once more the right question. The claim the freeze was carrying
+does not disappear with it:
+``test_the_gate_change_moved_no_verdict_on_the_corpus_it_did_not_judge`` re-derives
+every run-4 verdict through today's gate against the frozen archive. That is the
+arithmetic ADR-0006 rests its "zero verdicts change" on, and it stays checkable
+long after run 4 stops being the page's subject.
 """
 
 from __future__ import annotations
@@ -121,65 +123,161 @@ def test_empty_scorecard_dir_renders_the_not_yet_judged_state(tmp_path):
 
 def test_placeholder_roster_matches_the_shipped_skills():
     shipped = {p.parent.name for p in (REPO_ROOT / "skills").glob("*/SKILL.md")}
-    names = set()
-    for skill_dir in sorted(shipped):
-        text = (REPO_ROOT / "skills" / skill_dir / "SKILL.md").read_text(encoding="utf-8")
-        for line in text.splitlines()[1:]:
-            if line.startswith("name:"):
-                names.add(line.split(":", 1)[1].strip())
-                break
-    assert set(gen.PLACEHOLDER_SKILLS) == names
+    assert set(gen.PLACEHOLDER_SKILLS) == shipped, (
+        "every shipped skill must have a row, judged or not — and the roster is keyed by the "
+        "directory name because that is what a scorecard's `skill` field carries"
+    )
 
 
-def test_the_committed_results_table_is_run_4_under_the_rule_that_produced_it():
-    """The published board is frozen, and the freeze has to be checkable.
+def test_placeholder_roster_is_in_the_namespace_scorecards_key_on():
+    """The bug this pins is a namespace split, and it was invisible in the output's shape.
 
-    `--check` was the right assertion while one rule had produced every published
-    verdict. It is not any more. ADR-0006 changed the gate's second clause on
-    2026-08-24, after run 4 was published, so `render_block` now evaluates the
-    run-4 corpus under a rule run 4 was never scored against — and regenerating
-    would restate `AST09`'s BLOCKED reason in the words of a clause that never
-    saw it. ADR-0006 forbids exactly that, so the table stays as issued until
-    run 5 replaces it.
+    A scorecard's `skill` field is the directory under `skills/` (`AST01`); that
+    same skill's `SKILL.md` frontmatter calls it `ast01-malicious-skills`. While
+    `PLACEHOLDER_SKILLS` held the frontmatter names, `render_block`'s
+    "which of these did no scorecard cover?" set difference matched nothing at
+    all: the committed board carried its eleven judged rows plus ten more rows
+    asserting that ten of those same eleven skills were NOT YET JUDGED — 21 rows
+    for 11 skills, every extra one false.
 
-    What replaces `--check` is the stronger claim, and the one a sceptical reader
-    actually wants: **the freeze hides nothing.** Every verdict in the committed
-    table is re-derived here through the CURRENT gate and must match. If the new
-    clause would move any row, this fails and the table is not merely stale — it
-    is wrong, and the freeze is no longer defensible. If someone regenerates the
-    table anyway, the reason cell stops naming the retired clause and this fails
-    too.
+    Asserting the tuple against the shipped directories is not enough on its own,
+    because a future roster could be renamed on one side only. This asserts the
+    property that actually matters: every recorded scorecard's own key is a
+    member of the placeholder roster, so the two can never again describe the
+    same skill in two vocabularies.
     """
-    import re
+    keyed = {
+        json.loads(path.read_text(encoding="utf-8")).get("skill")
+        for directory in sorted((REPO_ROOT / "eval").glob("scorecards*"))
+        if directory.is_dir()
+        for path in sorted(directory.glob("*.json"))
+    }
+    keyed.discard(None)
+    assert keyed, "no recorded scorecards — the namespace claim is unverifiable"
+    assert keyed <= set(gen.PLACEHOLDER_SKILLS), (
+        f"scorecards key on {sorted(keyed - set(gen.PLACEHOLDER_SKILLS))}, which the placeholder "
+        "roster does not contain — those skills will render twice, once judged and once as "
+        "NOT YET JUDGED"
+    )
 
-    from scripts.ship_floor import POOLED_LOWER_BOUND, aggregate_verdict
 
+def test_a_full_corpus_renders_one_row_per_skill_and_no_phantom_placeholders():
+    """Eleven judged skills must produce eleven rows, not eleven plus a shadow roster."""
+    cards = gen.load_scorecards(REPO_ROOT / "eval" / "scorecards")
+    if not cards:
+        pytest.skip("no scorecards recorded")
+    block = gen.render_block(cards)
+    assert "NOT YET JUDGED" not in block, (
+        "every skill on the roster is judged, so no placeholder row belongs on the board"
+    )
+    rows = [line for line in block.splitlines() if line.startswith("| `")]
+    assert len(rows) == len(cards) == len(gen.PLACEHOLDER_SKILLS)
+
+
+def _published_rows() -> dict[str, str]:
+    """Skill -> verdict cell, read out of the committed Results block."""
     text = (REPO_ROOT / "docs" / "skill-judge-dashboard.md").read_text(encoding="utf-8")
     block = text.split(gen.BEGIN, 1)[1].split(gen.END, 1)[0]
-
-    published: dict[str, str] = {}
+    rows: dict[str, str] = {}
     for line in block.splitlines():
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
         if len(cells) == 7 and cells[0].startswith("`") and cells[-1] not in ("Verdict", "NOT YET JUDGED"):
-            published[cells[0].strip("`")] = cells[-1]
-    assert published, "no judged rows found in the committed Results block"
+            rows[cells[0].strip("`")] = cells[-1]
+    assert rows, "no judged rows found in the committed Results block"
+    return rows
 
-    cards = {str(c.get("skill")): c for c in gen.load_scorecards()}
-    assert set(published) == set(cards), (
-        "the frozen table and eval/scorecards/ describe different skills; the freeze cannot be checked"
+
+def _last_corpus_judged_under_the_retired_clause() -> Path:
+    """The newest recorded run scored before ADR-0006, found by reading the bytes.
+
+    ADR-0006 added `sem` and `ci_lower` to every aggregate written under it, so a
+    corpus carrying neither was scored under the retired clause. Deriving the
+    directory this way means the check keeps pointing at the evidence rather than
+    at whichever run is topical: when run 5 is archived it will carry both keys and
+    this will still find run 4.
+    """
+    dated: list[tuple[int, Path]] = []
+    for directory in sorted((REPO_ROOT / "eval").glob("scorecards*")):
+        if not directory.is_dir():
+            continue
+        cards = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(directory.glob("*.json"))]
+        aggregates = [c["aggregate"] for c in cards if c.get("aggregate")]
+        if not aggregates or any("ci_lower" in agg for agg in aggregates):
+            continue
+        suffix = directory.name.rsplit("run", 1)[-1]
+        dated.append((int(suffix) if suffix.isdigit() else 0, directory))
+    assert dated, "no recorded corpus predates ADR-0006; its zero-verdicts-change claim is unverifiable"
+    return max(dated)[1]
+
+
+def test_the_committed_results_table_is_the_live_corpus_under_the_rule_in_force():
+    """The published board is what today's generator emits from today's corpus.
+
+    This was a freeze check for exactly one run. ADR-0006 changed the gate's second
+    clause on 2026-08-24, after run 4 was published, so regenerating would have
+    restated a run-4 verdict in the words of a rule that never judged it, and the
+    table stayed as issued. Run 5 was scored under the rule in force, which ends
+    the freeze and restores the stronger question: is the committed table exactly
+    what the generator produces from `eval/scorecards/` today?
+
+    Both halves are asserted, because `--check` alone would pass on a table
+    regenerated from a corpus whose stored statistics lie. Every verdict published
+    here is also re-derived through `aggregate_verdict`, so a row reading SHIP has
+    been recomputed rather than transcribed. A stale table and a fabricated one
+    fail differently, and both fail.
+    """
+    from scripts.ship_floor import aggregate_verdict
+
+    assert gen.main(["--check"]) == 0, (
+        "the committed Results table is not what eval/generate_dashboard.py produces from "
+        "eval/scorecards/ — run `python3 eval/generate_dashboard.py`. The table was frozen only "
+        "while the published corpus predated the rule in force; run 5 was judged under it, so "
+        "staleness is no longer excused."
     )
 
+    published = _published_rows()
+    cards = {str(c.get("skill")): c for c in gen.load_scorecards()}
+    assert set(published) == set(cards), "the committed table and eval/scorecards/ describe different skills"
     for skill, cell in published.items():
         recomputed, _why = aggregate_verdict(skill, cards[skill].get("aggregate"))
         assert cell.split(" — ")[0] == recomputed, (
-            f"{skill}: the frozen run-4 table publishes {cell.split(' — ')[0]!r} but the rule now in "
-            f"force computes {recomputed!r}. A frozen board is only honest while the freeze changes "
-            "no verdict — see docs/adr/0006-confidence-bound-on-the-pooled-mean.md."
+            f"{skill}: the published table says {cell.split(' — ')[0]!r} but the rule in force computes "
+            f"{recomputed!r} from that scorecard's own judgments"
         )
 
-    # The one row whose REASON belongs to the retired clause is still stated in
-    # that clause's terms. Derived, not named: whichever skill run 4 blocked on
-    # the lower bound is the one that must still say so.
+
+def test_the_gate_change_moved_no_verdict_on_the_corpus_it_did_not_judge():
+    """ADR-0006's central claim — "Zero verdicts change" — kept permanently checkable.
+
+    The claim is arithmetic over a frozen corpus: run 4 was scored under
+    `mean − stdev ≥ 105`, and running today's `mean − 1.0 × stdev/√n ≥ 108` across
+    those same bytes must reproduce every verdict as issued. While run 4 was live
+    the freeze check made that claim in passing. Now that run 5 has replaced it the
+    claim needs a home of its own, or it stops being tested the moment it stops
+    being topical — and it is the whole reason a reader may read 11 of 11 as a
+    statement about the skills rather than about the rule.
+
+    The corpus is found, not named, and so is the row: whichever skill the retired
+    clause blocked on its own must still be BLOCKED, by the new clause, for the new
+    clause's stated reason.
+    """
+    from scripts.ship_floor import POOLED_LOWER_BOUND, aggregate_verdict
+
+    directory = _last_corpus_judged_under_the_retired_clause()
+    cards = {}
+    for path in sorted(directory.glob("*.json")):
+        card = json.loads(path.read_text(encoding="utf-8"))
+        cards[card["skill"]] = card
+
+    for skill, card in cards.items():
+        recomputed, _why = aggregate_verdict(skill, card.get("aggregate"))
+        assert recomputed == card["verdict"], (
+            f"eval/{directory.name}/{skill}.json was issued {card['verdict']} under the retired clause "
+            f"and the rule in force computes {recomputed}. ADR-0006 was accepted on the arithmetic that "
+            "the change moves no verdict; if that is false, the record is wrong and so is every page "
+            "citing it."
+        )
+
     blocked_by_the_retired_clause = [
         skill
         for skill, card in cards.items()
@@ -189,13 +287,15 @@ def test_the_committed_results_table_is_run_4_under_the_rule_that_produced_it():
         and all(agg["dim_means"][d] >= f for d, f in gen.FLOORS.items())
     ]
     assert len(blocked_by_the_retired_clause) == 1, (
-        f"expected exactly one run-4 skill blocked by the retired clause alone, found {blocked_by_the_retired_clause}"
+        f"expected exactly one skill in eval/{directory.name}/ blocked by the retired clause alone, found "
+        f"{blocked_by_the_retired_clause} — it is the worked example ADR-0005 and ADR-0006 both argue from"
     )
-    cell = published[blocked_by_the_retired_clause[0]]
-    assert re.search(r"lower bound \(mean - stdev\) [\d.]+ < 105", cell), (
-        f"{blocked_by_the_retired_clause[0]}'s published reason no longer names the clause that "
-        f"produced it — the table has been regenerated under the new rule, which re-labels a "
-        f"run-4 verdict: {cell!r}"
+    example = blocked_by_the_retired_clause[0]
+    assert cards[example]["verdict"] == "BLOCKED"
+    recomputed, why = aggregate_verdict(example, cards[example]["aggregate"])
+    assert recomputed == "BLOCKED" and "confidence bound" in why, (
+        f"{example} was blocked by a spread statistic and must still be blocked by the confidence bound "
+        f"— a change of reason, not of outcome. Today's gate says: {recomputed} — {why}"
     )
 
 
@@ -204,12 +304,29 @@ def test_the_committed_results_table_is_run_4_under_the_rule_that_produced_it():
 # ---------------------------------------------------------------------------
 
 
+def _results_row(dashboard: Path, skill: str) -> str:
+    """The Results-table row for `skill`, scoped to the generated block.
+
+    Scoped, not grepped. The page carries other tables that name the same skills
+    — the robustness section publishes a `ci_lower` row per skill with a gap —
+    so "the first line mentioning AST06" stopped being the generated row the
+    moment the page grew a second table, and silently asserted against the wrong
+    one rather than failing.
+    """
+    text = dashboard.read_text(encoding="utf-8")
+    block = text.split(gen.BEGIN, 1)[1].split(gen.END, 1)[0]
+    prefix = f"| `{skill}` |"
+    rows = [line for line in block.splitlines() if line.startswith(prefix)]
+    assert len(rows) == 1, f"expected exactly one Results row for {skill}, found {len(rows)}"
+    return rows[0]
+
+
 def test_a_passing_scorecard_renders_ship_and_grade_a(tmp_path, dashboard):
     cards = tmp_path / "cards"
-    _write_card(cards, "ast01-malicious-skills", _aggregate([109, 111, 108, 112]))
+    _write_card(cards, "AST01", _aggregate([109, 111, 108, 112]))
     gen.main(["--dashboard", str(dashboard), "--scorecards", str(cards)])
     text = dashboard.read_text(encoding="utf-8")
-    row = next(line for line in text.splitlines() if "ast01-malicious-skills" in line)
+    row = _results_row(dashboard, "AST01")
     assert row.endswith("| A | SHIP |")
     assert "1 of 11 skills judged; 1 clears the ship rule" in text
 
@@ -219,13 +336,9 @@ def test_a_stored_verdict_is_never_copied(tmp_path, dashboard):
     cards = tmp_path / "cards"
     aggregate = _aggregate([80, 82, 79, 81])
     aggregate["verdict"] = "SHIP"  # the lie
-    _write_card(cards, "ast02-supply-chain-compromise", aggregate)
+    _write_card(cards, "AST02", aggregate)
     gen.main(["--dashboard", str(dashboard), "--scorecards", str(cards)])
-    row = next(
-        line
-        for line in dashboard.read_text(encoding="utf-8").splitlines()
-        if "ast02-supply-chain-compromise" in line and "|" in line
-    )
+    row = _results_row(dashboard, "AST02")
     assert "BLOCKED" in row
     assert "pooled mean 80.5 < target 108" in row
 
@@ -234,13 +347,9 @@ def test_stats_that_disagree_with_the_judgments_block(tmp_path, dashboard):
     cards = tmp_path / "cards"
     aggregate = _aggregate([109, 111, 108, 112])
     aggregate["mean"] = 118.0  # inflated, contradicted by `judgments`
-    _write_card(cards, "ast03-over-privileged-skills", aggregate)
+    _write_card(cards, "AST03", aggregate)
     gen.main(["--dashboard", str(dashboard), "--scorecards", str(cards)])
-    row = next(
-        line
-        for line in dashboard.read_text(encoding="utf-8").splitlines()
-        if "ast03-over-privileged-skills" in line and "|" in line
-    )
+    row = _results_row(dashboard, "AST03")
     assert "BLOCKED" in row
     assert "stored stats disagree with recompute" in row
     assert "118" not in row, "the inflated stored mean must not be rendered"
@@ -250,25 +359,17 @@ def test_a_wrong_rubric_sha_blocks(tmp_path, dashboard):
     cards = tmp_path / "cards"
     aggregate = _aggregate([109, 111, 108, 112])
     aggregate["rubric_sha"] = "0" * 40
-    _write_card(cards, "ast04-insecure-metadata", aggregate)
+    _write_card(cards, "AST04", aggregate)
     gen.main(["--dashboard", str(dashboard), "--scorecards", str(cards)])
-    row = next(
-        line
-        for line in dashboard.read_text(encoding="utf-8").splitlines()
-        if "ast04-insecure-metadata" in line and "|" in line
-    )
+    row = _results_row(dashboard, "AST04")
     assert "BLOCKED" in row and "rubric_sha" in row
 
 
 def test_fewer_than_min_rounds_blocks(tmp_path, dashboard):
     cards = tmp_path / "cards"
-    _write_card(cards, "ast05-untrusted-external-instructions", _aggregate([110, 111]))
+    _write_card(cards, "AST05", _aggregate([110, 111]))
     gen.main(["--dashboard", str(dashboard), "--scorecards", str(cards)])
-    row = next(
-        line
-        for line in dashboard.read_text(encoding="utf-8").splitlines()
-        if "ast05-untrusted-external-instructions" in line and "|" in line
-    )
+    row = _results_row(dashboard, "AST05")
     assert "BLOCKED" in row and "pooled judgments" in row
 
 
@@ -276,13 +377,9 @@ def test_a_dimension_below_its_floor_blocks_a_high_total(tmp_path, dashboard):
     """The floors exist so a strong total cannot buy past a weak dimension."""
     cards = tmp_path / "cards"
     dims = dict(PASSING_DIMS, D1=12.0)  # floor is 17
-    _write_card(cards, "ast06-weak-isolation", _aggregate([115, 116, 114, 117], dims))
+    _write_card(cards, "AST06", _aggregate([115, 116, 114, 117], dims))
     gen.main(["--dashboard", str(dashboard), "--scorecards", str(cards)])
-    row = next(
-        line
-        for line in dashboard.read_text(encoding="utf-8").splitlines()
-        if "ast06-weak-isolation" in line and "|" in line
-    )
+    row = _results_row(dashboard, "AST06")
     assert "BLOCKED" in row
     assert "dimension means below floor: D1" in row
     assert "`D1` 12/17 ⚠" in row
@@ -295,7 +392,7 @@ def test_a_dimension_below_its_floor_blocks_a_high_total(tmp_path, dashboard):
 
 def test_unjudged_skills_keep_their_row(tmp_path, dashboard):
     cards = tmp_path / "cards"
-    _write_card(cards, "ast01-malicious-skills", _aggregate([109, 111, 108, 112]))
+    _write_card(cards, "AST01", _aggregate([109, 111, 108, 112]))
     gen.main(["--dashboard", str(dashboard), "--scorecards", str(cards)])
     text = dashboard.read_text(encoding="utf-8")
     assert text.count("NOT YET JUDGED") == len(gen.PLACEHOLDER_SKILLS) - 1
@@ -317,7 +414,7 @@ def test_only_the_marked_region_is_rewritten(tmp_path, dashboard):
 
 def test_generator_is_idempotent(tmp_path, dashboard):
     cards = tmp_path / "cards"
-    _write_card(cards, "ast08-poor-scanning", _aggregate([109, 111, 108, 112]))
+    _write_card(cards, "AST08", _aggregate([109, 111, 108, 112]))
     args = ["--dashboard", str(dashboard), "--scorecards", str(cards)]
     gen.main(args)
     once = dashboard.read_text(encoding="utf-8")
@@ -328,7 +425,7 @@ def test_generator_is_idempotent(tmp_path, dashboard):
 
 def test_check_flag_reports_drift_without_writing(tmp_path, dashboard):
     cards = tmp_path / "cards"
-    _write_card(cards, "ast09-no-governance", _aggregate([109, 111, 108, 112]))
+    _write_card(cards, "AST09", _aggregate([109, 111, 108, 112]))
     before = dashboard.read_text(encoding="utf-8")
     assert gen.main(["--dashboard", str(dashboard), "--scorecards", str(cards), "--check"]) == 1
     assert dashboard.read_text(encoding="utf-8") == before

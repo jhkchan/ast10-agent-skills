@@ -20,15 +20,16 @@ Two invariants make the generated table trustworthy:
    measurement that did not happen.
 
 **Do not run this against a corpus scored under a superseded rule.** It calls the
-live gate, so pointing it at `eval/scorecards/` (run 4, judged under the clause
-`docs/adr/0006-confidence-bound-on-the-pooled-mean.md` retired on 2026-08-24)
-would restate a published verdict in the words of a rule that never issued it —
-which that record forbids in as many words. The committed Results table is
-therefore frozen until run 5 replaces it; `--check` will report it out of date
-and that report is expected, not a defect.
-``tests/test_generate_dashboard.py::test_the_committed_results_table_is_run_4_under_the_rule_that_produced_it``
-is what guards the table instead, by re-deriving every published verdict through
-the current gate and failing if one has moved.
+live gate, so pointing it at a corpus judged under an older one would restate a
+published verdict in the words of a rule that never issued it — which
+`docs/adr/0006-confidence-bound-on-the-pooled-mean.md` forbids in as many words.
+That was the state of `eval/scorecards/` between 2026-08-24 and run 5, and the
+committed Results table was frozen for exactly that period. Run 5 was judged under
+the rule in force, so the table is a regeneration again and `--check` is expected
+to pass. ``tests/test_generate_dashboard.py`` asserts that, and separately that
+today's gate over the frozen ``eval/scorecards-run4/`` still reproduces every
+run-4 verdict. The rule stands for the next time the gate changes: archive first,
+and never point this at an archive.
 
 Usage::
 
@@ -63,17 +64,29 @@ END = "<!-- END:results -->"
 
 #: Rendered when no scorecard exists for a skill. Kept in sync with the
 #: repository's own roster so a skill that is never judged still appears.
+#:
+#: THESE ARE SCORECARD KEYS, NOT FRONTMATTER NAMES, and the distinction is the
+#: whole reason this comment exists. A scorecard's `skill` field is the
+#: directory under `skills/` — `AST01` — while that skill's `SKILL.md`
+#: frontmatter calls it `ast01-malicious-skills`. This tuple used to hold the
+#: frontmatter names, so `render_block`'s "which of these did no scorecard
+#: cover?" test never matched anything: the board rendered its eleven judged
+#: rows and then TEN MORE rows claiming the same ten skills were NOT YET JUDGED,
+#: twenty-one rows for eleven skills. Anything added here must be spelled the
+#: way a scorecard spells it, and
+#: `tests/test_generate_dashboard.py::test_placeholder_roster_is_in_the_namespace_scorecards_key_on`
+#: fails if the two namespaces part company again.
 PLACEHOLDER_SKILLS: tuple[str, ...] = (
-    "ast01-malicious-skills",
-    "ast02-supply-chain-compromise",
-    "ast03-over-privileged-skills",
-    "ast04-insecure-metadata",
-    "ast05-untrusted-external-instructions",
-    "ast06-weak-isolation",
-    "ast07-update-drift",
-    "ast08-poor-scanning",
-    "ast09-no-governance",
-    "ast10-cross-platform-reuse",
+    "AST01",
+    "AST02",
+    "AST03",
+    "AST04",
+    "AST05",
+    "AST06",
+    "AST07",
+    "AST08",
+    "AST09",
+    "AST10",
     "advisory",
 )
 

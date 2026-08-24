@@ -18,10 +18,23 @@
 #
 # `runtime_entries` is APPEND-ONLY: adapters/base.py's record_unavailable()
 # and record_failure() append here — never edit or delete a prior entry —
-# when a live-checked adapter is skipped at roster-build time (S-004) or
-# crashes mid-round (S-008). Empty at authoring time; populated once the
-# harness (plan.md T-2.2/T-2.3) runs a judge round against this file's
-# default path.
+# when a live-checked adapter is skipped at roster-build time (S-004), crashes
+# mid-round (S-008), or answers with a judgement that will not bind. Empty at
+# authoring time; populated once the harness (plan.md T-2.2/T-2.3) runs a judge
+# round against this file's default path.
+#
+# IT IS STILL EMPTY, AND THAT IS A DEFECT IN THE RUNS ALREADY PUBLISHED, not a
+# statement that nothing went wrong. Runs 3, 4 and 5 discarded 21, 18 and 10
+# judgments respectively; scripts/judge_harness.py::run_judge built its audit
+# trail in memory and never called record_failure(), so none of them reached
+# this file and the process exit took the reasons and the raw responses with
+# it. Fixed 2026-08-24: run_judge now records every refusal here before it
+# returns. The entries that were lost cannot be recreated — nothing is
+# back-filled into this file, because a fabricated timestamp is worse than an
+# empty list. eval/run5-refusals.md reconstructs what the surviving bytes
+# support (which skill, which judge, which round) and says plainly what they do
+# not, and `python3 scripts/refusal_ledger.py` fails if any scorecard's pooled
+# count drops below its attempted count without matching records.
 
 providers:
   bedrock-anthropic:

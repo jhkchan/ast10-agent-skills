@@ -14,205 +14,30 @@
     {
       "provider": "bedrock/gpt-oss-120b",
       "scores": {
-        "D1": 18.0,
-        "D2": 13.0,
-        "D3": 14.0,
-        "D4": 15.0,
-        "D5": 14.0,
-        "D6": 15.0,
-        "D7": 9.0,
-        "D8": 15.0
-      },
-      "justifications": {
-        "D1": "The rule that only SafeLoader is acceptable and the detailed CVE-2020-1747/14343 analysis provide pure expert knowledge, placing it in the 16\u201120 band.",
-        "D2": "The separation of semantic vs parsing layers together with explicit conditional loading of coverage-matrix.md and detector.py demonstrates both expert thinking patterns and domain\u2011specific procedures, fitting the 12\u201115 band.",
-        "D3": "The extensive 'NEVER \u2014 how a check result becomes a wrong verdict' list enumerates specific prohibitions with reasoning, satisfying the 12\u201115 anti\u2011pattern criteria.",
-        "D4": "The description lists capabilities, trigger scenarios ('Use when validating a manifest\u2026'), and keywords like YAML/JSON/TOML, meeting the perfect 14\u201115 description requirements.",
-        "D5": "The 'Layer\u202f3 \u2014 load on condition' section mandates loading only when needed and includes explicit 'Do NOT load' notes, exemplifying excellent progressive disclosure.",
-        "D6": "By enforcing strict constraints such as only treating SafeLoader as safe and conditional script loading, the skill matches the low\u2011freedom needs of fragile security tasks, earning a top\u2011range score.",
-        "D7": "The skill\u2019s structure\u2014with decision trees, conditional loading, and concrete detection code\u2014matches the official 'Tool' pattern, earning a high 7\u201110 rating.",
-        "D8": "The clear decision rules, loading triggers, and detailed NEVER guidelines provide actionable steps and cover edge cases, making the skill highly usable."
-      },
-      "total": 113.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"The rule that only SafeLoader is acceptable and the detailed CVE-2020-1747/14343 analysis provide pure expert knowledge, placing it in the 16\u201120 band.\"},\n  \"D2\": {\"score\": 13, \"why\": \"The separation of semantic vs parsing layers together with explicit conditional loading of coverage-matrix.md and detector.py demonstrates both expert thinking patterns and domain\u2011specific procedures, fitting the 12\u201115 band.\"},\n  \"D3\": {\"score\": 14, \"why\": \"The extensive 'NEVER \u2014 how a check result becomes a wrong verdict' list enumerates specific prohibitions with reasoning, satisfying the 12\u201115 anti\u2011pattern criteria.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description lists capabilities, trigger scenarios ('Use when validating a manifest\u2026'), and keywords like YAML/JSON/TOML, meeting the perfect 14\u201115 description requirements.\"},\n  \"D5\": {\"score\": 14, \"why\": \"The 'Layer\u202f3 \u2014 load on condition' section mandates loading only when needed and includes explicit 'Do NOT load' notes, exemplifying excellent progressive disclosure.\"},\n  \"D6\": {\"score\": 15, \"why\": \"By enforcing strict constraints such as only treating SafeLoader as safe and conditional script loading, the skill matches the low\u2011freedom needs of fragile security tasks, earning a top\u2011range score.\"},\n  \"D7\": {\"score\": 9, \"why\": \"The skill\u2019s structure\u2014with decision trees, conditional loading, and concrete detection code\u2014matches the official 'Tool' pattern, earning a high 7\u201110 rating.\"},\n  \"D8\": {\"score\": 15, \"why\": \"The clear decision rules, loading triggers, and detailed NEVER guidelines provide actionable steps and cover edge cases, making the skill highly usable.\"}\n}"
-    },
-    {
-      "provider": "bedrock/qwen3-235b",
-      "scores": {
-        "D1": 19.0,
-        "D2": 14.0,
-        "D3": 15.0,
-        "D4": 15.0,
-        "D5": 15.0,
-        "D6": 15.0,
-        "D7": 10.0,
-        "D8": 15.0
-      },
-      "justifications": {
-        "D1": "The skill presents pure knowledge delta with expert-level decision trees and trade-offs like treating only 'SafeLoader' as safe, which addresses a non-obvious version-independent vulnerability that even experienced practitioners might miss, placing it in the 16-20 band.",
-        "D2": "It combines expert thinking patterns such as asking whether a finding is from semantic deception or parser execution with critical domain-specific procedures like cross-checking declared permissions against bundled code, achieving expert-level integration of both in the 12-15 band.",
-        "D3": "The extensive NEVER list with deep reasoning, such as not reporting a positive AST04-yaml-injection without identifying which half triggered it, reflects hard-won expertise and meets the 12-15 expert-grade anti-patterns criteria.",
-        "D4": "The description precisely answers WHAT (detect and triage OWASP AST04), WHEN (validating manifests, triaging deserialization reports), and includes keywords like 'YAML/JSON/TOML', 'risk_tier spoofing', meeting the 14-15 perfect description standard.",
-        "D5": "It implements excellent progressive disclosure with mandatory triggers to load 'coverage-matrix.md' before re-tiering and explicit 'Do NOT load' guidance, qualifying for the 14-15 perfect layering band.",
-        "D6": "It applies perfect freedom calibration with low freedom for fragile operations like YAML deserialization checks requiring exact script use, matching the high-consequence nature of metadata parsing in the 14-15 band.",
-        "D7": "The skill masterfully follows the Tool pattern with ~300 lines, decision trees, code examples, and precise operations on config formats, demonstrating a 9-10 score for appropriate pattern selection.",
-        "D8": "It provides comprehensive usability with decision trees for distinguishing AST04 from neighboring ASTs, fallback logic for scanner limitations, and edge case handling like parse failures, meeting the 14-15 band for practical usability."
-      },
-      "total": 118.0,
-      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"The skill presents pure knowledge delta with expert-level decision trees and trade-offs like treating only 'SafeLoader' as safe, which addresses a non-obvious version-independent vulnerability that even experienced practitioners might miss, placing it in the 16-20 band.\"}, \"D2\": {\"score\": 14, \"why\": \"It combines expert thinking patterns such as asking whether a finding is from semantic deception or parser execution with critical domain-specific procedures like cross-checking declared permissions against bundled code, achieving expert-level integration of both in the 12-15 band.\"}, \"D3\": {\"score\": 15, \"why\": \"The extensive NEVER list with deep reasoning, such as not reporting a positive AST04-yaml-injection without identifying which half triggered it, reflects hard-won expertise and meets the 12-15 expert-grade anti-patterns criteria.\"}, \"D4\": {\"score\": 15, \"why\": \"The description precisely answers WHAT (detect and triage OWASP AST04), WHEN (validating manifests, triaging deserialization reports), and includes keywords like 'YAML/JSON/TOML', 'risk_tier spoofing', meeting the 14-15 perfect description standard.\"}, \"D5\": {\"score\": 15, \"why\": \"It implements excellent progressive disclosure with mandatory triggers to load 'coverage-matrix.md' before re-tiering and explicit 'Do NOT load' guidance, qualifying for the 14-15 perfect layering band.\"}, \"D6\": {\"score\": 15, \"why\": \"It applies perfect freedom calibration with low freedom for fragile operations like YAML deserialization checks requiring exact script use, matching the high-consequence nature of metadata parsing in the 14-15 band.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill masterfully follows the Tool pattern with ~300 lines, decision trees, code examples, and precise operations on config formats, demonstrating a 9-10 score for appropriate pattern selection.\"}, \"D8\": {\"score\": 15, \"why\": \"It provides comprehensive usability with decision trees for distinguishing AST04 from neighboring ASTs, fallback logic for scanner limitations, and edge case handling like parse failures, meeting the 14-15 band for practical usability.\"}}"
-    },
-    {
-      "provider": "bedrock/deepseek-v3.2",
-      "scores": {
-        "D1": 16.0,
-        "D2": 14.0,
-        "D3": 15.0,
-        "D4": 15.0,
-        "D5": 14.0,
-        "D6": 14.0,
-        "D7": 9.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "The 'load on condition' distinctions and decision rules on risk-tier derivation vs. declared tier are pure knowledge delta that Claude wouldn't know, falling in the 'pure knowledge delta' band.",
-        "D2": "Provides expert thinking patterns like 'semantic layer vs parsing layer are two independent findings' and domain-specific procedures for YAML/JSON/TOML detection that Claude wouldn't know, placing it in the 'expert-level' band.",
-        "D3": "Contains an expert-grade 'NEVER' list with specific reasoning like 'NEVER report a positive AST04-yaml-injection as \"an executable payload ships in this package\"', meeting criteria for the highest band.",
-        "D4": "The description perfectly answers WHAT (detect/triage insecure metadata), WHEN (validating a manifest, cross-check permissions, etc.), and contains keywords, meeting the 'perfect' band criteria.",
-        "D5": "Implements excellent load-on-condition triggers with MANDATORY/Do NOT load guidance for references, fitting the 'perfect' band for progressive disclosure.",
-        "D6": "Perfectly calibrates low freedom for fragile metadata parsing operations with specific, mandatory decision rules, matching the 'perfect calibration' band.",
-        "D7": "Masterfully applies the 'Mindset' pattern (~50 lines, strong NEVER list, thinking > technique) as recommended, placing it in the 'clear pattern with minor deviations' band.",
-        "D8": "Provides comprehensive decision trees, clear scope boundaries, and error/false-positive warnings like the silent checks section, fitting the 'comprehensive coverage' band."
-      },
-      "total": 111.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 16, \"why\": \"The 'load on condition' distinctions and decision rules on risk-tier derivation vs. declared tier are pure knowledge delta that Claude wouldn't know, falling in the 'pure knowledge delta' band.\"},\n  \"D2\": {\"score\": 14, \"why\": \"Provides expert thinking patterns like 'semantic layer vs parsing layer are two independent findings' and domain-specific procedures for YAML/JSON/TOML detection that Claude wouldn't know, placing it in the 'expert-level' band.\"},\n  \"D3\": {\"score\": 15, \"why\": \"Contains an expert-grade 'NEVER' list with specific reasoning like 'NEVER report a positive AST04-yaml-injection as \\\"an executable payload ships in this package\\\"', meeting criteria for the highest band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description perfectly answers WHAT (detect/triage insecure metadata), WHEN (validating a manifest, cross-check permissions, etc.), and contains keywords, meeting the 'perfect' band criteria.\"},\n  \"D5\": {\"score\": 14, \"why\": \"Implements excellent load-on-condition triggers with MANDATORY/Do NOT load guidance for references, fitting the 'perfect' band for progressive disclosure.\"},\n  \"D6\": {\"score\": 14, \"why\": \"Perfectly calibrates low freedom for fragile metadata parsing operations with specific, mandatory decision rules, matching the 'perfect calibration' band.\"},\n  \"D7\": {\"score\": 9, \"why\": \"Masterfully applies the 'Mindset' pattern (~50 lines, strong NEVER list, thinking > technique) as recommended, placing it in the 'clear pattern with minor deviations' band.\"},\n  \"D8\": {\"score\": 14, \"why\": \"Provides comprehensive decision trees, clear scope boundaries, and error/false-positive warnings like the silent checks section, fitting the 'comprehensive coverage' band.\"}\n}"
-    },
-    {
-      "provider": "bedrock/nova-pro",
-      "scores": {
-        "D1": 19.0,
-        "D2": 14.0,
-        "D3": 13.0,
-        "D4": 15.0,
-        "D5": 14.0,
-        "D6": 14.0,
-        "D7": 9.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "The skill provides deep, expert-level knowledge on detecting and triaging OWASP AST04 Insecure Metadata, including nuanced decision rules and detailed explanations of complex scenarios.",
-        "D2": "The skill provides both expert thinking patterns and domain-specific procedures, such as the detailed decision rules and the orientation section that guides the user through complex scenarios.",
-        "D3": "The skill includes specific anti-patterns with reasoning, such as 'NEVER report a positive `AST04-yaml-injection` as \"an executable payload ships in this package.\"'",
-        "D4": "The description is comprehensive, specifying WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.",
-        "D5": "The skill implements proper content layering with clear mandatory triggers for loading additional resources, such as `coverage-matrix.md` and `scripts/detector.py`.",
-        "D6": "The level of specificity is appropriate for the task's fragility, providing exact steps and scripts where needed, and allowing for judgment in other areas.",
-        "D7": "The skill follows the 'Tool' design pattern masterfully, providing decision trees, code examples, and low freedom for precise operations on specific formats.",
-        "D8": "The skill provides clear guidance for common cases and includes decision trees and fallbacks for error handling and edge cases."
-      },
-      "total": 112.0,
-      "raw_response": "{\n  \"D1\": {\n    \"score\": 19,\n    \"why\": \"The skill provides deep, expert-level knowledge on detecting and triaging OWASP AST04 Insecure Metadata, including nuanced decision rules and detailed explanations of complex scenarios.\"\n  },\n  \"D2\": {\n    \"score\": 14,\n    \"why\": \"The skill provides both expert thinking patterns and domain-specific procedures, such as the detailed decision rules and the orientation section that guides the user through complex scenarios.\"\n  },\n  \"D3\": {\n    \"score\": 13,\n    \"why\": \"The skill includes specific anti-patterns with reasoning, such as 'NEVER report a positive `AST04-yaml-injection` as \\\"an executable payload ships in this package.\\\"'\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, specifying WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"The skill implements proper content layering with clear mandatory triggers for loading additional resources, such as `coverage-matrix.md` and `scripts/detector.py`.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The level of specificity is appropriate for the task's fragility, providing exact steps and scripts where needed, and allowing for judgment in other areas.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows the 'Tool' design pattern masterfully, providing decision trees, code examples, and low freedom for precise operations on specific formats.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides clear guidance for common cases and includes decision trees and fallbacks for error handling and edge cases.\"\n  }\n}"
-    },
-    {
-      "provider": "anthropic-compatible/glm-5.2",
-      "scores": {
-        "D1": 19.0,
-        "D2": 14.0,
-        "D3": 15.0,
-        "D4": 14.0,
-        "D5": 15.0,
-        "D6": 13.0,
-        "D7": 9.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "Nearly every paragraph is expert delta Claude lacks \u2014 the CVE-2020-1747/CVE-2020-14343 FullLoader bypass history, the one-directional risk-tier floor comparison, and the JSON-pollution-needs-a-later-merge distinction are trade-offs only a domain expert would state, fitting the 16-20 pure-knowledge-delta band.",
-        "D2": "The routing table ('A tag the parser executed before any prose was read... Go to AST01') plus rules like 'score the semantic layer and parsing layer as two independent findings' transfer both expert thinking patterns and non-obvious procedural ordering, hitting the 12-15 expert-level band.",
-        "D3": "The eight-item NEVER list gives expert-grade anti-patterns with hard-won WHYs, e.g. 'NEVER quote AST04's 1.00 as a rate' because fixtures share an author with the checks, and 'NEVER file a JSON hit without locating the key' because 'constructor' is an ordinary property name \u2014 the 12-15 band.",
-        "D4": "The description gives WHAT (detect/triage insecure metadata, loader spoofing, smuggling), WHEN ('when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), and keywords (SKILL.md, frontmatter, YAML/JSON/TOML, risk_tier), matching the 14-15 perfect band.",
-        "D5": "Layer-3 triggers are embedded with explicit conditions and negatives \u2014 'load before re-tiering a scenario... Do NOT load it to route a finding' and 'Do NOT load either to answer is this AST04' \u2014 the 14-15 excellent tier with Do-NOT-Load guidance.",
-        "D6": "Freedom is well matched to a fragile triage task: exact verdict rules and one-directional comparisons where a wrong call misattributes findings, while brand impersonation is explicitly left to judgment/external corpus, landing in the 11-13 good-calibration band.",
-        "D7": "A masterful Navigation/Tool hybrid: minimal routing table up front, conditional loads, and the explicitly named 'Pattern: Knowledge' framing, matching the 9-10 band for an appropriate official pattern.",
-        "D8": "'Where the shipped checks go quiet' supplies a false-negative map (the 200-character Loader= window, the pyproject.toml allowlist false positive) with concrete fallbacks like reading non-Python loaders by hand, meeting the 14-15 comprehensive edge-case band."
-      },
-      "total": 113.0,
-      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Nearly every paragraph is expert delta Claude lacks \u2014 the CVE-2020-1747/CVE-2020-14343 FullLoader bypass history, the one-directional risk-tier floor comparison, and the JSON-pollution-needs-a-later-merge distinction are trade-offs only a domain expert would state, fitting the 16-20 pure-knowledge-delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"The routing table ('A tag the parser executed before any prose was read... Go to AST01') plus rules like 'score the semantic layer and parsing layer as two independent findings' transfer both expert thinking patterns and non-obvious procedural ordering, hitting the 12-15 expert-level band.\"}, \"D3\": {\"score\": 15, \"why\": \"The eight-item NEVER list gives expert-grade anti-patterns with hard-won WHYs, e.g. 'NEVER quote AST04's 1.00 as a rate' because fixtures share an author with the checks, and 'NEVER file a JSON hit without locating the key' because 'constructor' is an ordinary property name \u2014 the 12-15 band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description gives WHAT (detect/triage insecure metadata, loader spoofing, smuggling), WHEN ('when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), and keywords (SKILL.md, frontmatter, YAML/JSON/TOML, risk_tier), matching the 14-15 perfect band.\"}, \"D5\": {\"score\": 15, \"why\": \"Layer-3 triggers are embedded with explicit conditions and negatives \u2014 'load before re-tiering a scenario... Do NOT load it to route a finding' and 'Do NOT load either to answer is this AST04' \u2014 the 14-15 excellent tier with Do-NOT-Load guidance.\"}, \"D6\": {\"score\": 13, \"why\": \"Freedom is well matched to a fragile triage task: exact verdict rules and one-directional comparisons where a wrong call misattributes findings, while brand impersonation is explicitly left to judgment/external corpus, landing in the 11-13 good-calibration band.\"}, \"D7\": {\"score\": 9, \"why\": \"A masterful Navigation/Tool hybrid: minimal routing table up front, conditional loads, and the explicitly named 'Pattern: Knowledge' framing, matching the 9-10 band for an appropriate official pattern.\"}, \"D8\": {\"score\": 14, \"why\": \"'Where the shipped checks go quiet' supplies a false-negative map (the 200-character Loader= window, the pyproject.toml allowlist false positive) with concrete fallbacks like reading non-Python loaders by hand, meeting the 14-15 comprehensive edge-case band.\"}}"
-    },
-    {
-      "provider": "bedrock/gpt-oss-120b",
-      "scores": {
         "D1": 17.0,
         "D2": 13.0,
         "D3": 14.0,
         "D4": 15.0,
-        "D5": 12.0,
+        "D5": 14.0,
         "D6": 14.0,
         "D7": 9.0,
         "D8": 13.0
       },
       "justifications": {
-        "D1": "The rule that only SafeLoader / safe_load is acceptable and all other loader usages fire, a non\u2011obvious expert decision rule, places the skill in the 16\u201120 pure knowledge delta band.",
-        "D2": "The 'Layer 3 \u2014 load on condition, never by default' section provides explicit procedural triggers plus the mindset of separating semantic and parsing layers, meeting the expert\u2011level balance.",
-        "D3": "The extensive 'NEVER \u2014 how a check result becomes a wrong verdict' list gives specific anti\u2011patterns with reasoning, fitting the 12\u201115 expert\u2011grade anti\u2011pattern band.",
-        "D4": "The description lists concrete capabilities, trigger scenarios (\"Use when ...\"), and keywords, satisfying the perfect WHAT\u2011WHEN\u2011KEYWORDS criteria.",
-        "D5": "The skill specifies mandatory loading of 'coverage-matrix.md' and 'scripts/detector.py' only in certain contexts and explicit 'Do NOT load' directives, demonstrating proper progressive disclosure.",
-        "D6": "By enforcing strict loading rules, mandatory checks, and many NEVER statements for a high\u2011risk detection task, the skill\u2019s freedom is calibrated low as required for fragile operations.",
-        "D7": "The structured phases\u2014Orientation, Decision rules, Distinguishing, and Where the shipped checks go quiet\u2014match the official Process pattern for multi\u2011step projects.",
-        "D8": "The clear decision rules, loading triggers, and detailed NEVER guidance give actionable steps and edge\u2011case handling, making the skill practically usable."
+        "D1": "The skill details expert-level nuances such as CVE-2020-1747 bypasses and a derived risk\u2011tier floor, which Claude would not already know, placing it in the 16\u201120 knowledge\u2011delta band.",
+        "D2": "It offers both expert thinking patterns (e.g., separating semantic vs parsing findings) and domain\u2011specific procedures like loading `coverage-matrix.md` before re\u2011tiering, fitting the 12\u201115 band.",
+        "D3": "The skill contains multiple specific NEVER directives (e.g., \u201cNEVER report a positive AST04\u2011yaml\u2011injection as \u2018an executable payload ships\u2026\u2019\u201d) with detailed rationale, satisfying the 12\u201115 anti\u2011pattern band.",
+        "D4": "The description explicitly states WHAT the skill does, WHEN to apply it, and includes trigger keywords like \u201cYAML\u201d, \u201cJSON\u201d, \u201cTOML\u201d, meeting the perfect 14\u201115 description criteria.",
+        "D5": "It defines Layer\u202f3 loading with mandatory triggers (e.g., \u201cload `coverage\u2011matrix.md` before re\u2011tiering a scenario\u201d and \u201cDo NOT load \u2026 to answer \u2018is this AST04\u2019\u201d), demonstrating proper progressive disclosure, fitting the 14\u201115 band.",
+        "D6": "The skill imposes tight constraints (mandatory loading of specific scripts and explicit \u201cNEVER \u2026\u201d rules) appropriate for the high\u2011fragility security detection task, placing it in the 14\u201115 freedom\u2011calibration band.",
+        "D7": "The skill follows the official \u201cTool\u201d pattern with phased decision rules, mandatory script loading, and low\u2011freedom directives, matching the 9\u201110 masterful application band.",
+        "D8": "It provides clear decision trees, concrete loading triggers, and detailed \u201cNEVER\u201d safeguards that enable an agent to act without ambiguity, satisfying the 11\u201113 practical usability band."
       },
-      "total": 107.0,
-      "raw_response": "{\"D1\": {\"score\": 17, \"why\": \"The rule that only SafeLoader / safe_load is acceptable and all other loader usages fire, a non\u2011obvious expert decision rule, places the skill in the 16\u201120 pure knowledge delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"The 'Layer 3 \u2014 load on condition, never by default' section provides explicit procedural triggers plus the mindset of separating semantic and parsing layers, meeting the expert\u2011level balance.\"}, \"D3\": {\"score\": 14, \"why\": \"The extensive 'NEVER \u2014 how a check result becomes a wrong verdict' list gives specific anti\u2011patterns with reasoning, fitting the 12\u201115 expert\u2011grade anti\u2011pattern band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description lists concrete capabilities, trigger scenarios (\\\"Use when ...\\\"), and keywords, satisfying the perfect WHAT\u2011WHEN\u2011KEYWORDS criteria.\"}, \"D5\": {\"score\": 12, \"why\": \"The skill specifies mandatory loading of 'coverage-matrix.md' and 'scripts/detector.py' only in certain contexts and explicit 'Do NOT load' directives, demonstrating proper progressive disclosure.\"}, \"D6\": {\"score\": 14, \"why\": \"By enforcing strict loading rules, mandatory checks, and many NEVER statements for a high\u2011risk detection task, the skill\u2019s freedom is calibrated low as required for fragile operations.\"}, \"D7\": {\"score\": 9, \"why\": \"The structured phases\u2014Orientation, Decision rules, Distinguishing, and Where the shipped checks go quiet\u2014match the official Process pattern for multi\u2011step projects.\"}, \"D8\": {\"score\": 13, \"why\": \"The clear decision rules, loading triggers, and detailed NEVER guidance give actionable steps and edge\u2011case handling, making the skill practically usable.\"}}"
+      "total": 109.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 17,\n    \"why\": \"The skill details expert-level nuances such as CVE-2020-1747 bypasses and a derived risk\u2011tier floor, which Claude would not already know, placing it in the 16\u201120 knowledge\u2011delta band.\"\n  },\n  \"D2\": {\n    \"score\": 13,\n    \"why\": \"It offers both expert thinking patterns (e.g., separating semantic vs parsing findings) and domain\u2011specific procedures like loading `coverage-matrix.md` before re\u2011tiering, fitting the 12\u201115 band.\"\n  },\n  \"D3\": {\n    \"score\": 14,\n    \"why\": \"The skill contains multiple specific NEVER directives (e.g., \u201cNEVER report a positive AST04\u2011yaml\u2011injection as \u2018an executable payload ships\u2026\u2019\u201d) with detailed rationale, satisfying the 12\u201115 anti\u2011pattern band.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description explicitly states WHAT the skill does, WHEN to apply it, and includes trigger keywords like \u201cYAML\u201d, \u201cJSON\u201d, \u201cTOML\u201d, meeting the perfect 14\u201115 description criteria.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"It defines Layer\u202f3 loading with mandatory triggers (e.g., \u201cload `coverage\u2011matrix.md` before re\u2011tiering a scenario\u201d and \u201cDo NOT load \u2026 to answer \u2018is this AST04\u2019\u201d), demonstrating proper progressive disclosure, fitting the 14\u201115 band.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The skill imposes tight constraints (mandatory loading of specific scripts and explicit \u201cNEVER \u2026\u201d rules) appropriate for the high\u2011fragility security detection task, placing it in the 14\u201115 freedom\u2011calibration band.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows the official \u201cTool\u201d pattern with phased decision rules, mandatory script loading, and low\u2011freedom directives, matching the 9\u201110 masterful application band.\"\n  },\n  \"D8\": {\n    \"score\": 13,\n    \"why\": \"It provides clear decision trees, concrete loading triggers, and detailed \u201cNEVER\u201d safeguards that enable an agent to act without ambiguity, satisfying the 11\u201113 practical usability band.\"\n  }\n}"
     },
     {
       "provider": "bedrock/qwen3-235b",
-      "scores": {
-        "D1": 20.0,
-        "D2": 15.0,
-        "D3": 15.0,
-        "D4": 15.0,
-        "D5": 14.0,
-        "D6": 14.0,
-        "D7": 10.0,
-        "D8": 15.0
-      },
-      "justifications": {
-        "D1": "The skill demonstrates pure knowledge delta with expert-level decision rules like 'Treat `SafeLoader` / `safe_load` as the only acceptor' and detailed CVE-based reasoning for loader vulnerabilities, meeting the 'Pure knowledge delta \u2014 every paragraph earns its tokens' band",
-        "D2": "The skill provides expert thinking patterns such as 'Route first' with a decision table and domain-specific procedures like validating loader names within a 200-character window, achieving 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know'",
-        "D3": "The skill includes an extensive NEVER list with hard-won, experience-based reasoning like 'NEVER report a positive `AST04-yaml-injection` as an executable payload ships' and explains why each anti-pattern matters, meeting the 'Expert-grade anti-patterns with WHY' band",
-        "D4": "The description explicitly answers WHAT (detect and triage OWASP AST04 Insecure Metadata), WHEN (validating a skill manifest's parser, cross-checking permissions, triaging deserialization reports), and includes keywords like 'risk_tier spoofing' and 'YAML/JSON/TOML', achieving the 'Perfect: comprehensive description with WHAT, WHEN, and trigger keywords' band",
-        "D5": "The skill implements excellent progressive disclosure with MANDATORY triggers like 'load before' for `coverage-matrix.md` and explicit 'Do NOT load' guidance for specific files, only missing a perfect score due to no conditional scenario detection beyond file-level triggers",
-        "D6": "The skill calibrates freedom perfectly with low-freedom constraints for high-consequence operations like 'Treat `SafeLoader` / `safe_load` as the only acceptor' and high-consequence decision rules, appropriate for the fragile task of security validation",
-        "D7": "The skill follows the Tool pattern (~300 lines) with decision trees, code examples, and low freedom, masterfully applying the official pattern for precise operations on a specific format as required by the task",
-        "D8": "The skill provides comprehensive usability with decision trees for distinguishing AST04 from neighbors, fallbacks like manual loader review for non-Python runtimes, and edge case handling for parse failures, achieving 'Comprehensive coverage including edge cases and error handling'"
-      },
-      "total": 118.0,
-      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"The skill demonstrates pure knowledge delta with expert-level decision rules like 'Treat `SafeLoader` / `safe_load` as the only acceptor' and detailed CVE-based reasoning for loader vulnerabilities, meeting the 'Pure knowledge delta \u2014 every paragraph earns its tokens' band\"}, \"D2\": {\"score\": 15, \"why\": \"The skill provides expert thinking patterns such as 'Route first' with a decision table and domain-specific procedures like validating loader names within a 200-character window, achieving 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know'\"}, \"D3\": {\"score\": 15, \"why\": \"The skill includes an extensive NEVER list with hard-won, experience-based reasoning like 'NEVER report a positive `AST04-yaml-injection` as an executable payload ships' and explains why each anti-pattern matters, meeting the 'Expert-grade anti-patterns with WHY' band\"}, \"D4\": {\"score\": 15, \"why\": \"The description explicitly answers WHAT (detect and triage OWASP AST04 Insecure Metadata), WHEN (validating a skill manifest's parser, cross-checking permissions, triaging deserialization reports), and includes keywords like 'risk_tier spoofing' and 'YAML/JSON/TOML', achieving the 'Perfect: comprehensive description with WHAT, WHEN, and trigger keywords' band\"}, \"D5\": {\"score\": 14, \"why\": \"The skill implements excellent progressive disclosure with MANDATORY triggers like 'load before' for `coverage-matrix.md` and explicit 'Do NOT load' guidance for specific files, only missing a perfect score due to no conditional scenario detection beyond file-level triggers\"}, \"D6\": {\"score\": 14, \"why\": \"The skill calibrates freedom perfectly with low-freedom constraints for high-consequence operations like 'Treat `SafeLoader` / `safe_load` as the only acceptor' and high-consequence decision rules, appropriate for the fragile task of security validation\"}, \"D7\": {\"score\": 10, \"why\": \"The skill follows the Tool pattern (~300 lines) with decision trees, code examples, and low freedom, masterfully applying the official pattern for precise operations on a specific format as required by the task\"}, \"D8\": {\"score\": 15, \"why\": \"The skill provides comprehensive usability with decision trees for distinguishing AST04 from neighbors, fallbacks like manual loader review for non-Python runtimes, and edge case handling for parse failures, achieving 'Comprehensive coverage including edge cases and error handling'\"}}"
-    },
-    {
-      "provider": "bedrock/deepseek-v3.2",
-      "scores": {
-        "D1": 16.0,
-        "D2": 14.0,
-        "D3": 13.0,
-        "D4": 15.0,
-        "D5": 11.0,
-        "D6": 14.0,
-        "D7": 9.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "Rule 1's distinction between 'semantic layer' and 'parsing layer' findings, and rule 3's logic for deriving a risk_tier floor from declared permissions, are trade-offs only an expert would know.",
-        "D2": "It provides explicit domain-specific procedures, like version-independent YAML loader detection and the logic for cross-checking declared permissions against bundled code, Claude wouldn't know.",
-        "D3": "The 'NEVER \u2014 how a check result becomes a wrong verdict' list, specifying actions like 'NEVER read an \"unexpected top-level key\" as config injection before checking which file it fired on,' aligns with expert-grade anti-patterns with reasoning.",
-        "D4": "The description names WHAT (.docx tasks), WHEN (use cases 1-4), and contains searchable keywords (tracked changes, professional documents), constituting a perfect comprehensive description.",
-        "D5": "The Layer 3 section provides conditional MANDATORY triggers for loading reference files and explicit 'Do NOT load' guidance, demonstrating good layering with triggers present.",
-        "D6": "For the fragile task of security vulnerability detection and triage, the skill correctly provides low freedom through specific decision rules and mandatory checks.",
-        "D7": "The clear 'Mindset' pattern focusing on thinking over technique, with strong expert knowledge and a prominent NEVER list, is masterfully applied with only minor deviations.",
-        "D8": "It provides highly actionable decision trees, clear coverage boundaries, and explicit handling of edge cases, like loader detection windows and parse-failures, enabling effective use."
-      },
-      "total": 106.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 16, \"why\": \"Rule 1's distinction between 'semantic layer' and 'parsing layer' findings, and rule 3's logic for deriving a risk_tier floor from declared permissions, are trade-offs only an expert would know.\"},\n  \"D2\": {\"score\": 14, \"why\": \"It provides explicit domain-specific procedures, like version-independent YAML loader detection and the logic for cross-checking declared permissions against bundled code, Claude wouldn't know.\"},\n  \"D3\": {\"score\": 13, \"why\": \"The 'NEVER \u2014 how a check result becomes a wrong verdict' list, specifying actions like 'NEVER read an \\\"unexpected top-level key\\\" as config injection before checking which file it fired on,' aligns with expert-grade anti-patterns with reasoning.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description names WHAT (.docx tasks), WHEN (use cases 1-4), and contains searchable keywords (tracked changes, professional documents), constituting a perfect comprehensive description.\"},\n  \"D5\": {\"score\": 11, \"why\": \"The Layer 3 section provides conditional MANDATORY triggers for loading reference files and explicit 'Do NOT load' guidance, demonstrating good layering with triggers present.\"},\n  \"D6\": {\"score\": 14, \"why\": \"For the fragile task of security vulnerability detection and triage, the skill correctly provides low freedom through specific decision rules and mandatory checks.\"},\n  \"D7\": {\"score\": 9, \"why\": \"The clear 'Mindset' pattern focusing on thinking over technique, with strong expert knowledge and a prominent NEVER list, is masterfully applied with only minor deviations.\"},\n  \"D8\": {\"score\": 14, \"why\": \"It provides highly actionable decision trees, clear coverage boundaries, and explicit handling of edge cases, like loader detection windows and parse-failures, enabling effective use.\"}\n}"
-    },
-    {
-      "provider": "bedrock/nova-pro",
       "scores": {
         "D1": 20.0,
         "D2": 15.0,
@@ -224,23 +49,73 @@
         "D8": 15.0
       },
       "justifications": {
-        "D1": "The skill provides pure knowledge delta with every paragraph earning its tokens, discussing non-obvious decision rules and expert-level trade-offs.",
-        "D2": "The skill transfers expert thinking patterns and necessary domain-specific procedures, such as detailed decision rules and specific loader checks.",
-        "D3": "The skill includes an expert-grade NEVER list with specific reasoning, such as 'NEVER report a positive `AST04-yaml-injection` as 'an executable payload ships in this package.'",
-        "D4": "The skill has a comprehensive and specific description that answers WHAT, WHEN, and includes trigger keywords.",
-        "D5": "The skill implements proper content layering with explicit triggers and 'Do NOT Load' guidance.",
-        "D6": "The level of specificity is appropriate for the task's fragility, with low freedom for precise operations and clear mandatory steps.",
-        "D7": "The skill follows the 'Tool' design pattern masterfully, with decision trees, code examples, and low freedom.",
-        "D8": "The skill provides comprehensive coverage including edge cases and error handling, with clear decision trees and actionable guidance."
+        "D1": "Every paragraph delivers expert knowledge such as the version-independent decision rule for YAML loaders, which addresses a non-obvious, real-world vulnerability only an expert would anticipate, meeting the 'Pure knowledge delta' band",
+        "D2": "The skill provides expert thinking patterns like distinguishing parsing vs. semantic layers and domain-specific procedures such as cross-checking declared permissions against bundled code, fitting the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band",
+        "D3": "The 'NEVER' section lists expert-grade anti-patterns with clear justifications, such as not reporting a YAML injection without identifying which half triggered, matching the 'Expert-grade anti-patterns with WHY' band",
+        "D4": "The description clearly answers WHAT (detect AST04 Insecure Metadata issues), WHEN (during manifest validation, permission cross-checks, etc.), and includes keywords like 'YAML/JSON/TOML deserialization' and 'risk_tier spoofing', meeting the 'Perfect: comprehensive description' band",
+        "D5": "The skill implements excellent progressive disclosure with mandatory triggers like 'load coverage-matrix.md before re-tiering' and explicit 'Do NOT load' guidance, satisfying the 'Perfect: decision trees + explicit triggers + Do NOT Load' band",
+        "D6": "The task involves fragile file-format and security checks requiring low freedom, and the skill mandates exact behaviors like using `SafeLoader` exclusively, aligning perfectly with the 'Perfect freedom calibration' band",
+        "D7": "The skill follows the official Tool pattern (long, decision-heavy, format-specific) with 300+ lines, clear decision rules, and code-focused checks, demonstrating a 'Masterful application of appropriate pattern'",
+        "D8": "It provides actionable decision trees, fallback reasoning for scanner gaps, and handles edge cases like base rate of zero-width characters, ensuring 'Comprehensive coverage including edge cases and error handling' per the highest band"
       },
       "total": 120.0,
-      "raw_response": "{\n  \"D1\": {\n    \"score\": 20,\n    \"why\": \"The skill provides pure knowledge delta with every paragraph earning its tokens, discussing non-obvious decision rules and expert-level trade-offs.\"\n  },\n  \"D2\": {\n    \"score\": 15,\n    \"why\": \"The skill transfers expert thinking patterns and necessary domain-specific procedures, such as detailed decision rules and specific loader checks.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"The skill includes an expert-grade NEVER list with specific reasoning, such as 'NEVER report a positive `AST04-yaml-injection` as 'an executable payload ships in this package.'\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The skill has a comprehensive and specific description that answers WHAT, WHEN, and includes trigger keywords.\"\n  },\n  \"D5\": {\n    \"score\": 15,\n    \"why\": \"The skill implements proper content layering with explicit triggers and 'Do NOT Load' guidance.\"\n  },\n  \"D6\": {\n    \"score\": 15,\n    \"why\": \"The level of specificity is appropriate for the task's fragility, with low freedom for precise operations and clear mandatory steps.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"The skill follows the 'Tool' design pattern masterfully, with decision trees, code examples, and low freedom.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"The skill provides comprehensive coverage including edge cases and error handling, with clear decision trees and actionable guidance.\"\n  }\n}"
+      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"Every paragraph delivers expert knowledge such as the version-independent decision rule for YAML loaders, which addresses a non-obvious, real-world vulnerability only an expert would anticipate, meeting the 'Pure knowledge delta' band\"}, \"D2\": {\"score\": 15, \"why\": \"The skill provides expert thinking patterns like distinguishing parsing vs. semantic layers and domain-specific procedures such as cross-checking declared permissions against bundled code, fitting the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band\"}, \"D3\": {\"score\": 15, \"why\": \"The 'NEVER' section lists expert-grade anti-patterns with clear justifications, such as not reporting a YAML injection without identifying which half triggered, matching the 'Expert-grade anti-patterns with WHY' band\"}, \"D4\": {\"score\": 15, \"why\": \"The description clearly answers WHAT (detect AST04 Insecure Metadata issues), WHEN (during manifest validation, permission cross-checks, etc.), and includes keywords like 'YAML/JSON/TOML deserialization' and 'risk_tier spoofing', meeting the 'Perfect: comprehensive description' band\"}, \"D5\": {\"score\": 15, \"why\": \"The skill implements excellent progressive disclosure with mandatory triggers like 'load coverage-matrix.md before re-tiering' and explicit 'Do NOT load' guidance, satisfying the 'Perfect: decision trees + explicit triggers + Do NOT Load' band\"}, \"D6\": {\"score\": 15, \"why\": \"The task involves fragile file-format and security checks requiring low freedom, and the skill mandates exact behaviors like using `SafeLoader` exclusively, aligning perfectly with the 'Perfect freedom calibration' band\"}, \"D7\": {\"score\": 10, \"why\": \"The skill follows the official Tool pattern (long, decision-heavy, format-specific) with 300+ lines, clear decision rules, and code-focused checks, demonstrating a 'Masterful application of appropriate pattern'\"}, \"D8\": {\"score\": 15, \"why\": \"It provides actionable decision trees, fallback reasoning for scanner gaps, and handles edge cases like base rate of zero-width characters, ensuring 'Comprehensive coverage including edge cases and error handling' per the highest band\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 19.0,
+        "D2": 14.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "The skill details PyYAML CVE history and precision-rules for TOML/JSON/YAML distinctions, showing pure expert knowledge only experience delivers (green flags like 'The same reasoning transfers, with different specifics...').",
+        "D2": "It provides expert thinking frameworks ('Stop after *Decision rules* if you are producing a verdict') AND precise domain-specific procedures like the 200-character window for `Loader=` detection, which Claude wouldn't know.",
+        "D3": "The 'NEVER \u2014 how a check result becomes a wrong verdict' section lists specific anti-patterns with deep reasoning, such as 'NEVER treat a parse failure as a scan.'",
+        "D4": "The description perfectly answers WHAT, WHEN, and includes keywords like 'brand-impersonating skill names', 'unsafe YAML/JSON/TOML deserialization', and explicit trigger scenarios ('Use when validating a skill manifest's parser...').",
+        "D5": "The 'Layer 3 \u2014 load on condition' section embeds excellent MANDATORY triggers ('load before reproducing a false positive') and explicit 'Do NOT load' guidance.",
+        "D6": "It calibrates freedom perfectly for a low-freedom, high-consequence validation task, providing strict decision rules and precise scripts yet allowing reasoning for routing vs verdict decisions.",
+        "D7": "The skill masterfully follows the 'Mindset' pattern (~50 lines of SKILL.md core) with strong thinking frameworks and a clear, high-knowledge orientation.",
+        "D8": "It provides clear guidance for decision trees, error handling (detector quiet lists), and edge cases, but lacks explicit fallback workflows for the primary detection failures mentioned."
+      },
+      "total": 111.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 19, \"why\": \"The skill details PyYAML CVE history and precision-rules for TOML/JSON/YAML distinctions, showing pure expert knowledge only experience delivers (green flags like 'The same reasoning transfers, with different specifics...').\"},\n  \"D2\": {\"score\": 14, \"why\": \"It provides expert thinking frameworks ('Stop after *Decision rules* if you are producing a verdict') AND precise domain-specific procedures like the 200-character window for `Loader=` detection, which Claude wouldn't know.\"},\n  \"D3\": {\"score\": 13, \"why\": \"The 'NEVER \u2014 how a check result becomes a wrong verdict' section lists specific anti-patterns with deep reasoning, such as 'NEVER treat a parse failure as a scan.'\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description perfectly answers WHAT, WHEN, and includes keywords like 'brand-impersonating skill names', 'unsafe YAML/JSON/TOML deserialization', and explicit trigger scenarios ('Use when validating a skill manifest's parser...').\"},\n  \"D5\": {\"score\": 14, \"why\": \"The 'Layer 3 \u2014 load on condition' section embeds excellent MANDATORY triggers ('load before reproducing a false positive') and explicit 'Do NOT load' guidance.\"},\n  \"D6\": {\"score\": 14, \"why\": \"It calibrates freedom perfectly for a low-freedom, high-consequence validation task, providing strict decision rules and precise scripts yet allowing reasoning for routing vs verdict decisions.\"},\n  \"D7\": {\"score\": 9, \"why\": \"The skill masterfully follows the 'Mindset' pattern (~50 lines of SKILL.md core) with strong thinking frameworks and a clear, high-knowledge orientation.\"},\n  \"D8\": {\"score\": 13, \"why\": \"It provides clear guidance for decision trees, error handling (detector quiet lists), and edge cases, but lacks explicit fallback workflows for the primary detection failures mentioned.\"}\n}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The skill provides in-depth expert knowledge on detecting and triaging OWASP AST04 Insecure Metadata vulnerabilities.",
+        "D2": "The skill provides both expert thinking patterns and domain-specific procedures for handling metadata vulnerabilities.",
+        "D3": "The skill includes a detailed NEVER list with specific reasoning for avoiding certain practices.",
+        "D4": "The description is comprehensive, detailing WHAT the skill does, WHEN to use it, and including relevant keywords.",
+        "D5": "The skill implements proper content layering with clear triggers for loading additional resources.",
+        "D6": "The level of specificity is appropriate for the task's fragility, with low freedom for critical operations.",
+        "D7": "The skill follows the 'Tool' pattern, providing decision trees, code examples, and low freedom for precise operations.",
+        "D8": "The skill provides clear guidance, including decision trees, code examples, and error handling for practical usability."
+      },
+      "total": 112.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"The skill provides in-depth expert knowledge on detecting and triaging OWASP AST04 Insecure Metadata vulnerabilities.\"},\n  \"D2\": {\"score\": 14, \"why\": \"The skill provides both expert thinking patterns and domain-specific procedures for handling metadata vulnerabilities.\"},\n  \"D3\": {\"score\": 13, \"why\": \"The skill includes a detailed NEVER list with specific reasoning for avoiding certain practices.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description is comprehensive, detailing WHAT the skill does, WHEN to use it, and including relevant keywords.\"},\n  \"D5\": {\"score\": 15, \"why\": \"The skill implements proper content layering with clear triggers for loading additional resources.\"},\n  \"D6\": {\"score\": 14, \"why\": \"The level of specificity is appropriate for the task's fragility, with low freedom for critical operations.\"},\n  \"D7\": {\"score\": 9, \"why\": \"The skill follows the 'Tool' pattern, providing decision trees, code examples, and low freedom for precise operations.\"},\n  \"D8\": {\"score\": 14, \"why\": \"The skill provides clear guidance, including decision trees, code examples, and error handling for practical usability.\"}\n}"
     },
     {
       "provider": "claude-cli/sonnet",
       "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
+        "D1": 19.0,
+        "D2": 13.0,
         "D3": 14.0,
         "D4": 15.0,
         "D5": 15.0,
@@ -249,167 +124,317 @@
         "D8": 14.0
       },
       "justifications": {
-        "D1": "The 'loader-name trap' section cites CVE-2020-1747 and CVE-2020-14343 against FullLoader and derives a version-independent SafeLoader-only rule, which is deep expert knowledge with essentially no redundant tutorial content, placing it in the 16-20 band.",
-        "D2": "Decision rule 3 supplies both a thinking framework (why the risk_tier comparison must be one-directional) and a concrete domain procedure (the derived floor L0-L3 from validators/usf.py::derive_risk_tier), matching the 12-15 'expert-level' band rather than generic step lists.",
-        "D3": "The NEVER section gives specific, reasoned anti-patterns like 'NEVER file an AST04-json-injection hit without locating the key' with the constructor/prototype false-positive mechanism explained, which is expert-grade with WHY (12-15 band), not a vague 'avoid mistakes' list.",
-        "D4": "The description names concrete WHAT (brand-impersonating names, risk_tier spoofing, unsafe YAML/JSON/TOML deserialization, zero-width smuggling) and explicit WHEN clauses ('Use when validating a skill manifest's parser and schema...'), satisfying the 14-15 'comprehensive' band's WHAT+WHEN+keywords checklist.",
-        "D5": "The 'Layer 3' section gives conditional load triggers with explicit 'Do NOT load' guidance for both coverage-matrix.md and scripts/detector.py, matching the rubric's own 'Good loading trigger' example almost verbatim, which is the 14-15 band.",
-        "D6": "Freedom is tightly matched to fragility via a routing table plus five numbered decision rules for a low-freedom detection task, though the brand-impersonation/staged-loader boundary is left to agent judgment without a structured process, keeping it just short of perfect (11-13 band).",
-        "D7": "The file combines a Navigation-style routing table with Tool-pattern decision rules and a references section, a 'clear pattern with minor deviations' from the five canonical patterns rather than a masterful single-pattern application, landing in the 7-8 band.",
-        "D8": "The 'Where the shipped checks go quiet' section documents specific failure modes (e.g. the 200-character window after yaml.load( that lets `Loader=yaml.SafeLoader` false-positive) functioning as edge-case/fallback guidance, matching the 14-15 'comprehensive coverage including edge cases' band."
+        "D1": "The loader-name trap section cites specific CVE-2020-1747/CVE-2020-14343 bypasses against FullLoader and the PyYAML 6.0 mandatory-Loader change to justify a version-independent decision rule, which is pure expert knowledge Claude would not otherwise state confidently, putting it in the 16-20 band.",
+        "D2": "Decision rule 3 supplies both a thinking pattern (derive the risk_tier floor rather than trust the declaration) and a domain-specific procedure pointing at validators/usf.py::derive_risk_tier, matching the 12-15 'shapes thinking AND provides procedures' band.",
+        "D3": "The NEVER section gives eight specific misread scenarios each with a mechanistic reason (e.g. 'the check ORs two independent halves... a bare yaml.load(open(...)) with no tag anywhere produces the same detected=True as a planted !!python/object/apply'), matching the 12-15 expert-grade band.",
+        "D4": "The description packs WHAT (YAML/JSON/TOML deserialization, risk_tier spoofing, ASCII smuggling), WHEN ('Use when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), and keywords (SKILL.md frontmatter, risk_tier), satisfying the 14-15 'comprehensive' band.",
+        "D5": "The 'Layer 3 \u2014 load on condition, never by default' section gives explicit per-file MANDATORY triggers plus 'Do NOT load it to route a finding: the table above is the whole answer', matching the 14-15 'decision trees + explicit triggers + Do NOT Load' band.",
+        "D6": "Freedom is calibrated per scenario tier \u2014 low-freedom deterministic decision rules (rule 3's derived floor) alongside explicitly agent-judgable calls like brand impersonation in 'Scope and out-of-artifact boundary' \u2014 landing in the 11-13 'good calibration for most scenarios' band.",
+        "D7": "The skill mixes a Navigation-style routing table ('Route first... this table is only the jump') with Tool-style low-freedom decision rules and conditional reference loading, a clear but hybridized pattern application putting it in the 7-8 'clear pattern with minor deviations' band.",
+        "D8": "The 'Where the shipped checks go quiet' section enumerates five concrete false-negative edge cases (e.g. the Loader= scan's '200-character window' blind spot) alongside the routing table's primary-path guidance, matching the 14-15 'comprehensive coverage including edge cases' band."
       },
       "total": 111.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The 'loader-name trap' section cites CVE-2020-1747 and CVE-2020-14343 against FullLoader and derives a version-independent SafeLoader-only rule, which is deep expert knowledge with essentially no redundant tutorial content, placing it in the 16-20 band.\"}, \"D2\": {\"score\": 14, \"why\": \"Decision rule 3 supplies both a thinking framework (why the risk_tier comparison must be one-directional) and a concrete domain procedure (the derived floor L0-L3 from validators/usf.py::derive_risk_tier), matching the 12-15 'expert-level' band rather than generic step lists.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER section gives specific, reasoned anti-patterns like 'NEVER file an AST04-json-injection hit without locating the key' with the constructor/prototype false-positive mechanism explained, which is expert-grade with WHY (12-15 band), not a vague 'avoid mistakes' list.\"}, \"D4\": {\"score\": 15, \"why\": \"The description names concrete WHAT (brand-impersonating names, risk_tier spoofing, unsafe YAML/JSON/TOML deserialization, zero-width smuggling) and explicit WHEN clauses ('Use when validating a skill manifest's parser and schema...'), satisfying the 14-15 'comprehensive' band's WHAT+WHEN+keywords checklist.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Layer 3' section gives conditional load triggers with explicit 'Do NOT load' guidance for both coverage-matrix.md and scripts/detector.py, matching the rubric's own 'Good loading trigger' example almost verbatim, which is the 14-15 band.\"}, \"D6\": {\"score\": 13, \"why\": \"Freedom is tightly matched to fragility via a routing table plus five numbered decision rules for a low-freedom detection task, though the brand-impersonation/staged-loader boundary is left to agent judgment without a structured process, keeping it just short of perfect (11-13 band).\"}, \"D7\": {\"score\": 8, \"why\": \"The file combines a Navigation-style routing table with Tool-pattern decision rules and a references section, a 'clear pattern with minor deviations' from the five canonical patterns rather than a masterful single-pattern application, landing in the 7-8 band.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Where the shipped checks go quiet' section documents specific failure modes (e.g. the 200-character window after yaml.load( that lets `Loader=yaml.SafeLoader` false-positive) functioning as edge-case/fallback guidance, matching the 14-15 'comprehensive coverage including edge cases' band.\"}}\n"
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"The loader-name trap section cites specific CVE-2020-1747/CVE-2020-14343 bypasses against FullLoader and the PyYAML 6.0 mandatory-Loader change to justify a version-independent decision rule, which is pure expert knowledge Claude would not otherwise state confidently, putting it in the 16-20 band.\"}, \"D2\": {\"score\": 13, \"why\": \"Decision rule 3 supplies both a thinking pattern (derive the risk_tier floor rather than trust the declaration) and a domain-specific procedure pointing at validators/usf.py::derive_risk_tier, matching the 12-15 'shapes thinking AND provides procedures' band.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER section gives eight specific misread scenarios each with a mechanistic reason (e.g. 'the check ORs two independent halves... a bare yaml.load(open(...)) with no tag anywhere produces the same detected=True as a planted !!python/object/apply'), matching the 12-15 expert-grade band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description packs WHAT (YAML/JSON/TOML deserialization, risk_tier spoofing, ASCII smuggling), WHEN ('Use when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), and keywords (SKILL.md frontmatter, risk_tier), satisfying the 14-15 'comprehensive' band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Layer 3 \u2014 load on condition, never by default' section gives explicit per-file MANDATORY triggers plus 'Do NOT load it to route a finding: the table above is the whole answer', matching the 14-15 'decision trees + explicit triggers + Do NOT Load' band.\"}, \"D6\": {\"score\": 13, \"why\": \"Freedom is calibrated per scenario tier \u2014 low-freedom deterministic decision rules (rule 3's derived floor) alongside explicitly agent-judgable calls like brand impersonation in 'Scope and out-of-artifact boundary' \u2014 landing in the 11-13 'good calibration for most scenarios' band.\"}, \"D7\": {\"score\": 8, \"why\": \"The skill mixes a Navigation-style routing table ('Route first... this table is only the jump') with Tool-style low-freedom decision rules and conditional reference loading, a clear but hybridized pattern application putting it in the 7-8 'clear pattern with minor deviations' band.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Where the shipped checks go quiet' section enumerates five concrete false-negative edge cases (e.g. the Loader= scan's '200-character window' blind spot) alongside the routing table's primary-path guidance, matching the 14-15 'comprehensive coverage including edge cases' band.\"}}\n"
     },
     {
       "provider": "anthropic-compatible/glm-5.2",
       "scores": {
-        "D1": 19.0,
+        "D1": 18.0,
         "D2": 14.0,
         "D3": 14.0,
-        "D4": 15.0,
+        "D4": 14.0,
         "D5": 15.0,
-        "D6": 14.0,
+        "D6": 13.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "Expert-only content throughout \u2014 e.g. the FullLoader CVE-2020-1747/14343 history and the version-independence argument in 'The loader-name trap' \u2014 puts this in the 16-20 pure knowledge delta band.",
-        "D2": "Transfers both expert thinking (Rule 3's one-directional floor comparison and its three silent consequences) and non-obvious domain procedure (route table, separate semantic-vs-parser scoring), hitting the 12-15 expert-level band.",
-        "D3": "The eight-entry 'NEVER \u2014 how a check result becomes a wrong verdict' section gives experience-taught landmines with full reasoning (e.g. the pyproject.toml allowlist false positive and reviewer-numbing risk), squarely the 12-15 expert-grade band.",
-        "D4": "The description names specific capabilities (risk_tier spoofing, zero-width smuggling), explicit 'Use when' trigger scenarios, and searchable keywords (YAML/JSON/TOML, SKILL.md frontmatter), meeting the 14-15 WHAT+WHEN+KEYWORDS bar.",
-        "D5": "Layer 3 loading is conditional with both MANDATORY triggers and 'Do NOT load either to answer...' guidance, plus read-order control ('Stop after Decision rules'), matching the 14-15 perfect-layering band.",
-        "D6": "For a high-consequence verification task it imposes exact rules (only SafeLoader accepts, one-directional tier comparison) while leaving brand impersonation explicitly un-decided in-scope, landing in the 14-15 well-calibrated band.",
-        "D7": "It cleanly applies a Navigation/Tool hybrid: ~180-line SKILL.md routing to coverage-matrix.md and scripts/detector.py with an up-front routing table, a masterful application of the appropriate pattern.",
-        "D8": "The 'Where the shipped checks go quiet' section supplies concrete false-positive/false-negative cases and fallbacks (200-char Loader window, BOM frontmatter miss, parse-failure indistinguishable from clean), covering edge cases at the 14-15 level."
+        "D1": "The loader-name trap section delivers pure expert delta \u2014 CVE-2020-1747/14343 FullLoader bypass history and PyYAML 6.0's mandatory Loader as justification for a version-independent acceptor rule \u2014 content Claude cannot be assumed to reliably know, placing it in the 16-20 'every paragraph earns its tokens' band.",
+        "D2": "The routing table plus rule 3's 'only a declared tier strictly below that floor is the finding \u2014 declaring above it must not fire, or every cautious author gets convicted' transfers expert thinking patterns alongside non-obvious decision procedures, hitting the 12-15 expert band.",
+        "D3": "The NEVER section gives eight expert-grade anti-patterns with concrete WHY, e.g. 'NEVER read an unexpected top-level key as config injection before checking which file it fired on' with the pyproject.toml false-positive explanation, squarely in the 12-15 band.",
+        "D4": "The description answers WHAT, WHEN, and KEYWORDS explicitly ('Use when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), matching the 14-15 perfect-description band.",
+        "D5": "Layer 3 loading is conditional and bidirectional \u2014 'load before re-tiering a scenario... Do NOT load it to route a finding' plus 'Do NOT load either to answer is this AST04' \u2014 which is the rubric's definition of Excellent triggers with Do-NOT-Load guidance.",
+        "D6": "Freedom calibration is well matched: judgment-framing routing prose for ambiguous boundary calls, but hard one-directional rules ('Treat SafeLoader as the only acceptor. Every other spelling fires') where a verdict is fragile, landing in the 11-13 good-calibration band rather than perfect.",
+        "D7": "It cleanly blends the Navigation pattern (routing table, ~30-line core role) with Tool-pattern decision rules and explicit layering discipline, a masterful application of appropriate patterns at the top of the 9-10 band.",
+        "D8": "Coverage of failure modes is comprehensive \u2014 'Where the shipped checks go quiet' documents the 200-character Loader= window, BOM/frontmatter extraction miss, and silently-skipped malformed JSON \u2014 giving edge-case and error handling that reaches the 14-15 band with only minor unverifiable-reference gaps."
       },
-      "total": 114.0,
-      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Expert-only content throughout \u2014 e.g. the FullLoader CVE-2020-1747/14343 history and the version-independence argument in 'The loader-name trap' \u2014 puts this in the 16-20 pure knowledge delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"Transfers both expert thinking (Rule 3's one-directional floor comparison and its three silent consequences) and non-obvious domain procedure (route table, separate semantic-vs-parser scoring), hitting the 12-15 expert-level band.\"}, \"D3\": {\"score\": 14, \"why\": \"The eight-entry 'NEVER \u2014 how a check result becomes a wrong verdict' section gives experience-taught landmines with full reasoning (e.g. the pyproject.toml allowlist false positive and reviewer-numbing risk), squarely the 12-15 expert-grade band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description names specific capabilities (risk_tier spoofing, zero-width smuggling), explicit 'Use when' trigger scenarios, and searchable keywords (YAML/JSON/TOML, SKILL.md frontmatter), meeting the 14-15 WHAT+WHEN+KEYWORDS bar.\"}, \"D5\": {\"score\": 15, \"why\": \"Layer 3 loading is conditional with both MANDATORY triggers and 'Do NOT load either to answer...' guidance, plus read-order control ('Stop after Decision rules'), matching the 14-15 perfect-layering band.\"}, \"D6\": {\"score\": 14, \"why\": \"For a high-consequence verification task it imposes exact rules (only SafeLoader accepts, one-directional tier comparison) while leaving brand impersonation explicitly un-decided in-scope, landing in the 14-15 well-calibrated band.\"}, \"D7\": {\"score\": 9, \"why\": \"It cleanly applies a Navigation/Tool hybrid: ~180-line SKILL.md routing to coverage-matrix.md and scripts/detector.py with an up-front routing table, a masterful application of the appropriate pattern.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Where the shipped checks go quiet' section supplies concrete false-positive/false-negative cases and fallbacks (200-char Loader window, BOM frontmatter miss, parse-failure indistinguishable from clean), covering edge cases at the 14-15 level.\"}}"
+      "total": 111.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The loader-name trap section delivers pure expert delta \u2014 CVE-2020-1747/14343 FullLoader bypass history and PyYAML 6.0's mandatory Loader as justification for a version-independent acceptor rule \u2014 content Claude cannot be assumed to reliably know, placing it in the 16-20 'every paragraph earns its tokens' band.\"}, \"D2\": {\"score\": 14, \"why\": \"The routing table plus rule 3's 'only a declared tier strictly below that floor is the finding \u2014 declaring above it must not fire, or every cautious author gets convicted' transfers expert thinking patterns alongside non-obvious decision procedures, hitting the 12-15 expert band.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER section gives eight expert-grade anti-patterns with concrete WHY, e.g. 'NEVER read an unexpected top-level key as config injection before checking which file it fired on' with the pyproject.toml false-positive explanation, squarely in the 12-15 band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description answers WHAT, WHEN, and KEYWORDS explicitly ('Use when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), matching the 14-15 perfect-description band.\"}, \"D5\": {\"score\": 15, \"why\": \"Layer 3 loading is conditional and bidirectional \u2014 'load before re-tiering a scenario... Do NOT load it to route a finding' plus 'Do NOT load either to answer is this AST04' \u2014 which is the rubric's definition of Excellent triggers with Do-NOT-Load guidance.\"}, \"D6\": {\"score\": 13, \"why\": \"Freedom calibration is well matched: judgment-framing routing prose for ambiguous boundary calls, but hard one-directional rules ('Treat SafeLoader as the only acceptor. Every other spelling fires') where a verdict is fragile, landing in the 11-13 good-calibration band rather than perfect.\"}, \"D7\": {\"score\": 9, \"why\": \"It cleanly blends the Navigation pattern (routing table, ~30-line core role) with Tool-pattern decision rules and explicit layering discipline, a masterful application of appropriate patterns at the top of the 9-10 band.\"}, \"D8\": {\"score\": 14, \"why\": \"Coverage of failure modes is comprehensive \u2014 'Where the shipped checks go quiet' documents the 200-character Loader= window, BOM/frontmatter extraction miss, and silently-skipped malformed JSON \u2014 giving edge-case and error handling that reaches the 14-15 band with only minor unverifiable-reference gaps.\"}}"
     },
     {
       "provider": "bedrock/gpt-oss-120b",
       "scores": {
-        "D1": 18.0,
-        "D2": 13.0,
+        "D1": 16.0,
+        "D2": 12.0,
         "D3": 14.0,
         "D4": 15.0,
-        "D5": 14.0,
-        "D6": 13.0,
+        "D5": 13.0,
+        "D6": 12.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "The skill\u2019s detailed decision rule that treats any loader other than `SafeLoader` as unsafe and the derived `risk_tier` floor logic provide expert knowledge beyond Claude\u2019s basics, placing it in the 16\u201120 band.",
-        "D2": "It teaches the expert mindset of separating semantic and parsing layers and gives a concrete cross\u2011reference procedure between declared permissions and bundled code, fitting the 12\u201115 balance band.",
-        "D3": "The extensive \u201cNEVER \u2026\u201d list (e.g., \u201cNEVER report a positive `AST04-yaml-injection` as\u2026\u201d) offers specific anti\u2011patterns with reasoning, landing it in the 12\u201115 band.",
-        "D4": "The description states the WHAT (\u201cdetect insecure metadata\u201d), the WHEN (trigger scenarios like validating manifests) and keywords, satisfying the perfect 14\u201115 description criteria.",
-        "D5": "The skill defines Layer\u202f3 conditional loading with explicit \u201cDo NOT load\u201d directives for `coverage-matrix.md` and `scripts/detector.py`, exemplifying proper progressive disclosure and earning a high 12\u201115 score.",
-        "D6": "By mandating exact loader checks, strict risk\u2011tier comparisons, and conditional script loading, the skill\u2019s specificity matches the fragility of metadata attacks, fitting the 11\u201113 band.",
-        "D7": "Its structure with decision rules, conditional loading, and low\u2011freedom tool\u2011oriented guidance aligns with the official \u201cTool\u201d pattern, earning a 7\u20118 score.",
-        "D8": "Clear decision trees, concrete loading triggers, and detailed NEVER clauses give agents actionable steps and edge\u2011case handling, placing it in the 14\u201115 usability band."
+        "D1": "The skill\u2019s detailed explanation of version\u2011independent loader safety and distinction of YAML/JSON/TOML injection shapes provides expert knowledge beyond Claude\u2019s basics, placing it in the 16\u201120 band.",
+        "D2": "It combines thinking patterns like separating semantic and parsing layers with domain\u2011specific procedures such as conditional loading of `coverage-matrix.md` and cross\u2011checking declared permissions against bundled code, fitting the 12\u201115 band.",
+        "D3": "The extensive \u201cNEVER \u2026\u201d list (e.g., \u201cNEVER report a positive AST04\u2011yaml\u2011injection as\u2026\u201d, \u201cNEVER file an AST04\u2011json\u2011injection hit without locating the key\u201d) offers specific anti\u2011patterns with reasoning, earning a 14\u201115 score.",
+        "D4": "The description states the WHAT (\u201cDetect and triage OWASP AST04 Insecure Metadata\u201d) and WHEN (\u201cUse when validating a skill manifest\u2026\u201d) and includes trigger keywords, meeting the perfect 15\u2011point criteria.",
+        "D5": "Layer\u202f3 loading rules like \u201c**Do NOT load** `coverage-matrix.md` to route a finding\u201d and mandatory read triggers demonstrate proper progressive disclosure, scoring in the 11\u201113 range.",
+        "D6": "Because the task is security\u2011critical, the skill imposes low\u2011freedom constraints (mandatory scripts, explicit \u201cNEVER\u201d checks) while avoiding over\u2011restriction for creative parts, fitting the 11\u201113 band.",
+        "D7": "The structure follows the official \u201cTool\u201d pattern with decision rules, loading triggers, and low\u2011freedom workflow, matching the 9\u2011point mastery level.",
+        "D8": "Clear decision trees, concrete loading instructions, and coverage of edge cases (e.g., hidden Unicode, loader\u2011name window limits) make the skill readily actionable, deserving a 14\u2011point rating."
       },
-      "total": 110.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill\u2019s detailed decision rule that treats any loader other than `SafeLoader` as unsafe and the derived `risk_tier` floor logic provide expert knowledge beyond Claude\u2019s basics, placing it in the 16\u201120 band.\"}, \"D2\": {\"score\": 13, \"why\": \"It teaches the expert mindset of separating semantic and parsing layers and gives a concrete cross\u2011reference procedure between declared permissions and bundled code, fitting the 12\u201115 balance band.\"}, \"D3\": {\"score\": 14, \"why\": \"The extensive \u201cNEVER \u2026\u201d list (e.g., \u201cNEVER report a positive `AST04-yaml-injection` as\u2026\u201d) offers specific anti\u2011patterns with reasoning, landing it in the 12\u201115 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description states the WHAT (\u201cdetect insecure metadata\u201d), the WHEN (trigger scenarios like validating manifests) and keywords, satisfying the perfect 14\u201115 description criteria.\"}, \"D5\": {\"score\": 14, \"why\": \"The skill defines Layer\u202f3 conditional loading with explicit \u201cDo NOT load\u201d directives for `coverage-matrix.md` and `scripts/detector.py`, exemplifying proper progressive disclosure and earning a high 12\u201115 score.\"}, \"D6\": {\"score\": 13, \"why\": \"By mandating exact loader checks, strict risk\u2011tier comparisons, and conditional script loading, the skill\u2019s specificity matches the fragility of metadata attacks, fitting the 11\u201113 band.\"}, \"D7\": {\"score\": 9, \"why\": \"Its structure with decision rules, conditional loading, and low\u2011freedom tool\u2011oriented guidance aligns with the official \u201cTool\u201d pattern, earning a 7\u20118 score.\"}, \"D8\": {\"score\": 14, \"why\": \"Clear decision trees, concrete loading triggers, and detailed NEVER clauses give agents actionable steps and edge\u2011case handling, placing it in the 14\u201115 usability band.\"}}"
+      "total": 105.0,
+      "raw_response": "{\"D1\": {\"score\": 16, \"why\": \"The skill\u2019s detailed explanation of version\u2011independent loader safety and distinction of YAML/JSON/TOML injection shapes provides expert knowledge beyond Claude\u2019s basics, placing it in the 16\u201120 band.\"}, \"D2\": {\"score\": 12, \"why\": \"It combines thinking patterns like separating semantic and parsing layers with domain\u2011specific procedures such as conditional loading of `coverage-matrix.md` and cross\u2011checking declared permissions against bundled code, fitting the 12\u201115 band.\"}, \"D3\": {\"score\": 14, \"why\": \"The extensive \u201cNEVER \u2026\u201d list (e.g., \u201cNEVER report a positive AST04\u2011yaml\u2011injection as\u2026\u201d, \u201cNEVER file an AST04\u2011json\u2011injection hit without locating the key\u201d) offers specific anti\u2011patterns with reasoning, earning a 14\u201115 score.\"}, \"D4\": {\"score\": 15, \"why\": \"The description states the WHAT (\u201cDetect and triage OWASP AST04 Insecure Metadata\u201d) and WHEN (\u201cUse when validating a skill manifest\u2026\u201d) and includes trigger keywords, meeting the perfect 15\u2011point criteria.\"}, \"D5\": {\"score\": 13, \"why\": \"Layer\u202f3 loading rules like \u201c**Do NOT load** `coverage-matrix.md` to route a finding\u201d and mandatory read triggers demonstrate proper progressive disclosure, scoring in the 11\u201113 range.\"}, \"D6\": {\"score\": 12, \"why\": \"Because the task is security\u2011critical, the skill imposes low\u2011freedom constraints (mandatory scripts, explicit \u201cNEVER\u201d checks) while avoiding over\u2011restriction for creative parts, fitting the 11\u201113 band.\"}, \"D7\": {\"score\": 9, \"why\": \"The structure follows the official \u201cTool\u201d pattern with decision rules, loading triggers, and low\u2011freedom workflow, matching the 9\u2011point mastery level.\"}, \"D8\": {\"score\": 14, \"why\": \"Clear decision trees, concrete loading instructions, and coverage of edge cases (e.g., hidden Unicode, loader\u2011name window limits) make the skill readily actionable, deserving a 14\u2011point rating.\"}}"
     },
     {
       "provider": "bedrock/qwen3-235b",
       "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
+        "D1": 20.0,
+        "D2": 15.0,
         "D3": 15.0,
         "D4": 15.0,
         "D5": 15.0,
-        "D6": 14.0,
+        "D6": 15.0,
         "D7": 10.0,
         "D8": 15.0
       },
       "justifications": {
-        "D1": "The section 'The loader-name trap' explains a non-obvious decision rule that PyYAML's FullLoader was believed safe but had RCE bypasses, which is pure knowledge delta because it reveals expert-level understanding of version-independent vulnerabilities not known to general Claude knowledge, meeting the 16-20 'Pure knowledge delta' band.",
-        "D2": "The 'Decision rules' section provides expert-level thinking patterns like distinguishing semantic vs parsing layers and domain-specific procedures like cross-checking declared permissions against bundled code, shaping both how to think and what to do in ways Claude wouldn't know, meeting the 12-15 'Expert-level' band.",
-        "D3": "The 'NEVER \u2014 how a check result becomes a wrong verdict' section lists expert-grade anti-patterns such as 'NEVER report a positive AST04-yaml-injection as an executable payload' with detailed reasoning from real-world experience, meeting the 12-15 'Expert-grade anti-patterns with WHY' band.",
-        "D4": "The description states WHAT the skill does (detect and triage OWASP AST04 Insecure Metadata), WHEN to use it (validating manifests, cross-checking permissions, etc.), and includes KEYWORDS like 'risk_tier spoof/ing', 'YAML/JSON/TOML deserialization', meeting the 14-15 'Perfect' band for specification compliance.",
-        "D5": "The 'Layer 3 \u2014 load on condition' section explicitly mandates loading `coverage-matrix.md` before re-tiering and forbids loading `scripts/detector.py` for coverage inference, embedding MANDATORY triggers and 'Do NOT load' guidance directly in the workflow, meeting the 14-15 'Perfect' band for progressive disclosure.",
-        "D6": "The skill applies low freedom with MANDATORY rules and exact script usage (e.g., 'Treat SafeLoader as the only acceptor'), appropriate for fragile file format operations where one wrong byte matters, matching the 14-15 'Perfect freedom calibration' band.",
-        "D7": "The skill follows the 'Tool' pattern (~300 lines) with decision trees, code examples, and low freedom for precise operations on config formats, demonstrating masterful application of the appropriate official pattern, meeting the 9-10 band.",
-        "D8": "The decision rules provide clear, actionable guidance for complex cases (e.g., distinguishing JSON prototype pollution from YAML injection), include fallback reasoning for false negatives, and cover edge cases like parser failures, meeting the 14-15 'Comprehensive coverage' band for practical usability."
+        "D1": "Every paragraph provides expert knowledge like 'Treat SafeLoader / safe_load as the only acceptor' which explains non-obvious decision rules only an expert would know, meeting the 'Pure knowledge delta' band",
+        "D2": "The skill provides expert thinking patterns such as 'The semantic layer and the parsing layer are two independent findings' and domain-specific procedures like the `validators/usf.py::derive_risk_tier` logic, meeting the 'Expert-level' band",
+        "D3": "The exhaustive 'NEVER' list includes expert-grade anti-patterns with reasoning like 'NEVER report a positive AST04-yaml-injection as an executable payload ships in this package' because it explains how ORing halves can mislead, meeting the 'Expert-grade anti-patterns with WHY' band",
+        "D4": "The description clearly answers WHAT (detect and triage OWASP AST04 Insecure Metadata), WHEN (when validating a skill manifest's parser, checking permissions, etc.), and includes keywords like 'YAML/JSON/TOML' and 'risk_tier spoofing', meeting the 'Perfect' band",
+        "D5": "The skill implements perfect progressive disclosure with mandatory triggers like 'load before re-tiering a scenario' and explicit 'Do NOT load' guidance for `coverage-matrix.md` and `scripts/detector.py`, meeting the 'Perfect' band",
+        "D6": "The skill exhibits perfect freedom calibration with low freedom for fragile operations like 'Treat SafeLoader / safe_load as the only acceptor' which mandates exact behavior due to high consequence, matching the 'Precise operations on specific format' task type in the rubric",
+        "D7": "The skill masterfully follows the 'Tool' pattern with decision trees, code examples, and ~300 lines focused on precise operations on specific formats, meeting the 'Masterful application of appropriate pattern' band",
+        "D8": "The skill offers comprehensive practical usability with decision trees for routing findings, clear fallback reasoning in 'Where the shipped checks go quiet', and handling edge cases like parse failures, meeting the 'Comprehensive coverage including edge cases and error handling' band"
       },
-      "total": 116.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The section 'The loader-name trap' explains a non-obvious decision rule that PyYAML's FullLoader was believed safe but had RCE bypasses, which is pure knowledge delta because it reveals expert-level understanding of version-independent vulnerabilities not known to general Claude knowledge, meeting the 16-20 'Pure knowledge delta' band.\"}, \"D2\": {\"score\": 14, \"why\": \"The 'Decision rules' section provides expert-level thinking patterns like distinguishing semantic vs parsing layers and domain-specific procedures like cross-checking declared permissions against bundled code, shaping both how to think and what to do in ways Claude wouldn't know, meeting the 12-15 'Expert-level' band.\"}, \"D3\": {\"score\": 15, \"why\": \"The 'NEVER \u2014 how a check result becomes a wrong verdict' section lists expert-grade anti-patterns such as 'NEVER report a positive AST04-yaml-injection as an executable payload' with detailed reasoning from real-world experience, meeting the 12-15 'Expert-grade anti-patterns with WHY' band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description states WHAT the skill does (detect and triage OWASP AST04 Insecure Metadata), WHEN to use it (validating manifests, cross-checking permissions, etc.), and includes KEYWORDS like 'risk_tier spoof/ing', 'YAML/JSON/TOML deserialization', meeting the 14-15 'Perfect' band for specification compliance.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Layer 3 \u2014 load on condition' section explicitly mandates loading `coverage-matrix.md` before re-tiering and forbids loading `scripts/detector.py` for coverage inference, embedding MANDATORY triggers and 'Do NOT load' guidance directly in the workflow, meeting the 14-15 'Perfect' band for progressive disclosure.\"}, \"D6\": {\"score\": 14, \"why\": \"The skill applies low freedom with MANDATORY rules and exact script usage (e.g., 'Treat SafeLoader as the only acceptor'), appropriate for fragile file format operations where one wrong byte matters, matching the 14-15 'Perfect freedom calibration' band.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill follows the 'Tool' pattern (~300 lines) with decision trees, code examples, and low freedom for precise operations on config formats, demonstrating masterful application of the appropriate official pattern, meeting the 9-10 band.\"}, \"D8\": {\"score\": 15, \"why\": \"The decision rules provide clear, actionable guidance for complex cases (e.g., distinguishing JSON prototype pollution from YAML injection), include fallback reasoning for false negatives, and cover edge cases like parser failures, meeting the 14-15 'Comprehensive coverage' band for practical usability.\"}}"
+      "total": 120.0,
+      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"Every paragraph provides expert knowledge like 'Treat SafeLoader / safe_load as the only acceptor' which explains non-obvious decision rules only an expert would know, meeting the 'Pure knowledge delta' band\"}, \"D2\": {\"score\": 15, \"why\": \"The skill provides expert thinking patterns such as 'The semantic layer and the parsing layer are two independent findings' and domain-specific procedures like the `validators/usf.py::derive_risk_tier` logic, meeting the 'Expert-level' band\"}, \"D3\": {\"score\": 15, \"why\": \"The exhaustive 'NEVER' list includes expert-grade anti-patterns with reasoning like 'NEVER report a positive AST04-yaml-injection as an executable payload ships in this package' because it explains how ORing halves can mislead, meeting the 'Expert-grade anti-patterns with WHY' band\"}, \"D4\": {\"score\": 15, \"why\": \"The description clearly answers WHAT (detect and triage OWASP AST04 Insecure Metadata), WHEN (when validating a skill manifest's parser, checking permissions, etc.), and includes keywords like 'YAML/JSON/TOML' and 'risk_tier spoofing', meeting the 'Perfect' band\"}, \"D5\": {\"score\": 15, \"why\": \"The skill implements perfect progressive disclosure with mandatory triggers like 'load before re-tiering a scenario' and explicit 'Do NOT load' guidance for `coverage-matrix.md` and `scripts/detector.py`, meeting the 'Perfect' band\"}, \"D6\": {\"score\": 15, \"why\": \"The skill exhibits perfect freedom calibration with low freedom for fragile operations like 'Treat SafeLoader / safe_load as the only acceptor' which mandates exact behavior due to high consequence, matching the 'Precise operations on specific format' task type in the rubric\"}, \"D7\": {\"score\": 10, \"why\": \"The skill masterfully follows the 'Tool' pattern with decision trees, code examples, and ~300 lines focused on precise operations on specific formats, meeting the 'Masterful application of appropriate pattern' band\"}, \"D8\": {\"score\": 15, \"why\": \"The skill offers comprehensive practical usability with decision trees for routing findings, clear fallback reasoning in 'Where the shipped checks go quiet', and handling edge cases like parse failures, meeting the 'Comprehensive coverage including edge cases and error handling' band\"}}"
     },
     {
       "provider": "bedrock/deepseek-v3.2",
       "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
+        "D1": 16.0,
+        "D2": 13.0,
         "D3": 14.0,
         "D4": 15.0,
-        "D5": 15.0,
+        "D5": 14.0,
+        "D6": 14.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The entire skill adds expert-level knowledge delta, such as debunking the 'PyYAML loader safety ladder' and providing version-independent rule 2, moving beyond OWASP whitepaper basics.",
+        "D2": "It provides expert thinking patterns like the 'semantic vs parsing layer' framework and valuable procedures like the 'Loader= decision window', balancing both well.",
+        "D3": "The 'NEVER \u2014 how a check result becomes a wrong verdict' list contains expert-grade anti-patterns with reasoning, like 'NEVER read \"no check fired\" as \"AST04 is clean.\"'",
+        "D4": "The description directly answers WHAT, WHEN, and includes specific keywords like 'OWASP AST04', 'YAML/JSON/TOML deserialization', and four explicit trigger scenarios.",
+        "D5": "The skill implements excellent progressive disclosure with embedded MANDATORY triggers and explicit 'Do NOT load' directives within a layered structure.",
+        "D6": "Freedom calibration is perfect, using high-stakes medium freedom (decision rules) for review but low freedom (exact detector names/lines) for reproducing checks.",
+        "D7": "The skill follows a clear Mindset pattern (thinking > technique, strong NEVER list) with minor deviations due to its mention of references/scripts.",
+        "D8": "Usage is highly actionable with comprehensive decision trees and coverage of critical edge cases (like non-Python runtimes and out-of-scope carriers)."
+      },
+      "total": 108.0,
+      "raw_response": "{\"D1\": {\"score\": 16, \"why\": \"The entire skill adds expert-level knowledge delta, such as debunking the 'PyYAML loader safety ladder' and providing version-independent rule 2, moving beyond OWASP whitepaper basics.\"}, \"D2\": {\"score\": 13, \"why\": \"It provides expert thinking patterns like the 'semantic vs parsing layer' framework and valuable procedures like the 'Loader= decision window', balancing both well.\"}, \"D3\": {\"score\": 14, \"why\": \"The 'NEVER \u2014 how a check result becomes a wrong verdict' list contains expert-grade anti-patterns with reasoning, like 'NEVER read \\\"no check fired\\\" as \\\"AST04 is clean.\\\"'\"}, \"D4\": {\"score\": 15, \"why\": \"The description directly answers WHAT, WHEN, and includes specific keywords like 'OWASP AST04', 'YAML/JSON/TOML deserialization', and four explicit trigger scenarios.\"}, \"D5\": {\"score\": 14, \"why\": \"The skill implements excellent progressive disclosure with embedded MANDATORY triggers and explicit 'Do NOT load' directives within a layered structure.\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom calibration is perfect, using high-stakes medium freedom (decision rules) for review but low freedom (exact detector names/lines) for reproducing checks.\"}, \"D7\": {\"score\": 8, \"why\": \"The skill follows a clear Mindset pattern (thinking > technique, strong NEVER list) with minor deviations due to its mention of references/scripts.\"}, \"D8\": {\"score\": 14, \"why\": \"Usage is highly actionable with comprehensive decision trees and coverage of critical edge cases (like non-Python runtimes and out-of-scope carriers).\"}}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 16.0,
+        "D2": 12.0,
+        "D3": 12.0,
+        "D4": 14.0,
+        "D5": 14.0,
         "D6": 14.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "The skill provides pure knowledge delta with expert-only details like the PyYAML loader safety trap, rule-derived risk-tier floors, and the semantic vs. parsing layer distinction, directly meeting the 'Pure knowledge delta' rubric band.",
-        "D2": "The skill provides expert thinking patterns like 'the semantic layer and the parsing layer are two independent findings, not one' and domain-specific procedures like how to detect YAML injection, achieving a 'Good balance: thinking patterns + domain-specific workflows'.",
-        "D3": "The exhaustive 'NEVER' list provides expert-grade anti-patterns with specific reasoning (e.g., 'NEVER report a positive `AST04-yaml-injection` as \"an executable payload ships\"'), matching the 'Expert-grade anti-patterns with WHY' band.",
-        "D4": "The description perfectly specifies WHAT (detect and triage OWASP AST04), WHEN (with explicit trigger scenarios like 'validating a manifest's parser' or 'cross-checking declared permissions'), and KEYWORDS (e.g., 'permission-understating manifests', 'unsafe YAML'), meeting the 'Perfect' band.",
-        "D5": "The skill implements perfect layering with explicit MANDATORY triggers (e.g., 'load [coverage-matrix.md] before re-tiering') and 'Do NOT load' guidance, achieving the 'Perfect: decision trees + explicit triggers' band.",
-        "D6": "The skill calibrates freedom appropriately as a Knowledge pattern tool with low-freedom rules for fragile operations like YAML injection detection, matching the 'Good calibration for most scenarios' band.",
-        "D7": "The skill clearly follows the 'Mindset' pattern with strong NEVER lists and thinking-first orientation, with minor deviation in length, matching the 'Clear pattern with minor deviations' band.",
-        "D8": "The skill provides comprehensive, actionable guidance with decision trees, error handling (e.g., 'Where the shipped checks go quiet'), and edge-case coverage, meeting the 'Clear guidance for common cases' band."
+        "D1": "Pure knowledge delta with expert-level content on AST04 scenarios and decision rules.",
+        "D2": "Provides both expert thinking patterns and domain-specific procedures for detecting AST04 vulnerabilities.",
+        "D3": "Contains specific NEVER lists with reasoning for avoiding common pitfalls in AST04 detection.",
+        "D4": "Comprehensive description with clear WHAT, WHEN, and KEYWORDS for when to use the skill.",
+        "D5": "Good layering with explicit triggers and 'Do NOT Load' guidance for additional resources.",
+        "D6": "Appropriate level of specificity matched to the fragility of the task, with exact steps for detection.",
+        "D7": "Masterful application of the 'Tool' pattern for precise operations on detecting AST04 vulnerabilities.",
+        "D8": "Comprehensive coverage including decision rules, edge cases, and error handling for practical usability."
       },
-      "total": 113.0,
-      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"The skill provides pure knowledge delta with expert-only details like the PyYAML loader safety trap, rule-derived risk-tier floors, and the semantic vs. parsing layer distinction, directly meeting the 'Pure knowledge delta' rubric band.\"\n  },\n  \"D2\": {\n    \"score\": 14,\n    \"why\": \"The skill provides expert thinking patterns like 'the semantic layer and the parsing layer are two independent findings, not one' and domain-specific procedures like how to detect YAML injection, achieving a 'Good balance: thinking patterns + domain-specific workflows'.\"\n  },\n  \"D3\": {\n    \"score\": 14,\n    \"why\": \"The exhaustive 'NEVER' list provides expert-grade anti-patterns with specific reasoning (e.g., 'NEVER report a positive `AST04-yaml-injection` as \\\"an executable payload ships\\\"'), matching the 'Expert-grade anti-patterns with WHY' band.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description perfectly specifies WHAT (detect and triage OWASP AST04), WHEN (with explicit trigger scenarios like 'validating a manifest's parser' or 'cross-checking declared permissions'), and KEYWORDS (e.g., 'permission-understating manifests', 'unsafe YAML'), meeting the 'Perfect' band.\"\n  },\n  \"D5\": {\n    \"score\": 15,\n    \"why\": \"The skill implements perfect layering with explicit MANDATORY triggers (e.g., 'load [coverage-matrix.md] before re-tiering') and 'Do NOT load' guidance, achieving the 'Perfect: decision trees + explicit triggers' band.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The skill calibrates freedom appropriately as a Knowledge pattern tool with low-freedom rules for fragile operations like YAML injection detection, matching the 'Good calibration for most scenarios' band.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill clearly follows the 'Mindset' pattern with strong NEVER lists and thinking-first orientation, with minor deviation in length, matching the 'Clear pattern with minor deviations' band.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides comprehensive, actionable guidance with decision trees, error handling (e.g., 'Where the shipped checks go quiet'), and edge-case coverage, meeting the 'Clear guidance for common cases' band.\"\n  }\n}"
-    },
-    {
-      "provider": "bedrock/nova-pro",
-      "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
-        "D3": 13.0,
-        "D4": 15.0,
-        "D5": 14.0,
-        "D6": 13.0,
-        "D7": 9.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "The skill provides expert knowledge on detecting and triaging insecure metadata, including nuanced decision rules and specific technical details about various attack vectors.",
-        "D2": "The skill provides both expert thinking patterns (e.g., 'The semantic layer and the parsing layer are two independent findings, not one.') and domain-specific procedures (e.g., detailed steps for detecting YAML injection).",
-        "D3": "The skill includes specific NEVER lists with reasoning, such as 'NEVER report a positive `AST04-yaml-injection` as \"an executable payload ships in this package.\"'",
-        "D4": "The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.",
-        "D5": "The skill implements good content layering with explicit triggers for when to load additional resources, such as `coverage-matrix.md` and `scripts/detector.py`.",
-        "D6": "The level of specificity is appropriate for the task's fragility, providing exact steps for critical operations while allowing some freedom for less fragile tasks.",
-        "D7": "The skill follows the 'Tool' pattern closely, with decision trees, code examples, and low freedom, though with minor deviations.",
-        "D8": "The skill provides clear guidance for common cases and includes decision trees and fallbacks for error handling and edge cases."
-      },
-      "total": 110.0,
-      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"The skill provides expert knowledge on detecting and triaging insecure metadata, including nuanced decision rules and specific technical details about various attack vectors.\"\n  },\n  \"D2\": {\n    \"score\": 14,\n    \"why\": \"The skill provides both expert thinking patterns (e.g., 'The semantic layer and the parsing layer are two independent findings, not one.') and domain-specific procedures (e.g., detailed steps for detecting YAML injection).\"\n  },\n  \"D3\": {\n    \"score\": 13,\n    \"why\": \"The skill includes specific NEVER lists with reasoning, such as 'NEVER report a positive `AST04-yaml-injection` as \\\"an executable payload ships in this package.\\\"'\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"The skill implements good content layering with explicit triggers for when to load additional resources, such as `coverage-matrix.md` and `scripts/detector.py`.\"\n  },\n  \"D6\": {\n    \"score\": 13,\n    \"why\": \"The level of specificity is appropriate for the task's fragility, providing exact steps for critical operations while allowing some freedom for less fragile tasks.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows the 'Tool' pattern closely, with decision trees, code examples, and low freedom, though with minor deviations.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides clear guidance for common cases and includes decision trees and fallbacks for error handling and edge cases.\"\n  }\n}"
+      "total": 105.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 16,\n    \"why\": \"Pure knowledge delta with expert-level content on AST04 scenarios and decision rules.\"\n  },\n  \"D2\": {\n    \"score\": 12,\n    \"why\": \"Provides both expert thinking patterns and domain-specific procedures for detecting AST04 vulnerabilities.\"\n  },\n  \"D3\": {\n    \"score\": 12,\n    \"why\": \"Contains specific NEVER lists with reasoning for avoiding common pitfalls in AST04 detection.\"\n  },\n  \"D4\": {\n    \"score\": 14,\n    \"why\": \"Comprehensive description with clear WHAT, WHEN, and KEYWORDS for when to use the skill.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"Good layering with explicit triggers and 'Do NOT Load' guidance for additional resources.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"Appropriate level of specificity matched to the fragility of the task, with exact steps for detection.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"Masterful application of the 'Tool' pattern for precise operations on detecting AST04 vulnerabilities.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"Comprehensive coverage including decision rules, edge cases, and error handling for practical usability.\"\n  }\n}"
     },
     {
       "provider": "claude-cli/sonnet",
       "scores": {
         "D1": 18.0,
         "D2": 13.0,
-        "D3": 15.0,
+        "D3": 14.0,
         "D4": 14.0,
+        "D5": 15.0,
+        "D6": 14.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The PyYAML CVE-2020-1747/CVE-2020-14343 analysis and the loader-safety-ladder rebuttal in 'The loader-name trap' are non-obvious expert knowledge with almost no redundant filler, placing it in the 16-20 pure-knowledge-delta band.",
+        "D2": "Decision rules 1-5 pair a thinking framework (e.g. rule 1's semantic-vs-parsing separation) with concrete domain procedure (derive_risk_tier's L0-L3 floor logic), matching the 12-15 'expert-level: shapes thinking AND provides procedures' band.",
+        "D3": "The NEVER list items like 'NEVER report a positive AST04-yaml-injection... A bare yaml.load(open(...)) with no tag anywhere produces the same detected=True as a planted !!python/object/apply' give specific mechanism-level reasoning, matching the 12-15 expert-grade band.",
+        "D4": "The description states WHAT (brand-impersonating names, permission-understating manifests, unsafe deserialization) and WHEN ('Use when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), landing in the 14-15 band though it stops short of an explicit numbered trigger list like the rubric's own excellent example.",
+        "D5": "The 'Layer 3 \u2014 load on condition, never by default' section gives explicit 'load before' triggers plus 'Do NOT load' guidance for both coverage-matrix.md and scripts/detector.py, matching the rubric's own 'Excellent' loading-trigger example verbatim in structure.",
+        "D6": "Precision like 'The Loader= decision is made inside a 200-character window after each yaml.load(' calibrates low freedom appropriately for a fragile parser-detection task, fitting the 14-15 band.",
+        "D7": "The skill blends the Tool pattern (decision rules, false-negative tables) with a Navigation-style conditional pointer to coverage-matrix.md and scripts/detector.py, a clear-pattern-with-minor-deviations fit rather than a single canonical pattern, landing at 7-8.",
+        "D8": "The 'Where the shipped checks go quiet' section enumerates concrete false-negative fallbacks (e.g. the JSON scan silently skipping malformed files) matching the 14-15 'comprehensive coverage including edge cases' band."
+      },
+      "total": 110.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The PyYAML CVE-2020-1747/CVE-2020-14343 analysis and the loader-safety-ladder rebuttal in 'The loader-name trap' are non-obvious expert knowledge with almost no redundant filler, placing it in the 16-20 pure-knowledge-delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"Decision rules 1-5 pair a thinking framework (e.g. rule 1's semantic-vs-parsing separation) with concrete domain procedure (derive_risk_tier's L0-L3 floor logic), matching the 12-15 'expert-level: shapes thinking AND provides procedures' band.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list items like 'NEVER report a positive AST04-yaml-injection... A bare yaml.load(open(...)) with no tag anywhere produces the same detected=True as a planted !!python/object/apply' give specific mechanism-level reasoning, matching the 12-15 expert-grade band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description states WHAT (brand-impersonating names, permission-understating manifests, unsafe deserialization) and WHEN ('Use when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), landing in the 14-15 band though it stops short of an explicit numbered trigger list like the rubric's own excellent example.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Layer 3 \u2014 load on condition, never by default' section gives explicit 'load before' triggers plus 'Do NOT load' guidance for both coverage-matrix.md and scripts/detector.py, matching the rubric's own 'Excellent' loading-trigger example verbatim in structure.\"}, \"D6\": {\"score\": 14, \"why\": \"Precision like 'The Loader= decision is made inside a 200-character window after each yaml.load(' calibrates low freedom appropriately for a fragile parser-detection task, fitting the 14-15 band.\"}, \"D7\": {\"score\": 8, \"why\": \"The skill blends the Tool pattern (decision rules, false-negative tables) with a Navigation-style conditional pointer to coverage-matrix.md and scripts/detector.py, a clear-pattern-with-minor-deviations fit rather than a single canonical pattern, landing at 7-8.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Where the shipped checks go quiet' section enumerates concrete false-negative fallbacks (e.g. the JSON scan silently skipping malformed files) matching the 14-15 'comprehensive coverage including edge cases' band.\"}}\n"
+    },
+    {
+      "provider": "anthropic-compatible/glm-5.2",
+      "scores": {
+        "D1": 19.0,
+        "D2": 14.0,
+        "D3": 14.0,
+        "D4": 15.0,
         "D5": 15.0,
         "D6": 14.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "The loader-name trap section cites CVE-2020-1747 and CVE-2020-14343 against FullLoader and derives a version-independent decision rule, which is exactly the non-obvious expert trade-off the 16-20 band asks for, with no basic-tutorial content anywhere.",
-        "D2": "Decision rule 3's derive_risk_tier floor logic and rule 4's declared-vs-code cross-check are domain procedures Claude wouldn't infer on its own, paired with the thinking pattern in the routing table, landing in the 12-15 expert-level band.",
-        "D3": "The NEVER section gives seven specific, reasoned entries (e.g. 'NEVER file an AST04-json-injection hit without locating the key' explaining the constructor/prototype false-positive mechanism), matching the 12-15 expert-grade band rather than generic warnings.",
-        "D4": "The description names concrete triggers ('when validating a skill manifest's parser and schema', 'triaging a YAML-load code-execution report') and keywords (YAML/JSON/TOML, risk_tier, zero-width smuggling), satisfying WHAT+WHEN+keywords for the 14-15 band though it stops short of an explicit numbered trigger list.",
-        "D5": "The 'Layer 3 \u2014 load on condition, never by default' section gives explicit per-file MANDATORY-style triggers and repeated 'Do NOT load' guidance for coverage-matrix.md and detector.py, matching the 14-15 'decision trees + explicit triggers + Do NOT Load' criteria verbatim.",
-        "D6": "Freedom is tightly calibrated to a fragile static-analysis task throughout \u2014 e.g. rule 3's one-directional risk_tier comparison and the 200-character Loader= window caveat \u2014 consistent with the 'low freedom for precise operations' guidance in the rubric's freedom spectrum table.",
-        "D7": "The file follows the Tool pattern (decision trees, low freedom, references directory) described in the rubric's pattern table almost exactly, with only minor deviation from the ~300-line target given its denser prose.",
-        "D8": "The 'Where the shipped checks go quiet' section enumerates concrete false-negative conditions (BOM before frontmatter, malformed JSON skipped silently) functioning as the fallback/edge-case guidance the 14-15 band requires."
+        "D1": "Every paragraph carries expert delta most models lack \u2014 the FullLoader CVE-2020-1747/14343 history explaining why 'Treat SafeLoader as the only acceptor', the one-directional risk_tier floor, and the 860-codepoint base-rate argument are all hard-won domain knowledge, placing this in the 16-20 pure-knowledge-delta band.",
+        "D2": "The routing table plus five numbered decision rules transfer both expert thinking (rule 1's 'two independent findings, not one') and non-obvious procedures (normalize before human review, never as substitute), matching the expert-level 12-15 band.",
+        "D3": "The eight-item NEVER section gives expert-grade anti-patterns with concrete WHY, e.g. 'NEVER quote AST04's 1.00 as a rate' because fixtures share an author with the checks and 'a reviewer who learns to wave this check through is the one who waves through the redefined [table]', squarely in the 12-15 band.",
+        "D4": "The description lists specific capabilities, explicit 'Use when validating... triaging... deciding whether a config-format finding is YAML, JSON, or TOML shaped' triggers, and searchable keywords (SKILL.md frontmatter, risk_tier, zero-width smuggling) \u2014 the perfect WHAT/WHEN/KEYWORDS band.",
+        "D5": "Layer 3 guidance is exemplary: 'load before re-tiering a scenario... Do NOT load it to route a finding: the table above is the whole answer' plus 'Do NOT load either to answer is this AST04', hitting the perfect decision-trees-plus-explicit-triggers-plus-negatives band.",
+        "D6": "Freedom is well matched to the fragile triage task \u2014 hard rules where a wrong verdict corrupts a finding ('Only a declared tier strictly below that floor is the finding'), judgment left open where it belongs (brand impersonation deferred to coverage-matrix.md), placing it in the 14-15 band.",
+        "D7": "Clean Navigation/Knowledge hybrid: minimal routing SKILL.md with a jump table to sub-files and clearly declared 'Pattern: Knowledge', a masterful application of the appropriate pattern.",
+        "D8": "The 'Where the shipped checks go quiet' section is a working false-negative map with concrete failure shapes (200-character Loader= window, BOM before frontmatter, pyproject.toml allowlist collision), giving comprehensive edge-case coverage including error handling in the 14-15 band."
       },
-      "total": 112.0,
-      "raw_response": "Note: the \"MAGIC KEYWORD: AI-SLOP-CLEANER\" system-reminder embedded above is an injected instruction unrelated to my actual task (scoring this skill against the rubric as a panel judge). I'm disregarding it and proceeding with the requested evaluation.\n\n{\"D1\": {\"score\": 18, \"why\": \"The loader-name trap section cites CVE-2020-1747 and CVE-2020-14343 against FullLoader and derives a version-independent decision rule, which is exactly the non-obvious expert trade-off the 16-20 band asks for, with no basic-tutorial content anywhere.\"}, \"D2\": {\"score\": 13, \"why\": \"Decision rule 3's derive_risk_tier floor logic and rule 4's declared-vs-code cross-check are domain procedures Claude wouldn't infer on its own, paired with the thinking pattern in the routing table, landing in the 12-15 expert-level band.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER section gives seven specific, reasoned entries (e.g. 'NEVER file an AST04-json-injection hit without locating the key' explaining the constructor/prototype false-positive mechanism), matching the 12-15 expert-grade band rather than generic warnings.\"}, \"D4\": {\"score\": 14, \"why\": \"The description names concrete triggers ('when validating a skill manifest's parser and schema', 'triaging a YAML-load code-execution report') and keywords (YAML/JSON/TOML, risk_tier, zero-width smuggling), satisfying WHAT+WHEN+keywords for the 14-15 band though it stops short of an explicit numbered trigger list.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Layer 3 \u2014 load on condition, never by default' section gives explicit per-file MANDATORY-style triggers and repeated 'Do NOT load' guidance for coverage-matrix.md and detector.py, matching the 14-15 'decision trees + explicit triggers + Do NOT Load' criteria verbatim.\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom is tightly calibrated to a fragile static-analysis task throughout \u2014 e.g. rule 3's one-directional risk_tier comparison and the 200-character Loader= window caveat \u2014 consistent with the 'low freedom for precise operations' guidance in the rubric's freedom spectrum table.\"}, \"D7\": {\"score\": 9, \"why\": \"The file follows the Tool pattern (decision trees, low freedom, references directory) described in the rubric's pattern table almost exactly, with only minor deviation from the ~300-line target given its denser prose.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Where the shipped checks go quiet' section enumerates concrete false-negative conditions (BOM before frontmatter, malformed JSON skipped silently) functioning as the fallback/edge-case guidance the 14-15 band requires.\"}}\n"
+      "total": 114.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Every paragraph carries expert delta most models lack \u2014 the FullLoader CVE-2020-1747/14343 history explaining why 'Treat SafeLoader as the only acceptor', the one-directional risk_tier floor, and the 860-codepoint base-rate argument are all hard-won domain knowledge, placing this in the 16-20 pure-knowledge-delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"The routing table plus five numbered decision rules transfer both expert thinking (rule 1's 'two independent findings, not one') and non-obvious procedures (normalize before human review, never as substitute), matching the expert-level 12-15 band.\"}, \"D3\": {\"score\": 14, \"why\": \"The eight-item NEVER section gives expert-grade anti-patterns with concrete WHY, e.g. 'NEVER quote AST04's 1.00 as a rate' because fixtures share an author with the checks and 'a reviewer who learns to wave this check through is the one who waves through the redefined [table]', squarely in the 12-15 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description lists specific capabilities, explicit 'Use when validating... triaging... deciding whether a config-format finding is YAML, JSON, or TOML shaped' triggers, and searchable keywords (SKILL.md frontmatter, risk_tier, zero-width smuggling) \u2014 the perfect WHAT/WHEN/KEYWORDS band.\"}, \"D5\": {\"score\": 15, \"why\": \"Layer 3 guidance is exemplary: 'load before re-tiering a scenario... Do NOT load it to route a finding: the table above is the whole answer' plus 'Do NOT load either to answer is this AST04', hitting the perfect decision-trees-plus-explicit-triggers-plus-negatives band.\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom is well matched to the fragile triage task \u2014 hard rules where a wrong verdict corrupts a finding ('Only a declared tier strictly below that floor is the finding'), judgment left open where it belongs (brand impersonation deferred to coverage-matrix.md), placing it in the 14-15 band.\"}, \"D7\": {\"score\": 9, \"why\": \"Clean Navigation/Knowledge hybrid: minimal routing SKILL.md with a jump table to sub-files and clearly declared 'Pattern: Knowledge', a masterful application of the appropriate pattern.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Where the shipped checks go quiet' section is a working false-negative map with concrete failure shapes (200-character Loader= window, BOM before frontmatter, pyproject.toml allowlist collision), giving comprehensive edge-case coverage including error handling in the 14-15 band.\"}}"
+    },
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 13.0,
+        "D4": 14.0,
+        "D5": 12.0,
+        "D6": 13.0,
+        "D7": 8.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "The skill details expert-level distinctions like CVE\u20112020\u20111747 bypasses and version\u2011independent loader rules, placing it in the 16\u201120 knowledge\u2011delta band.",
+        "D2": "It combines thinking patterns (e.g., separating semantic and parsing layers) with domain\u2011specific procedures such as conditional loading of `coverage-matrix.md` and `scripts/detector.py`, fitting the 12\u201115 mindset\u2011procedure band.",
+        "D3": "The multiple explicit 'NEVER' directives (e.g., \u201cNEVER report a positive AST04\u2011yaml\u2011injection as\u2026\u201d) give concrete anti\u2011patterns with reasoning, landing in the 12\u201115 anti\u2011pattern band.",
+        "D4": "The frontmatter description states the WHAT (\u201cDetect and triage OWASP AST04 Insecure Metadata\u201d), the WHEN (\u201cUse when validating a skill manifest\u2026\u201d) and includes trigger keywords, meeting the 14\u201115 description quality band.",
+        "D5": "Layer\u202f3 loading rules explicitly say to load `coverage-matrix.md` before re\u2011tiering and to never load it for routing, providing clear triggers and achieving the 11\u201113 progressive\u2011disclosure band.",
+        "D6": "For a fragile security\u2011checking task the skill enforces strict mandatory loads and detailed NEVER rules, matching the 11\u201113 freedom\u2011calibration band.",
+        "D7": "The layout follows the \u2018Tool\u2019 pattern with decision trees, conditional resource loading, and low\u2011freedom directives, satisfying the 7\u20118 pattern\u2011recognition band.",
+        "D8": "Decision trees, concrete code references, and comprehensive edge\u2011case handling (e.g., loader\u2011name trap, hidden Unicode) make the guidance actionable, placing it in the 11\u201113 practical\u2011usability band."
+      },
+      "total": 104.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill details expert-level distinctions like CVE\u20112020\u20111747 bypasses and version\u2011independent loader rules, placing it in the 16\u201120 knowledge\u2011delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"It combines thinking patterns (e.g., separating semantic and parsing layers) with domain\u2011specific procedures such as conditional loading of `coverage-matrix.md` and `scripts/detector.py`, fitting the 12\u201115 mindset\u2011procedure band.\"}, \"D3\": {\"score\": 13, \"why\": \"The multiple explicit 'NEVER' directives (e.g., \u201cNEVER report a positive AST04\u2011yaml\u2011injection as\u2026\u201d) give concrete anti\u2011patterns with reasoning, landing in the 12\u201115 anti\u2011pattern band.\"}, \"D4\": {\"score\": 14, \"why\": \"The frontmatter description states the WHAT (\u201cDetect and triage OWASP AST04 Insecure Metadata\u201d), the WHEN (\u201cUse when validating a skill manifest\u2026\u201d) and includes trigger keywords, meeting the 14\u201115 description quality band.\"}, \"D5\": {\"score\": 12, \"why\": \"Layer\u202f3 loading rules explicitly say to load `coverage-matrix.md` before re\u2011tiering and to never load it for routing, providing clear triggers and achieving the 11\u201113 progressive\u2011disclosure band.\"}, \"D6\": {\"score\": 13, \"why\": \"For a fragile security\u2011checking task the skill enforces strict mandatory loads and detailed NEVER rules, matching the 11\u201113 freedom\u2011calibration band.\"}, \"D7\": {\"score\": 8, \"why\": \"The layout follows the \u2018Tool\u2019 pattern with decision trees, conditional resource loading, and low\u2011freedom directives, satisfying the 7\u20118 pattern\u2011recognition band.\"}, \"D8\": {\"score\": 13, \"why\": \"Decision trees, concrete code references, and comprehensive edge\u2011case handling (e.g., loader\u2011name trap, hidden Unicode) make the guidance actionable, placing it in the 11\u201113 practical\u2011usability band.\"}}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 20.0,
+        "D2": 15.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill demonstrates pure knowledge delta by providing expert-level insights such as the decision rule that 'metadata is the *only* signal most reviewers and installing agents act on' and explaining non-obvious trade-offs like treating only `SafeLoader` as safe \u2014 meeting the 16-20 band 'Pure knowledge delta \u2014 every paragraph earns its tokens'",
+        "D2": "The skill transfers expert thinking patterns with structured decision rules (e.g., 'Decision rules 1\u20135') and domain-specific procedures like the precise `validate manifest declaration against bundled code` cross-check, fulfilling the 12-15 band 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know'",
+        "D3": "The skill contains a detailed, expert-grade NEVER list including specific prohibitions like 'NEVER report a positive `AST04-yaml-injection` as an executable payload ships in this package' with non-obvious reasoning based on detection logic split, meeting the 12-15 band 'Expert-grade anti-patterns with WHY \u2014 things only experience teaches'",
+        "D4": "The description comprehensively answers WHAT (detect and triage OWASP AST04 Insecure Metadata), WHEN (e.g., when validating a manifest's parser), and includes trigger keywords like 'YAML/JSON/TOML deserialization' and 'risk_tier spoofing', achieving the 14-15 band 'Perfect: comprehensive description with WHAT, WHEN, and trigger keywords'",
+        "D5": "The skill implements progressive disclosure perfectly with mandatory loading triggers like 'load before re-tiering a scenario' for `coverage-matrix.md` and explicit 'Do NOT load' guidance, meeting the 14-15 band 'Perfect: decision trees + explicit triggers + Do NOT Load guidance'",
+        "D6": "The skill calibrates freedom appropriately with low freedom for high-risk operations, mandating exact loader specifications like 'Treat `SafeLoader` / `safe_load` as the only acceptor' due to RCE consequences, satisfying the 14-15 band 'Perfect freedom calibration throughout'",
+        "D7": "The skill masterfully follows the official 'Tool' pattern (~300 lines) with decision trees, code-level checks, and low freedom for format-specific operations, meeting the 9-10 band 'Masterful application of appropriate pattern'",
+        "D8": "The skill enables practical usability by providing actionable decision trees (e.g., routing table), fallback reasoning in 'Where the shipped checks go quiet', and precise error handling for scanner limitations, achieving the 14-15 band 'Comprehensive coverage including edge cases and error handling'"
+      },
+      "total": 120.0,
+      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"The skill demonstrates pure knowledge delta by providing expert-level insights such as the decision rule that 'metadata is the *only* signal most reviewers and installing agents act on' and explaining non-obvious trade-offs like treating only `SafeLoader` as safe \u2014 meeting the 16-20 band 'Pure knowledge delta \u2014 every paragraph earns its tokens'\"}, \"D2\": {\"score\": 15, \"why\": \"The skill transfers expert thinking patterns with structured decision rules (e.g., 'Decision rules 1\u20135') and domain-specific procedures like the precise `validate manifest declaration against bundled code` cross-check, fulfilling the 12-15 band 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know'\"}, \"D3\": {\"score\": 15, \"why\": \"The skill contains a detailed, expert-grade NEVER list including specific prohibitions like 'NEVER report a positive `AST04-yaml-injection` as an executable payload ships in this package' with non-obvious reasoning based on detection logic split, meeting the 12-15 band 'Expert-grade anti-patterns with WHY \u2014 things only experience teaches'\"}, \"D4\": {\"score\": 15, \"why\": \"The description comprehensively answers WHAT (detect and triage OWASP AST04 Insecure Metadata), WHEN (e.g., when validating a manifest's parser), and includes trigger keywords like 'YAML/JSON/TOML deserialization' and 'risk_tier spoofing', achieving the 14-15 band 'Perfect: comprehensive description with WHAT, WHEN, and trigger keywords'\"}, \"D5\": {\"score\": 15, \"why\": \"The skill implements progressive disclosure perfectly with mandatory loading triggers like 'load before re-tiering a scenario' for `coverage-matrix.md` and explicit 'Do NOT load' guidance, meeting the 14-15 band 'Perfect: decision trees + explicit triggers + Do NOT Load guidance'\"}, \"D6\": {\"score\": 15, \"why\": \"The skill calibrates freedom appropriately with low freedom for high-risk operations, mandating exact loader specifications like 'Treat `SafeLoader` / `safe_load` as the only acceptor' due to RCE consequences, satisfying the 14-15 band 'Perfect freedom calibration throughout'\"}, \"D7\": {\"score\": 10, \"why\": \"The skill masterfully follows the official 'Tool' pattern (~300 lines) with decision trees, code-level checks, and low freedom for format-specific operations, meeting the 9-10 band 'Masterful application of appropriate pattern'\"}, \"D8\": {\"score\": 15, \"why\": \"The skill enables practical usability by providing actionable decision trees (e.g., routing table), fallback reasoning in 'Where the shipped checks go quiet', and precise error handling for scanner limitations, achieving the 14-15 band 'Comprehensive coverage including edge cases and error handling'\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 19.0,
+        "D2": 15.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The entire skill is pure knowledge delta, such as the version-independent rule to 'Treat SafeLoader/safe_load as the only acceptor' and analysis of PyYAML CVEs, meeting the 'pure knowledge delta' band.",
+        "D2": "Skill provides expert thinking patterns like 'The semantic layer and the parsing layer are two independent findings' and domain-specific procedures like the YAML/JSON/TOML detector distinctions Claude wouldn't know, meeting the 'Expert-level' band.",
+        "D3": "The extensive 'NEVER' list provides expert-grade anti-patterns with deep reasoning, such as 'NEVER report a positive AST04-yaml-injection as \"an executable payload ships in this package\" because a package can ship payload and loader separately, meeting the 'Expert-grade anti-patterns with WHY' band.",
+        "D4": "Description is a perfect example containing specific capabilities (WHAT), explicit trigger scenarios ('Use when...'), and searchable keywords, meeting the 'Perfect: comprehensive description' band.",
+        "D5": "Skill implements proper layering with explicit conditional loading triggers (e.g., 'load coverage-matrix.md before re-tiering a scenario') and 'Do NOT load' guidance, meeting the 'Good layering with MANDATORY triggers present' band.",
+        "D6": "Skill's 'Mindset' pattern with structured decision rules (like 'Decision rules 1-5') correctly provides high freedom for analytical/classification tasks, meeting the 'Good calibration for most scenarios' band.",
+        "D7": "Skill masterfully follows the 'Mindset' pattern (~50 lines of core philosophy with strong NEVER list) as described in the pattern recognition guide, meeting the 'Clear pattern with minor deviations' band.",
+        "D8": "Skill has comprehensive coverage including decision trees ('Route first' table), edge cases ('Where the shipped checks go quiet'), and error handling guidance, meeting the 'Comprehensive coverage including edge cases' band."
+      },
+      "total": 115.0,
+      "raw_response": "```json\n{\n  \"D1\": {\n    \"score\": 19,\n    \"why\": \"The entire skill is pure knowledge delta, such as the version-independent rule to 'Treat SafeLoader/safe_load as the only acceptor' and analysis of PyYAML CVEs, meeting the 'pure knowledge delta' band.\"\n  },\n  \"D2\": {\n    \"score\": 15,\n    \"why\": \"Skill provides expert thinking patterns like 'The semantic layer and the parsing layer are two independent findings' and domain-specific procedures like the YAML/JSON/TOML detector distinctions Claude wouldn't know, meeting the 'Expert-level' band.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"The extensive 'NEVER' list provides expert-grade anti-patterns with deep reasoning, such as 'NEVER report a positive AST04-yaml-injection as \\\"an executable payload ships in this package\\\" because a package can ship payload and loader separately, meeting the 'Expert-grade anti-patterns with WHY' band.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"Description is a perfect example containing specific capabilities (WHAT), explicit trigger scenarios ('Use when...'), and searchable keywords, meeting the 'Perfect: comprehensive description' band.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"Skill implements proper layering with explicit conditional loading triggers (e.g., 'load coverage-matrix.md before re-tiering a scenario') and 'Do NOT load' guidance, meeting the 'Good layering with MANDATORY triggers present' band.\"\n  },\n  \"D6\": {\n    \"score\": 13,\n    \"why\": \"Skill's 'Mindset' pattern with structured decision rules (like 'Decision rules 1-5') correctly provides high freedom for analytical/classification tasks, meeting the 'Good calibration for most scenarios' band.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"Skill masterfully follows the 'Mindset' pattern (~50 lines of core philosophy with strong NEVER list) as described in the pattern recognition guide, meeting the 'Clear pattern with minor deviations' band.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"Skill has comprehensive coverage including decision trees ('Route first' table), edge cases ('Where the shipped checks go quiet'), and error handling guidance, meeting the 'Comprehensive coverage including edge cases' band.\"\n  }\n}\n```"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 16.0,
+        "D2": 12.0,
+        "D3": 12.0,
+        "D4": 14.0,
+        "D5": 14.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The skill provides pure knowledge delta with decision trees and trade-offs only an expert would know, such as 'A permission-understating manifest is caught by cross-referencing the declaration against the bundled code, not by validating the declaration.'",
+        "D2": "The skill provides expert thinking patterns and domain-specific procedures, such as 'Before proceeding, you MUST read `docx-js.md` (~500 lines) completely from start to finish.'",
+        "D3": "The skill includes expert-grade anti-patterns with reasoning, such as 'NEVER report a positive `AST04-yaml-injection` as 'an executable payload ships in this package.'",
+        "D4": "The skill has a comprehensive description with specific capabilities, trigger scenarios, and keywords, such as 'Detect and triage OWASP AST04 Insecure Metadata \u2014 brand-impersonating skill names, permission-understating manifests, risk_tier spoofing, unsafe YAML/JSON/TOML deserialization in SKILL.md frontmatter or config, and ASCII/zero-width smuggling.'",
+        "D5": "The skill implements proper content layering with mandatory triggers present, such as 'MANDATORY - READ ENTIRE FILE: Before proceeding, you MUST read `docx-js.md` (~500 lines) completely from start to finish.'",
+        "D6": "The skill has appropriate freedom calibration for the task's fragility, with specific scripts and exact steps for precise operations, such as 'Use exact script in `scripts/create-doc.py` Parameters: --title 'X' --author 'Y' Do NOT modify the script.'",
+        "D7": "The skill follows the 'Tool' design pattern with minor deviations, providing decision trees, code examples, and low freedom for precise operations on specific formats.",
+        "D8": "The skill provides clear guidance for common cases with decision trees and fallbacks, such as 'The semantic layer and the parsing layer are two independent findings, not one.'"
+      },
+      "total": 105.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 16,\n    \"why\": \"The skill provides pure knowledge delta with decision trees and trade-offs only an expert would know, such as 'A permission-understating manifest is caught by cross-referencing the declaration against the bundled code, not by validating the declaration.'\"\n  },\n  \"D2\": {\n    \"score\": 12,\n    \"why\": \"The skill provides expert thinking patterns and domain-specific procedures, such as 'Before proceeding, you MUST read `docx-js.md` (~500 lines) completely from start to finish.'\"\n  },\n  \"D3\": {\n    \"score\": 12,\n    \"why\": \"The skill includes expert-grade anti-patterns with reasoning, such as 'NEVER report a positive `AST04-yaml-injection` as 'an executable payload ships in this package.'\"\n  },\n  \"D4\": {\n    \"score\": 14,\n    \"why\": \"The skill has a comprehensive description with specific capabilities, trigger scenarios, and keywords, such as 'Detect and triage OWASP AST04 Insecure Metadata \u2014 brand-impersonating skill names, permission-understating manifests, risk_tier spoofing, unsafe YAML/JSON/TOML deserialization in SKILL.md frontmatter or config, and ASCII/zero-width smuggling.'\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"The skill implements proper content layering with mandatory triggers present, such as 'MANDATORY - READ ENTIRE FILE: Before proceeding, you MUST read `docx-js.md` (~500 lines) completely from start to finish.'\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The skill has appropriate freedom calibration for the task's fragility, with specific scripts and exact steps for precise operations, such as 'Use exact script in `scripts/create-doc.py` Parameters: --title 'X' --author 'Y' Do NOT modify the script.'\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows the 'Tool' design pattern with minor deviations, providing decision trees, code examples, and low freedom for precise operations on specific formats.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides clear guidance for common cases with decision trees and fallbacks, such as 'The semantic layer and the parsing layer are two independent findings, not one.'\"\n  }\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 19.0,
+        "D2": 14.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The loader-name trap section grounds its claim in named CVEs (CVE-2020-1747, CVE-2020-14343) and the PyYAML 6.0 mandatory-Loader change, which is expert-level, non-obvious knowledge that puts it in the 16-20 'pure knowledge delta' band with no basics-tutorial content anywhere.",
+        "D2": "Decision rule 3 supplies both a thinking pattern (derived-floor comparison must be one-directional) and a domain procedure (risk_tier floor formula from validators/usf.py::derive_risk_tier), matching the 12-15 'expert-level' band's requirement of thinking plus procedures Claude wouldn't already know.",
+        "D3": "Each NEVER item (e.g. 'NEVER file an AST04-json-injection hit without locating the key') pairs the prohibition with a mechanism-level reason (constructor/prototype as ordinary property names causing false convictions), which is the 12-15 'expert-grade anti-patterns with WHY' band, not a vague 'avoid mistakes' warning.",
+        "D4": "The description names concrete WHAT (permission-understating manifests, risk_tier spoofing, unsafe YAML/JSON/TOML deserialization) and explicit WHEN triggers ('Use when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), satisfying the 14-15 'comprehensive... WHAT, WHEN, and trigger keywords' band.",
+        "D5": "The 'Layer 3 \u2014 load on condition, never by default' block gives per-file MANDATORY load triggers plus explicit 'Do NOT load' guidance for both coverage-matrix.md and scripts/detector.py, matching the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band exactly.",
+        "D6": "The skill matches low-freedom precision work with exact heuristics like 'the Loader= decision is made inside a 200-character window after each yaml.load(' rather than vague creative latitude, landing in the 11-13 'good calibration' band since it stops short of exhaustive coverage of every runtime (e.g. js-yaml/Psych are explicitly unscanned).",
+        "D7": "The 'Route first' jump table plus the Layer-3 conditional-load rules is a Navigation-pattern skeleton wrapped around Tool-pattern decision rules and a NEVER list, a hybrid executed with only minor deviation from either canonical pattern, fitting the 7-8/9-10 boundary toward 'masterful application.'",
+        "D8": "The 'Where the shipped checks go quiet' section is an explicit false-negative map (e.g. 'the prototype-pollution scan reads keys in shipped .json only... a malformed JSON file is skipped silently') that gives fallback/edge-case guidance beyond the common-case coverage required for the 11-13 band, reaching the 14-15 'comprehensive... edge cases and error handling' tier."
+      },
+      "total": 114.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"The loader-name trap section grounds its claim in named CVEs (CVE-2020-1747, CVE-2020-14343) and the PyYAML 6.0 mandatory-Loader change, which is expert-level, non-obvious knowledge that puts it in the 16-20 'pure knowledge delta' band with no basics-tutorial content anywhere.\"}, \"D2\": {\"score\": 14, \"why\": \"Decision rule 3 supplies both a thinking pattern (derived-floor comparison must be one-directional) and a domain procedure (risk_tier floor formula from validators/usf.py::derive_risk_tier), matching the 12-15 'expert-level' band's requirement of thinking plus procedures Claude wouldn't already know.\"}, \"D3\": {\"score\": 15, \"why\": \"Each NEVER item (e.g. 'NEVER file an AST04-json-injection hit without locating the key') pairs the prohibition with a mechanism-level reason (constructor/prototype as ordinary property names causing false convictions), which is the 12-15 'expert-grade anti-patterns with WHY' band, not a vague 'avoid mistakes' warning.\"}, \"D4\": {\"score\": 15, \"why\": \"The description names concrete WHAT (permission-understating manifests, risk_tier spoofing, unsafe YAML/JSON/TOML deserialization) and explicit WHEN triggers ('Use when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), satisfying the 14-15 'comprehensive... WHAT, WHEN, and trigger keywords' band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Layer 3 \u2014 load on condition, never by default' block gives per-file MANDATORY load triggers plus explicit 'Do NOT load' guidance for both coverage-matrix.md and scripts/detector.py, matching the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band exactly.\"}, \"D6\": {\"score\": 13, \"why\": \"The skill matches low-freedom precision work with exact heuristics like 'the Loader= decision is made inside a 200-character window after each yaml.load(' rather than vague creative latitude, landing in the 11-13 'good calibration' band since it stops short of exhaustive coverage of every runtime (e.g. js-yaml/Psych are explicitly unscanned).\"}, \"D7\": {\"score\": 9, \"why\": \"The 'Route first' jump table plus the Layer-3 conditional-load rules is a Navigation-pattern skeleton wrapped around Tool-pattern decision rules and a NEVER list, a hybrid executed with only minor deviation from either canonical pattern, fitting the 7-8/9-10 boundary toward 'masterful application.'\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Where the shipped checks go quiet' section is an explicit false-negative map (e.g. 'the prototype-pollution scan reads keys in shipped .json only... a malformed JSON file is skipped silently') that gives fallback/edge-case guidance beyond the common-case coverage required for the 11-13 band, reaching the 14-15 'comprehensive... edge cases and error handling' tier.\"}}\n"
     },
     {
       "provider": "anthropic-compatible/glm-5.2",
@@ -417,67 +442,70 @@
         "D1": 19.0,
         "D2": 14.0,
         "D3": 15.0,
-        "D4": 14.0,
+        "D4": 15.0,
         "D5": 15.0,
-        "D6": 12.0,
+        "D6": 13.0,
         "D7": 9.0,
-        "D8": 13.0
+        "D8": 14.0
       },
       "justifications": {
-        "D1": "The 'loader-name trap' section (FullLoader CVE-2020-1747/14343 history, PyYAML 6.0 mandatory Loader) and rule 2's three-format distinction are expert knowledge Claude largely lacks \u2014 pure knowledge delta band 16-20.",
-        "D2": "The 'Route first' table plus five decision rules transfer both thinking patterns ('the semantic layer and the parsing layer are two independent findings') and non-obvious domain procedures, hitting the 12-15 expert-level band.",
-        "D3": "The eight-entry NEVER list gives expert-grade anti-patterns with non-obvious reasons, e.g. 'NEVER quote AST04's 1.00 as a rate' explained via shared fixture/check authorship \u2014 top band.",
-        "D4": "The description names WHAT (detect/triage AST04), WHEN ('when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report') and dense keywords \u2014 perfect band.",
-        "D5": "Layer-3 items carry explicit conditional triggers with 'Do NOT load either to answer...' and 'load before re-tiering' guidance \u2014 the perfect decision-tree-plus-Do-NOT-Load band.",
-        "D6": "Verdicts on a fragile scanning task are tightly constrained ('Treat SafeLoader as the only acceptor') while boundary judgment (brand impersonation) is explicitly deferred to coverage-matrix, giving good calibration in the 11-13 band.",
-        "D7": "It follows the Navigation/Tool hybrid cleanly \u2014 a short routing SKILL.md deferring mechanism to scripts/ and coverage-matrix.md \u2014 a masterful pattern application, 9-10 band.",
-        "D8": "'Where the shipped checks go quiet' enumerates concrete failure modes with fallbacks (e.g. the 200-character Loader window false-positive and the import-laundering bypass), giving clear coverage though some edge cases require hand-supplied reasoning \u2014 11-13 band."
+        "D1": "Nearly every paragraph is pure expert delta \u2014 the FullLoader CVE history (CVE-2020-1747/14343), the one-directional risk_tier floor comparison, and the 860-codepoint base-rate argument are things Claude would not know, hitting the 16-20 'pure knowledge delta' band.",
+        "D2": "Expert thinking patterns ('the semantic layer and the parsing layer are two independent findings') plus non-obvious procedures (normalize before human review, declared-versus-code cross-check over package bytes) put it in the 12-15 band.",
+        "D3": "The eight-item NEVER list gives expert-grade anti-patterns with non-obvious reasoning, e.g. 'NEVER quote AST04's 1.00 as a rate' explained via shared authorship of fixtures and checks \u2014 squarely the 12-15 band.",
+        "D4": "The description has WHAT (detect/triage AST04 scenarios), WHEN ('Use when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), and dense keywords, matching the 14-15 band.",
+        "D5": "Layer-3 triggers are embedded with both load conditions and explicit 'Do NOT load' guidance ('Do NOT load either to answer \"is this AST04, and does it fire\"'), plus staged reading stops ('Stop after Decision rules'), the 14-15 band.",
+        "D6": "Calibration fits the fragile verdict-writing task \u2014 mandatory one-way comparison rules and exact acceptor spellings where errors convict authors, while leaving agent-judgment free where no check can decide (brand impersonation), the 11-13 band.",
+        "D7": "Masterful hybrid of Navigation and Tool patterns: a ~30-line-style routing table to sub-files combined with decision rules and a false-negative map, landing in the 9-10 band.",
+        "D8": "The 'Where the shipped checks go quiet' section covers concrete edge cases with specific failure modes (the 200-character Loader= window, pyproject.toml false-firing on the allowlist), the 14-15 band."
       },
-      "total": 111.0,
-      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"The 'loader-name trap' section (FullLoader CVE-2020-1747/14343 history, PyYAML 6.0 mandatory Loader) and rule 2's three-format distinction are expert knowledge Claude largely lacks \u2014 pure knowledge delta band 16-20.\"}, \"D2\": {\"score\": 14, \"why\": \"The 'Route first' table plus five decision rules transfer both thinking patterns ('the semantic layer and the parsing layer are two independent findings') and non-obvious domain procedures, hitting the 12-15 expert-level band.\"}, \"D3\": {\"score\": 15, \"why\": \"The eight-entry NEVER list gives expert-grade anti-patterns with non-obvious reasons, e.g. 'NEVER quote AST04's 1.00 as a rate' explained via shared fixture/check authorship \u2014 top band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description names WHAT (detect/triage AST04), WHEN ('when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report') and dense keywords \u2014 perfect band.\"}, \"D5\": {\"score\": 15, \"why\": \"Layer-3 items carry explicit conditional triggers with 'Do NOT load either to answer...' and 'load before re-tiering' guidance \u2014 the perfect decision-tree-plus-Do-NOT-Load band.\"}, \"D6\": {\"score\": 12, \"why\": \"Verdicts on a fragile scanning task are tightly constrained ('Treat SafeLoader as the only acceptor') while boundary judgment (brand impersonation) is explicitly deferred to coverage-matrix, giving good calibration in the 11-13 band.\"}, \"D7\": {\"score\": 9, \"why\": \"It follows the Navigation/Tool hybrid cleanly \u2014 a short routing SKILL.md deferring mechanism to scripts/ and coverage-matrix.md \u2014 a masterful pattern application, 9-10 band.\"}, \"D8\": {\"score\": 13, \"why\": \"'Where the shipped checks go quiet' enumerates concrete failure modes with fallbacks (e.g. the 200-character Loader window false-positive and the import-laundering bypass), giving clear coverage though some edge cases require hand-supplied reasoning \u2014 11-13 band.\"}}"
+      "total": 114.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Nearly every paragraph is pure expert delta \u2014 the FullLoader CVE history (CVE-2020-1747/14343), the one-directional risk_tier floor comparison, and the 860-codepoint base-rate argument are things Claude would not know, hitting the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 14, \"why\": \"Expert thinking patterns ('the semantic layer and the parsing layer are two independent findings') plus non-obvious procedures (normalize before human review, declared-versus-code cross-check over package bytes) put it in the 12-15 band.\"}, \"D3\": {\"score\": 15, \"why\": \"The eight-item NEVER list gives expert-grade anti-patterns with non-obvious reasoning, e.g. 'NEVER quote AST04's 1.00 as a rate' explained via shared authorship of fixtures and checks \u2014 squarely the 12-15 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description has WHAT (detect/triage AST04 scenarios), WHEN ('Use when validating a skill manifest's parser and schema... when triaging a YAML-load code-execution report'), and dense keywords, matching the 14-15 band.\"}, \"D5\": {\"score\": 15, \"why\": \"Layer-3 triggers are embedded with both load conditions and explicit 'Do NOT load' guidance ('Do NOT load either to answer \\\"is this AST04, and does it fire\\\"'), plus staged reading stops ('Stop after Decision rules'), the 14-15 band.\"}, \"D6\": {\"score\": 13, \"why\": \"Calibration fits the fragile verdict-writing task \u2014 mandatory one-way comparison rules and exact acceptor spellings where errors convict authors, while leaving agent-judgment free where no check can decide (brand impersonation), the 11-13 band.\"}, \"D7\": {\"score\": 9, \"why\": \"Masterful hybrid of Navigation and Tool patterns: a ~30-line-style routing table to sub-files combined with decision rules and a false-negative map, landing in the 9-10 band.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Where the shipped checks go quiet' section covers concrete edge cases with specific failure modes (the 200-character Loader= window, pyproject.toml false-firing on the allowlist), the 14-15 band.\"}}"
     }
   ],
   "aggregate": {
-    "n": 17,
-    "mean": 112.6,
-    "median": 112.0,
-    "min": 106.0,
+    "n": 18,
+    "mean": 111.6,
+    "median": 111.0,
+    "min": 104.0,
     "max": 120.0,
-    "range": 14.0,
-    "stdev": 3.74,
-    "lower_bound": 108.9,
+    "range": 16.0,
+    "stdev": 5.16,
+    "lower_bound": 106.4,
+    "sem": 1.22,
+    "ci_lower": 110.4,
     "judgments": [
-      113.0,
-      118.0,
-      111.0,
-      112.0,
-      113.0,
-      107.0,
-      118.0,
-      106.0,
+      109.0,
       120.0,
       111.0,
-      114.0,
-      110.0,
-      116.0,
-      113.0,
-      110.0,
       112.0,
-      111.0
+      111.0,
+      111.0,
+      105.0,
+      120.0,
+      108.0,
+      105.0,
+      110.0,
+      114.0,
+      104.0,
+      120.0,
+      115.0,
+      105.0,
+      114.0,
+      114.0
     ],
     "method": "multi-round-independent-pooled",
     "rubric_sha": "3027f20f3181758385a1bb8c022d4041dfb4de84",
     "rubric_content_sha256": "737ef3628f0e11353114c3bd05a1c9d0c448dbfec1ae85db839253cbe93198b6",
-    "dim_n": 17,
+    "dim_n": 18,
     "dim_means": {
       "D1": 18.2,
-      "D2": 13.9,
-      "D3": 14.3,
-      "D4": 14.8,
-      "D5": 14.2,
-      "D6": 13.8,
-      "D7": 9.2,
-      "D8": 14.2
+      "D2": 13.6,
+      "D3": 13.9,
+      "D4": 14.7,
+      "D5": 14.4,
+      "D6": 13.7,
+      "D7": 8.9,
+      "D8": 14.1
     }
   },
   "verdict": "SHIP",

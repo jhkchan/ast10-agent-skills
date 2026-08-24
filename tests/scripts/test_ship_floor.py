@@ -390,3 +390,71 @@ def test_main_fails_when_stored_verdict_disagrees_with_recompute(tmp_path, monke
 
     assert rc == 1
     assert "FAIL: AST01" in out
+
+
+# ---------------------------------------------------------------------------
+# main() as a verification command: it must actually verify something
+# ---------------------------------------------------------------------------
+
+
+def _scorecard(directory: Path, skill: str, verdict: str = "SHIP") -> None:
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / f"{skill}.json").write_text(
+        json.dumps(
+            {
+                "skill": skill,
+                "judgments": [],
+                "providers": [],
+                "aggregate": _golden_agg(verdict=verdict),
+                "verdict": verdict,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+def test_main_fails_when_there_is_nothing_to_verify(tmp_path, monkeypatch, capsys):
+    """A documented verification command that checks nothing must not report success.
+
+    `python3 scripts/ship_floor.py` printed "scores.json does not exist" and
+    exited 0 while README listed it as the step that recomputes every stored
+    judge verdict. Exit 0 from a check that ran no check is worse than no check:
+    it is a green light nobody earned.
+    """
+    monkeypatch.setattr(ship_floor, "ROOT", tmp_path)
+    rc = ship_floor.main()
+    out = capsys.readouterr().out
+    assert rc == 1
+    assert "nothing was checked" in out
+
+
+def test_main_recomputes_the_scorecards_when_there_is_no_scores_json(tmp_path, monkeypatch, capsys):
+    """`eval/scorecards/` is the record this repository actually writes."""
+    _scorecard(tmp_path / "eval" / "scorecards", "AST01")
+    monkeypatch.setattr(ship_floor, "ROOT", tmp_path)
+    rc = ship_floor.main()
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "recomputed 1 scorecard verdict(s)" in out
+    assert "OK: 1 skill(s) shipped." in out
+
+
+def test_main_fails_when_a_scorecards_stored_verdict_disagrees_with_the_recompute(tmp_path, monkeypatch, capsys):
+    _scorecard(tmp_path / "eval" / "scorecards", "AST01", verdict="BLOCKED")  # self-asserted, wrong
+    monkeypatch.setattr(ship_floor, "ROOT", tmp_path)
+    rc = ship_floor.main()
+    out = capsys.readouterr().out
+    assert rc == 1
+    assert "stored verdict 'BLOCKED' != recomputed 'SHIP'" in out
+
+
+def test_main_over_this_repository_checks_the_recorded_corpus(capsys):
+    """The integration case: run it where it is documented, against what is committed."""
+    live = ship_floor.scorecard_dir()
+    if not live.is_dir() or not any(live.glob("*.json")):
+        pytest.skip("no recorded scorecards in this checkout")
+    rc = ship_floor.main()
+    out = capsys.readouterr().out
+    assert rc == 0, out
+    checked = int(out.split("recomputed ", 1)[1].split(" ", 1)[0])
+    assert checked == len(list(live.glob("*.json")))

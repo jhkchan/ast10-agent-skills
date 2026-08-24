@@ -30,7 +30,9 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import math
 import re
+import statistics
 import subprocess
 from pathlib import Path
 
@@ -630,6 +632,10 @@ NUMBER_WORDS = {
     "fourteen": 14,
 }
 
+#: Spelled forms, for assertions that must quote a derived count the way prose
+#: spells it rather than the way Python prints it.
+NUMBER_WORDS_INVERSE = {value: word for word, value in NUMBER_WORDS.items()}
+
 
 def test_readme_slash_command_count_matches_the_directory():
     """A spelled-out count is the cheapest claim to get wrong and the last to be checked.
@@ -752,10 +758,12 @@ def test_readme_judged_column_matches_the_recorded_scorecards(category):
 
 
 def test_readme_ship_count_matches_the_recorded_scorecards():
-    """ "Nine of the eleven skills clear the ship rule" has to be nine, and eleven.
+    """ "Eleven of the eleven skills clear the ship rule" has to be eleven, and eleven.
 
     Counted from the scorecards rather than from the table, so the prose and the
-    rows cannot drift apart or drift together in the same wrong direction.
+    rows cannot drift apart or drift together in the same wrong direction. The
+    words are derived too — the sentence read "Nine of the eleven" for a run and
+    was not edited by hand when the count moved; this test failed instead.
     """
     cards = sorted((REPO_ROOT / "eval" / "scorecards").glob("*.json"))
     if not cards:
@@ -1121,3 +1129,371 @@ def test_every_relative_markdown_link_points_at_a_file_that_exists(doc):
         if not (path.parent / target).exists():
             dangling.append(target)
     assert not dangling, f"{doc} links to file(s) that do not exist: {sorted(set(dangling))}"
+
+
+# ---------------------------------------------------------------------------
+# 6. Claims a pre-publication review found overstated, pinned to the artifact
+# ---------------------------------------------------------------------------
+#
+# Each test below re-derives a published claim from the corpus or the code, so
+# the prose cannot go back to the flattering version once the numbers move. They
+# are grouped because they share a failure shape: every one of them was a true
+# sentence about an earlier run that stayed on the page after it stopped being
+# true, which is the most expensive kind of documentation defect this repository
+# can ship — a reader has no way to date a sentence.
+
+
+def _plain(path: Path) -> str:
+    """`_flat`, with Markdown emphasis, code ticks and typographic dashes removed.
+
+    An assertion about a *figure* must not fail because the figure was bolded,
+    and must not pass because it was not.
+    """
+    text = _flat(path)
+    for glyph, ascii_form in (("−", "-"), ("–", "-"), ("→", "->"), ("×", "x")):
+        text = text.replace(glyph, ascii_form)
+    return text.replace("**", "").replace("`", "")
+
+
+def _live_scorecards() -> dict[str, dict]:
+    directory = REPO_ROOT / "eval" / "scorecards"
+    return {
+        json.loads(p.read_text(encoding="utf-8"))["skill"]: json.loads(p.read_text(encoding="utf-8"))
+        for p in sorted(directory.glob("*.json"))
+    }
+
+
+def _ships_under_each_clause() -> tuple[int, int, int]:
+    """(retired-clause ships, live-clause ships, skills) over the live corpus.
+
+    The retired clause is `mean - stdev >= POOLED_LOWER_BOUND`; the live one is
+    `mean - CONFIDENCE_K * sem >= POOLED_TARGET`. Both are recomputed from each
+    scorecard's stored statistics rather than read from a `verdict` field,
+    because the point is to compare two rules over one corpus.
+    """
+    cards = _live_scorecards()
+    retired = live = 0
+    for card in cards.values():
+        agg = card["aggregate"]
+        floors_clear = all(agg["dim_means"].get(d, 0) >= f for d, f in FLOORS.items())
+        grade_a = agg["mean"] >= POOLED_TARGET
+        retired += bool(floors_clear and grade_a and agg["lower_bound"] >= POOLED_LOWER_BOUND)
+        live += bool(floors_clear and grade_a and agg["ci_lower"] >= POOLED_TARGET)
+    return retired, live, len(cards)
+
+
+def test_the_readme_states_what_the_gate_change_bought_on_the_run_it_gates():
+    """ "The change bought nothing" was true of run 4 and is false of run 5.
+
+    Derived, not hard-coded: whatever the two clauses say about the live corpus,
+    the README must state the retired clause's count when it differs from the
+    live one, and must not carry the unqualified claim that the change cost
+    nothing.
+    """
+    retired, live, total = _ships_under_each_clause()
+    flat = _plain(README)
+    if retired == live:
+        pytest.skip(f"both clauses ship {live} of {total} on this corpus; there is nothing to disclose")
+    assert f"run 5 is {retired} of {total}" in flat, (
+        f"the live corpus ships {live} of {total} under the rule in force and {retired} of {total} "
+        f"under the retired one; the README must say so"
+    )
+    assert "it bought nothing when adopted" not in flat, (
+        "the README must not claim the gate change bought nothing without naming the run that is "
+        f"true of — it bought {live - retired} ship(s) on the corpus it now gates"
+    )
+
+
+def test_the_docs_do_not_present_the_confidence_bound_as_the_stricter_rule():
+    """Whichever clause is harsher on this corpus, the page has to say which.
+
+    `mean - sigma >= 105` and `mean - sigma/sqrt(n) >= 108` cross over at
+    `sigma = 3/(1 - 1/sqrt(n))`. Above that sigma the adopted clause demands the
+    LOWER mean, which is the case for every skill in the live corpus, and a
+    reader told only that a confidence bound replaced a spread statistic will
+    assume the opposite.
+    """
+    cards = _live_scorecards()
+    harder = [
+        skill
+        for skill, card in cards.items()
+        if POOLED_TARGET + CONFIDENCE_K * card["aggregate"]["sem"] > POOLED_LOWER_BOUND + card["aggregate"]["stdev"]
+    ]
+    if harder:
+        pytest.skip(f"the adopted clause is the harder one on {sorted(harder)}; the caveat does not apply")
+    gaps = {
+        skill: (POOLED_LOWER_BOUND + card["aggregate"]["stdev"])
+        - (POOLED_TARGET + CONFIDENCE_K * card["aggregate"]["sem"])
+        for skill, card in cards.items()
+    }
+    adr_0006 = REPO_ROOT / "docs" / "adr" / "0006-confidence-bound-on-the-pooled-mean.md"
+    for name, text in (("the dashboard", _plain(DASHBOARD)), ("ADR-0006", _plain(adr_0006))):
+        assert "demands a lower mean than the retired" in text, (
+            f"at every (n, sigma) in the live corpus the adopted clause demands a lower mean than "
+            f"the retired one, and {name} must publish that rather than leaving 'confidence bound' "
+            "to imply strictness"
+        )
+        # The size of the gap, not just its sign: "slightly more permissive" and
+        # "two points more permissive on the row that decides the board" are
+        # different claims, and only one of them is true here.
+        for value in (min(gaps.values()), max(gaps.values())):
+            assert f"{value:.2f}" in text, f"{name} must publish the {value:.2f}-point gap it derives from"
+
+
+#: Every judged corpus on disk, live first. The crossover tally below is a
+#: statement about all of them, so it may not be derived from the live one alone.
+ALL_CORPORA = ("scorecards", "scorecards-run1", "scorecards-run2", "scorecards-run3", "scorecards-run4")
+
+
+def _clause_bars() -> list[tuple[str, str, int, float, float, float]]:
+    """`(corpus, skill, n, sigma, retired_bar, adopted_bar)` for every judged skill-run.
+
+    The two clauses are the bars `mean >= POOLED_LOWER_BOUND + sigma` and
+    `mean >= POOLED_TARGET + CONFIDENCE_K * sem`, so comparing the bars compares
+    the rules independently of what any particular skill scored. `sem` is derived
+    from the ROUNDED `stdev`, exactly as `ship_floor.pooled_stats` derives it, so
+    this lands on the gate's own arithmetic rather than near it.
+    """
+    rows = []
+    for corpus in ALL_CORPORA:
+        directory = REPO_ROOT / "eval" / corpus
+        if not directory.is_dir():
+            continue
+        for path in sorted(directory.glob("*.json")):
+            card = json.loads(path.read_text(encoding="utf-8"))
+            agg = card.get("aggregate")
+            if not isinstance(agg, dict) or not agg.get("judgments"):
+                continue
+            judgments = agg["judgments"]
+            n = len(judgments)
+            sigma = round(statistics.stdev(judgments), 2)
+            sem = round(sigma / math.sqrt(n), 2)
+            rows.append(
+                (
+                    corpus,
+                    str(card.get("skill", path.stem)),
+                    n,
+                    sigma,
+                    POOLED_LOWER_BOUND + sigma,
+                    POOLED_TARGET + CONFIDENCE_K * sem,
+                )
+            )
+    return rows
+
+
+def test_the_crossover_tally_every_page_publishes_is_the_one_the_corpora_yield():
+    """How often the adopted clause was the harder one is a measured count, not a memory.
+
+    Three pages state it. It was hand-tallied once as "exactly four skill-runs"
+    and it is three — the fourth, `AST06` in run 4, is an exact tie at the
+    precision the gate publishes (both clauses demand 109.04), and a tie is not
+    an instance of the new rule being stricter. The direction of that error is
+    the one that matters: it made the adopted clause look harder more often than
+    it has ever been, which is precisely the impression ADR-0006 is required not
+    to leave.
+    """
+    rows = _clause_bars()
+    assert rows, "no judged corpus on disk; the tally cannot be derived"
+    harder = [(c, s) for c, s, _n, _sd, ret, ado in rows if ado > ret]
+    tied = [(c, s) for c, s, _n, _sd, ret, ado in rows if ado == ret]
+
+    pages = {
+        "README.md": _plain(README),
+        "the dashboard": _plain(DASHBOARD),
+        "ADR-0006": _plain(REPO_ROOT / "docs" / "adr" / "0006-confidence-bound-on-the-pooled-mean.md"),
+    }
+    for name, text in pages.items():
+        assert "exactly four skill-runs" not in text, (
+            f"{name} carries the hand-tallied 'exactly four skill-runs'; the corpora yield "
+            f"{len(harder)} strictly harder ({sorted(harder)}) and {len(tied)} tied ({sorted(tied)})"
+        )
+        assert f"{len(rows)} skill-runs" in text, f"{name} must state the {len(rows)} skill-runs the tally is over"
+        # Spelled, not digits: "three" is how all three pages say it, and a bare
+        # "3" would also match a sigma or a round number somewhere on the page.
+        word = NUMBER_WORDS_INVERSE.get(len(harder), str(len(harder)))
+        assert f"strictly higher mean on exactly {word}" in text, (
+            f"{name} must state that the adopted clause demanded a strictly higher mean on exactly "
+            f"{word} of {len(rows)} skill-runs: {sorted(harder)}"
+        )
+
+    # The tie is a named row, not a footnote: it is the one a re-tally trips over.
+    for name, text in pages.items():
+        for _corpus, skill in tied:
+            assert skill in text, f"{name} must name {skill}, the exact tie, rather than absorbing it into the count"
+
+
+def _skills_without_an_anti_pattern_section() -> list[str]:
+    """Roster entries whose `SKILL.md` contains no `NEVER` prohibition at all."""
+    out = []
+    for path in sorted(SKILLS_DIR.glob("*/SKILL.md")):
+        if "NEVER" not in path.read_text(encoding="utf-8"):
+            out.append(path.parent.name)
+    return out
+
+
+def test_the_d3_anti_pattern_claim_is_qualified_by_the_skill_that_contradicts_it():
+    """A controlled result licenses the narrow claim, and the page must not widen it.
+
+    The run-3 -> run-4 arm shows that ADDING an anti-pattern section raises `D3`
+    on a skill that is at or under the floor. It does not show that a
+    consolidated `NEVER` section is what a good `D3` is made of — and this
+    repository ships the counterexample. Any skill with no such section that
+    nonetheless scores above every treated skill's starting `D3` has to be named
+    on the page that makes the claim, with its score, or the claim is wider than
+    the evidence.
+    """
+    untreated = _skills_without_an_anti_pattern_section()
+    if not untreated:
+        pytest.skip("every shipped skill carries an anti-pattern section; there is no counterexample")
+    cards = _live_scorecards()
+    run3 = REPO_ROOT / "eval" / "scorecards-run3"
+    treated = ("AST02", "AST03", "AST04", "AST05", "AST06", "AST07", "AST09", "AST10")
+    starting = [
+        json.loads((run3 / f"{s}.json").read_text(encoding="utf-8"))["aggregate"]["dim_means"]["D3"]
+        for s in treated
+        if (run3 / f"{s}.json").is_file()
+    ]
+    assert starting, "run 3 is not on disk; the treated skills' starting D3 cannot be derived"
+
+    adr_path = REPO_ROOT / "docs" / "adr" / "0005-judge-panel-calibration-and-the-lower-bound.md"
+    dashboard, adr = _plain(DASHBOARD), _plain(adr_path)
+    for skill in untreated:
+        card = cards.get(skill)
+        if card is None:
+            continue
+        d3 = card["aggregate"]["dim_means"]["D3"]
+        if d3 <= max(starting):
+            continue
+        for name, text in (("dashboard", dashboard), ("ADR-0005", adr)):
+            assert skill in text, f"{name} makes the D3 claim without naming {skill}, which contradicts it"
+            assert "no consolidated anti-pattern section" in text or "no anti-pattern section" in text, (
+                f"{name} must say plainly that {skill} has no anti-pattern section at all"
+            )
+        assert f"{d3:g}" in dashboard, (
+            f"{skill} scores D3 {d3:g} with no anti-pattern section, above every treated skill's "
+            f"starting D3 (max {max(starting):g}); the dashboard must publish that number"
+        )
+
+
+#: Below this, a "<n> checks" phrase is a per-category count rather than a
+#: repository-wide total. The largest single category ships ten, so any figure
+#: from twelve up is claiming a roll-up and has to match the roll-up.
+DETECTOR_TOTAL_FLOOR = 12
+
+
+def test_no_document_claims_a_detector_total_the_modules_do_not_ship():
+    """Per-category counts are checked row by row; this catches the roll-up.
+
+    A repository-wide "N detectors ship" is the figure a reader quotes, it is
+    the figure nothing else here derives, and it was wrong: prose claimed 37
+    against 36 registered checks. Every candidate total in any committed
+    Markdown must now equal the sum of the modules' own registries.
+    """
+    total = sum(_detector_check_count(category) for category in AST_IDS)
+    offenders: list[str] = []
+    pattern = re.compile(r"\b(\d+)\s+(?:\w+\s+){0,2}?(?:detector|check)s\b", re.IGNORECASE)
+    for path in _committed_files():
+        if path.suffix != ".md":
+            continue
+        for match in pattern.finditer(path.read_text(encoding="utf-8")):
+            claimed = int(match.group(1))
+            if claimed >= DETECTOR_TOTAL_FLOOR and claimed != total:
+                offenders.append(f"{path.relative_to(REPO_ROOT)}: {match.group(0)!r}")
+    assert not offenders, f"{total} checks ship across the ten modules; these claim otherwise: {offenders}"
+
+
+def test_the_readme_rows_sum_to_the_shipped_check_count():
+    """The table is the only place the total is derivable, so its parts must add up."""
+    stated = 0
+    for category in AST_IDS:
+        match = re.match(r"\*?\*?([A-Za-z]+) checks?\b", _readme_row(category)[2])
+        if match:
+            stated += NUMBER_WORDS.get(match.group(1).lower(), 0)
+    assert stated == sum(_detector_check_count(c) for c in AST_IDS)
+
+
+def test_the_sweep_page_check_table_matches_the_detector_modules():
+    """`/ast:audit-skill-package` publishes a per-category check roster; it must be the real one.
+
+    Every single-category command page is already checked against its module by
+    `test_command_page_lists_exactly_the_checks_the_detector_registers`. The
+    all-ten sweep page was not, and it drifted furthest: it carried a
+    scaffold-era roster — 13 checks over six categories — long after 36 shipped
+    across eight, which is the figure a reader of the sweep page quotes.
+    """
+    page = (COMMANDS_DIR / "audit-skill-package.md").read_text(encoding="utf-8")
+    stated: dict[str, int] = {}
+    for line in page.splitlines():
+        match = re.match(r"\|\s*(AST\d\d)\s[^|]*\|\s*(\d+)\s*\|", line)
+        if match:
+            stated[match.group(1)] = int(match.group(2))
+    actual = {category: _detector_check_count(category) for category in AST_IDS}
+    assert stated == actual, f"commands/ast/audit-skill-package.md publishes {stated}; the modules register {actual}"
+    assert f"**{sum(actual.values())} in total**" in page, (
+        f"the sweep page must state the roll-up too: {sum(actual.values())} checks ship"
+    )
+
+
+CAVEAT_SECTION = "What 11 of 11 is, and what it is not"
+
+#: The four limits the headline number may never be published without. Each is
+#: (label, the substrings that together prove the caveat is actually MADE rather
+#: than merely alluded to). Kept as data because the failure mode this guards is
+#: a caveat being softened one clause at a time until only its heading survives.
+REQUIRED_CAVEATS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("self-authored corpus", ("corpus is self-authored", "not** external validation")),
+    ("panel bias with the flagged judge", ("11.4-point spread", "COARSE", "8 of 11")),
+    ("k = 1.0 is not a confidence level", ("not a confidence level", "design effect")),
+    ("leave-one-out / missing-data fragility", ("198 attempted", "107.6", "single-judge exclusions")),
+)
+
+
+def _caveat_section() -> str:
+    """The body of the caveats section, heading excluded, next `##` excluded."""
+    text = README.read_text(encoding="utf-8")
+    start = text.find(f"## {CAVEAT_SECTION}")
+    assert start != -1, f"README no longer has a '## {CAVEAT_SECTION}' section"
+    rest = text[start + len(CAVEAT_SECTION) :]
+    end = rest.find("\n## ")
+    return rest[:end] if end != -1 else rest
+
+
+def test_the_headline_number_carries_all_four_caveats_in_its_own_section():
+    """11 of 11 is the figure a reader quotes, so its limits live beside it.
+
+    A pre-publication review found the section carrying three of the four: the
+    leave-one-out result (the board is 8 of 11 without one judge, and three of
+    six single-judge exclusions block AST01) was published elsewhere and not
+    here, where someone reading only the headline would meet it. Each caveat is
+    asserted by the figures that make it a claim rather than a gesture — a
+    heading alone does not satisfy this test.
+    """
+    section = _caveat_section()
+    missing = [
+        f"{label} (missing: {[frag for frag in frags if frag not in section]})"
+        for label, frags in REQUIRED_CAVEATS
+        if any(frag not in section for frag in frags)
+    ]
+    assert not missing, f"'{CAVEAT_SECTION}' must carry all four caveats; incomplete: {missing}"
+
+
+def test_the_caveat_section_states_its_own_length_correctly():
+    """ "The three limits" outlived the third limit once; it must not do so again.
+
+    The count is re-derived from the bolded lead-ins actually present, so adding
+    or removing a caveat fails here until the prose that introduces them agrees.
+    """
+    section = _caveat_section()
+    # DOTALL: a lead-in that reflows across a line break is still a lead-in.
+    leads = re.findall(r"^\*\*(.+?)\*\*", section, re.MULTILINE | re.DOTALL)
+    count = len(leads)
+    word = {3: "three", 4: "four", 5: "five", 6: "six"}[count]
+    flat = _plain(README)
+    assert f"the {word} limits on it sit here" in flat, (
+        f"the section opens with {count} bolded limits ({leads}); its preamble must say '{word}'"
+    )
+    assert f"it is {word} paragraphs" in flat, (
+        f"the cross-reference above the table must call the section {word} paragraphs, not another count"
+    )
+    for stale in {"three", "four", "five", "six"} - {word}:
+        assert f"the {stale} limits on it sit here" not in flat

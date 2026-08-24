@@ -29,13 +29,16 @@ Four things are held here:
 
    Both were once asserted against whichever directory was live, and run 4 is
    why they are not any more. It flags `bedrock/qwen3-235b` again — not by
-   going flat, but because the *skills* improved into a judge that puts 77% of
+   going flat, but because the *skills* improved into a judge that puts most of
    its scores at a dimension maximum, compressing its per-skill means below the
-   across-skill floor. A claim about what one panel measured has to live on that
-   panel's frozen directory or it decays into a claim about the newest run. What
-   `eval/scorecards/` gets instead is the assertion true of it in any state: the
-   published signals are what an independent recount of the same JSON produces,
-   and whatever is flagged is named on the dashboard with its reasons.
+   across-skill floor. Run 5 then made the same point twice over: it does **not**
+   flag that judge, so the compression finding now lives on `eval/scorecards-run4/`
+   too. A claim about what one panel measured has to live on that panel's frozen
+   directory or it decays into a claim about the newest run — and, worse, into a
+   test that skips. What `eval/scorecards/` gets instead is the assertion true of
+   it in any state: the published signals are what an independent recount of the
+   same JSON produces, and whatever is flagged is named on the dashboard with its
+   reasons.
 
    The third claim is that the harshest judge on a panel — whoever that is on a
    given run — is never flagged: a rule that flags a strict judge as a broken
@@ -79,6 +82,14 @@ SCORECARDS_RUN2 = REPO_ROOT / "eval" / "scorecards-run2"
 #: run 4 landed — a claim about a specific measurement belongs on the directory
 #: holding that measurement, not on whichever directory is current.
 SCORECARDS_RUN3 = REPO_ROOT / "eval" / "scorecards-run3"
+#: Run 4, archived and frozen: the corpus in which the *compression* pathology is
+#: on record. Run 2 has a judge that went flat, run 3 has the same judge repaired,
+#: and run 4 has it flagged again for a third reason — a saturating judge whose
+#: per-skill means compressed when the roster rose into its ceiling. Run 5 does
+#: not flag it, which is exactly why that finding had to move onto frozen bytes:
+#: a mechanism asserted against whichever corpus is live stops being asserted the
+#: day the panel improves.
+SCORECARDS_RUN4 = REPO_ROOT / "eval" / "scorecards-run4"
 JUDGE_QUALITY_JSON = REPO_ROOT / "eval" / "judge-quality.json"
 RUBRIC = REPO_ROOT / "vendor" / "skill-judge" / "SKILL.md"
 
@@ -307,6 +318,20 @@ def archived_run3():
     return cal.judge_quality(cal.load_judgments(SCORECARDS_RUN3))
 
 
+@pytest.fixture(scope="module")
+def archived_run4():
+    """The frozen run-4 panel, diagnosed by today's rule.
+
+    The third fixed point, and the one that carries the compression mechanism.
+    Not skipped when absent, for the same reason runs 2 and 3 are not.
+    """
+    assert SCORECARDS_RUN4.is_dir() and any(SCORECARDS_RUN4.glob("*.json")), (
+        f"{SCORECARDS_RUN4.relative_to(REPO_ROOT)} is the archived run-4 corpus and must stay committed: "
+        "it is what pins that a saturating judge can be flagged by the roster rising into its ceiling"
+    )
+    return cal.judge_quality(cal.load_judgments(SCORECARDS_RUN4))
+
+
 def _row(quality: dict, provider: str) -> dict:
     return next(r for r in quality["providers"] if r["provider"] == provider)
 
@@ -316,9 +341,12 @@ def _row(quality: dict, provider: str) -> dict:
 #: on purpose: `eval/scorecards/` is whichever run is live, and labelling that
 #: parameter "run3" is exactly the drift this file exists to catch — it went on
 #: reading "run3" for a whole run after the directory held run 4.
-def _corpus(name: str, quality: dict, archived_run2: dict, archived_run3: dict) -> tuple[Path, dict]:
+def _corpus(
+    name: str, quality: dict, archived_run2: dict, archived_run3: dict, archived_run4: dict
+) -> tuple[Path, dict]:
     return {
         "current": (SCORECARDS, quality),
+        "run4": (SCORECARDS_RUN4, archived_run4),
         "run3": (SCORECARDS_RUN3, archived_run3),
         "run2": (SCORECARDS_RUN2, archived_run2),
     }[name]
@@ -526,28 +554,36 @@ def test_the_qwen_signals_are_recomputed_from_disk_on_every_corpus(quality, arch
     assert QWEN not in archived_run3["flagged"]
 
 
-def test_a_saturating_judge_can_be_flagged_by_the_population_narrowing_under_it(quality, archived_run3):
+def test_a_saturating_judge_can_be_flagged_by_the_population_narrowing_under_it(quality, archived_run3, archived_run4):
     """Run 4's finding, stated as the mechanism rather than as a verdict.
 
-    `bedrock/qwen3-235b` clears the distinct-value threshold on both corpora and
-    ranks the roster on both, yet run 4 flags it. The reason is not that the
-    judge degraded: it puts most of its dimension scores at a dimension's
-    maximum, so it has very little room above a roster, and when the skills
-    improved into that ceiling its per-skill means compressed. This asserts the
-    mechanism is what the numbers actually show — a judge still ranking, still
-    using enough of the scale, whose across-skill spread narrowed because its
-    ceiling did not move with the population.
+    `bedrock/qwen3-235b` cleared the distinct-value threshold on run 3 and run 4
+    and ranked the roster on both, yet run 4 flags it. The reason is not that the
+    judge degraded: it puts most of its dimension scores at a dimension's maximum,
+    so it has very little room above a roster, and when the skills improved into
+    that ceiling its per-skill means compressed. This asserts the mechanism is
+    what the numbers actually show — a judge still ranking, still using enough of
+    the scale, whose across-skill spread narrowed because its ceiling did not move
+    with the population.
 
-    Written as a conditional on the live corpus rather than as "qwen is flagged",
-    because pinning the flag would make a future repair look like a regression.
-    What must never happen silently is the *other* reading: a judge flagged here
-    while the panel's own numbers say it collapsed to one value.
+    Asserted against the **frozen run-4 corpus**, and that is the correction run 5
+    forced. Written as a conditional on the live corpus, the whole test skipped the
+    moment the panel stopped flagging this judge — which is exactly what run 5 did,
+    so a finding that cost a run to establish would have gone unchecked from the
+    first run that no longer reproduced it. A claim about what one panel measured
+    belongs on that panel's bytes. The live corpus keeps the assertion that is true
+    of it in any state: whatever it flags, it flags for a reason the numbers
+    support, and pinning the flag itself would make a future repair look like a
+    regression.
     """
     live = _row(quality, QWEN)
-    if QWEN not in quality["flagged"]:
-        pytest.skip("the live panel does not flag this judge; the mechanism has nothing to describe")
+    flagged = _row(archived_run4, QWEN)
+    assert QWEN in archived_run4["flagged"], (
+        "eval/scorecards-run4/ is the corpus on which this mechanism was measured; if it no longer "
+        "flags this judge the archive has been rewritten"
+    )
 
-    disc, frozen = live["discrimination"], archived_run3["providers"]
+    disc, frozen = flagged["discrimination"], archived_run3["providers"]
     before = next(r for r in frozen if r["provider"] == QWEN)["discrimination"]
 
     assert disc["across_skill_sd"] < cal.DISCRIMINATION_SD_FLOOR, "the flag must be the across-skill one"
@@ -556,13 +592,24 @@ def test_a_saturating_judge_can_be_flagged_by_the_population_narrowing_under_it(
         "if it is not, this is the flat pathology and not the compression one"
     )
     assert disc["skill_mean_min"] < disc["skill_mean_max"], "a compressed ranking is still a ranking"
-    assert live["saturation"]["dimension_max_rate"] >= cal.SATURATION_DIM_MAX_CEILING, (
+    assert flagged["saturation"]["dimension_max_rate"] >= cal.SATURATION_DIM_MAX_CEILING, (
         "compression against a ceiling is only the explanation for a judge that sits at the ceiling"
     )
     assert disc["skill_mean_min"] > before["skill_mean_min"], (
         "the mechanism is the roster rising into a fixed ceiling: this judge's worst-scored skill "
         f"must have risen since run 3 ({before['skill_mean_min']} -> {disc['skill_mean_min']})"
     )
+
+    # The live panel, in whichever state it is in. A flag here must be the same
+    # mechanism and not the flat pathology; no flag here must not be silence.
+    if QWEN in quality["flagged"]:
+        assert live["discrimination"]["distinct_dimension_values"] >= cal.MIN_DISTINCT_DIMENSION_VALUES
+        assert live["discrimination"]["skill_mean_min"] < live["discrimination"]["skill_mean_max"]
+    else:
+        assert live["discrimination"]["across_skill_sd"] >= cal.DISCRIMINATION_SD_FLOOR, (
+            "an unflagged judge must actually clear the across-skill floor"
+        )
+        assert live["verdict"] != cal.VERDICT_NON_DISCRIMINATING
 
 
 def test_every_judge_on_the_panel_gets_a_verdict(quality, recorded):
@@ -571,8 +618,8 @@ def test_every_judge_on_the_panel_gets_a_verdict(quality, recorded):
     assert all(row["verdict"] in quality["verdicts"] for row in quality["providers"])
 
 
-@pytest.mark.parametrize("corpus", ["current", "run3", "run2"])
-def test_the_harshest_judge_on_the_panel_is_never_flagged(corpus, quality, archived_run2, archived_run3):
+@pytest.mark.parametrize("corpus", ["current", "run4", "run3", "run2"])
+def test_the_harshest_judge_on_the_panel_is_never_flagged(corpus, quality, archived_run2, archived_run3, archived_run4):
     """A strict judge is a judge, not a defect.
 
     This used to name `claude-cli/sonnet` and quote its −3.7 bias. Sonnet is not
@@ -585,7 +632,7 @@ def test_the_harshest_judge_on_the_panel_is_never_flagged(corpus, quality, archi
     quality — and that failure would now be caught on whichever judge is harsh
     next run, not only on the one that was harsh when this was written.
     """
-    directory, panel = _corpus(corpus, quality, archived_run2, archived_run3)
+    directory, panel = _corpus(corpus, quality, archived_run2, archived_run3, archived_run4)
     biases = cal.provider_bias(cal.load_judgments(directory))
     harshest = min(biases, key=lambda r: r["bias"])
     row = _row(panel, harshest["provider"])
@@ -598,8 +645,10 @@ def test_the_harshest_judge_on_the_panel_is_never_flagged(corpus, quality, archi
     assert harshest["provider"] not in panel["flagged"]
 
 
-@pytest.mark.parametrize("corpus", ["current", "run3", "run2"])
-def test_granularity_across_the_panel_is_measured_not_asserted(corpus, quality, archived_run2, archived_run3):
+@pytest.mark.parametrize("corpus", ["current", "run4", "run3", "run2"])
+def test_granularity_across_the_panel_is_measured_not_asserted(
+    corpus, quality, archived_run2, archived_run3, archived_run4
+):
     """Every published granularity figure is re-derived from the scorecards here.
 
     The old form hard-coded run 2's two extremes (100% for qwen, 0% for sonnet)
@@ -610,7 +659,7 @@ def test_granularity_across_the_panel_is_measured_not_asserted(corpus, quality, 
     the chance rate the ceiling is justified against, and the coarsest judge is
     identified rather than assumed.
     """
-    directory, panel = _corpus(corpus, quality, archived_run2, archived_run3)
+    directory, panel = _corpus(corpus, quality, archived_run2, archived_run3, archived_run4)
     rates = {r["provider"]: r["granularity"]["multiple_of_five_rate"] for r in panel["providers"]}
     assert all(rate is not None for rate in rates.values()), "a rate of None is an unrecorded signal, not a zero"
 
@@ -635,8 +684,8 @@ def test_granularity_across_the_panel_is_measured_not_asserted(corpus, quality, 
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("corpus", ["current", "run3", "run2"])
-def test_the_exclusion_block_agrees_with_the_flag_list(corpus, quality, archived_run2, archived_run3):
+@pytest.mark.parametrize("corpus", ["current", "run4", "run3", "run2"])
+def test_the_exclusion_block_agrees_with_the_flag_list(corpus, quality, archived_run2, archived_run3, archived_run4):
     """The exclusion block is a function of who is flagged, on any panel.
 
     The old form asserted both columns unconditionally, which only held while
@@ -647,7 +696,7 @@ def test_the_exclusion_block_agrees_with_the_flag_list(corpus, quality, archived
     but only half-checked — and run 3 exercises the path where the honest output
     is a sentence instead of a column.
     """
-    panel = _corpus(corpus, quality, archived_run2, archived_run3)[1]
+    panel = _corpus(corpus, quality, archived_run2, archived_run3, archived_run4)[1]
     exclusion = panel["exclusion"]
     with_flagged, without_flagged = exclusion["with_flagged"], exclusion["without_flagged"]
 

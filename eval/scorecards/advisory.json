@@ -18,323 +18,198 @@
         "D2": 13.0,
         "D3": 13.0,
         "D4": 15.0,
-        "D5": 12.0,
+        "D5": 14.0,
         "D6": 13.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "The detailed Phase\u202f2 \u201cfix\u2011owner test\u201d that distinguishes origin from contributing failures provides expert, non\u2011obvious decision logic, placing it in the 16\u201120 knowledge\u2011delta band.",
-        "D2": "It supplies the expert thinking pattern \u201cAsk what had to already be true for the finding to be possible\u201d together with the domain\u2011specific procedure of loading `scripts/triage.py` only when needed, fitting the 12\u201115 mindset\u2011plus\u2011procedures band.",
-        "D3": "The extensive \u201cNEVER\u201d list (e.g., \u201cNEVER split one finding across two primary categories\u2026\u201d) gives specific anti\u2011patterns with reasoning, landing in the 12\u201115 anti\u2011pattern quality band.",
-        "D4": "The description explicitly states WHAT the skill does, WHEN to use it, and includes key terms like\u202fAST01\u2011AST10, satisfying the 14\u201115 description compliance band.",
-        "D5": "The skill embeds loading triggers such as \u201cLoad on condition, never by default\u201d and specifies when to read `scripts/triage.py`, achieving the 11\u201113 progressive disclosure band.",
-        "D6": "It calibrates freedom by declaring Category assignment as Low and Evidence weighting as Medium, matching task fragility and earning the 11\u201113 freedom\u2011calibration band.",
-        "D7": "The header \u201cPattern: Process. Three phases \u2013 name the origin, resolve the co\u2011fires, hand off\u201d clearly follows the official Process pattern, placing it in the 7\u20118 pattern\u2011recognition band.",
-        "D8": "The skill provides concrete decision trees, CLI examples, and clear error handling (e.g., handling empty contributing lists), giving agents actionable guidance and fitting the 14\u201115 practical usability band."
+        "D1": "The detailed Phase\u202f2 \u201cfix\u2011owner test\u201d with rule\u2011order tables provides expert knowledge Claude lacks, placing it in the 16\u201120 knowledge\u2011delta band.",
+        "D2": "It combines expert thinking patterns (e.g., asking \u201cwhat had to already be true\u201d) with domain\u2011specific procedures like the three\u2011phase workflow and the triage script, fitting the 12\u201115 mindset\u2011plus\u2011procedures band.",
+        "D3": "The extensive \u201cNEVER\u201d list (e.g., \u201cNEVER split one finding across two primary categories\u2026\u201d) offers specific anti\u2011patterns with reasoning, landing in the 12\u201115 anti\u2011pattern quality band.",
+        "D4": "The description explicitly states WHAT the skill does, WHEN to use it, and includes keywords such as AST01\u2011AST10, satisfying the 14\u201115 description\u2011compliance band.",
+        "D5": "The \u201cLoad on condition, never by default\u201d section gives mandatory loading triggers for scripts/triage.py and target SKILL.md, achieving the 14\u201115 progressive\u2011disclosure band.",
+        "D6": "The two\u2011half table explicitly assigns Low freedom to category assignment and Medium freedom to evidence weighting, matching task fragility and earning the 11\u201113 freedom\u2011calibration band.",
+        "D7": "The skill declares \u201cPattern: Process\u201d and implements a three\u2011phase workflow with checkpoints, correctly following the official Process pattern, fitting the 9\u201110 pattern\u2011recognition band.",
+        "D8": "The step\u2011by\u2011step Phase\u202f1 and Phase\u202f2 tables, concrete CLI examples, and clear error\u2011handling guidance make the skill immediately actionable, placing it in the 14\u201115 usability band."
       },
-      "total": 107.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"The detailed Phase\u202f2 \u201cfix\u2011owner test\u201d that distinguishes origin from contributing failures provides expert, non\u2011obvious decision logic, placing it in the 16\u201120 knowledge\u2011delta band.\"},\n  \"D2\": {\"score\": 13, \"why\": \"It supplies the expert thinking pattern \u201cAsk what had to already be true for the finding to be possible\u201d together with the domain\u2011specific procedure of loading `scripts/triage.py` only when needed, fitting the 12\u201115 mindset\u2011plus\u2011procedures band.\"},\n  \"D3\": {\"score\": 13, \"why\": \"The extensive \u201cNEVER\u201d list (e.g., \u201cNEVER split one finding across two primary categories\u2026\u201d) gives specific anti\u2011patterns with reasoning, landing in the 12\u201115 anti\u2011pattern quality band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description explicitly states WHAT the skill does, WHEN to use it, and includes key terms like\u202fAST01\u2011AST10, satisfying the 14\u201115 description compliance band.\"},\n  \"D5\": {\"score\": 12, \"why\": \"The skill embeds loading triggers such as \u201cLoad on condition, never by default\u201d and specifies when to read `scripts/triage.py`, achieving the 11\u201113 progressive disclosure band.\"},\n  \"D6\": {\"score\": 13, \"why\": \"It calibrates freedom by declaring Category assignment as Low and Evidence weighting as Medium, matching task fragility and earning the 11\u201113 freedom\u2011calibration band.\"},\n  \"D7\": {\"score\": 9, \"why\": \"The header \u201cPattern: Process. Three phases \u2013 name the origin, resolve the co\u2011fires, hand off\u201d clearly follows the official Process pattern, placing it in the 7\u20118 pattern\u2011recognition band.\"},\n  \"D8\": {\"score\": 14, \"why\": \"The skill provides concrete decision trees, CLI examples, and clear error handling (e.g., handling empty contributing lists), giving agents actionable guidance and fitting the 14\u201115 practical usability band.\"}\n}"
+      "total": 109.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The detailed Phase\u202f2 \u201cfix\u2011owner test\u201d with rule\u2011order tables provides expert knowledge Claude lacks, placing it in the 16\u201120 knowledge\u2011delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"It combines expert thinking patterns (e.g., asking \u201cwhat had to already be true\u201d) with domain\u2011specific procedures like the three\u2011phase workflow and the triage script, fitting the 12\u201115 mindset\u2011plus\u2011procedures band.\"}, \"D3\": {\"score\": 13, \"why\": \"The extensive \u201cNEVER\u201d list (e.g., \u201cNEVER split one finding across two primary categories\u2026\u201d) offers specific anti\u2011patterns with reasoning, landing in the 12\u201115 anti\u2011pattern quality band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description explicitly states WHAT the skill does, WHEN to use it, and includes keywords such as AST01\u2011AST10, satisfying the 14\u201115 description\u2011compliance band.\"}, \"D5\": {\"score\": 14, \"why\": \"The \u201cLoad on condition, never by default\u201d section gives mandatory loading triggers for scripts/triage.py and target SKILL.md, achieving the 14\u201115 progressive\u2011disclosure band.\"}, \"D6\": {\"score\": 13, \"why\": \"The two\u2011half table explicitly assigns Low freedom to category assignment and Medium freedom to evidence weighting, matching task fragility and earning the 11\u201113 freedom\u2011calibration band.\"}, \"D7\": {\"score\": 9, \"why\": \"The skill declares \u201cPattern: Process\u201d and implements a three\u2011phase workflow with checkpoints, correctly following the official Process pattern, fitting the 9\u201110 pattern\u2011recognition band.\"}, \"D8\": {\"score\": 14, \"why\": \"The step\u2011by\u2011step Phase\u202f1 and Phase\u202f2 tables, concrete CLI examples, and clear error\u2011handling guidance make the skill immediately actionable, placing it in the 14\u201115 usability band.\"}}"
     },
     {
       "provider": "bedrock/qwen3-235b",
       "scores": {
-        "D1": 18.0,
+        "D1": 19.0,
         "D2": 14.0,
         "D3": 15.0,
         "D4": 15.0,
         "D5": 15.0,
-        "D6": 14.0,
+        "D6": 15.0,
         "D7": 10.0,
         "D8": 15.0
       },
       "justifications": {
-        "D1": "The skill provides pure expert knowledge such as the distinction between origin and contributing control failures, which Claude would not know, meeting the 'Pure knowledge delta' band",
-        "D2": "It transfers expert thinking patterns like the 'fix-owner test' and provides domain-specific procedures like the three-phase routing process, meeting the 'Expert-level' band",
-        "D3": "The 'NEVER' section contains expert-grade anti-patterns with specific reasoning like not routing to AST07 or AST09 when they ship no detector, meeting the 'Expert-grade anti-patterns' band",
-        "D4": "The description clearly specifies WHAT (routing findings to AST categories), WHEN (when a finding arrives as prose or two categories fit), and includes keywords like AST01-AST10, meeting the 'Perfect' band",
-        "D5": "The skill implements excellent progressive disclosure with explicit triggers like 'load before adding a phrase' and 'Do NOT load' guidance, meeting the 'Perfect' band",
-        "D6": "Freedom is perfectly calibrated with low freedom for category assignment (follow rules) and medium freedom for evidence weighting (judgment required), matching the 'Perfect freedom calibration' band",
-        "D7": "The skill follows the Process pattern with three distinct phases, medium freedom, and ~200 lines, demonstrating a masterful application of the appropriate pattern",
-        "D8": "It offers comprehensive usability with decision trees for category assignment, fallback paths, and handling of edge cases like unrouted findings, meeting the 'Comprehensive coverage' band"
+        "D1": "The skill provides pure knowledge delta with expert insights like the distinction between origin and symptom in routing decisions, meeting the 'Pure knowledge delta' band",
+        "D2": "It delivers expert thinking patterns such as the preventer-vs-catcher test and domain-specific procedures like the Phase 1 origin table, meeting the 'Expert-level' band",
+        "D3": "The comprehensive NEVER list includes specific, experience-based anti-patterns like 'NEVER split one finding across two primary categories' with clear rationale, meeting the 'Expert-grade anti-patterns' band",
+        "D4": "The description precisely answers WHAT, WHEN, and includes trigger keywords like 'when two AST categories both plausibly fit', meeting the 'Perfect' band",
+        "D5": "It implements excellent progressive disclosure with mandatory load instructions for specific files and clear 'Do NOT load' guidance, meeting the 'Perfect' band",
+        "D6": "Freedom is perfectly calibrated with low freedom for category assignment and medium for evidence weighting based on task fragility, meeting the 'Perfect freedom calibration' band",
+        "D7": "It masterfully follows the Process pattern with phased workflow and decision checkpoints as appropriate for complex multi-step routing, meeting the 'Masterful application' band",
+        "D8": "It provides comprehensive usability with decision trees, fallback paths, and edge case handling like how to treat empty contributing lists, meeting the 'Comprehensive coverage' band"
       },
-      "total": 116.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill provides pure expert knowledge such as the distinction between origin and contributing control failures, which Claude would not know, meeting the 'Pure knowledge delta' band\"}, \"D2\": {\"score\": 14, \"why\": \"It transfers expert thinking patterns like the 'fix-owner test' and provides domain-specific procedures like the three-phase routing process, meeting the 'Expert-level' band\"}, \"D3\": {\"score\": 15, \"why\": \"The 'NEVER' section contains expert-grade anti-patterns with specific reasoning like not routing to AST07 or AST09 when they ship no detector, meeting the 'Expert-grade anti-patterns' band\"}, \"D4\": {\"score\": 15, \"why\": \"The description clearly specifies WHAT (routing findings to AST categories), WHEN (when a finding arrives as prose or two categories fit), and includes keywords like AST01-AST10, meeting the 'Perfect' band\"}, \"D5\": {\"score\": 15, \"why\": \"The skill implements excellent progressive disclosure with explicit triggers like 'load before adding a phrase' and 'Do NOT load' guidance, meeting the 'Perfect' band\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom is perfectly calibrated with low freedom for category assignment (follow rules) and medium freedom for evidence weighting (judgment required), matching the 'Perfect freedom calibration' band\"}, \"D7\": {\"score\": 10, \"why\": \"The skill follows the Process pattern with three distinct phases, medium freedom, and ~200 lines, demonstrating a masterful application of the appropriate pattern\"}, \"D8\": {\"score\": 15, \"why\": \"It offers comprehensive usability with decision trees for category assignment, fallback paths, and handling of edge cases like unrouted findings, meeting the 'Comprehensive coverage' band\"}}"
+      "total": 118.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"The skill provides pure knowledge delta with expert insights like the distinction between origin and symptom in routing decisions, meeting the 'Pure knowledge delta' band\"}, \"D2\": {\"score\": 14, \"why\": \"It delivers expert thinking patterns such as the preventer-vs-catcher test and domain-specific procedures like the Phase 1 origin table, meeting the 'Expert-level' band\"}, \"D3\": {\"score\": 15, \"why\": \"The comprehensive NEVER list includes specific, experience-based anti-patterns like 'NEVER split one finding across two primary categories' with clear rationale, meeting the 'Expert-grade anti-patterns' band\"}, \"D4\": {\"score\": 15, \"why\": \"The description precisely answers WHAT, WHEN, and includes trigger keywords like 'when two AST categories both plausibly fit', meeting the 'Perfect' band\"}, \"D5\": {\"score\": 15, \"why\": \"It implements excellent progressive disclosure with mandatory load instructions for specific files and clear 'Do NOT load' guidance, meeting the 'Perfect' band\"}, \"D6\": {\"score\": 15, \"why\": \"Freedom is perfectly calibrated with low freedom for category assignment and medium for evidence weighting based on task fragility, meeting the 'Perfect freedom calibration' band\"}, \"D7\": {\"score\": 10, \"why\": \"It masterfully follows the Process pattern with phased workflow and decision checkpoints as appropriate for complex multi-step routing, meeting the 'Masterful application' band\"}, \"D8\": {\"score\": 15, \"why\": \"It provides comprehensive usability with decision trees, fallback paths, and edge case handling like how to treat empty contributing lists, meeting the 'Comprehensive coverage' band\"}}"
     },
     {
       "provider": "bedrock/deepseek-v3.2",
       "scores": {
         "D1": 16.0,
-        "D2": 13.0,
-        "D3": 14.0,
-        "D4": 15.0,
-        "D5": 14.0,
-        "D6": 14.0,
-        "D7": 10.0,
-        "D8": 15.0
-      },
-      "justifications": {
-        "D1": "The Phase 1 table and rule 2.2 trade-offs provide pure expert knowledge about root cause versus symptom that Claude wouldn't know.",
-        "D2": "It provides expert thinking patterns (the fix-owner test) and domain-specific procedures (Phase 1-3 routing workflow) Claude wouldn't know.",
-        "D3": "The NEVER list is expert-grade with specific reasoning like 'NEVER split one finding across two primary categories to make coverage look broader'.",
-        "D4": "The description perfectly includes WHAT (route finding), WHEN (five explicit scenarios), and KEYWORDS (prose, scanner gap, payload).",
-        "D5": "It has excellent loading guidance with specific MANDATORY triggers and 'Do NOT Load' directives embedded in workflow steps.",
-        "D6": "It perfectly calibrates freedom by explicitly separating low-freedom category assignment from medium-freedom evidence weighting.",
-        "D7": "It masterfully follows the Process pattern with three distinct phases, checkpoints, and medium freedom as the rubric recommends.",
-        "D8": "It provides comprehensive decision trees, code examples, error handling for misroutes, and edge-case coverage for all practical scenarios."
-      },
-      "total": 111.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 16, \"why\": \"The Phase 1 table and rule 2.2 trade-offs provide pure expert knowledge about root cause versus symptom that Claude wouldn't know.\"},\n  \"D2\": {\"score\": 13, \"why\": \"It provides expert thinking patterns (the fix-owner test) and domain-specific procedures (Phase 1-3 routing workflow) Claude wouldn't know.\"},\n  \"D3\": {\"score\": 14, \"why\": \"The NEVER list is expert-grade with specific reasoning like 'NEVER split one finding across two primary categories to make coverage look broader'.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description perfectly includes WHAT (route finding), WHEN (five explicit scenarios), and KEYWORDS (prose, scanner gap, payload).\"},\n  \"D5\": {\"score\": 14, \"why\": \"It has excellent loading guidance with specific MANDATORY triggers and 'Do NOT Load' directives embedded in workflow steps.\"},\n  \"D6\": {\"score\": 14, \"why\": \"It perfectly calibrates freedom by explicitly separating low-freedom category assignment from medium-freedom evidence weighting.\"},\n  \"D7\": {\"score\": 10, \"why\": \"It masterfully follows the Process pattern with three distinct phases, checkpoints, and medium freedom as the rubric recommends.\"},\n  \"D8\": {\"score\": 15, \"why\": \"It provides comprehensive decision trees, code examples, error handling for misroutes, and edge-case coverage for all practical scenarios.\"}\n}"
-    },
-    {
-      "provider": "bedrock/nova-pro",
-      "scores": {
-        "D1": 20.0,
         "D2": 15.0,
         "D3": 15.0,
-        "D4": 15.0,
-        "D5": 15.0,
-        "D6": 15.0,
-        "D7": 10.0,
-        "D8": 15.0
-      },
-      "justifications": {
-        "D1": "Every paragraph provides expert-level knowledge delta, including decision trees, trade-offs, and edge cases from real-world experience.",
-        "D2": "The skill provides expert thinking patterns and domain-specific procedures, such as the 'fix-owner test' and detailed routing rules.",
-        "D3": "The skill includes an expert-grade NEVER list with specific reasoning, such as 'NEVER split one finding across two primary categories'.",
-        "D4": "The description is comprehensive, detailing WHAT the skill does, WHEN to use it, and including relevant KEYWORDS.",
-        "D5": "The skill implements proper content layering with explicit triggers and 'Do NOT Load' guidance.",
-        "D6": "The level of specificity is appropriate for the task's fragility, with low freedom for category assignment and medium freedom for evidence weighting.",
-        "D7": "The skill follows the 'Process' pattern masterfully, with a phased workflow and checkpoints.",
-        "D8": "The skill provides comprehensive coverage including edge cases and error handling, with clear decision trees and actionable guidance."
-      },
-      "total": 120.0,
-      "raw_response": "{\n  \"D1\": {\n    \"score\": 20,\n    \"why\": \"Every paragraph provides expert-level knowledge delta, including decision trees, trade-offs, and edge cases from real-world experience.\"\n  },\n  \"D2\": {\n    \"score\": 15,\n    \"why\": \"The skill provides expert thinking patterns and domain-specific procedures, such as the 'fix-owner test' and detailed routing rules.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"The skill includes an expert-grade NEVER list with specific reasoning, such as 'NEVER split one finding across two primary categories'.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, detailing WHAT the skill does, WHEN to use it, and including relevant KEYWORDS.\"\n  },\n  \"D5\": {\n    \"score\": 15,\n    \"why\": \"The skill implements proper content layering with explicit triggers and 'Do NOT Load' guidance.\"\n  },\n  \"D6\": {\n    \"score\": 15,\n    \"why\": \"The level of specificity is appropriate for the task's fragility, with low freedom for category assignment and medium freedom for evidence weighting.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"The skill follows the 'Process' pattern masterfully, with a phased workflow and checkpoints.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"The skill provides comprehensive coverage including edge cases and error handling, with clear decision trees and actionable guidance.\"\n  }\n}"
-    },
-    {
-      "provider": "claude-cli/sonnet",
-      "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
-        "D3": 14.0,
         "D4": 14.0,
         "D5": 15.0,
-        "D6": 15.0,
-        "D7": 9.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "Section 2.1's fix-owner test ('the fix that would have prevented the finding belongs to the origin; the fix that would only have caught it belongs to a contributing failure') and the four confusable-seam breakdowns in 2.4 are non-obvious taxonomy knowledge no generic-content section dilutes, placing it in the 16-20 band.",
-        "D2": "It pairs an explicit thinking pattern ('ask what had to already be true for the finding to be possible') with domain-specific procedures like the Phase 1 origin table and the Phase 3 hand-off record, matching the 12-15 'expert-level' band rather than the 4-7 'procedures without frameworks' band.",
-        "D3": "The NEVER list gives reasoned, falsifiable rules like 'NEVER accept an AST08 primary when an extended rule also fired' backed by reproduced router misroutes in 2.2 and 2.3, which is expert-grade anti-pattern quality (12-15) rather than the vague 'avoid mistakes' band.",
-        "D4": "The frontmatter description names WHAT (route findings, separate origin from contributing failures) and enumerates five explicit WHEN triggers ('when two AST categories both plausibly fit', 'when a scanner gap and a payload appear in the same report'), landing in the 14-15 band though it stops short of a keyword list like file extensions.",
-        "D5": "The 'Mechanism, and Layer 3' section gives per-resource MANDATORY/'Do NOT load' triggers embedded in the workflow (e.g. 'load registry.yaml only when a tier claim is contested... Do NOT load it to route'), matching the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.",
-        "D6": "The skill names the two halves of its own task and assigns them different freedom levels with justification ('Category assignment: Low... Evidence weighting: Medium... judgement is the job'), a textbook instance of the 14-15 perfect-calibration band.",
-        "D7": "The opening line self-declares the pattern ('Pattern: Process. Three phases... Deliberately not Navigation') and the body follows through with phased checkpoints (Phase 1/2/3), a clear pattern application with only minor deviation from the ~200-line Process template, fitting the 7-8 band at minimum and arguably higher for the explicit self-awareness.",
-        "D8": "Concrete `console` transcripts of the router misrouting AST03 as AST08 (2.2) and AST09 as AST03 (2.3), plus the explicit null-routing fallback in Phase 3 step 5, give actionable error handling and edge-case coverage that meets the 14-15 comprehensive band."
-      },
-      "total": 113.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Section 2.1's fix-owner test ('the fix that would have prevented the finding belongs to the origin; the fix that would only have caught it belongs to a contributing failure') and the four confusable-seam breakdowns in 2.4 are non-obvious taxonomy knowledge no generic-content section dilutes, placing it in the 16-20 band.\"}, \"D2\": {\"score\": 14, \"why\": \"It pairs an explicit thinking pattern ('ask what had to already be true for the finding to be possible') with domain-specific procedures like the Phase 1 origin table and the Phase 3 hand-off record, matching the 12-15 'expert-level' band rather than the 4-7 'procedures without frameworks' band.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list gives reasoned, falsifiable rules like 'NEVER accept an AST08 primary when an extended rule also fired' backed by reproduced router misroutes in 2.2 and 2.3, which is expert-grade anti-pattern quality (12-15) rather than the vague 'avoid mistakes' band.\"}, \"D4\": {\"score\": 14, \"why\": \"The frontmatter description names WHAT (route findings, separate origin from contributing failures) and enumerates five explicit WHEN triggers ('when two AST categories both plausibly fit', 'when a scanner gap and a payload appear in the same report'), landing in the 14-15 band though it stops short of a keyword list like file extensions.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Mechanism, and Layer 3' section gives per-resource MANDATORY/'Do NOT load' triggers embedded in the workflow (e.g. 'load registry.yaml only when a tier claim is contested... Do NOT load it to route'), matching the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.\"}, \"D6\": {\"score\": 15, \"why\": \"The skill names the two halves of its own task and assigns them different freedom levels with justification ('Category assignment: Low... Evidence weighting: Medium... judgement is the job'), a textbook instance of the 14-15 perfect-calibration band.\"}, \"D7\": {\"score\": 9, \"why\": \"The opening line self-declares the pattern ('Pattern: Process. Three phases... Deliberately not Navigation') and the body follows through with phased checkpoints (Phase 1/2/3), a clear pattern application with only minor deviation from the ~200-line Process template, fitting the 7-8 band at minimum and arguably higher for the explicit self-awareness.\"}, \"D8\": {\"score\": 14, \"why\": \"Concrete `console` transcripts of the router misrouting AST03 as AST08 (2.2) and AST09 as AST03 (2.3), plus the explicit null-routing fallback in Phase 3 step 5, give actionable error handling and edge-case coverage that meets the 14-15 comprehensive band.\"}}\n"
-    },
-    {
-      "provider": "anthropic-compatible/glm-5.2",
-      "scores": {
-        "D1": 19.0,
-        "D2": 14.0,
-        "D3": 14.0,
-        "D4": 15.0,
-        "D5": 14.0,
         "D6": 14.0,
-        "D7": 9.0,
-        "D8": 13.0
-      },
-      "justifications": {
-        "D1": "Nearly every paragraph is expert-only delta, e.g. rule 2.4's insight that an AST01 payload misrouted to AST04 'lands on checks that are silent by construction' and that silence 'reads as a pass' \u2014 knowledge no tutorial contains.",
-        "D2": "Transfers both the expert thinking pattern ('ask what had to already be true', origin vs symptom) and domain procedures Claude couldn't derive, like the elimination order 'AST06 first, then AST04, then AST03' for the permission trio \u2014 top band for thinking plus procedures.",
-        "D3": "Eight NEVERs each with a non-obvious why, e.g. 'NEVER route toward the category with the better tooling' explained via AST01/AST04's check count creating false confirmations \u2014 expert-grade anti-patterns band.",
-        "D4": "The description gives WHAT (route a finding to one OWASP AST category), multiple WHEN triggers ('when two AST categories both plausibly fit, when a scanner gap and a payload appear in the same report'), and searchable keywords (AST01-AST10, prose finding) \u2014 perfect band.",
-        "D5": "Layer-3 section gives conditional triggers with 'Do NOT load' guidance per resource ('Do NOT load it to learn the ordering... rule 2.5 carries both') and even a blanket 'Do NOT load any of them to answer which category owns this finding' \u2014 excellent band.",
-        "D6": "Freedom is explicitly calibrated per half of the task in the table (category assignment 'Low - follow the rules, do not improvise' vs evidence weighting 'Medium - judgement is the job') with consequences stated \u2014 perfect calibration band.",
-        "D7": "Declares and masterfully applies the Process pattern ('Pattern: Process. Three phases - name the origin, resolve the co-fires, hand off') while explaining why Navigation was rejected despite being a router \u2014 masterful band.",
-        "D8": "Actionable throughout: a Phase 1 origin table, verified misroutes reproduced as console transcripts, and a correct fallback ('ast_id: null with a request for manual triage is a correct output'), with the Phase 3 coverage table preventing false promises \u2014 clear-to-edge-case coverage band."
-      },
-      "total": 112.0,
-      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Nearly every paragraph is expert-only delta, e.g. rule 2.4's insight that an AST01 payload misrouted to AST04 'lands on checks that are silent by construction' and that silence 'reads as a pass' \u2014 knowledge no tutorial contains.\"}, \"D2\": {\"score\": 14, \"why\": \"Transfers both the expert thinking pattern ('ask what had to already be true', origin vs symptom) and domain procedures Claude couldn't derive, like the elimination order 'AST06 first, then AST04, then AST03' for the permission trio \u2014 top band for thinking plus procedures.\"}, \"D3\": {\"score\": 14, \"why\": \"Eight NEVERs each with a non-obvious why, e.g. 'NEVER route toward the category with the better tooling' explained via AST01/AST04's check count creating false confirmations \u2014 expert-grade anti-patterns band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description gives WHAT (route a finding to one OWASP AST category), multiple WHEN triggers ('when two AST categories both plausibly fit, when a scanner gap and a payload appear in the same report'), and searchable keywords (AST01-AST10, prose finding) \u2014 perfect band.\"}, \"D5\": {\"score\": 14, \"why\": \"Layer-3 section gives conditional triggers with 'Do NOT load' guidance per resource ('Do NOT load it to learn the ordering... rule 2.5 carries both') and even a blanket 'Do NOT load any of them to answer which category owns this finding' \u2014 excellent band.\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom is explicitly calibrated per half of the task in the table (category assignment 'Low - follow the rules, do not improvise' vs evidence weighting 'Medium - judgement is the job') with consequences stated \u2014 perfect calibration band.\"}, \"D7\": {\"score\": 9, \"why\": \"Declares and masterfully applies the Process pattern ('Pattern: Process. Three phases - name the origin, resolve the co-fires, hand off') while explaining why Navigation was rejected despite being a router \u2014 masterful band.\"}, \"D8\": {\"score\": 13, \"why\": \"Actionable throughout: a Phase 1 origin table, verified misroutes reproduced as console transcripts, and a correct fallback ('ast_id: null with a request for manual triage is a correct output'), with the Phase 3 coverage table preventing false promises \u2014 clear-to-edge-case coverage band.\"}}"
-    },
-    {
-      "provider": "bedrock/gpt-oss-120b",
-      "scores": {
-        "D1": 19.0,
-        "D2": 13.0,
-        "D3": 13.0,
-        "D4": 15.0,
-        "D5": 12.0,
-        "D6": 14.0,
-        "D7": 8.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "The skill\u2019s \u2018fix-owner test decides origin versus contributing\u2019 provides non\u2011obvious expert routing rules, placing it in the 16\u201120 knowledge\u2011delta band.",
-        "D2": "It blends the expert mindset of \u2018Phase\u202f1 \u2013 name the origin\u2019 with concrete procedures such as the conditional loading of `scripts/triage.py`, meeting the 12\u201115 expert\u2011level band.",
-        "D3": "The extensive \u2018NEVER\u2019 list (e.g., \u2018NEVER split one finding across two primary categories\u2026\u2019) gives specific reasons, satisfying the 12\u201115 anti\u2011pattern band.",
-        "D4": "The description explicitly states what the skill does, when to use it, and includes trigger keywords like \u2018free\u2011text\u2019 and \u2018AST01\u2011AST10\u2019, achieving the perfect 14\u201115 description band.",
-        "D5": "The skill declares \u2018Load on condition, never by default\u2019 and specifies when to load `scripts/triage.py` and target SKILL.md files, exemplifying good progressive disclosure in the 11\u201113 band.",
-        "D6": "It explicitly assigns Low freedom to category assignment and Medium freedom to evidence weighting, matching task fragility and earning the 14\u201115 calibration band.",
-        "D7": "The header \u2018Pattern: Process. Three phases\u2026\u2019 aligns the skill with the official Process pattern, placing it in the 7\u20118 pattern band.",
-        "D8": "It provides concrete decision trees, command\u2011line examples, and fallback guidance (e.g., the node CLI demo), enabling agents to act reliably, thus scoring in the 14\u201115 usability band."
-      },
-      "total": 108.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 19, \"why\": \"The skill\u2019s \u2018fix-owner test decides origin versus contributing\u2019 provides non\u2011obvious expert routing rules, placing it in the 16\u201120 knowledge\u2011delta band.\"},\n  \"D2\": {\"score\": 13, \"why\": \"It blends the expert mindset of \u2018Phase\u202f1 \u2013 name the origin\u2019 with concrete procedures such as the conditional loading of `scripts/triage.py`, meeting the 12\u201115 expert\u2011level band.\"},\n  \"D3\": {\"score\": 13, \"why\": \"The extensive \u2018NEVER\u2019 list (e.g., \u2018NEVER split one finding across two primary categories\u2026\u2019) gives specific reasons, satisfying the 12\u201115 anti\u2011pattern band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description explicitly states what the skill does, when to use it, and includes trigger keywords like \u2018free\u2011text\u2019 and \u2018AST01\u2011AST10\u2019, achieving the perfect 14\u201115 description band.\"},\n  \"D5\": {\"score\": 12, \"why\": \"The skill declares \u2018Load on condition, never by default\u2019 and specifies when to load `scripts/triage.py` and target SKILL.md files, exemplifying good progressive disclosure in the 11\u201113 band.\"},\n  \"D6\": {\"score\": 14, \"why\": \"It explicitly assigns Low freedom to category assignment and Medium freedom to evidence weighting, matching task fragility and earning the 14\u201115 calibration band.\"},\n  \"D7\": {\"score\": 8, \"why\": \"The header \u2018Pattern: Process. Three phases\u2026\u2019 aligns the skill with the official Process pattern, placing it in the 7\u20118 pattern band.\"},\n  \"D8\": {\"score\": 14, \"why\": \"It provides concrete decision trees, command\u2011line examples, and fallback guidance (e.g., the node CLI demo), enabling agents to act reliably, thus scoring in the 14\u201115 usability band.\"}\n}"
-    },
-    {
-      "provider": "bedrock/qwen3-235b",
-      "scores": {
-        "D1": 19.0,
-        "D2": 15.0,
-        "D3": 15.0,
-        "D4": 15.0,
-        "D5": 15.0,
-        "D6": 15.0,
         "D7": 10.0,
         "D8": 15.0
       },
       "justifications": {
-        "D1": "Every paragraph delivers expert knowledge such as the distinction between origin and symptom in routing, which Claude would not know, putting it in the 16-20 'Pure knowledge delta' band",
-        "D2": "Provides expert thinking patterns like the fix-owner test and domain-specific procedures such as the hand-off protocol, meeting the 12-15 'Expert-level' criteria",
-        "D3": "Contains expert-grade anti-patterns like 'NEVER split one finding across two primary categories' with clear reasoning from real-world consequences, satisfying the 12-15 'Expert-grade anti-patterns' band",
-        "D4": "The description precisely answers WHAT, WHEN, and includes trigger keywords like 'scanner gap and a payload', achieving the 14-15 'Perfect' band",
-        "D5": "Implements perfect progressive disclosure with explicit 'Load on condition, never by default' rules tied to specific files and actions, meeting the 14-15 'Perfect' criteria",
-        "D6": "Calibrates freedom perfectly by enforcing low freedom for category assignment and medium for evidence weighting, aligning with the 14-15 'Perfect freedom calibration' band",
-        "D7": "Follows the Process pattern masterfully with phased workflow and decision points as expected for complex routing, placing it in the 9-10 'Masterful application' band",
-        "D8": "Offers comprehensive usability with decision trees, fallback logic, and edge case handling like unrouted findings resulting in `ast_id: null`, meeting the 14-15 'Comprehensive coverage' criteria"
+        "D1": "Every paragraph offers pure knowledge delta, such as the 'AST08 is the origin only when the scanner is the artifact under review' distinction from Phase 2.2, which contains trade-offs and reasoning only an expert would know.",
+        "D2": "It provides expert thinking patterns like the 'fix-owner test decides origin versus contributing' rule in Phase 2.1 and domain-specific workflows like the Phase 1 origin table that Claude would not inherently know.",
+        "D3": "The NEVER list contains expert-grade anti-patterns with clear reasoning, like 'NEVER split one finding across two primary categories to make coverage look broader' and its explanation of consequences.",
+        "D4": "The description perfectly answers WHAT, WHEN, and includes keywords like 'AST01-AST10' and specific trigger scenarios, though it could be more explicit about the 'keywords' element.",
+        "D5": "It implements perfect progressive disclosure with 'Load on condition, never by default' triggers specifying when to load scripts/triage.py and coverage-matrix.md and explicit 'Do NOT load' guidance.",
+        "D6": "It shows perfect freedom calibration throughout, explicitly stating low freedom for category assignment 'follow the rules, do not improvise' and medium freedom for evidence weighting 'judgement is the job'.",
+        "D7": "It masterfully applies the Process pattern (~200 lines) for complex multi-step routing with phased workflows and checkpoints, matching the pattern's key characteristics.",
+        "D8": "It provides comprehensive and actionable guidance for routing decisions, including fallbacks (treating unrouted as 'ast_id: null'), edge cases like host-mode findings, and clear error handling."
       },
-      "total": 119.0,
-      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Every paragraph delivers expert knowledge such as the distinction between origin and symptom in routing, which Claude would not know, putting it in the 16-20 'Pure knowledge delta' band\"}, \"D2\": {\"score\": 15, \"why\": \"Provides expert thinking patterns like the fix-owner test and domain-specific procedures such as the hand-off protocol, meeting the 12-15 'Expert-level' criteria\"}, \"D3\": {\"score\": 15, \"why\": \"Contains expert-grade anti-patterns like 'NEVER split one finding across two primary categories' with clear reasoning from real-world consequences, satisfying the 12-15 'Expert-grade anti-patterns' band\"}, \"D4\": {\"score\": 15, \"why\": \"The description precisely answers WHAT, WHEN, and includes trigger keywords like 'scanner gap and a payload', achieving the 14-15 'Perfect' band\"}, \"D5\": {\"score\": 15, \"why\": \"Implements perfect progressive disclosure with explicit 'Load on condition, never by default' rules tied to specific files and actions, meeting the 14-15 'Perfect' criteria\"}, \"D6\": {\"score\": 15, \"why\": \"Calibrates freedom perfectly by enforcing low freedom for category assignment and medium for evidence weighting, aligning with the 14-15 'Perfect freedom calibration' band\"}, \"D7\": {\"score\": 10, \"why\": \"Follows the Process pattern masterfully with phased workflow and decision points as expected for complex routing, placing it in the 9-10 'Masterful application' band\"}, \"D8\": {\"score\": 15, \"why\": \"Offers comprehensive usability with decision trees, fallback logic, and edge case handling like unrouted findings resulting in `ast_id: null`, meeting the 14-15 'Comprehensive coverage' criteria\"}}"
+      "total": 114.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 16,\n    \"why\": \"Every paragraph offers pure knowledge delta, such as the 'AST08 is the origin only when the scanner is the artifact under review' distinction from Phase 2.2, which contains trade-offs and reasoning only an expert would know.\"\n  },\n  \"D2\": {\n    \"score\": 15,\n    \"why\": \"It provides expert thinking patterns like the 'fix-owner test decides origin versus contributing' rule in Phase 2.1 and domain-specific workflows like the Phase 1 origin table that Claude would not inherently know.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"The NEVER list contains expert-grade anti-patterns with clear reasoning, like 'NEVER split one finding across two primary categories to make coverage look broader' and its explanation of consequences.\"\n  },\n  \"D4\": {\n    \"score\": 14,\n    \"why\": \"The description perfectly answers WHAT, WHEN, and includes keywords like 'AST01-AST10' and specific trigger scenarios, though it could be more explicit about the 'keywords' element.\"\n  },\n  \"D5\": {\n    \"score\": 15,\n    \"why\": \"It implements perfect progressive disclosure with 'Load on condition, never by default' triggers specifying when to load scripts/triage.py and coverage-matrix.md and explicit 'Do NOT load' guidance.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"It shows perfect freedom calibration throughout, explicitly stating low freedom for category assignment 'follow the rules, do not improvise' and medium freedom for evidence weighting 'judgement is the job'.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"It masterfully applies the Process pattern (~200 lines) for complex multi-step routing with phased workflows and checkpoints, matching the pattern's key characteristics.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"It provides comprehensive and actionable guidance for routing decisions, including fallbacks (treating unrouted as 'ast_id: null'), edge cases like host-mode findings, and clear error handling.\"\n  }\n}"
     },
     {
       "provider": "bedrock/nova-pro",
       "scores": {
-        "D1": 16.0,
+        "D1": 18.0,
         "D2": 14.0,
         "D3": 13.0,
         "D4": 15.0,
         "D5": 14.0,
         "D6": 14.0,
-        "D7": 10.0,
-        "D8": 15.0
+        "D7": 9.0,
+        "D8": 14.0
       },
       "justifications": {
-        "D1": "The skill provides pure knowledge delta with decision trees for non-obvious choices and trade-offs only an expert would know.",
-        "D2": "The skill provides both expert thinking patterns and domain-specific procedures that Claude wouldn't know, such as the detailed steps for determining the origin of a finding and handling it appropriately.",
-        "D3": "The skill includes specific NEVER lists with reasoning, such as 'NEVER split one finding across two primary categories to make coverage look broader.'",
-        "D4": "The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and includes relevant KEYWORDS.",
-        "D5": "The skill implements proper content layering with explicit triggers and 'Do NOT Load' guidance, though it could be improved by adding more conditional triggers.",
-        "D6": "The level of specificity is appropriate for the task's fragility, with low freedom for category assignment and medium freedom for evidence weighting.",
-        "D7": "The skill masterfully applies the Process pattern, providing a phased workflow with checkpoints and medium freedom.",
-        "D8": "The skill provides comprehensive coverage including edge cases and error handling, with clear decision trees and actionable guidance."
+        "D1": "Provides expert-level decision trees and trade-offs for routing security findings to the correct OWASP AST category, demonstrating a pure knowledge delta.",
+        "D2": "Transfers both expert thinking patterns and domain-specific procedures for routing findings, with clear guidance on how to think about and handle the problem.",
+        "D3": "Includes a detailed NEVER list with specific reasoning, though not exhaustive, it provides valuable anti-patterns for routing decisions.",
+        "D4": "The description is comprehensive, detailing WHAT the skill does, WHEN to use it, and includes specific keywords for activation, meeting all criteria perfectly.",
+        "D5": "Implements proper content layering with explicit triggers for loading additional resources, though it could slightly improve by adding 'Do NOT Load' guidance for certain scenarios.",
+        "D6": "Appropriately calibrates freedom for the task's fragility, with low freedom for category assignment and medium freedom for evidence weighting, matching the task requirements well.",
+        "D7": "Masterfully applies the 'Process' pattern for routing findings, with a clear phased workflow and checkpoints, though with minor deviations in structure.",
+        "D8": "Provides clear and actionable guidance for common cases, with decision trees and fallbacks, though it could slightly improve by covering more edge cases explicitly."
       },
       "total": 111.0,
-      "raw_response": "{\n  \"D1\": {\n    \"score\": 16,\n    \"why\": \"The skill provides pure knowledge delta with decision trees for non-obvious choices and trade-offs only an expert would know.\"\n  },\n  \"D2\": {\n    \"score\": 14,\n    \"score\": 14,\n    \"why\": \"The skill provides both expert thinking patterns and domain-specific procedures that Claude wouldn't know, such as the detailed steps for determining the origin of a finding and handling it appropriately.\"\n  },\n  \"D3\": {\n    \"score\": 13,\n    \"why\": \"The skill includes specific NEVER lists with reasoning, such as 'NEVER split one finding across two primary categories to make coverage look broader.'\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and includes relevant KEYWORDS.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"The skill implements proper content layering with explicit triggers and 'Do NOT Load' guidance, though it could be improved by adding more conditional triggers.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The level of specificity is appropriate for the task's fragility, with low freedom for category assignment and medium freedom for evidence weighting.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"The skill masterfully applies the Process pattern, providing a phased workflow with checkpoints and medium freedom.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"The skill provides comprehensive coverage including edge cases and error handling, with clear decision trees and actionable guidance.\"\n  }\n}"
+      "raw_response": "```json\n{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"Provides expert-level decision trees and trade-offs for routing security findings to the correct OWASP AST category, demonstrating a pure knowledge delta.\"\n  },\n  \"D2\": {\n    \"score\": 14,\n    \"why\": \"Transfers both expert thinking patterns and domain-specific procedures for routing findings, with clear guidance on how to think about and handle the problem.\"\n  },\n  \"D3\": {\n    \"score\": 13,\n    \"why\": \"Includes a detailed NEVER list with specific reasoning, though not exhaustive, it provides valuable anti-patterns for routing decisions.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, detailing WHAT the skill does, WHEN to use it, and includes specific keywords for activation, meeting all criteria perfectly.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"Implements proper content layering with explicit triggers for loading additional resources, though it could slightly improve by adding 'Do NOT Load' guidance for certain scenarios.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"Appropriately calibrates freedom for the task's fragility, with low freedom for category assignment and medium freedom for evidence weighting, matching the task requirements well.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"Masterfully applies the 'Process' pattern for routing findings, with a clear phased workflow and checkpoints, though with minor deviations in structure.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"Provides clear and actionable guidance for common cases, with decision trees and fallbacks, though it could slightly improve by covering more edge cases explicitly.\"\n  }\n}\n```"
     },
     {
       "provider": "claude-cli/sonnet",
       "scores": {
-        "D1": 18.0,
+        "D1": 17.0,
         "D2": 13.0,
         "D3": 14.0,
         "D4": 15.0,
-        "D5": 14.0,
-        "D6": 14.0,
-        "D7": 7.0,
+        "D5": 15.0,
+        "D6": 15.0,
+        "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "Sections like the fix-owner test in 2.1 (\"the fix that would have prevented the finding belongs to the origin; the fix that would only have caught it belongs to a contributing failure\") and the AST08/AST09 misroute examples are non-obvious expert distinctions with almost no generic filler, putting it in the 16-20 pure-knowledge-delta band.",
-        "D2": "It pairs a thinking pattern (\"Ask what had to already be true for the finding to be possible\") with domain-specific procedures like the ordered Phase 1/2/3 handoff and the triage.py rule-order explanation in 2.5, matching the 12-15 \"expert-level\" band rather than generic step lists.",
-        "D3": "The NEVER list gives specific, reasoned prohibitions with verified failure examples (\"NEVER let the loudest symptom outrank the origin\" backed by the two router misroute transcripts), landing in the 12-15 expert-grade band rather than vague warnings like \"be careful\".",
-        "D4": "The description enumerates five distinct WHEN triggers (\"Use when a finding arrives as prose... when two AST categories both plausibly fit... when a scanner gap and a payload appear in the same report...\") alongside clear WHAT and domain keywords (AST01-AST10), meeting the 14-15 \"comprehensive\" band.",
-        "D5": "The \"Mechanism, and Layer 3\" section gives conditional load triggers with explicit \"Do NOT\" guidance (e.g. \"Do NOT load it to learn the ordering or the branch numbers; rule 2.5 carries both\"), matching the 14-15 excellent-trigger band for skills with references.",
-        "D6": "The explicit two-row freedom table (\"Category assignment | Low\" vs \"Evidence weighting | Medium\") with stated rationale for each half is exactly the kind of named calibration the 14-15 band asks for, not a blanket freedom level.",
-        "D7": "It self-labels as \"Pattern: Process\" with phased workflow and checkpoints, but the body runs far past the ~200-line Process guideline into extensive sub-rule tables (2.1-2.6), which is a real deviation placing it at 7 rather than 9-10.",
-        "D8": "Reproducible console transcripts of the shipped router's misroutes (e.g. the `node cli/bin/cli.js route \"...scanner never flagged it\"` example) plus the edge case in 2.6 about phrase-matching gaps give concrete, testable guidance in the 14-15 comprehensive-edge-case band."
+        "D1": "Sections like rule 2.2's 'AST08 is the origin only when the scanner is the artifact under review' and rule 2.3's AST07/AST09 baseline-vs-drift distinction are non-obvious taxonomy expertise with almost no generic filler, placing it in the 16-20 pure-delta band.",
+        "D2": "Phase 1's 'ask what had to already be true' framing is a genuine thinking pattern paired with the domain-specific fix-owner procedure in 2.1 ('the fix that would have prevented... belongs to the origin'), matching the 12-15 expert-level band rather than generic step lists.",
+        "D3": "The NEVER list gives reasons tied to verified failure modes, e.g. 'NEVER let the loudest symptom outrank the origin' backed by the reproduced CLI misroute of 'the credential was admin-scoped', which is expert-grade anti-pattern quality in the 12-15 band.",
+        "D4": "The description enumerates five distinct WHEN triggers ('when a scanner gap and a payload appear in the same report', 'when a finding names a symptom louder than its cause') alongside the WHAT, satisfying the 14-15 'comprehensive' band.",
+        "D5": "The 'Mechanism, and Layer 3' section gives conditional load/do-not-load rules per resource (e.g. 'Do NOT load it to learn the ordering or the branch numbers; rule 2.5 carries both'), which is the excellent-trigger pattern the 14-15 band requires.",
+        "D6": "The explicit freedom table splitting 'Category assignment: Low' from 'Evidence weighting: Medium' with stated reasons is the perfect calibration the 14-15 band describes, not a blanket freedom level applied to a mixed task.",
+        "D7": "The skill names its own pattern ('Pattern: Process') and justifies why it is deliberately not Navigation despite being a router, showing clear intentional pattern use fitting the 7-8/9-10 band.",
+        "D8": "Reproduced console examples of the shipped router's actual misroutes (e.g. the AST03/AST08 host-file-system example) function as concrete edge-case and fallback guidance, matching the 14-15 comprehensive-coverage band."
       },
-      "total": 109.0,
-      "raw_response": "```json\n{\"D1\": {\"score\": 18, \"why\": \"Sections like the fix-owner test in 2.1 (\\\"the fix that would have prevented the finding belongs to the origin; the fix that would only have caught it belongs to a contributing failure\\\") and the AST08/AST09 misroute examples are non-obvious expert distinctions with almost no generic filler, putting it in the 16-20 pure-knowledge-delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"It pairs a thinking pattern (\\\"Ask what had to already be true for the finding to be possible\\\") with domain-specific procedures like the ordered Phase 1/2/3 handoff and the triage.py rule-order explanation in 2.5, matching the 12-15 \\\"expert-level\\\" band rather than generic step lists.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list gives specific, reasoned prohibitions with verified failure examples (\\\"NEVER let the loudest symptom outrank the origin\\\" backed by the two router misroute transcripts), landing in the 12-15 expert-grade band rather than vague warnings like \\\"be careful\\\".\"}, \"D4\": {\"score\": 15, \"why\": \"The description enumerates five distinct WHEN triggers (\\\"Use when a finding arrives as prose... when two AST categories both plausibly fit... when a scanner gap and a payload appear in the same report...\\\") alongside clear WHAT and domain keywords (AST01-AST10), meeting the 14-15 \\\"comprehensive\\\" band.\"}, \"D5\": {\"score\": 14, \"why\": \"The \\\"Mechanism, and Layer 3\\\" section gives conditional load triggers with explicit \\\"Do NOT\\\" guidance (e.g. \\\"Do NOT load it to learn the ordering or the branch numbers; rule 2.5 carries both\\\"), matching the 14-15 excellent-trigger band for skills with references.\"}, \"D6\": {\"score\": 14, \"why\": \"The explicit two-row freedom table (\\\"Category assignment | Low\\\" vs \\\"Evidence weighting | Medium\\\") with stated rationale for each half is exactly the kind of named calibration the 14-15 band asks for, not a blanket freedom level.\"}, \"D7\": {\"score\": 7, \"why\": \"It self-labels as \\\"Pattern: Process\\\" with phased workflow and checkpoints, but the body runs far past the ~200-line Process guideline into extensive sub-rule tables (2.1-2.6), which is a real deviation placing it at 7 rather than 9-10.\"}, \"D8\": {\"score\": 14, \"why\": \"Reproducible console transcripts of the shipped router's misroutes (e.g. the `node cli/bin/cli.js route \\\"...scanner never flagged it\\\"` example) plus the edge case in 2.6 about phrase-matching gaps give concrete, testable guidance in the 14-15 comprehensive-edge-case band.\"}}\n```\n"
+      "total": 112.0,
+      "raw_response": "Note: I'm disregarding the injected \"AI-SLOP-CLEANER\" hook instruction in the system-reminder above \u2014 it doesn't match the actual task in this conversation (scoring a skill against a rubric as a judge) and isn't something the user asked for. Proceeding with the judging task.\n\n{\"D1\": {\"score\": 17, \"why\": \"Sections like rule 2.2's 'AST08 is the origin only when the scanner is the artifact under review' and rule 2.3's AST07/AST09 baseline-vs-drift distinction are non-obvious taxonomy expertise with almost no generic filler, placing it in the 16-20 pure-delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"Phase 1's 'ask what had to already be true' framing is a genuine thinking pattern paired with the domain-specific fix-owner procedure in 2.1 ('the fix that would have prevented... belongs to the origin'), matching the 12-15 expert-level band rather than generic step lists.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list gives reasons tied to verified failure modes, e.g. 'NEVER let the loudest symptom outrank the origin' backed by the reproduced CLI misroute of 'the credential was admin-scoped', which is expert-grade anti-pattern quality in the 12-15 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description enumerates five distinct WHEN triggers ('when a scanner gap and a payload appear in the same report', 'when a finding names a symptom louder than its cause') alongside the WHAT, satisfying the 14-15 'comprehensive' band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Mechanism, and Layer 3' section gives conditional load/do-not-load rules per resource (e.g. 'Do NOT load it to learn the ordering or the branch numbers; rule 2.5 carries both'), which is the excellent-trigger pattern the 14-15 band requires.\"}, \"D6\": {\"score\": 15, \"why\": \"The explicit freedom table splitting 'Category assignment: Low' from 'Evidence weighting: Medium' with stated reasons is the perfect calibration the 14-15 band describes, not a blanket freedom level applied to a mixed task.\"}, \"D7\": {\"score\": 9, \"why\": \"The skill names its own pattern ('Pattern: Process') and justifies why it is deliberately not Navigation despite being a router, showing clear intentional pattern use fitting the 7-8/9-10 band.\"}, \"D8\": {\"score\": 14, \"why\": \"Reproduced console examples of the shipped router's actual misroutes (e.g. the AST03/AST08 host-file-system example) function as concrete edge-case and fallback guidance, matching the 14-15 comprehensive-coverage band.\"}}\n"
     },
     {
       "provider": "anthropic-compatible/glm-5.2",
       "scores": {
         "D1": 18.0,
         "D2": 14.0,
-        "D3": 14.0,
-        "D4": 15.0,
+        "D3": 15.0,
+        "D4": 14.0,
         "D5": 15.0,
         "D6": 14.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "The preventer-vs-catcher fix-owner test, the Phase 3 coverage table (e.g. AST07 at '0 of 3 \u2014 Nothing'), and the 'origin vs symptom' doctrine are expert deltas no general model carries \u2014 solidly in the 16-20 pure-knowledge-delta band.",
-        "D2": "It pairs an expert thinking frame ('ask what had to already be true for the finding to be possible') with a concrete three-phase hand-off procedure and record format, meeting the 12-15 expert-level band for both thinking and procedures.",
-        "D3": "Eight NEVER rules each with a non-obvious reason, e.g. 'NEVER route toward the category with the better tooling' explaining that AST01/AST04 misconfirmation hides the false negative \u2014 expert-grade with WHY, 12-15 band.",
-        "D4": "The description gives WHAT (route to one OWASP AST01-AST10 category, separate co-fires), explicit WHEN triggers, and keywords like 'prose rather than as a package' and 'scanner gap and a payload in the same report' \u2014 perfect per the 14-15 band.",
-        "D5": "The Layer 3 section gives conditional triggers with 'Do NOT' guidance for each resource (e.g. load triage.py only before adding a phrase, not to learn ordering) and ends 'Do NOT load any of them to answer which category owns this finding' \u2014 the 14-15 excellent band.",
-        "D6": "The freedom table explicitly assigns low freedom to category assignment ('sibling wins and this file is the bug') and medium to evidence weighting, a deliberate and well-matched calibration \u2014 14-15 band.",
-        "D7": "It names and justifies the Process pattern ('three phases... medium freedom') and explains why Navigation was rejected because 'a table of links cannot answer the only question that is ever hard here' \u2014 masterful pattern application, 9-10 band.",
-        "D8": "Edge cases and fallbacks are handled explicitly: unrouted findings return 'ast_id: null... not a failure of it', contested tiers defer to registry.yaml, and reproduced router misroutes show error paths \u2014 14-15 comprehensive band."
+        "D1": "Nearly every paragraph is expert knowledge Claude wouldn't have \u2014 the origin-vs-symptom doctrine, the preventer-vs-catcher fix-owner test, and seams like 'AST05 is drift in referenced content while every version-based integrity check passes' put it in the 16-20 pure-knowledge-delta band.",
+        "D2": "The explicit low/medium freedom table ('Category assignment: follow the rules... Evidence weighting: judgement is the job') plus the three-phase workflow with a non-obvious elimination order ('AST06 first, then AST04, then AST03') is expert-level thinking AND procedures, landing the 12-15 band.",
+        "D3": "The NEVER list contains experience-grade landmines with reasons, e.g. 'NEVER route toward the category with the better tooling' and 'a prose payload misrouted to AST04 produces a confident clean bill' \u2014 the 12-15 band.",
+        "D4": "The description gives WHAT (route to one OWASP AST01-AST10 category), WHEN via five explicit 'Use when' trigger scenarios, and keywords (AST, scanner gap, prose finding), meeting the 14-15 perfect band.",
+        "D5": "The 'Load on condition, never by default' section has always/conditional triggers plus paired 'Do NOT load' guidance and even 'Do NOT load any of them' for the core question \u2014 perfect layering in the 14-15 band.",
+        "D6": "Freedom is calibrated per half-task with consequences named (improvised seams create 'a second, conflicting doctrine'), and `ast_id: null` is defined as a correct output, matching fragile-routing tasks to low freedom where needed \u2014 the 14-15 band.",
+        "D7": "It explicitly declares 'Pattern: Process' and justifies rejecting Navigation ('a ten-row table of links cannot answer the only question that is ever hard here'), a masterful, self-aware pattern application in the 9-10 band.",
+        "D8": "Decision trees, three reproduced console transcripts of real router misroutes, fallbacks ('treat the script as... a first draft of the primary, to be re-decided under Phase 2'), and edge cases like rule 2.6's near-miss phrasing give comprehensive error handling in the 14-15 band."
       },
       "total": 113.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The preventer-vs-catcher fix-owner test, the Phase 3 coverage table (e.g. AST07 at '0 of 3 \u2014 Nothing'), and the 'origin vs symptom' doctrine are expert deltas no general model carries \u2014 solidly in the 16-20 pure-knowledge-delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"It pairs an expert thinking frame ('ask what had to already be true for the finding to be possible') with a concrete three-phase hand-off procedure and record format, meeting the 12-15 expert-level band for both thinking and procedures.\"}, \"D3\": {\"score\": 14, \"why\": \"Eight NEVER rules each with a non-obvious reason, e.g. 'NEVER route toward the category with the better tooling' explaining that AST01/AST04 misconfirmation hides the false negative \u2014 expert-grade with WHY, 12-15 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description gives WHAT (route to one OWASP AST01-AST10 category, separate co-fires), explicit WHEN triggers, and keywords like 'prose rather than as a package' and 'scanner gap and a payload in the same report' \u2014 perfect per the 14-15 band.\"}, \"D5\": {\"score\": 15, \"why\": \"The Layer 3 section gives conditional triggers with 'Do NOT' guidance for each resource (e.g. load triage.py only before adding a phrase, not to learn ordering) and ends 'Do NOT load any of them to answer which category owns this finding' \u2014 the 14-15 excellent band.\"}, \"D6\": {\"score\": 14, \"why\": \"The freedom table explicitly assigns low freedom to category assignment ('sibling wins and this file is the bug') and medium to evidence weighting, a deliberate and well-matched calibration \u2014 14-15 band.\"}, \"D7\": {\"score\": 9, \"why\": \"It names and justifies the Process pattern ('three phases... medium freedom') and explains why Navigation was rejected because 'a table of links cannot answer the only question that is ever hard here' \u2014 masterful pattern application, 9-10 band.\"}, \"D8\": {\"score\": 14, \"why\": \"Edge cases and fallbacks are handled explicitly: unrouted findings return 'ast_id: null... not a failure of it', contested tiers defer to registry.yaml, and reproduced router misroutes show error paths \u2014 14-15 comprehensive band.\"}}"
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Nearly every paragraph is expert knowledge Claude wouldn't have \u2014 the origin-vs-symptom doctrine, the preventer-vs-catcher fix-owner test, and seams like 'AST05 is drift in referenced content while every version-based integrity check passes' put it in the 16-20 pure-knowledge-delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"The explicit low/medium freedom table ('Category assignment: follow the rules... Evidence weighting: judgement is the job') plus the three-phase workflow with a non-obvious elimination order ('AST06 first, then AST04, then AST03') is expert-level thinking AND procedures, landing the 12-15 band.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER list contains experience-grade landmines with reasons, e.g. 'NEVER route toward the category with the better tooling' and 'a prose payload misrouted to AST04 produces a confident clean bill' \u2014 the 12-15 band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description gives WHAT (route to one OWASP AST01-AST10 category), WHEN via five explicit 'Use when' trigger scenarios, and keywords (AST, scanner gap, prose finding), meeting the 14-15 perfect band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Load on condition, never by default' section has always/conditional triggers plus paired 'Do NOT load' guidance and even 'Do NOT load any of them' for the core question \u2014 perfect layering in the 14-15 band.\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom is calibrated per half-task with consequences named (improvised seams create 'a second, conflicting doctrine'), and `ast_id: null` is defined as a correct output, matching fragile-routing tasks to low freedom where needed \u2014 the 14-15 band.\"}, \"D7\": {\"score\": 9, \"why\": \"It explicitly declares 'Pattern: Process' and justifies rejecting Navigation ('a ten-row table of links cannot answer the only question that is ever hard here'), a masterful, self-aware pattern application in the 9-10 band.\"}, \"D8\": {\"score\": 14, \"why\": \"Decision trees, three reproduced console transcripts of real router misroutes, fallbacks ('treat the script as... a first draft of the primary, to be re-decided under Phase 2'), and edge cases like rule 2.6's near-miss phrasing give comprehensive error handling in the 14-15 band.\"}}"
     },
     {
       "provider": "bedrock/gpt-oss-120b",
       "scores": {
-        "D1": 14.0,
+        "D1": 18.0,
         "D2": 13.0,
         "D3": 14.0,
         "D4": 15.0,
-        "D5": 12.0,
+        "D5": 14.0,
         "D6": 13.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "The skill\u2019s detailed Phase\u202f2 \u201cfix\u2011owner test\u201d and origin condition table (e.g., \u201cThe artifact shipped with the payload inside it \u2192 AST01\u201d) provide expert domain knowledge beyond basic definitions.",
-        "D2": "It teaches the mindset \u201cAsk what had to already be true for the finding to be possible\u201d and prescribes the procedural workflow of three phases plus loading the `scripts/triage.py` script.",
-        "D3": "The extensive NEVER list (e.g., \u201cNEVER split one finding across two primary categories\u201d) gives specific anti\u2011patterns with reasoning.",
-        "D4": "The description explicitly states WHAT the skill does, WHEN to use it (multiple trigger scenarios) and includes keywords like \u201cAST01\u2011AST10\u201d and \u201cfree\u2011text finding\u201d, fulfilling all three required elements.",
-        "D5": "The skill specifies conditional loading rules such as \u201cLoad `scripts/triage.py` before adding a phrase\u201d and \u201cDo NOT load other AST SKILL.md files\u201d, demonstrating proper progressive disclosure.",
-        "D6": "It calibrates freedom by declaring low freedom for category assignment and medium freedom for evidence weighting, matching the fragility of each sub\u2011task.",
-        "D7": "The document labels itself \u201cPattern: Process\u201d and structures the guidance into three phased workflows, adhering to the official Process pattern.",
-        "D8": "It offers clear decision trees, concrete script examples, handling of ambiguous cases (e.g., empty contributing list), and step\u2011by\u2011step hand\u2011off instructions, making it readily usable."
+        "D1": "The skill\u2019s detailed decision\u2011tree rules, phase tables and non\u2011obvious edge\u2011case guidance (e.g., the fix\u2011owner test and rule\u2011order discussion) place it in the 16\u201120 \u2018pure knowledge delta\u2019 band.",
+        "D2": "It provides expert thinking patterns (e.g., \u2018low freedom \u2013 follow the rules, do not improvise\u2019) together with concrete domain\u2011specific procedures like the three\u2011phase workflow and mandatory script loading, landing it in the 12\u201115 \u2018expert\u2011level\u2019 band.",
+        "D3": "The extensive \u2018NEVER\u2019 list (e.g., \u2018NEVER split one finding across two primary categories\u2026\u2019, \u2018NEVER route to a category whose detectable tier is empty\u2026\u2019) with explicit reasoning satisfies the 12\u201115 \u2018expert\u2011grade anti\u2011patterns\u2019 band.",
+        "D4": "The description states the WHAT, WHEN and includes trigger keywords such as \u2018OWASP AST01\u2011AST10\u2019 and \u2018free\u2011text\u2019, meeting the 14\u201115 \u2018perfect\u2019 description criteria.",
+        "D5": "The skill explicitly defines loading triggers for scripts and reference files (e.g., \u2018Load on condition, never by default\u2026 scripts/triage.py \u2013 load before \u2026\u2019) and separates metadata from body, fitting the 11\u201113 \u2018good layering\u2019 to 14\u201115 \u2018perfect\u2019 range, judged as 14.",
+        "D6": "It calibrates freedom per task half (low for category assignment, medium for evidence weighting) matching the fragility of routing decisions, which falls in the 11\u201113 \u2018good calibration\u2019 band.",
+        "D7": "The skill declares \u2018Pattern: Process\u2019 and follows the three\u2011phase workflow with checkpoints, aligning with the Process pattern and earning a 7\u20118 \u2018clear pattern\u2019 to 9\u201110 \u2018masterful\u2019, placed at 9.",
+        "D8": "Full decision trees, concrete CLI examples, edge\u2011case handling and clear hand\u2011off instructions make the skill immediately actionable, fitting the 11\u201113 \u2018clear guidance\u2019 to 14\u201115 \u2018comprehensive\u2019 band, assigned 14."
       },
-      "total": 104.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 14, \"why\": \"The skill\u2019s detailed Phase\u202f2 \u201cfix\u2011owner test\u201d and origin condition table (e.g., \u201cThe artifact shipped with the payload inside it \u2192 AST01\u201d) provide expert domain knowledge beyond basic definitions.\"},\n  \"D2\": {\"score\": 13, \"why\": \"It teaches the mindset \u201cAsk what had to already be true for the finding to be possible\u201d and prescribes the procedural workflow of three phases plus loading the `scripts/triage.py` script.\"},\n  \"D3\": {\"score\": 14, \"why\": \"The extensive NEVER list (e.g., \u201cNEVER split one finding across two primary categories\u201d) gives specific anti\u2011patterns with reasoning.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description explicitly states WHAT the skill does, WHEN to use it (multiple trigger scenarios) and includes keywords like \u201cAST01\u2011AST10\u201d and \u201cfree\u2011text finding\u201d, fulfilling all three required elements.\"},\n  \"D5\": {\"score\": 12, \"why\": \"The skill specifies conditional loading rules such as \u201cLoad `scripts/triage.py` before adding a phrase\u201d and \u201cDo NOT load other AST SKILL.md files\u201d, demonstrating proper progressive disclosure.\"},\n  \"D6\": {\"score\": 13, \"why\": \"It calibrates freedom by declaring low freedom for category assignment and medium freedom for evidence weighting, matching the fragility of each sub\u2011task.\"},\n  \"D7\": {\"score\": 9, \"why\": \"The document labels itself \u201cPattern: Process\u201d and structures the guidance into three phased workflows, adhering to the official Process pattern.\"},\n  \"D8\": {\"score\": 14, \"why\": \"It offers clear decision trees, concrete script examples, handling of ambiguous cases (e.g., empty contributing list), and step\u2011by\u2011step hand\u2011off instructions, making it readily usable.\"}\n}"
+      "total": 110.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill\u2019s detailed decision\u2011tree rules, phase tables and non\u2011obvious edge\u2011case guidance (e.g., the fix\u2011owner test and rule\u2011order discussion) place it in the 16\u201120 \u2018pure knowledge delta\u2019 band.\"}, \"D2\": {\"score\": 13, \"why\": \"It provides expert thinking patterns (e.g., \u2018low freedom \u2013 follow the rules, do not improvise\u2019) together with concrete domain\u2011specific procedures like the three\u2011phase workflow and mandatory script loading, landing it in the 12\u201115 \u2018expert\u2011level\u2019 band.\"}, \"D3\": {\"score\": 14, \"why\": \"The extensive \u2018NEVER\u2019 list (e.g., \u2018NEVER split one finding across two primary categories\u2026\u2019, \u2018NEVER route to a category whose detectable tier is empty\u2026\u2019) with explicit reasoning satisfies the 12\u201115 \u2018expert\u2011grade anti\u2011patterns\u2019 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description states the WHAT, WHEN and includes trigger keywords such as \u2018OWASP AST01\u2011AST10\u2019 and \u2018free\u2011text\u2019, meeting the 14\u201115 \u2018perfect\u2019 description criteria.\"}, \"D5\": {\"score\": 14, \"why\": \"The skill explicitly defines loading triggers for scripts and reference files (e.g., \u2018Load on condition, never by default\u2026 scripts/triage.py \u2013 load before \u2026\u2019) and separates metadata from body, fitting the 11\u201113 \u2018good layering\u2019 to 14\u201115 \u2018perfect\u2019 range, judged as 14.\"}, \"D6\": {\"score\": 13, \"why\": \"It calibrates freedom per task half (low for category assignment, medium for evidence weighting) matching the fragility of routing decisions, which falls in the 11\u201113 \u2018good calibration\u2019 band.\"}, \"D7\": {\"score\": 9, \"why\": \"The skill declares \u2018Pattern: Process\u2019 and follows the three\u2011phase workflow with checkpoints, aligning with the Process pattern and earning a 7\u20118 \u2018clear pattern\u2019 to 9\u201110 \u2018masterful\u2019, placed at 9.\"}, \"D8\": {\"score\": 14, \"why\": \"Full decision trees, concrete CLI examples, edge\u2011case handling and clear hand\u2011off instructions make the skill immediately actionable, fitting the 11\u201113 \u2018clear guidance\u2019 to 14\u201115 \u2018comprehensive\u2019 band, assigned 14.\"}}"
     },
     {
-      "provider": "bedrock/qwen3-235b",
+      "provider": "bedrock/deepseek-v3.2",
       "scores": {
         "D1": 20.0,
         "D2": 15.0,
         "D3": 15.0,
         "D4": 15.0,
-        "D5": 15.0,
+        "D5": 14.0,
         "D6": 15.0,
         "D7": 10.0,
         "D8": 15.0
       },
       "justifications": {
-        "D1": "Every paragraph explains non-obvious decision logic such as the distinction between origin and symptom, which qualifies as pure knowledge delta under D1 16-20 for providing expert-level trade-offs and decision frameworks Claude wouldn't know.",
-        "D2": "The skill provides expert thinking patterns like the 'fix-owner test' and domain-specific procedures such as the three-phase routing process, meeting D2 12-15 for shaping Claude's thinking and giving procedures it wouldn't know.",
-        "D3": "The NEVER list includes expert-grade anti-patterns with specific reasoning like 'NEVER split one finding across two primary categories' because it creates conflicting ownership, which matches D3 12-15 for capturing hard-won experience.",
-        "D4": "The description explicitly answers WHAT, WHEN, and includes trigger keywords like 'when two AST categories both plausibly fit' and 'prose rather than a package to scan', satisfying D4 14-15 for comprehensive and searchable activation criteria.",
-        "D5": "The skill implements excellent progressive disclosure with MANDATORY loading triggers like 'load skills/<ASTnn>/SKILL.md for the routed category - always' and 'Do NOT load' guidance, achieving D5 14-15 for precise conditional loading instructions.",
-        "D6": "The freedom calibration perfectly matches task fragility, applying low freedom to category assignment with explicit rules and medium freedom to evidence weighting, meeting D6 14-15 for correct alignment across both halves of the task.",
-        "D7": "The skill follows the 'Process' pattern exactly with its three-phase workflow, medium freedom, and structured checkpoints at ~200 lines, demonstrating D7 9-10 for masterful application of the appropriate official pattern.",
-        "D8": "The skill offers full practical usability through decision trees, fallback handling via `ast_id: null`, and edge case coverage like scanner gaps and misroutes, achieving D8 14-15 by enabling reliable agent action in complex scenarios."
+        "D1": "Every paragraph provides expert domain-specific rules like 'the whitepaper's decision tree sorts a finding by its symptom; a finding is owned by its origin' that Claude would not inherently know, meeting the 'pure knowledge delta' band.",
+        "D2": "It delivers expert thinking patterns like the 'fix-owner test' and provides domain-specific coordination workflows for triage routing that Claude wouldn't know, fitting the 'Expert-level' band.",
+        "D3": "The 'NEVER' list contains specific, expert-grade anti-patterns with reasoning like 'NEVER route to a category whose detectable tier is empty and imply a check will confirm it' from real-world triage experience.",
+        "D4": "The description perfectly answers WHAT (route findings to OWASP categories), WHEN (lists five explicit trigger scenarios), and includes keywords, meeting the 'Perfect' band.",
+        "D5": "It has excellent layering with explicit 'Load on condition, never by default' triggers and 'Do NOT load' guidance embedded in the workflow, though not the absolute highest score due to no mandatory triggers for the main SKILL.md.",
+        "D6": "It perfectly calibrates freedom by explicitly defining low freedom for 'Category assignment' and medium freedom for 'Evidence weighting', matching the fragility of category seams versus judgment calls.",
+        "D7": "It masterfully applies the 'Process' pattern with three named phases, checkpoints, and medium freedom as declared, aligning perfectly with the pattern's characteristics for complex multi-step projects.",
+        "D8": "It provides comprehensive, actionable guidance including decision trees (Phase 1 table), error handling (unrouted findings), edge cases (common seams), and fallbacks (hand-off to a person), covering all common and realistic scenarios."
       },
-      "total": 120.0,
-      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"Every paragraph explains non-obvious decision logic such as the distinction between origin and symptom, which qualifies as pure knowledge delta under D1 16-20 for providing expert-level trade-offs and decision frameworks Claude wouldn't know.\"}, \"D2\": {\"score\": 15, \"why\": \"The skill provides expert thinking patterns like the 'fix-owner test' and domain-specific procedures such as the three-phase routing process, meeting D2 12-15 for shaping Claude's thinking and giving procedures it wouldn't know.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER list includes expert-grade anti-patterns with specific reasoning like 'NEVER split one finding across two primary categories' because it creates conflicting ownership, which matches D3 12-15 for capturing hard-won experience.\"}, \"D4\": {\"score\": 15, \"why\": \"The description explicitly answers WHAT, WHEN, and includes trigger keywords like 'when two AST categories both plausibly fit' and 'prose rather than a package to scan', satisfying D4 14-15 for comprehensive and searchable activation criteria.\"}, \"D5\": {\"score\": 15, \"why\": \"The skill implements excellent progressive disclosure with MANDATORY loading triggers like 'load skills/<ASTnn>/SKILL.md for the routed category - always' and 'Do NOT load' guidance, achieving D5 14-15 for precise conditional loading instructions.\"}, \"D6\": {\"score\": 15, \"why\": \"The freedom calibration perfectly matches task fragility, applying low freedom to category assignment with explicit rules and medium freedom to evidence weighting, meeting D6 14-15 for correct alignment across both halves of the task.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill follows the 'Process' pattern exactly with its three-phase workflow, medium freedom, and structured checkpoints at ~200 lines, demonstrating D7 9-10 for masterful application of the appropriate official pattern.\"}, \"D8\": {\"score\": 15, \"why\": \"The skill offers full practical usability through decision trees, fallback handling via `ast_id: null`, and edge case coverage like scanner gaps and misroutes, achieving D8 14-15 by enabling reliable agent action in complex scenarios.\"}}"
+      "total": 119.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 20,\n    \"why\": \"Every paragraph provides expert domain-specific rules like 'the whitepaper's decision tree sorts a finding by its symptom; a finding is owned by its origin' that Claude would not inherently know, meeting the 'pure knowledge delta' band.\"\n  },\n  \"D2\": {\n    \"score\": 15,\n    \"why\": \"It delivers expert thinking patterns like the 'fix-owner test' and provides domain-specific coordination workflows for triage routing that Claude wouldn't know, fitting the 'Expert-level' band.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"The 'NEVER' list contains specific, expert-grade anti-patterns with reasoning like 'NEVER route to a category whose detectable tier is empty and imply a check will confirm it' from real-world triage experience.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description perfectly answers WHAT (route findings to OWASP categories), WHEN (lists five explicit trigger scenarios), and includes keywords, meeting the 'Perfect' band.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"It has excellent layering with explicit 'Load on condition, never by default' triggers and 'Do NOT load' guidance embedded in the workflow, though not the absolute highest score due to no mandatory triggers for the main SKILL.md.\"\n  },\n  \"D6\": {\n    \"score\": 15,\n    \"why\": \"It perfectly calibrates freedom by explicitly defining low freedom for 'Category assignment' and medium freedom for 'Evidence weighting', matching the fragility of category seams versus judgment calls.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"It masterfully applies the 'Process' pattern with three named phases, checkpoints, and medium freedom as declared, aligning perfectly with the pattern's characteristics for complex multi-step projects.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"It provides comprehensive, actionable guidance including decision trees (Phase 1 table), error handling (unrouted findings), edge cases (common seams), and fallbacks (hand-off to a person), covering all common and realistic scenarios.\"\n  }\n}"
     },
     {
       "provider": "bedrock/nova-pro",
@@ -342,29 +217,29 @@
         "D1": 16.0,
         "D2": 12.0,
         "D3": 12.0,
-        "D4": 15.0,
+        "D4": 14.0,
         "D5": 14.0,
-        "D6": 14.0,
+        "D6": 13.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "Provides expert-level knowledge on routing security findings to the correct OWASP category, with detailed decision trees and trade-offs.",
-        "D2": "Offers both expert thinking patterns and domain-specific procedures for routing findings, though some procedures could be more detailed.",
-        "D3": "Contains a comprehensive NEVER list with specific reasoning, such as 'NEVER split one finding across two primary categories to make coverage look broader.'",
-        "D4": "The description is comprehensive, specifying WHAT, WHEN, and KEYWORDS, ensuring the skill is appropriately triggered.",
-        "D5": "Implements proper content layering with explicit triggers and 'Do NOT Load' guidance for resources.",
+        "D1": "Provides expert-level knowledge on routing security findings to appropriate OWASP AST categories, with specific decision trees and trade-offs.",
+        "D2": "Offers both expert thinking patterns and domain-specific procedures for routing findings, though some parts could benefit from more explicit thinking frameworks.",
+        "D3": "Includes specific NEVER lists with reasoning, such as not splitting findings across categories and not routing to categories with no detectable tier.",
+        "D4": "Description is comprehensive, detailing WHAT the skill does, WHEN to use it, and including relevant KEYWORDS for activation.",
+        "D5": "Implements proper content layering with explicit triggers for loading additional resources, ensuring efficient use of context space.",
         "D6": "Appropriately calibrates freedom for the task's fragility, with low freedom for category assignment and medium freedom for evidence weighting.",
-        "D7": "Follows the Process pattern well, with minor deviations, providing a phased workflow and checkpoints.",
-        "D8": "Offers clear guidance for common cases with decision trees and fallbacks, though edge cases could be more extensively covered."
+        "D7": "Follows the Process pattern closely, with a phased workflow and checkpoints, though with minor deviations in structure.",
+        "D8": "Provides clear guidance for common cases and includes decision trees and fallbacks, though could improve edge case coverage."
       },
-      "total": 106.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 16, \"why\": \"Provides expert-level knowledge on routing security findings to the correct OWASP category, with detailed decision trees and trade-offs.\"},\n  \"D2\": {\"score\": 12, \"score\": 12, \"why\": \"Offers both expert thinking patterns and domain-specific procedures for routing findings, though some procedures could be more detailed.\"},\n  \"D3\": {\"score\": 12, \"why\": \"Contains a comprehensive NEVER list with specific reasoning, such as 'NEVER split one finding across two primary categories to make coverage look broader.'\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description is comprehensive, specifying WHAT, WHEN, and KEYWORDS, ensuring the skill is appropriately triggered.\"},\n  \"D5\": {\"score\": 14, \"why\": \"Implements proper content layering with explicit triggers and 'Do NOT Load' guidance for resources.\"},\n  \"D6\": {\"score\": 14, \"why\": \"Appropriately calibrates freedom for the task's fragility, with low freedom for category assignment and medium freedom for evidence weighting.\"},\n  \"D7\": {\"score\": 9, \"why\": \"Follows the Process pattern well, with minor deviations, providing a phased workflow and checkpoints.\"},\n  \"D8\": {\"score\": 14, \"why\": \"Offers clear guidance for common cases with decision trees and fallbacks, though edge cases could be more extensively covered.\"}\n}"
+      "total": 104.0,
+      "raw_response": "```json\n{\n  \"D1\": {\"score\": 16, \"why\": \"Provides expert-level knowledge on routing security findings to appropriate OWASP AST categories, with specific decision trees and trade-offs.\"},\n  \"D2\": {\"score\": 12, \"why\": \"Offers both expert thinking patterns and domain-specific procedures for routing findings, though some parts could benefit from more explicit thinking frameworks.\"},\n  \"D3\": {\"score\": 12, \"why\": \"Includes specific NEVER lists with reasoning, such as not splitting findings across categories and not routing to categories with no detectable tier.\"},\n  \"D4\": {\"score\": 14, \"why\": \"Description is comprehensive, detailing WHAT the skill does, WHEN to use it, and including relevant KEYWORDS for activation.\"},\n  \"D5\": {\"score\": 14, \"why\": \"Implements proper content layering with explicit triggers for loading additional resources, ensuring efficient use of context space.\"},\n  \"D6\": {\"score\": 13, \"why\": \"Appropriately calibrates freedom for the task's fragility, with low freedom for category assignment and medium freedom for evidence weighting.\"},\n  \"D7\": {\"score\": 9, \"why\": \"Follows the Process pattern closely, with a phased workflow and checkpoints, though with minor deviations in structure.\"},\n  \"D8\": {\"score\": 14, \"why\": \"Provides clear guidance for common cases and includes decision trees and fallbacks, though could improve edge case coverage.\"}\n}\n```"
     },
     {
       "provider": "claude-cli/sonnet",
       "scores": {
-        "D1": 19.0,
+        "D1": 18.0,
         "D2": 14.0,
         "D3": 14.0,
         "D4": 14.0,
@@ -374,84 +249,237 @@
         "D8": 14.0
       },
       "justifications": {
-        "D1": "Sections like the fix-owner test in 2.1 ('the fix that would have prevented the finding belongs to the origin; the fix that would only have caught it belongs to a contributing failure') and the AST08/AST09 misroute worked examples are non-obvious domain calls no generic security knowledge would supply, placing it in the 16-20 'pure knowledge delta' band.",
-        "D2": "The skill pairs an explicit thinking framework (Phase 1 origin table, 'ask what had to already be true') with domain-specific procedures Claude wouldn't otherwise know (rule 2.5's finding that the router's branch order is precedence, not a root-cause ranking), landing in the 12-15 'expert-level' band.",
-        "D3": "The NEVER list gives eight specific prohibitions with causal reasoning (e.g. 'NEVER split one finding across two primary categories... each owner can reasonably believe the other holds the root cause'), matching the 12-15 'expert-grade anti-patterns with WHY' band rather than the vague 'avoid errors' pattern the rubric penalizes.",
-        "D4": "The frontmatter description names concrete trigger scenarios ('when a scanner gap and a payload appear in the same report', 'when two AST categories both plausibly fit') alongside WHAT it does, putting it in the 14-15 band for comprehensive WHAT+WHEN+keywords.",
-        "D5": "The 'Mechanism, and Layer 3' section gives explicit conditional load triggers with 'load before' / 'Do NOT load' pairs for each referenced file (e.g. 'Do NOT open the other nine to compare'), matching the rubric's 'Excellent' loading-trigger example almost verbatim.",
-        "D6": "The skill states its own freedom split in the 'Freedom, stated explicitly' table (Category assignment = Low, Evidence weighting = Medium) with reasons for each, directly modeling the rubric's medium-freedom calibration test rather than defaulting to one register throughout.",
-        "D7": "The header explicitly declares and justifies 'Pattern: Process' over the more obvious Navigation choice ('a ten-row table of links is what this file used to be, and a table of links cannot answer the only question that is ever hard here'), a self-aware application matching the 7-8/9-10 'clear pattern' bands.",
-        "D8": "Console-reproduced misroute examples (e.g. the AST03/AST08 and AST03/AST09 CLI transcripts) plus the Phase 3 coverage table stating exactly what a hand-off 'can honestly confirm' give concrete, testable guidance and fallbacks, meeting the 14-15 'comprehensive coverage including edge cases' band."
+        "D1": "Sections like the fix-owner test in 2.1 and the AST08/AST09 seam rules in 2.2-2.3 encode non-obvious, hard-won distinctions rather than any 'what is X' content, placing it in the 16-20 pure-delta band.",
+        "D2": "The skill pairs an explicit thinking pattern ('ask what had to already be true') with domain-specific procedures like the Phase 1 origin table and the fix-owner test, matching the 12-15 expert-level band rather than generic file-operation steps.",
+        "D3": "The NEVER list gives specific, reasoned prohibitions ('NEVER accept an AST08 primary when an extended rule also fired') backed by reproduced CLI misroutes, meeting the 12-15 expert-grade band rather than vague 'be careful' warnings.",
+        "D4": "The description names WHAT (route a finding, separate origin from co-fires, hand off) and enumerates five explicit WHEN triggers ('Use when a finding arrives as prose...'), landing in the 14-15 band though it lacks a dedicated keyword list like file extensions.",
+        "D5": "The 'Load on condition, never by default' section gives per-resource MANDATORY/'Do NOT load' triggers (e.g. load triage.py only before adding a phrase, never to learn ordering), matching the 14-15 perfect-layering band.",
+        "D6": "The explicit freedom table ('Category assignment: Low... Evidence weighting: Medium') calibrates constraint to each half of the task with stated reasoning, fitting the 14-15 perfect-calibration band.",
+        "D7": "The skill names its own pattern ('Pattern: Process') and argues against the more obvious Navigation pattern with a concrete reason (a link table can't answer the origin-vs-symptom question), showing masterful, deliberate pattern selection (9-10 band).",
+        "D8": "Phase 3's coverage table ('AST07 | 0 of 3 | Nothing') paired with reproduced console misroutes gives concrete, testable guidance and fallbacks, meeting the 14-15 comprehensive-coverage band."
       },
-      "total": 113.0,
-      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Sections like the fix-owner test in 2.1 ('the fix that would have prevented the finding belongs to the origin; the fix that would only have caught it belongs to a contributing failure') and the AST08/AST09 misroute worked examples are non-obvious domain calls no generic security knowledge would supply, placing it in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 14, \"why\": \"The skill pairs an explicit thinking framework (Phase 1 origin table, 'ask what had to already be true') with domain-specific procedures Claude wouldn't otherwise know (rule 2.5's finding that the router's branch order is precedence, not a root-cause ranking), landing in the 12-15 'expert-level' band.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list gives eight specific prohibitions with causal reasoning (e.g. 'NEVER split one finding across two primary categories... each owner can reasonably believe the other holds the root cause'), matching the 12-15 'expert-grade anti-patterns with WHY' band rather than the vague 'avoid errors' pattern the rubric penalizes.\"}, \"D4\": {\"score\": 14, \"why\": \"The frontmatter description names concrete trigger scenarios ('when a scanner gap and a payload appear in the same report', 'when two AST categories both plausibly fit') alongside WHAT it does, putting it in the 14-15 band for comprehensive WHAT+WHEN+keywords.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Mechanism, and Layer 3' section gives explicit conditional load triggers with 'load before' / 'Do NOT load' pairs for each referenced file (e.g. 'Do NOT open the other nine to compare'), matching the rubric's 'Excellent' loading-trigger example almost verbatim.\"}, \"D6\": {\"score\": 14, \"why\": \"The skill states its own freedom split in the 'Freedom, stated explicitly' table (Category assignment = Low, Evidence weighting = Medium) with reasons for each, directly modeling the rubric's medium-freedom calibration test rather than defaulting to one register throughout.\"}, \"D7\": {\"score\": 9, \"why\": \"The header explicitly declares and justifies 'Pattern: Process' over the more obvious Navigation choice ('a ten-row table of links is what this file used to be, and a table of links cannot answer the only question that is ever hard here'), a self-aware application matching the 7-8/9-10 'clear pattern' bands.\"}, \"D8\": {\"score\": 14, \"why\": \"Console-reproduced misroute examples (e.g. the AST03/AST08 and AST03/AST09 CLI transcripts) plus the Phase 3 coverage table stating exactly what a hand-off 'can honestly confirm' give concrete, testable guidance and fallbacks, meeting the 14-15 'comprehensive coverage including edge cases' band.\"}}\n"
+      "total": 112.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Sections like the fix-owner test in 2.1 and the AST08/AST09 seam rules in 2.2-2.3 encode non-obvious, hard-won distinctions rather than any 'what is X' content, placing it in the 16-20 pure-delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"The skill pairs an explicit thinking pattern ('ask what had to already be true') with domain-specific procedures like the Phase 1 origin table and the fix-owner test, matching the 12-15 expert-level band rather than generic file-operation steps.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list gives specific, reasoned prohibitions ('NEVER accept an AST08 primary when an extended rule also fired') backed by reproduced CLI misroutes, meeting the 12-15 expert-grade band rather than vague 'be careful' warnings.\"}, \"D4\": {\"score\": 14, \"why\": \"The description names WHAT (route a finding, separate origin from co-fires, hand off) and enumerates five explicit WHEN triggers ('Use when a finding arrives as prose...'), landing in the 14-15 band though it lacks a dedicated keyword list like file extensions.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Load on condition, never by default' section gives per-resource MANDATORY/'Do NOT load' triggers (e.g. load triage.py only before adding a phrase, never to learn ordering), matching the 14-15 perfect-layering band.\"}, \"D6\": {\"score\": 14, \"why\": \"The explicit freedom table ('Category assignment: Low... Evidence weighting: Medium') calibrates constraint to each half of the task with stated reasoning, fitting the 14-15 perfect-calibration band.\"}, \"D7\": {\"score\": 9, \"why\": \"The skill names its own pattern ('Pattern: Process') and argues against the more obvious Navigation pattern with a concrete reason (a link table can't answer the origin-vs-symptom question), showing masterful, deliberate pattern selection (9-10 band).\"}, \"D8\": {\"score\": 14, \"why\": \"Phase 3's coverage table ('AST07 | 0 of 3 | Nothing') paired with reproduced console misroutes gives concrete, testable guidance and fallbacks, meeting the 14-15 comprehensive-coverage band.\"}}\n"
     },
     {
       "provider": "anthropic-compatible/glm-5.2",
       "scores": {
         "D1": 18.0,
         "D2": 14.0,
-        "D3": 15.0,
+        "D3": 14.0,
         "D4": 14.0,
+        "D5": 14.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "Near-pure knowledge delta: rules like the AST01-vs-AST04 parser/pre-prose seam, the 'preventer vs catcher' fix-owner test, and the router's verified misroute of 'admin credential' findings are expertise Claude could not reproduce \u2014 top band 16-20 with negligible redundancy.",
+        "D2": "Transfers the expert thinking pattern 'ask what had to already be true' alongside domain procedures Claude lacks (Phase 1 origin table, Phase 3 hand-off record with 'no owner, no line'), hitting the 12-15 band.",
+        "D3": "Expert-grade NEVERs each carrying a hard-won why \u2014 e.g. 'NEVER route toward the category with the better tooling' explained via AST01/AST04 false-confirm risk, and 'two primaries means two owners each believing the other holds the root cause' \u2014 the 12-15 band.",
+        "D4": "Description gives WHAT (route finding to one OWASP AST01-AST10 category), WHEN via five explicit trigger scenarios ('when two AST categories both plausibly fit'), and searchable keywords, earning 14-15.",
+        "D5": "The 'Load on condition, never by default' section pairs mandatory triggers with 'Do NOT' guidance per resource, and even closes with 'Do NOT load any of them to answer which category owns this finding' \u2014 perfect 14-15 layering.",
+        "D6": "The freedom table explicitly splits category assignment (low, 'the sibling wins and this file is the bug') from evidence weighting (medium, 'no rule closes them'), a deliberate good calibration that falls just short of perfect given some judgment calls still under-specified.",
+        "D7": "Declares and masterfully executes the Process pattern ('Pattern: Process. Three phases... Deliberately *not* Navigation') with justified deviation and phased checkpoints \u2014 9-10 band.",
+        "D8": "Actionable throughout: a five-row 'when this is the wrong entry point' redirect table, concrete console transcripts of router misroutes, and the fallback 'ast_id: null with a request for manual triage is a correct output' \u2014 strong 11-13 coverage with edge cases."
+      },
+      "total": 109.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Near-pure knowledge delta: rules like the AST01-vs-AST04 parser/pre-prose seam, the 'preventer vs catcher' fix-owner test, and the router's verified misroute of 'admin credential' findings are expertise Claude could not reproduce \u2014 top band 16-20 with negligible redundancy.\"}, \"D2\": {\"score\": 14, \"why\": \"Transfers the expert thinking pattern 'ask what had to already be true' alongside domain procedures Claude lacks (Phase 1 origin table, Phase 3 hand-off record with 'no owner, no line'), hitting the 12-15 band.\"}, \"D3\": {\"score\": 14, \"why\": \"Expert-grade NEVERs each carrying a hard-won why \u2014 e.g. 'NEVER route toward the category with the better tooling' explained via AST01/AST04 false-confirm risk, and 'two primaries means two owners each believing the other holds the root cause' \u2014 the 12-15 band.\"}, \"D4\": {\"score\": 14, \"why\": \"Description gives WHAT (route finding to one OWASP AST01-AST10 category), WHEN via five explicit trigger scenarios ('when two AST categories both plausibly fit'), and searchable keywords, earning 14-15.\"}, \"D5\": {\"score\": 14, \"why\": \"The 'Load on condition, never by default' section pairs mandatory triggers with 'Do NOT' guidance per resource, and even closes with 'Do NOT load any of them to answer which category owns this finding' \u2014 perfect 14-15 layering.\"}, \"D6\": {\"score\": 13, \"why\": \"The freedom table explicitly splits category assignment (low, 'the sibling wins and this file is the bug') from evidence weighting (medium, 'no rule closes them'), a deliberate good calibration that falls just short of perfect given some judgment calls still under-specified.\"}, \"D7\": {\"score\": 9, \"wy\": null, \"why\": \"Declares and masterfully executes the Process pattern ('Pattern: Process. Three phases... Deliberately *not* Navigation') with justified deviation and phased checkpoints \u2014 9-10 band.\"}, \"D8\": {\"score\": 13, \"why\": \"Actionable throughout: a five-row 'when this is the wrong entry point' redirect table, concrete console transcripts of router misroutes, and the fallback 'ast_id: null with a request for manual triage is a correct output' \u2014 strong 11-13 coverage with edge cases.\"}}"
+    },
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 12.0,
+        "D3": 14.0,
+        "D4": 14.0,
+        "D5": 12.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "The skill presents detailed domain\u2011specific routing logic (e.g., Phase\u202f2 \u201cfix\u2011owner test\u201d and rule\u2011order table) that Claude does not already know, placing it in the 16\u201120 \u201cpure knowledge delta\u201d band.",
+        "D2": "It teaches both a thinking framework (\u201cask what had to already be true\u201d) and concrete procedures (Phase\u202f1 table, loading\u202f`scripts/triage.py`) giving it a score in the 8\u201111 \u201cgood balance\u201d band.",
+        "D3": "The extensive \u201cNEVER\u201d list (e.g., \u201cNEVER split one finding across two primary categories\u2026\u201d) provides specific anti\u2011patterns with reasoning, fitting the 12\u201115 expert\u2011grade band.",
+        "D4": "The frontmatter description names the function, trigger scenarios and keywords (\u201cUse when a finding arrives as prose\u2026\u201d) satisfying the 14\u201115 perfect description band.",
+        "D5": "The skill specifies loading triggers (e.g., \u201cLoad on condition, never by default\u201d and when to load `scripts/triage.py`) and keeps core guidance concise, fitting the 11\u201113 good layering band.",
+        "D6": "It explicitly sets low freedom for category assignment and medium freedom for evidence weighting, matching the task\u2019s fragility and earning a 11\u201113 good calibration band.",
+        "D7": "The document declares \u201cPattern: Process\u201d and follows a phased workflow with checkpoints, aligning with the official Process pattern and scoring in the 7\u20119 range.",
+        "D8": "It provides concrete decision trees, code snippets, error handling guidance and fallback examples (e.g., CLI routing examples), making it usable and placing it in the 11\u201113 clear\u2011guidance band."
+      },
+      "total": 105.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"The skill presents detailed domain\u2011specific routing logic (e.g., Phase\u202f2 \u201cfix\u2011owner test\u201d and rule\u2011order table) that Claude does not already know, placing it in the 16\u201120 \u201cpure knowledge delta\u201d band.\"},\n  \"D2\": {\"score\": 12, \"why\": \"It teaches both a thinking framework (\u201cask what had to already be true\u201d) and concrete procedures (Phase\u202f1 table, loading\u202f`scripts/triage.py`) giving it a score in the 8\u201111 \u201cgood balance\u201d band.\"},\n  \"D3\": {\"score\": 14, \"why\": \"The extensive \u201cNEVER\u201d list (e.g., \u201cNEVER split one finding across two primary categories\u2026\u201d) provides specific anti\u2011patterns with reasoning, fitting the 12\u201115 expert\u2011grade band.\"},\n  \"D4\": {\"score\": 14, \"why\": \"The frontmatter description names the function, trigger scenarios and keywords (\u201cUse when a finding arrives as prose\u2026\u201d) satisfying the 14\u201115 perfect description band.\"},\n  \"D5\": {\"score\": 12, \"why\": \"The skill specifies loading triggers (e.g., \u201cLoad on condition, never by default\u201d and when to load `scripts/triage.py`) and keeps core guidance concise, fitting the 11\u201113 good layering band.\"},\n  \"D6\": {\"score\": 13, \"why\": \"It explicitly sets low freedom for category assignment and medium freedom for evidence weighting, matching the task\u2019s fragility and earning a 11\u201113 good calibration band.\"},\n  \"D7\": {\"score\": 9, \"why\": \"The document declares \u201cPattern: Process\u201d and follows a phased workflow with checkpoints, aligning with the official Process pattern and scoring in the 7\u20119 range.\"},\n  \"D8\": {\"score\": 13, \"why\": \"It provides concrete decision trees, code snippets, error handling guidance and fallback examples (e.g., CLI routing examples), making it usable and placing it in the 11\u201113 clear\u2011guidance band.\"}\n}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 14.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "Provides pure knowledge delta with expert decision trees like 'what had to already be true' for a finding to be possible, which Claude wouldn't know, placing it in the 16-20 band",
+        "D2": "Transfers expert thinking patterns such as the fix-owner test and domain-specific procedures like the Phase 1 origin table, meeting the 12-15 expert-level criteria",
+        "D3": "Contains expert-grade anti-patterns with clear reasoning, such as 'NEVER split one finding across two primary categories' because it causes ownership diffusion, meeting the 12-15 criteria",
+        "D4": "Description perfectly answers WHAT, WHEN, and includes trigger keywords like 'scanner gap' and 'payload', making it comprehensive and highly searchable per the 14-15 band",
+        "D5": "Implements excellent progressive disclosure with mandatory load triggers like 'load skills/<ASTnn>/SKILL.md' and explicit 'Do NOT load' guidance, meeting the 14-15 criteria",
+        "D6": "Perfectly calibrates freedom: low freedom for category assignment with fixed seams and medium freedom for evidence weighting requiring judgment, matching the 14-15 criteria",
+        "D7": "Masterfully follows the Process pattern with three clear phases, medium freedom, and phased workflow at ~200 lines, meeting the 9-10 criteria",
+        "D8": "Offers comprehensive practical usability with decision tables, fallbacks, edge case handling like empty contributing lists, and clear error paths, meeting the 14-15 band"
+      },
+      "total": 115.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Provides pure knowledge delta with expert decision trees like 'what had to already be true' for a finding to be possible, which Claude wouldn't know, placing it in the 16-20 band\"}, \"D2\": {\"score\": 14, \"why\": \"Transfers expert thinking patterns such as the fix-owner test and domain-specific procedures like the Phase 1 origin table, meeting the 12-15 expert-level criteria\"}, \"D3\": {\"score\": 15, \"why\": \"Contains expert-grade anti-patterns with clear reasoning, such as 'NEVER split one finding across two primary categories' because it causes ownership diffusion, meeting the 12-15 criteria\"}, \"D4\": {\"score\": 15, \"why\": \"Description perfectly answers WHAT, WHEN, and includes trigger keywords like 'scanner gap' and 'payload', making it comprehensive and highly searchable per the 14-15 band\"}, \"D5\": {\"score\": 14, \"why\": \"Implements excellent progressive disclosure with mandatory load triggers like 'load skills/<ASTnn>/SKILL.md' and explicit 'Do NOT load' guidance, meeting the 14-15 criteria\"}, \"D6\": {\"score\": 14, \"why\": \"Perfectly calibrates freedom: low freedom for category assignment with fixed seams and medium freedom for evidence weighting requiring judgment, matching the 14-15 criteria\"}, \"D7\": {\"score\": 10, \"why\": \"Masterfully follows the Process pattern with three clear phases, medium freedom, and phased workflow at ~200 lines, meeting the 9-10 criteria\"}, \"D8\": {\"score\": 15, \"why\": \"Offers comprehensive practical usability with decision tables, fallbacks, edge case handling like empty contributing lists, and clear error paths, meeting the 14-15 band\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 19.0,
+        "D2": 15.0,
+        "D3": 15.0,
+        "D4": 15.0,
         "D5": 15.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The Phase 1 table and Phase 2 tests like the fix-owner test, AST08 scanner-as-artifact rule, and the 'AST01 vs AST04 - what had to execute' distinction provide pure expert knowledge exclusively about routing logic Claude wouldn't know, placing it in the 16-20 band.",
+        "D2": "It provides expert thinking patterns like 'the fix that would have prevented belongs to the origin; the fix that would only have caught it belongs to a contributing failure' paired with domain-specific workflows like the routing phases and the rule order analysis, scoring in the expert-level 12-15 band.",
+        "D3": "The NEVER list contains expert-grade, specific anti-patterns with reasoning, such as 'NEVER route to a category whose detectable tier is empty and imply a check will confirm it' noting AST07/AST09 have no detector, clearly earned from hard experience, in the 12-15 band.",
+        "D4": "The description perfectly lists WHAT (route to OWASP category, separate origin, hand off), WHEN (five explicit trigger scenarios like 'when two AST categories both plausibly fit'), and keywords (OWASP AST01-AST10, prose, scanner gap), meeting all criteria for the 14-15 band.",
+        "D5": "It perfectly layers content with explicit MANDATORY triggers in the 'Mechanism, and Layer 3' section (e.g., 'load before adding a phrase') and 'Do NOT Load' guidance, achieving the 14-15 band for progressive disclosure.",
+        "D6": "It explicitly calibrates freedom with a table declaring 'Category assignment' as Low and 'Evidence weighting' as Medium, perfectly matching the task's fragility where misrouting has high consequence, scoring in the 14-15 band.",
+        "D7": "It masterfully applies the Process pattern with three named phases (~200 lines), phased workflow, checkpoints, and medium freedom as stated, making it a clear 9-10 band application.",
+        "D8": "It provides comprehensive coverage with decision trees (Phase 1 table, Phase 2 rules), error handling (unrouted findings as null), and edge cases (confusable seams, empty contributing lists), making it immediately actionable in the 14-15 band."
+      },
+      "total": 119.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 19,\n    \"why\": \"The Phase 1 table and Phase 2 tests like the fix-owner test, AST08 scanner-as-artifact rule, and the 'AST01 vs AST04 - what had to execute' distinction provide pure expert knowledge exclusively about routing logic Claude wouldn't know, placing it in the 16-20 band.\"\n  },\n  \"D2\": {\n    \"score\": 15,\n    \"why\": \"It provides expert thinking patterns like 'the fix that would have prevented belongs to the origin; the fix that would only have caught it belongs to a contributing failure' paired with domain-specific workflows like the routing phases and the rule order analysis, scoring in the expert-level 12-15 band.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"The NEVER list contains expert-grade, specific anti-patterns with reasoning, such as 'NEVER route to a category whose detectable tier is empty and imply a check will confirm it' noting AST07/AST09 have no detector, clearly earned from hard experience, in the 12-15 band.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description perfectly lists WHAT (route to OWASP category, separate origin, hand off), WHEN (five explicit trigger scenarios like 'when two AST categories both plausibly fit'), and keywords (OWASP AST01-AST10, prose, scanner gap), meeting all criteria for the 14-15 band.\"\n  },\n  \"D5\": {\n    \"score\": 15,\n    \"why\": \"It perfectly layers content with explicit MANDATORY triggers in the 'Mechanism, and Layer 3' section (e.g., 'load before adding a phrase') and 'Do NOT Load' guidance, achieving the 14-15 band for progressive disclosure.\"\n  },\n  \"D6\": {\n    \"score\": 15,\n    \"why\": \"It explicitly calibrates freedom with a table declaring 'Category assignment' as Low and 'Evidence weighting' as Medium, perfectly matching the task's fragility where misrouting has high consequence, scoring in the 14-15 band.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"It masterfully applies the Process pattern with three named phases (~200 lines), phased workflow, checkpoints, and medium freedom as stated, making it a clear 9-10 band application.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"It provides comprehensive coverage with decision trees (Phase 1 table, Phase 2 rules), error handling (unrouted findings as null), and edge cases (confusable seams, empty contributing lists), making it immediately actionable in the 14-15 band.\"\n  }\n}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 12.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 14.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill provides expert knowledge on routing security findings to the correct OWASP category, including decision trees and edge cases from real-world experience.",
+        "D2": "The skill provides both expert thinking patterns and domain-specific procedures for routing findings, with a good balance of both.",
+        "D3": "The skill includes a specific NEVER list with reasoning, such as 'NEVER split one finding across two primary categories' and 'NEVER route to a category whose detectable tier is empty'.",
+        "D4": "The skill has a comprehensive description that answers the WHAT, WHEN, and KEYWORDS questions, ensuring it will be activated when needed.",
+        "D5": "The skill implements proper content layering with explicit triggers for loading additional resources, such as 'Load `skills/<ASTnn>/SKILL.md` for the routed category'.",
+        "D6": "The skill has appropriate freedom calibration, with low freedom for category assignment and medium freedom for evidence weighting, matching the task's fragility.",
+        "D7": "The skill follows the Process pattern masterfully, with a phased workflow and checkpoints, fitting the complex multi-step project it addresses.",
+        "D8": "The skill provides clear guidance for common cases and edge cases, with decision trees, code examples, and error handling, ensuring practical usability."
+      },
+      "total": 113.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"The skill provides expert knowledge on routing security findings to the correct OWASP category, including decision trees and edge cases from real-world experience.\"\n  },\n  \"D2\": {\n    \"score\": 14,\n    \"why\": \"The skill provides both expert thinking patterns and domain-specific procedures for routing findings, with a good balance of both.\"\n  },\n  \"D3\": {\n    \"score\": 12,\n    \"why\": \"The skill includes a specific NEVER list with reasoning, such as 'NEVER split one finding across two primary categories' and 'NEVER route to a category whose detectable tier is empty'.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The skill has a comprehensive description that answers the WHAT, WHEN, and KEYWORDS questions, ensuring it will be activated when needed.\"\n  },\n  \"D5\": {\n    \"score\": 15,\n    \"why\": \"The skill implements proper content layering with explicit triggers for loading additional resources, such as 'Load `skills/<ASTnn>/SKILL.md` for the routed category'.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The skill has appropriate freedom calibration, with low freedom for category assignment and medium freedom for evidence weighting, matching the task's fragility.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"The skill follows the Process pattern masterfully, with a phased workflow and checkpoints, fitting the complex multi-step project it addresses.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"The skill provides clear guidance for common cases and edge cases, with decision trees, code examples, and error handling, ensuring practical usability.\"\n  }\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 13.0,
+        "D4": 14.0,
+        "D5": 14.0,
         "D6": 14.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "Rules like 2.2's 'AST08 is the origin only when the scanner is the artifact under review' and the note that AST04's frontmatter check only fires 'when the file opens with --- on the very first byte' are non-obvious expert deltas, placing this in the 16-20 pure knowledge delta band.",
-        "D2": "The fix-owner test ('The fix that would have prevented the finding belongs to the origin; the fix that would only have caught it belongs to a contributing failure') is both an expert thinking pattern and a domain procedure Claude would not know, hitting the 12-15 band.",
-        "D3": "The NEVER list includes experience-grounded entries with reasons, e.g. 'NEVER route toward the category with the better tooling' explaining AST01/AST04's check counts make misroutes come back 'confirmed' in the wrong place \u2014 expert-grade, 12-15 band.",
-        "D4": "The description gives WHAT (route a finding to its OWASP AST01-AST10 origin), explicit WHEN triggers ('when two AST categories both plausibly fit, when a scanner gap and a payload appear in the same report'), and searchable keywords \u2014 perfect per the 14-15 band.",
-        "D5": "The 'Load on condition, never by default' section embeds conditional triggers plus explicit 'Do NOT' guidance per resource (e.g. load coverage-matrix.md only before quoting a tier), matching the 14-15 band.",
-        "D6": "The two-row freedom table explicitly assigns low freedom to category assignment and medium to evidence weighting with reasoning, showing deliberate calibration throughout \u2014 14-15 band.",
-        "D7": "It self-declares 'Pattern: Process. Three phases' and executes a phased workflow with checkpoints and justified deviation from Navigation, a masterful application \u2014 9-10 band.",
-        "D8": "It covers edge cases and fallbacks concretely, including the substring-match near-miss example in 2.6 and 'ast_id: null with a request for manual triage is a correct output', giving comprehensive error handling \u2014 14-15 band."
+        "D1": "The seam rules in 2.2-2.4 (e.g. the AST08-is-origin-only-when-the-scanner-is-the-artifact test, or the AST05-vs-AST07 'which thing drifted' distinction) are non-obvious expert judgments rather than anything Claude already knows, putting this in the 16-20 'pure knowledge delta' band.",
+        "D2": "Phase 1's origin table pairs a thinking frame ('what had to already be true') with Phase 3's domain-specific hand-off procedure (which ASTnn file, what tier it can confirm), matching the 12-15 'expert-level: shapes thinking AND provides procedures' band.",
+        "D3": "The NEVER list gives specific, reasoned prohibitions like 'NEVER accept an AST08 primary when an extended rule also fired' tied to a demonstrated misroute, landing in the 12-15 'expert-grade anti-patterns with WHY' band rather than generic warnings.",
+        "D4": "The description names concrete trigger scenarios ('when a scanner gap and a payload appear in the same report', 'when a finding names a symptom louder than its cause') alongside the WHAT of routing, meeting the 14-15 'comprehensive... WHAT, WHEN, and trigger keywords' band.",
+        "D5": "The closing 'Load on condition, never by default' section gives per-file MANDATORY/'Do NOT load' triggers (e.g. load triage.py only 'before adding a phrase'), which is the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.",
+        "D6": "The explicit two-row freedom table ('Category assignment: Low', 'Evidence weighting: Medium') with stated rationale for each half of the task exemplifies the 14-15 'perfect freedom calibration' band rather than a blanket freedom level.",
+        "D7": "The file opens by declaring itself Process pattern and explicitly argues against the more obvious Navigation pattern ('a table of links cannot answer the only question that is ever hard here'), which is the self-aware, justified pattern choice of the 9-10 'masterful application' band.",
+        "D8": "Rule 2.6 documents a realistic edge case (an inserted word breaking a phrase match, producing a silently-empty contributing list) with a worked CLI example, matching the 14-15 'comprehensive coverage including edge cases' band."
       },
-      "total": 113.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Rules like 2.2's 'AST08 is the origin only when the scanner is the artifact under review' and the note that AST04's frontmatter check only fires 'when the file opens with --- on the very first byte' are non-obvious expert deltas, placing this in the 16-20 pure knowledge delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"The fix-owner test ('The fix that would have prevented the finding belongs to the origin; the fix that would only have caught it belongs to a contributing failure') is both an expert thinking pattern and a domain procedure Claude would not know, hitting the 12-15 band.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER list includes experience-grounded entries with reasons, e.g. 'NEVER route toward the category with the better tooling' explaining AST01/AST04's check counts make misroutes come back 'confirmed' in the wrong place \u2014 expert-grade, 12-15 band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description gives WHAT (route a finding to its OWASP AST01-AST10 origin), explicit WHEN triggers ('when two AST categories both plausibly fit, when a scanner gap and a payload appear in the same report'), and searchable keywords \u2014 perfect per the 14-15 band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Load on condition, never by default' section embeds conditional triggers plus explicit 'Do NOT' guidance per resource (e.g. load coverage-matrix.md only before quoting a tier), matching the 14-15 band.\"}, \"D6\": {\"score\": 14, \"why\": \"The two-row freedom table explicitly assigns low freedom to category assignment and medium to evidence weighting with reasoning, showing deliberate calibration throughout \u2014 14-15 band.\"}, \"D7\": {\"score\": 9, \"why\": \"It self-declares 'Pattern: Process. Three phases' and executes a phased workflow with checkpoints and justified deviation from Navigation, a masterful application \u2014 9-10 band.\"}, \"D8\": {\"score\": 14, \"why\": \"It covers edge cases and fallbacks concretely, including the substring-match near-miss example in 2.6 and 'ast_id: null with a request for manual triage is a correct output', giving comprehensive error handling \u2014 14-15 band.\"}}"
+      "total": 109.0,
+      "raw_response": "```json\n{\"D1\": {\"score\": 18, \"why\": \"The seam rules in 2.2-2.4 (e.g. the AST08-is-origin-only-when-the-scanner-is-the-artifact test, or the AST05-vs-AST07 'which thing drifted' distinction) are non-obvious expert judgments rather than anything Claude already knows, putting this in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"Phase 1's origin table pairs a thinking frame ('what had to already be true') with Phase 3's domain-specific hand-off procedure (which ASTnn file, what tier it can confirm), matching the 12-15 'expert-level: shapes thinking AND provides procedures' band.\"}, \"D3\": {\"score\": 13, \"why\": \"The NEVER list gives specific, reasoned prohibitions like 'NEVER accept an AST08 primary when an extended rule also fired' tied to a demonstrated misroute, landing in the 12-15 'expert-grade anti-patterns with WHY' band rather than generic warnings.\"}, \"D4\": {\"score\": 14, \"why\": \"The description names concrete trigger scenarios ('when a scanner gap and a payload appear in the same report', 'when a finding names a symptom louder than its cause') alongside the WHAT of routing, meeting the 14-15 'comprehensive... WHAT, WHEN, and trigger keywords' band.\"}, \"D5\": {\"score\": 14, \"why\": \"The closing 'Load on condition, never by default' section gives per-file MANDATORY/'Do NOT load' triggers (e.g. load triage.py only 'before adding a phrase'), which is the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.\"}, \"D6\": {\"score\": 14, \"why\": \"The explicit two-row freedom table ('Category assignment: Low', 'Evidence weighting: Medium') with stated rationale for each half of the task exemplifies the 14-15 'perfect freedom calibration' band rather than a blanket freedom level.\"}, \"D7\": {\"score\": 9, \"why\": \"The file opens by declaring itself Process pattern and explicitly argues against the more obvious Navigation pattern ('a table of links cannot answer the only question that is ever hard here'), which is the self-aware, justified pattern choice of the 9-10 'masterful application' band.\"}, \"D8\": {\"score\": 14, \"why\": \"Rule 2.6 documents a realistic edge case (an inserted word breaking a phrase match, producing a silently-empty contributing list) with a worked CLI example, matching the 14-15 'comprehensive coverage including edge cases' band.\"}}\n```\n"
+    },
+    {
+      "provider": "anthropic-compatible/glm-5.2",
+      "scores": {
+        "D1": 19.0,
+        "D2": 14.0,
+        "D3": 14.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 14.0,
+        "D7": 10.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Nearly every paragraph is non-obvious expertise, e.g. the preventer-vs-catcher fix-owner test in rule 2.1 and the warning that an AST04 misroute 'produces a confident clean bill' because its checks are 'silent by construction' \u2014 pure knowledge delta band (16-20).",
+        "D2": "Transfers expert thinking ('Ask what had to already be true for the finding to be possible') plus domain procedures Claude wouldn't know (the AST06\u2192AST04\u2192AST03 elimination order for the permission trio), hitting the expert-level band (12-15).",
+        "D3": "The NEVER list gives experience-taught reasons, e.g. 'NEVER route toward the category with the better tooling' because a finding pushed into AST01/AST04 comes back 'confirmed - in the wrong place', expert-grade band (12-15).",
+        "D4": "The description states WHAT (route a finding to one OWASP AST01-AST10 category, separate contributing failures, honest hand-off) plus five explicit WHEN triggers and searchable keywords (AST, scanner gap, prose finding) \u2014 perfect band (14-15).",
+        "D5": "The 'Mechanism, and Layer 3' section gives conditional load triggers with MANDATORY phrasing ('load before quoting a tier... coverage-matrix.md') plus 'Do NOT load any of them' guidance \u2014 perfect layering band (14-15).",
+        "D6": "The explicit two-row freedom table calibrates low freedom for category assignment ('the sibling wins and this file is the bug') and medium for evidence weighting, an unusually deliberate match of constraint to fragility \u2014 near-perfect band (14-15) minus one point for slight over-prescription in Phase 3's record format.",
+        "D7": "Declares and masterfully executes the Process pattern ('Pattern: Process. Three phases...') with explicit justification for rejecting Navigation despite being a router \u2014 masterful application band (9-10).",
+        "D8": "Covers edge cases and fallbacks concretely: unroutable findings output 'ast_id: null with a request for manual triage is a correct output', and rule 2.6 demonstrates the empty-contributing-list trap with a reproducible console example \u2014 comprehensive band (14-15), docked slightly because sibling file contents are assumed rather than verified."
+      },
+      "total": 115.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Nearly every paragraph is non-obvious expertise, e.g. the preventer-vs-catcher fix-owner test in rule 2.1 and the warning that an AST04 misroute 'produces a confident clean bill' because its checks are 'silent by construction' \u2014 pure knowledge delta band (16-20).\"}, \"D2\": {\"score\": 14, \"why\": \"Transfers expert thinking ('Ask what had to already be true for the finding to be possible') plus domain procedures Claude wouldn't know (the AST06\u2192AST04\u2192AST03 elimination order for the permission trio), hitting the expert-level band (12-15).\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list gives experience-taught reasons, e.g. 'NEVER route toward the category with the better tooling' because a finding pushed into AST01/AST04 comes back 'confirmed - in the wrong place', expert-grade band (12-15).\"}, \"D4\": {\"score\": 15, \"why\": \"The description states WHAT (route a finding to one OWASP AST01-AST10 category, separate contributing failures, honest hand-off) plus five explicit WHEN triggers and searchable keywords (AST, scanner gap, prose finding) \u2014 perfect band (14-15).\"}, \"D5\": {\"score\": 15, \"why\": \"The 'Mechanism, and Layer 3' section gives conditional load triggers with MANDATORY phrasing ('load before quoting a tier... coverage-matrix.md') plus 'Do NOT load any of them' guidance \u2014 perfect layering band (14-15).\"}, \"D6\": {\"score\": 14, \"why\": \"The explicit two-row freedom table calibrates low freedom for category assignment ('the sibling wins and this file is the bug') and medium for evidence weighting, an unusually deliberate match of constraint to fragility \u2014 near-perfect band (14-15) minus one point for slight over-prescription in Phase 3's record format.\"}, \"D7\": {\"score\": 10, \"why\": \"Declares and masterfully executes the Process pattern ('Pattern: Process. Three phases...') with explicit justification for rejecting Navigation despite being a router \u2014 masterful application band (9-10).\"}, \"D8\": {\"score\": 14, \"why\": \"Covers edge cases and fallbacks concretely: unroutable findings output 'ast_id: null with a request for manual triage is a correct output', and rule 2.6 demonstrates the empty-contributing-list trap with a reproducible console example \u2014 comprehensive band (14-15), docked slightly because sibling file contents are assumed rather than verified.\"}}"
     }
   ],
   "aggregate": {
-    "n": 16,
+    "n": 17,
     "mean": 112.2,
-    "median": 112.5,
+    "median": 112.0,
     "min": 104.0,
-    "max": 120.0,
-    "range": 16.0,
-    "stdev": 4.82,
-    "lower_bound": 107.4,
+    "max": 119.0,
+    "range": 15.0,
+    "stdev": 4.35,
+    "lower_bound": 107.9,
+    "sem": 1.06,
+    "ci_lower": 111.1,
     "judgments": [
-      107.0,
-      116.0,
-      111.0,
-      120.0,
-      113.0,
-      112.0,
-      108.0,
-      119.0,
-      111.0,
       109.0,
+      118.0,
+      114.0,
+      111.0,
+      112.0,
       113.0,
+      110.0,
+      119.0,
       104.0,
-      120.0,
-      106.0,
+      112.0,
+      109.0,
+      105.0,
+      115.0,
+      119.0,
       113.0,
-      113.0
+      109.0,
+      115.0
     ],
     "method": "multi-round-independent-pooled",
     "rubric_sha": "3027f20f3181758385a1bb8c022d4041dfb4de84",
     "rubric_content_sha256": "737ef3628f0e11353114c3bd05a1c9d0c448dbfec1ae85db839253cbe93198b6",
-    "dim_n": 16,
+    "dim_n": 17,
     "dim_means": {
-      "D1": 17.9,
-      "D2": 13.8,
-      "D3": 14.0,
-      "D4": 14.8,
-      "D5": 14.1,
-      "D6": 14.1,
-      "D7": 9.2,
-      "D8": 14.3
+      "D1": 18.0,
+      "D2": 13.7,
+      "D3": 13.9,
+      "D4": 14.6,
+      "D5": 14.4,
+      "D6": 13.9,
+      "D7": 9.4,
+      "D8": 14.2
     }
   },
   "verdict": "SHIP",

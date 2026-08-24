@@ -60,16 +60,29 @@ produced; they must not be pooled with, differenced against, or trended
 into anything measured from here on.
 
 ``eval/scorecards/`` is no longer one of them. It holds the live corpus,
-**run 4** -- 180 binding judgments of 198 attempted, the other 18 refused
-as malformed for want of a justification -- while **run 3**, the first run
-recorded under this prompt (177 of 198), was archived to
-``eval/scorecards-run3/`` when run 4 was written. Those two are the new
-baseline the pre-rebuild archives are not comparable to, rather than
-further points on a trend through them. Which corpus is which is
-checkable rather than remembered: ``tests/scripts/test_judge_harness.py``
-asserts that the archived responses are still *rejected* by
-``parse_judgment`` for the stated reason, and that every judgment banked in
-``eval/scorecards/`` satisfies the contract this module now enforces.
+**run 5** -- 188 binding judgments of 198 attempted, the other 10 discarded
+at parse time -- while **run 3**, the first run
+recorded under this prompt (177 of 198), and **run 4** (180 of 198) were
+archived to ``eval/scorecards-run3/`` and ``eval/scorecards-run4/`` as each
+was replaced. Those three are the new baseline the pre-rebuild archives are
+not comparable to, rather than further points on a trend through them.
+Which corpus is which is checkable rather than remembered:
+``tests/scripts/test_judge_harness.py`` asserts that the archived responses
+are still *rejected* by ``parse_judgment`` for the stated reason, and that
+every judgment banked in ``eval/scorecards/`` and in the two post-rebuild
+archives satisfies the contract this module now enforces.
+
+NOT ONE OF THOSE DISCARDS WAS WRITTEN DOWN, and 49 of them accumulated
+across the three runs (21, 18, 10). The recording path described under
+``run_judge`` dates from 2026-08-24; before it this function built
+``audit_trail`` as a local list and its caller kept only ``judgments``, so a
+refused judgement left the process with no trace on disk -- no reason, no
+status, no response. ``eval/run5-refusals.md`` is the after-the-fact
+reconstruction: which skill, judge and round each of the ten was, derived from
+the order the surviving judgments are stored in, plus a plain statement of what
+the bytes cannot support. ``scripts/refusal_ledger.py`` fails the build if any
+scorecard ever again shows a pooled count below its attempted count with
+nothing accounting for the difference.
 
 No gate constant moved for this change. ``ship_floor.FLOORS``,
 ``POOLED_TARGET``, ``POOLED_LOWER_BOUND``, ``MIN_ROUNDS`` and
@@ -83,8 +96,9 @@ not for this reason. On 2026-08-24, after run 4 was published,
 ship clause ``mean - stdev >= POOLED_LOWER_BOUND (105)`` in favour of
 ``mean - 1.0 * stdev/sqrt(n) >= POOLED_TARGET (108)``, because the retired
 clause was measured flipping the verdict of a byte-identical file. The
-constant was fixed before the run it judges, and no scorecard written by this
-harness before that date may be re-gated or re-described under it.
+constant was fixed before the run it judges -- run 5, the live corpus -- and
+no scorecard written by this harness before that date may be re-gated or
+re-described under it.
 """
 
 from __future__ import annotations
@@ -103,6 +117,8 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:  # allow `python3 scripts/judge_harness.py`
     sys.path.insert(0, str(_REPO_ROOT))
 
+from adapters.base import AUDIT_PATH as DEFAULT_AUDIT_PATH  # noqa: E402
+from adapters.base import record_failure  # noqa: E402
 from scripts.ship_floor import RUBRIC_CONTENT_SHA256, RUBRIC_PATH  # noqa: E402
 
 # The pinned skill-judge rubric: 8 dimensions, 120 points total (build-notes.md
@@ -161,7 +177,19 @@ class JudgmentParseError(ValueError):
     records the provider as malformed in the audit trail, which is the same
     treatment ``adapters/base.py::record_failure`` gives a provider that
     crashed -- excluded from the pool, never silently scored 0.
+
+    ``raw_response`` carries the bytes that were refused. It is attached by
+    :func:`call_model`, which is the only layer that holds both the response
+    and the parse failure at once, and it is what lets ``run_judge`` write a
+    diagnosable record instead of a bare error string. Run 5 discarded ten
+    judgments whose responses no longer exist anywhere
+    (``eval/run5-refusals.md``); this attribute is the reason that cannot
+    happen twice.
     """
+
+    def __init__(self, *args: object, raw_response: str | None = None) -> None:
+        super().__init__(*args)
+        self.raw_response = raw_response
 
 
 class RubricPinError(RuntimeError):
@@ -519,7 +547,13 @@ def call_model(adapter: JudgeAdapter, prompt: str, *, timeout: float = 60.0) -> 
     ``timeout=`` kwarg here made every live adapter raise ``TypeError``.
     """
     raw = adapter.judge(prompt)
-    judgment = parse_judgment(raw)
+    try:
+        judgment = parse_judgment(raw)
+    except JudgmentParseError as exc:
+        # Re-raised rather than handled: the caller decides what a refusal
+        # means. What this layer adds is the one thing the caller cannot
+        # reconstruct -- the response that was refused.
+        raise JudgmentParseError(*exc.args, raw_response=raw) from exc
     return {
         "provider": adapter.name,
         "scores": judgment.scores,
@@ -552,6 +586,9 @@ def run_judge(
     output_path: str | Path = "scores.json",
     prompt: str | None = None,
     timeout: float = 60.0,
+    skill: str | None = None,
+    round_index: int | None = None,
+    audit_path: str | Path | None = None,
 ) -> dict[str, Any]:
     """Judge one skill across every configured adapter and publish scores.json.
 
@@ -566,25 +603,59 @@ def run_judge(
     The run publishes ``status: "complete"`` when every adapter succeeded,
     ``"partial"`` when some but not all did, and ``"failed"`` when none did.
     Writes the result to ``output_path`` as JSON and returns the same dict.
+
+    **Every refusal is PERSISTED, not merely returned.** Until 2026-08-24
+    this function built ``audit_trail`` in memory and nothing else; the
+    caller (``eval/run_judge_matrix.py``) kept only ``judgments`` and
+    deleted the per-round file afterwards, so a refused judgment left the
+    process with no trace anywhere on disk. Run 5 lost ten that way and the
+    responses are unrecoverable -- ``eval/run5-refusals.md`` is the record of
+    what could and could not be reconstructed. Each entry now goes through
+    ``adapters.base.record_failure``, the same append-only path a crashed
+    adapter already took, carrying the skill, the 1-based round, the parse
+    error verbatim and a redacted, truncated excerpt of the offending
+    response. The dict appended to ``audit_trail`` IS the dict written to
+    ``config/audit.yml`` (plus an ``error`` alias for the key spec.md S-008
+    names), so the in-memory trail and the file cannot disagree.
+
+    ``audit_path=None`` means the repository's real ``config/audit.yml``.
+    There is deliberately no value of this argument that means "do not
+    record": tests pass a tmp path, and everything else records for real.
+    If the append itself fails the exception propagates and the round dies
+    loudly -- an unwritable audit trail is the exact defect this function
+    exists to prevent, and a run that cannot record its refusals is worth
+    less than no run at all.
+
+    ``skill`` defaults to the SKILL.md's parent directory name (``AST01``
+    for ``skills/AST01/SKILL.md``), which is the name every scorecard is
+    keyed by; ``round_index`` is 1-based and is what lets a recorded refusal
+    be matched to the row missing from that scorecard.
     """
     skill_path = Path(skill_path)
     skill_content = skill_path.read_text(encoding="utf-8")
     judge_prompt = prompt if prompt is not None else build_prompt(skill_content)
+    skill_name = skill if skill is not None else skill_path.parent.name
+    audit_file = Path(audit_path) if audit_path is not None else DEFAULT_AUDIT_PATH
 
     judgments: list[dict[str, Any]] = []
-    audit_trail: list[dict[str, str]] = []
+    audit_trail: list[dict[str, Any]] = []
     for adapter in adapters:
         try:
             judgments.append(call_model(adapter, judge_prompt, timeout=timeout))
         except Exception as exc:  # noqa: BLE001 - any adapter failure is recorded, never crashes the run
-            audit_trail.append(
-                {
-                    "timestamp": _now_iso(),
-                    "provider": getattr(adapter, "name", repr(adapter)),
-                    "status": "malformed" if isinstance(exc, JudgmentParseError) else "failed",
-                    "error": str(exc),
-                }
+            entry = record_failure(
+                getattr(adapter, "name", repr(adapter)),
+                str(exc) or f"{type(exc).__name__} with no message",
+                audit_file,
+                status="malformed" if isinstance(exc, JudgmentParseError) else "failed",
+                skill=skill_name,
+                round_index=round_index,
+                response=getattr(exc, "raw_response", None),
             )
+            # The persisted entry itself, plus the key spec.md S-008 names for
+            # the same string. Copied rather than rebuilt so the two records
+            # cannot drift.
+            audit_trail.append({**entry, "error": entry["reason"]})
 
     if not judgments:
         status = "failed"
@@ -595,11 +666,16 @@ def run_judge(
 
     result: dict[str, Any] = {
         "skill": str(skill_path),
+        "skill_name": skill_name,
+        "round": round_index,
         "timestamp": _now_iso(),
         "prompt_rubric_sha256": load_rubric().content_sha256 if prompt is None else None,
+        "attempted": len(adapters),
+        "pooled": _pool(judgments),
+        "pooled_n": len(judgments),
         "judgments": judgments,
         "audit_trail": audit_trail,
-        "pooled": _pool(judgments),
+        "audit_path": str(audit_file),
         "status": status,
     }
 

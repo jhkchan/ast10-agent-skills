@@ -252,6 +252,46 @@ mean − 1.0 × stdev/√n ≥ 108 **and** every per-dimension floor met, over a
 in `config/audit.yml` with a recorded reason — never silently averaged as zero
 and never dropped without a record.
 
+**A judgment that is discarded must be recorded, and the check is a command.** A
+provider that answers with a judgement that will not bind is refused at parse
+time, and `scripts/judge_harness.py::run_judge` appends the refusal to
+`config/audit.yml` — skill, 1-based round, provider, status, the parse error and
+a redacted excerpt of the response — before it returns; `eval/run_judge_matrix.py`
+copies the same entries into the scorecard as `attempted`, `pooled` and
+`refusals`. After any judge run:
+
+```bash
+python3 scripts/refusal_ledger.py
+```
+
+It fails if any scorecard's pooled count is below its attempted count without
+matching records, and `--report` prints the derivation. This exists because runs
+3, 4 and 5 discarded 21, 18 and 10 judgments with no record at all;
+[`eval/run5-refusals.md`](eval/run5-refusals.md) reconstructs what the surviving
+bytes support and states plainly what they do not. Do not back-fill
+`config/audit.yml` with reconstructed entries — a fabricated timestamp is worse
+than an empty list.
+
+**Publish the margin around the ship count, not only the count.** A board is a
+number and a number hides how much it is resting on. After any judge run:
+
+```bash
+python3 eval/calibration.py     # also prints and writes eval/robustness.json
+```
+
+The robustness block it prints answers two questions with the live gate: what
+the board becomes with each single judge dropped (**leave-one-judge-out**), and
+what it becomes when judgments that were attempted and never pooled are refilled
+at the same judge's own mean on the same skill (**missing-data sensitivity**).
+Neither excludes a judge from any published figure and neither writes an imputed
+value into a scorecard; both go on
+[`docs/skill-judge-dashboard.md`](docs/skill-judge-dashboard.md) beside the ship
+count rather than beneath it, and `tests/test_robustness.py` fails if the page
+and the corpus disagree. On run 5 that margin is large: 11 of 11 as measured,
+8 of 11 without one judge, and one skill that does not survive imputing its own
+two missing judgments. A run whose robustness block is uninteresting is a fine
+outcome; a run that publishes only the headline is not.
+
 **The second clause changed once, and only once.** It read `mean − stdev ≥ 105`
 through runs 1-4; on 2026-08-24
 [`docs/adr/0006-confidence-bound-on-the-pooled-mean.md`](docs/adr/0006-confidence-bound-on-the-pooled-mean.md)
@@ -259,13 +299,22 @@ retired it, because a spread statistic used as a confidence bound on a mean made
 the verdict depend on how much the panel agreed that day rather than on the file
 — `AST08` is byte-identical between runs 3 and 4 and flipped on that clause
 alone. The replacement was recorded, with its constant, **before** the run it
-judges, and it changes no run-4 verdict. Every published run-4 score stays as
-issued under the old rule; do not re-gate an archived corpus under the new one.
-Changing a gate constant again needs the same two steps ADR-0005 laid down and
-ADR-0006 followed: a superseding record naming the rule and its constants first,
-then a fresh judged run.
+judges, and it changed no run-4 verdict when it was adopted — which
+`tests/test_generate_dashboard.py` re-derives against the frozen archive rather
+than taking on trust. Every published run-4 score stays as issued under the old
+rule; do not re-gate an archived corpus under the new one. Run 5 is the first
+corpus judged under the clause above, **and on run 5 the change bought one
+ship**: under the retired clause run 5 is 10 of 11, with `AST01` blocked at
+`110.1 − 6.65 = 103.4 < 105`. "It cost nothing" is a run-4 sentence and is false
+about run 5, and the new clause is not the stricter one either — at every
+`(n, σ)` run 5 produced it demands a mean 0.12 to 1.99 points lower than the
+retired clause did. Both facts belong beside the board; see
+[ADR-0006](docs/adr/0006-confidence-bound-on-the-pooled-mean.md) "What it bought
+on run 5". Changing a gate constant again needs the
+same two steps ADR-0005 laid down and ADR-0006 followed: a superseding record
+naming the rule and its constants first, then a fresh judged run.
 
-**Before you run it: the prompt was rebuilt on 2026-08-23, and two of the four
+**Before you run it: the prompt was rebuilt on 2026-08-23, and two of the five
 recorded runs predate it.** The judge is now sent the pinned rubric's
 per-dimension scoring bands verbatim (it was previously sent only the dimension
 names) and must return a one-sentence justification per dimension; a judgement
@@ -273,23 +322,29 @@ that will not explain itself is recorded as malformed and excluded from the
 pool. That is a change of instrument, so **do not diff a fresh run against
 `eval/scorecards-run1/` or `eval/scorecards-run2/` and do not trend them
 together** — those two are the pre-rebuild archives and stay exactly as
-recorded. `eval/scorecards/` is run 4, the corpus the dashboard publishes, and
-`eval/scorecards-run3/` is its archived predecessor under the same prompt; a
-fresh run is comparable to both and is what replaces the live one. No gate
-constant moved with the prompt, and none moved with the run that took the board
-from one shippable skill to nine; the one change the gate has ever taken came
-afterwards, by ADR-0006, and is described above. See the callouts at the top of
-`docs/skill-judge-dashboard.md`, which name the rule that produced the published
-table.
+recorded. `eval/scorecards/` is run 5, the corpus the dashboard publishes, and
+`eval/scorecards-run3/` and `eval/scorecards-run4/` are its archived predecessors
+under the same prompt; a fresh run is comparable to all three and is what
+replaces the live one. No gate constant moved with the prompt, and none moved
+with the run that took the board from one shippable skill to nine; the one change
+the gate has ever taken came afterwards, by ADR-0006, and is described above. See
+the callouts at the top of `docs/skill-judge-dashboard.md`, which name the rule
+that produced the published table — and its "What 11 of 11 is, and what it is
+not" section, which is the shape an honest headline number takes here.
 
 **Archive the live corpus before you overwrite it.** `cp -r eval/scorecards
-eval/scorecards-run<N>` first, then record. Runs 3 and 4 were scored by the same
-prompt, which is what let the anti-pattern pass be measured as a controlled
-change rather than asserted — that comparison only exists because the previous
-corpus was kept. `tests/scripts/test_judge_harness.py` derives which archives
-predate the justification contract from the judgments themselves, so a new
-archive needs its name added to `ARCHIVED_POST_CONTRACT_CORPORA` and a `README.md`
-of its own, and the suite will tell you if you forget.
+eval/scorecards-run<N>` first, then record. Runs 3, 4 and 5 were scored by the
+same prompt, which is what let the anti-pattern pass be measured as a controlled
+change rather than asserted — twice, on eight skills and then on one — and those
+comparisons only exist because the previous corpora were kept.
+`tests/scripts/test_judge_harness.py` derives which archives predate the
+justification contract from the judgments themselves, so a new archive needs its
+name added to `ARCHIVED_POST_CONTRACT_CORPORA` and to `CORPUS_PROSE`, and a
+`README.md` of its own that describes the instrument that wrote it; the suite
+will tell you if you forget. Expect a handful of figure-pinning tests in
+`tests/test_calibration.py` and `tests/test_judge_quality.py` to fail the moment
+the corpus moves. That is them working: each one names the published figure that
+has gone stale. Refresh the documents; do not relax the guard.
 
 ---
 

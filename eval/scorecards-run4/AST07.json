@@ -1,0 +1,485 @@
+{
+  "skill": "AST07",
+  "rounds": 3,
+  "providers": [
+    "bedrock/gpt-oss-120b",
+    "bedrock/qwen3-235b",
+    "bedrock/deepseek-v3.2",
+    "bedrock/nova-pro",
+    "claude-cli/sonnet",
+    "anthropic-compatible/glm-5.2"
+  ],
+  "providers_unavailable": [],
+  "judgments": [
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 13.0,
+        "D4": 14.0,
+        "D5": 12.0,
+        "D6": 12.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The skill provides expert\u2011level decision rules such as \u201cPin to content hash, never to a version string\u201d and nuanced trade\u2011offs, placing it in the 16\u201120 pure\u2011knowledge\u2011delta band.",
+        "D2": "It offers both thinking patterns (e.g., \u201cconsider root cause\u201d) and a domain\u2011specific four\u2011step manual audit workflow, fitting the 12\u201115 expert\u2011level balance band.",
+        "D3": "The extensive \u201cNEVER\u201d list (e.g., \u201cNEVER write \u2018AST07: pass\u2019\u201d) includes specific reasons, meeting the 12\u201115 expert\u2011grade anti\u2011pattern band.",
+        "D4": "The description states what the skill does, when to use it, and includes keywords like \u201cpin discipline\u201d and \u201chash vs. version range,\u201d satisfying the 14\u201115 perfect description band.",
+        "D5": "Explicit loading triggers such as \u201cDo NOT load `scripts/detector.py`\u201d and conditional references provide good layering, landing in the 11\u201113 good\u2011layering band.",
+        "D6": "The skill enforces low\u2011freedom, precise mandatory steps for a fragile security audit, aligning with the 11\u201113 appropriate freedom\u2011calibration band.",
+        "D7": "The document follows a phased Process pattern with decision rules, checkpoints, and a clear workflow, fitting the 7\u20118 clear\u2011pattern band.",
+        "D8": "Clear decision rules, step\u2011by\u2011step audit guidance, and coverage of edge cases make the skill highly usable, placing it in the 14\u201115 comprehensive usability band."
+      },
+      "total": 105.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"The skill provides expert\u2011level decision rules such as \u201cPin to content hash, never to a version string\u201d and nuanced trade\u2011offs, placing it in the 16\u201120 pure\u2011knowledge\u2011delta band.\"},\n  \"D2\": {\"score\": 14, \"why\": \"It offers both thinking patterns (e.g., \u201cconsider root cause\u201d) and a domain\u2011specific four\u2011step manual audit workflow, fitting the 12\u201115 expert\u2011level balance band.\"},\n  \"D3\": {\"score\": 13, \"why\": \"The extensive \u201cNEVER\u201d list (e.g., \u201cNEVER write \u2018AST07: pass\u2019\u201d) includes specific reasons, meeting the 12\u201115 expert\u2011grade anti\u2011pattern band.\"},\n  \"D4\": {\"score\": 14, \"why\": \"The description states what the skill does, when to use it, and includes keywords like \u201cpin discipline\u201d and \u201chash vs. version range,\u201d satisfying the 14\u201115 perfect description band.\"},\n  \"D5\": {\"score\": 12, \"why\": \"Explicit loading triggers such as \u201cDo NOT load `scripts/detector.py`\u201d and conditional references provide good layering, landing in the 11\u201113 good\u2011layering band.\"},\n  \"D6\": {\"score\": 12, \"why\": \"The skill enforces low\u2011freedom, precise mandatory steps for a fragile security audit, aligning with the 11\u201113 appropriate freedom\u2011calibration band.\"},\n  \"D7\": {\"score\": 8, \"why\": \"The document follows a phased Process pattern with decision rules, checkpoints, and a clear workflow, fitting the 7\u20118 clear\u2011pattern band.\"},\n  \"D8\": {\"score\": 14, \"why\": \"Clear decision rules, step\u2011by\u2011step audit guidance, and coverage of edge cases make the skill highly usable, placing it in the 14\u201115 comprehensive usability band.\"}\n}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 20.0,
+        "D2": 15.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 14.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "Every paragraph delivers pure expert knowledge such as the insight that 'a version string is an attacker-controlled claim, not a security property,' which meets the 'Pure knowledge delta' band (16-20) by providing non-obvious, high-value reasoning only an expert would know.",
+        "D2": "The skill provides expert-level thinking patterns like the decision rule for distinguishing an unrequested downgrade and combines it with domain-specific procedures such as manually obtaining a resolver's decision record, meeting the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band (12-15).",
+        "D3": "It contains expert-grade anti-patterns with clear reasoning, such as 'NEVER write \"AST07: pass\", \"clean\", or \"no findings\"' because that retires tickets prematurely, which meets the 'Expert-grade anti-patterns with WHY' band (12-15) as these are hard-won insights from real operational experience.",
+        "D4": "The description perfectly answers WHAT (detect and triage OWASP AST07 Update Drift), WHEN (during audits of pin discipline, update mechanisms, etc.), and includes trigger keywords like 'immutable pinning', 'Rollback Attack', and 'Hot-Reload Abuse', meeting the 'Perfect: comprehensive description' band (14-15).",
+        "D5": "It implements excellent progressive disclosure with mandatory loading triggers like 'Do NOT load `scripts/detector.py` looking for a check' and conditional guidance for `coverage-matrix.md`, meeting the 'Perfect: decision trees + explicit triggers + \"Do NOT Load\" guidance' band (14-15).",
+        "D6": "The skill calibrates freedom appropriately by enforcing low freedom for fragile operations like pin verification with strict rules (e.g., 'Pin to content hash, never to a version string'), matching the 'Perfect freedom calibration' band (14-15), though it allows moderate judgment in reviewer steps without over-constraining.",
+        "D7": "The skill masterfully follows the 'Tool' pattern (~300 lines) with decision trees, code-like procedures, and low freedom for precise format operations on skill manifests, meeting the 'Masterful application of appropriate pattern' band (9-10).",
+        "D8": "It provides comprehensive practical usability with clear decision trees, explicit fallback paths for missing evidence (e.g., 'Cannot get it: S01 is undecided'), and edge case handling, meeting the 'Comprehensive coverage including edge cases and error handling' band (14-15)."
+      },
+      "total": 119.0,
+      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"Every paragraph delivers pure expert knowledge such as the insight that 'a version string is an attacker-controlled claim, not a security property,' which meets the 'Pure knowledge delta' band (16-20) by providing non-obvious, high-value reasoning only an expert would know.\"}, \"D2\": {\"score\": 15, \"why\": \"The skill provides expert-level thinking patterns like the decision rule for distinguishing an unrequested downgrade and combines it with domain-specific procedures such as manually obtaining a resolver's decision record, meeting the 'Expert-level: shapes thinking AND provides procedures Claude wouldn't know' band (12-15).\"}, \"D3\": {\"score\": 15, \"why\": \"It contains expert-grade anti-patterns with clear reasoning, such as 'NEVER write \\\"AST07: pass\\\", \\\"clean\\\", or \\\"no findings\\\"' because that retires tickets prematurely, which meets the 'Expert-grade anti-patterns with WHY' band (12-15) as these are hard-won insights from real operational experience.\"}, \"D4\": {\"score\": 15, \"why\": \"The description perfectly answers WHAT (detect and triage OWASP AST07 Update Drift), WHEN (during audits of pin discipline, update mechanisms, etc.), and includes trigger keywords like 'immutable pinning', 'Rollback Attack', and 'Hot-Reload Abuse', meeting the 'Perfect: comprehensive description' band (14-15).\"}, \"D5\": {\"score\": 15, \"why\": \"It implements excellent progressive disclosure with mandatory loading triggers like 'Do NOT load `scripts/detector.py` looking for a check' and conditional guidance for `coverage-matrix.md`, meeting the 'Perfect: decision trees + explicit triggers + \\\"Do NOT Load\\\" guidance' band (14-15).\"}, \"D6\": {\"score\": 14, \"why\": \"The skill calibrates freedom appropriately by enforcing low freedom for fragile operations like pin verification with strict rules (e.g., 'Pin to content hash, never to a version string'), matching the 'Perfect freedom calibration' band (14-15), though it allows moderate judgment in reviewer steps without over-constraining.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill masterfully follows the 'Tool' pattern (~300 lines) with decision trees, code-like procedures, and low freedom for precise format operations on skill manifests, meeting the 'Masterful application of appropriate pattern' band (9-10).\"}, \"D8\": {\"score\": 15, \"why\": \"It provides comprehensive practical usability with clear decision trees, explicit fallback paths for missing evidence (e.g., 'Cannot get it: S01 is undecided'), and edge case handling, meeting the 'Comprehensive coverage including edge cases and error handling' band (14-15).\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 16.0,
+        "D2": 12.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 14.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill provides expert knowledge delta on OWASP AST07 Update Drift, including decision rules like 'Pin to content hash, never to a version string' and 'A downgrade is not intrinsically suspicious \u2014 an *unrequested* downgrade is,' which Claude would not already know.",
+        "D2": "The skill transfers expert thinking patterns like distinguishing AST07 from its neighbors and provides domain-specific procedures a reviewer 'must do by hand,' such as obtaining a predecessor for Malicious Update with specific sufficiency criteria.",
+        "D3": "The skill includes an expert-grade NEVER list with specific reasoning, like 'NEVER write \"AST07: pass\", \"clean\", or \"no findings\"' because nothing ran, and 'NEVER convict Rollback Attack on \"the resolved version decreased\"' without an operator-intent record.",
+        "D4": "The description perfectly answers WHAT, WHEN, and includes keywords, specifying use 'when auditing an installed skill's pin discipline' and mentioning 'Rollback Attack' and 'Hot-Reload Abuse,' making it comprehensive for triggering.",
+        "D5": "The skill has perfect layering with explicit loading guidance like 'Do NOT load `scripts/detector.py` looking for a check' and 'Do NOT load `coverage-matrix.md` for triage,' ensuring proper progressive disclosure.",
+        "D6": "The skill calibrates freedom appropriately with low-freedom precision for fragile operations like decision rules and reviewer steps, matching the high consequence of security audit mistakes.",
+        "D7": "The skill masterfully applies the Mindset pattern (~50 lines style) by focusing on thinking over technique with a strong NEVER list and high freedom for creative security triage tasks.",
+        "D8": "The skill provides comprehensive practical usability with clear guidance for common cases and edge cases, including a routing table for wrong skills and a step-by-step hand audit procedure with fallback handling."
+      },
+      "total": 112.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 16,\n    \"why\": \"The skill provides expert knowledge delta on OWASP AST07 Update Drift, including decision rules like 'Pin to content hash, never to a version string' and 'A downgrade is not intrinsically suspicious \u2014 an *unrequested* downgrade is,' which Claude would not already know.\"\n  },\n  \"D2\": {\n    \"score\": 12,\n    \"why\": \"The skill transfers expert thinking patterns like distinguishing AST07 from its neighbors and provides domain-specific procedures a reviewer 'must do by hand,' such as obtaining a predecessor for Malicious Update with specific sufficiency criteria.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"The skill includes an expert-grade NEVER list with specific reasoning, like 'NEVER write \\\"AST07: pass\\\", \\\"clean\\\", or \\\"no findings\\\"' because nothing ran, and 'NEVER convict Rollback Attack on \\\"the resolved version decreased\\\"' without an operator-intent record.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description perfectly answers WHAT, WHEN, and includes keywords, specifying use 'when auditing an installed skill's pin discipline' and mentioning 'Rollback Attack' and 'Hot-Reload Abuse,' making it comprehensive for triggering.\"\n  },\n  \"D5\": {\n    \"score\": 15,\n    \"why\": \"The skill has perfect layering with explicit loading guidance like 'Do NOT load `scripts/detector.py` looking for a check' and 'Do NOT load `coverage-matrix.md` for triage,' ensuring proper progressive disclosure.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The skill calibrates freedom appropriately with low-freedom precision for fragile operations like decision rules and reviewer steps, matching the high consequence of security audit mistakes.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"The skill masterfully applies the Mindset pattern (~50 lines style) by focusing on thinking over technique with a strong NEVER list and high freedom for creative security triage tasks.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"The skill provides comprehensive practical usability with clear guidance for common cases and edge cases, including a routing table for wrong skills and a step-by-step hand audit procedure with fallback handling.\"\n  }\n}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 19.0,
+        "D2": 13.0,
+        "D3": 14.0,
+        "D4": 15.0,
+        "D5": 13.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The skill provides expert knowledge on the risks and mitigations of Update Drift, including nuanced decision rules and anti-patterns.",
+        "D2": "The skill provides expert thinking patterns and domain-specific procedures for auditing and mitigating Update Drift, though some procedures are manual and require human review.",
+        "D3": "The skill has an extensive NEVER list detailing specific anti-patterns and their reasoning, such as 'NEVER write \"AST07: pass\"'.",
+        "D4": "The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.",
+        "D5": "The skill has good content layering with mandatory triggers for loading references, though some triggers could be more explicit.",
+        "D6": "The level of specificity is appropriate for the task's fragility, providing low freedom for critical operations and high freedom for creative tasks.",
+        "D7": "The skill follows a clear 'Knowledge' pattern with minor deviations, providing decision rules and detailed guidance.",
+        "D8": "The skill provides clear and actionable guidance, including decision trees and fallbacks, though some edge cases could be more explicitly covered."
+      },
+      "total": 111.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 19,\n    \"why\": \"The skill provides expert knowledge on the risks and mitigations of Update Drift, including nuanced decision rules and anti-patterns.\"\n  },\n  \"D2\": {\n    \"score\": 13,\n    \"why\": \"The skill provides expert thinking patterns and domain-specific procedures for auditing and mitigating Update Drift, though some procedures are manual and require human review.\"\n  },\n  \"D3\": {\n    \"score\": 14,\n    \"why\": \"The skill has an extensive NEVER list detailing specific anti-patterns and their reasoning, such as 'NEVER write \\\"AST07: pass\\\"'.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, detailing WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.\"\n  },\n  \"D5\": {\n    \"score\": 13,\n    \"why\": \"The skill has good content layering with mandatory triggers for loading references, though some triggers could be more explicit.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The level of specificity is appropriate for the task's fragility, providing low freedom for critical operations and high freedom for creative tasks.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows a clear 'Knowledge' pattern with minor deviations, providing decision rules and detailed guidance.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides clear and actionable guidance, including decision trees and fallbacks, though some edge cases could be more explicitly covered.\"\n  }\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 14.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 13.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Lines like 'a version string is an attacker-controlled claim, not a security property' and the rejection rule that verification-without-freshness or freshness-without-verification 'has not closed anything' are non-obvious expert claims, putting this in the 16-20 'pure knowledge delta' band.",
+        "D2": "The by-hand procedure's sufficient/insufficient/cannot-get-it evidence criteria for each of Malicious Update, Rollback Attack, and Hot-Reload Abuse are domain-specific procedures paired with the routing-table thinking pattern, landing in the 12-15 'expert-level' band.",
+        "D3": "The NEVER list ties each prohibition to a concrete consequence (e.g. 'NEVER convict Rollback Attack on the resolved version decreased' because that 'convicts every admin who rolled back a bad release') rather than generic caution, matching the 12-15 'expert-grade anti-patterns with WHY' band.",
+        "D4": "The description states WHAT ('Detect and triage OWASP AST07 Update Drift') and four explicit WHEN clauses ('Use when auditing...', 'when an update mechanism applies...', 'when a downgrade needs distinguishing...') plus keywords like Rollback Attack and Hot-Reload Abuse, meeting the 14-15 'comprehensive' band.",
+        "D5": "The Orientation section gives conditional routing ('Then descend by need') and explicit 'Do NOT load scripts/detector.py looking for a check' / 'Do NOT load coverage-matrix.md for triage' guidance, matching the 14-15 band's 'explicit triggers + Do NOT Load guidance'.",
+        "D6": "The skill matches low-freedom, security-audit fragility with a rigid four-step evidence procedure and a single fixed verdict vocabulary ('declared-and-uncovered'), which is good calibration (11-13 band) though not flagged as flawless across every scenario.",
+        "D7": "It combines a Navigation-style orientation routing table with Tool-pattern decision trees and low-freedom procedure, a clear but hybrid pattern application placing it in the 7-8 'clear pattern with minor deviations' band rather than a single textbook pattern.",
+        "D8": "The reviewer procedure gives per-step 'Sufficient'/'Insufficient'/'Cannot get it' branches (e.g. rollback needs 'an operator-intent record separating a deliberate pin-back from an imposed one') covering fallbacks and edge cases, meeting the 14-15 'comprehensive coverage including edge cases and error handling' band."
+      },
+      "total": 109.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Lines like 'a version string is an attacker-controlled claim, not a security property' and the rejection rule that verification-without-freshness or freshness-without-verification 'has not closed anything' are non-obvious expert claims, putting this in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"The by-hand procedure's sufficient/insufficient/cannot-get-it evidence criteria for each of Malicious Update, Rollback Attack, and Hot-Reload Abuse are domain-specific procedures paired with the routing-table thinking pattern, landing in the 12-15 'expert-level' band.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list ties each prohibition to a concrete consequence (e.g. 'NEVER convict Rollback Attack on the resolved version decreased' because that 'convicts every admin who rolled back a bad release') rather than generic caution, matching the 12-15 'expert-grade anti-patterns with WHY' band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description states WHAT ('Detect and triage OWASP AST07 Update Drift') and four explicit WHEN clauses ('Use when auditing...', 'when an update mechanism applies...', 'when a downgrade needs distinguishing...') plus keywords like Rollback Attack and Hot-Reload Abuse, meeting the 14-15 'comprehensive' band.\"}, \"D5\": {\"score\": 14, \"why\": \"The Orientation section gives conditional routing ('Then descend by need') and explicit 'Do NOT load scripts/detector.py looking for a check' / 'Do NOT load coverage-matrix.md for triage' guidance, matching the 14-15 band's 'explicit triggers + Do NOT Load guidance'.\"}, \"D6\": {\"score\": 13, \"why\": \"The skill matches low-freedom, security-audit fragility with a rigid four-step evidence procedure and a single fixed verdict vocabulary ('declared-and-uncovered'), which is good calibration (11-13 band) though not flagged as flawless across every scenario.\"}, \"D7\": {\"score\": 8, \"why\": \"It combines a Navigation-style orientation routing table with Tool-pattern decision trees and low-freedom procedure, a clear but hybrid pattern application placing it in the 7-8 'clear pattern with minor deviations' band rather than a single textbook pattern.\"}, \"D8\": {\"score\": 14, \"why\": \"The reviewer procedure gives per-step 'Sufficient'/'Insufficient'/'Cannot get it' branches (e.g. rollback needs 'an operator-intent record separating a deliberate pin-back from an imposed one') covering fallbacks and edge cases, meeting the 14-15 'comprehensive coverage including edge cases and error handling' band.\"}}\n"
+    },
+    {
+      "provider": "anthropic-compatible/glm-5.2",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 14.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "Nearly every paragraph is non-obvious expert knowledge, e.g. the rejection rule that 'signature verification without a freshness requirement leaves a verified-but-ancient artifact looking healthy forever' and the deleted-fixtures anecdote about a slug labeled AST07-S3 colliding with registry AST07-S03 \u2014 pure knowledge delta band (16-20).",
+        "D2": "It pairs an expert thinking frame ('a version string is an attacker-controlled claim, not a security property') with a four-step by-hand audit procedure naming Sufficient/Insufficient evidence per scenario \u2014 expert-level thinking plus procedures Claude wouldn't know (12-15).",
+        "D3": "The NEVER list is expert-grade with WHY throughout, e.g. 'NEVER read a sha256: pin as evidence that no malicious update occurred... it stops binding the moment an operator accepts a new hash' and the fixture-admission anti-pattern \u2014 things only hard experience teaches (12-15).",
+        "D4": "The description covers WHAT (detect/triage pin discipline), WHEN ('when auditing an installed skill's pin discipline', 'when an update mechanism applies upstream changes without human review'), and keywords (sha256, hash vs version range, Rollback Attack, Hot-Reload Abuse) \u2014 perfect band (14-15).",
+        "D5": "Explicit 'Do NOT load scripts/detector.py' and 'Do NOT load coverage-matrix.md for triage' guidance embedded in the orientation block, with a need-based descent list for when each resource IS required \u2014 perfect layering band (14-15).",
+        "D6": "Freedom is well calibrated to fragility: judgment-heavy triage rules get principles while the zero-detector accounting is pinned rigidly ('publishes no F1', 'do not fill it'), matching constraint to consequence for most scenarios (11-13).",
+        "D7": "A masterful Navigation/Knowledge hybrid: a ~30-line orientation block routing by symptom table and need-based descent into sub-files, matching the multi-scenario routing pattern (9-10).",
+        "D8": "Decision trees are testable (the routing table and the per-step 'Cannot get it' branches like 'S01 is undecided. Say so; do not downgrade it'), though several referenced artifacts (coverage-matrix.md, registry.yaml, the CLI) are not shown, leaving a small verification gap (11-13)."
+      },
+      "total": 110.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Nearly every paragraph is non-obvious expert knowledge, e.g. the rejection rule that 'signature verification without a freshness requirement leaves a verified-but-ancient artifact looking healthy forever' and the deleted-fixtures anecdote about a slug labeled AST07-S3 colliding with registry AST07-S03 \u2014 pure knowledge delta band (16-20).\"}, \"D2\": {\"score\": 14, \"why\": \"It pairs an expert thinking frame ('a version string is an attacker-controlled claim, not a security property') with a four-step by-hand audit procedure naming Sufficient/Insufficient evidence per scenario \u2014 expert-level thinking plus procedures Claude wouldn't know (12-15).\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list is expert-grade with WHY throughout, e.g. 'NEVER read a sha256: pin as evidence that no malicious update occurred... it stops binding the moment an operator accepts a new hash' and the fixture-admission anti-pattern \u2014 things only hard experience teaches (12-15).\"}, \"D4\": {\"score\": 15, \"why\": \"The description covers WHAT (detect/triage pin discipline), WHEN ('when auditing an installed skill's pin discipline', 'when an update mechanism applies upstream changes without human review'), and keywords (sha256, hash vs version range, Rollback Attack, Hot-Reload Abuse) \u2014 perfect band (14-15).\"}, \"D5\": {\"score\": 14, \"why\": \"Explicit 'Do NOT load scripts/detector.py' and 'Do NOT load coverage-matrix.md for triage' guidance embedded in the orientation block, with a need-based descent list for when each resource IS required \u2014 perfect layering band (14-15).\"}, \"D6\": {\"score\": 13, \"why\": \"Freedom is well calibrated to fragility: judgment-heavy triage rules get principles while the zero-detector accounting is pinned rigidly ('publishes no F1', 'do not fill it'), matching constraint to consequence for most scenarios (11-13).\"}, \"D7\": {\"score\": 9, \"why\": \"A masterful Navigation/Knowledge hybrid: a ~30-line orientation block routing by symptom table and need-based descent into sub-files, matching the multi-scenario routing pattern (9-10).\"}, \"D8\": {\"score\": 13, \"why\": \"Decision trees are testable (the routing table and the per-step 'Cannot get it' branches like 'S01 is undecided. Say so; do not downgrade it'), though several referenced artifacts (coverage-matrix.md, registry.yaml, the CLI) are not shown, leaving a small verification gap (11-13).\"}}"
+    },
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 14.0,
+        "D4": 13.0,
+        "D5": 12.0,
+        "D6": 14.0,
+        "D7": 8.0,
+        "D8": 13.0
+      },
+      "justifications": {
+        "D1": "The skill\u2019s core decision rule \u2018Pin to content hash, never to a version string\u2019 and nuanced distinctions about rollback and hot\u2011reload are expert knowledge Claude does not already have, placing it in the 16\u201120 band.",
+        "D2": "It delivers a domain\u2011specific four\u2011step audit workflow (e.g., \u201cRead the two artifact\u2011decidable facts\u2026\u201d, \u201cObtain the predecessor\u2026\u201d) along with thinking patterns about trade\u2011offs, fitting the 12\u201115 band.",
+        "D3": "The extensive \u2018NEVER \u2026\u2019 list (e.g., \u201cNEVER write \u2018AST07: pass\u2019\u201d, \u201cNEVER convict Rollback Attack on \u2018the resolved version decreased\u2019\u201d) provides specific anti\u2011patterns with reasoning, landing in the 12\u201115 band.",
+        "D4": "The description states the WHAT (\u2018Detect and triage OWASP AST07 Update Drift\u2019), the WHEN (\u2018Use when auditing an installed skill\u2019s pin discipline\u2026\u2019) and keywords like \u2018pin\u2019, \u2018rollback\u2019, satisfying the 11\u201113 band.",
+        "D5": "It explicitly instructs \u2018Do NOT load `scripts/detector.py`\u2019 and to load `coverage-matrix.md` only when needed, giving clear mandatory load triggers consistent with the 11\u201113 band.",
+        "D6": "By mandating exact audit steps and prohibiting generic loading, it calibrates low freedom appropriate for a fragile security audit, meeting the 14\u201115 band.",
+        "D7": "The skill follows a phased Process pattern with decision rules, checkpoints and a structured workflow, matching the 7\u20118 band.",
+        "D8": "The concrete four\u2011step procedure, command snippets and decision trees (e.g., scenario table with fallbacks) make it readily actionable, placing it in the 11\u201113 band."
+      },
+      "total": 105.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"The skill\u2019s core decision rule \u2018Pin to content hash, never to a version string\u2019 and nuanced distinctions about rollback and hot\u2011reload are expert knowledge Claude does not already have, placing it in the 16\u201120 band.\"},\n  \"D2\": {\"score\": 13, \"why\": \"It delivers a domain\u2011specific four\u2011step audit workflow (e.g., \u201cRead the two artifact\u2011decidable facts\u2026\u201d, \u201cObtain the predecessor\u2026\u201d) along with thinking patterns about trade\u2011offs, fitting the 12\u201115 band.\"},\n  \"D3\": {\"score\": 14, \"why\": \"The extensive \u2018NEVER \u2026\u2019 list (e.g., \u201cNEVER write \u2018AST07: pass\u2019\u201d, \u201cNEVER convict Rollback Attack on \u2018the resolved version decreased\u2019\u201d) provides specific anti\u2011patterns with reasoning, landing in the 12\u201115 band.\"},\n  \"D4\": {\"score\": 13, \"why\": \"The description states the WHAT (\u2018Detect and triage OWASP AST07 Update Drift\u2019), the WHEN (\u2018Use when auditing an installed skill\u2019s pin discipline\u2026\u2019) and keywords like \u2018pin\u2019, \u2018rollback\u2019, satisfying the 11\u201113 band.\"},\n  \"D5\": {\"score\": 12, \"why\": \"It explicitly instructs \u2018Do NOT load `scripts/detector.py`\u2019 and to load `coverage-matrix.md` only when needed, giving clear mandatory load triggers consistent with the 11\u201113 band.\"},\n  \"D6\": {\"score\": 14, \"why\": \"By mandating exact audit steps and prohibiting generic loading, it calibrates low freedom appropriate for a fragile security audit, meeting the 14\u201115 band.\"},\n  \"D7\": {\"score\": 8, \"why\": \"The skill follows a phased Process pattern with decision rules, checkpoints and a structured workflow, matching the 7\u20118 band.\"},\n  \"D8\": {\"score\": 13, \"why\": \"The concrete four\u2011step procedure, command snippets and decision trees (e.g., scenario table with fallbacks) make it readily actionable, placing it in the 11\u201113 band.\"}\n}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 20.0,
+        "D2": 15.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 14.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill demonstrates pure knowledge delta with expert-level insights like 'a version string is an attacker-controlled claim, not a security property,' which Claude would not already know, meeting the 'pure knowledge delta' band.",
+        "D2": "It provides expert thinking patterns such as the five decision rules and domain-specific procedures like manually obtaining predecessor binding and resolver decision records, meeting the 'expert-level: shapes thinking AND provides procedures Claude wouldn't know' band.",
+        "D3": "The 'NEVER' list includes specific, expert-grade anti-patterns with strong reasoning, such as 'NEVER write \"AST07: pass\"' because it retires tickets prematurely, meeting the 'expert-grade anti-patterns with WHY' band.",
+        "D4": "The description clearly answers WHAT (detect and triage OWASP AST07 Update Drift), WHEN (during audits of pin discipline or update mechanisms), and includes keywords like 'immutable pinning' and 'Rollback Attack', meeting the 'perfect: comprehensive description' band.",
+        "D5": "It implements perfect progressive disclosure with clear MANDATORY triggers like 'Do NOT load coverage-matrix.md for triage' and conditional loading guidance, meeting the 'perfect: decision trees + explicit triggers + \"Do NOT Load\"' band.",
+        "D6": "The skill calibrates freedom appropriately for fragile operations with rigid constraints like 'Do NOT modify the script' equivalents in procedural steps, though slightly less prescriptive than full script mandates, meeting the 'perfect freedom calibration' band.",
+        "D7": "It follows the 'Mindset' pattern (~50 lines, thinking-focused, strong NEVER list, high freedom in judgment but low in procedure) appropriate for a task requiring expert judgment, meeting the 'masterful application of appropriate pattern' band.",
+        "D8": "The skill offers comprehensive usability with decision trees, clear fallback paths for missing evidence, and edge-case handling like what to do when predecessor data cannot be obtained, meeting the 'comprehensive coverage including edge cases and error handling' band."
+      },
+      "total": 119.0,
+      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"The skill demonstrates pure knowledge delta with expert-level insights like 'a version string is an attacker-controlled claim, not a security property,' which Claude would not already know, meeting the 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 15, \"why\": \"It provides expert thinking patterns such as the five decision rules and domain-specific procedures like manually obtaining predecessor binding and resolver decision records, meeting the 'expert-level: shapes thinking AND provides procedures Claude wouldn't know' band.\"}, \"D3\": {\"score\": 15, \"why\": \"The 'NEVER' list includes specific, expert-grade anti-patterns with strong reasoning, such as 'NEVER write \\\"AST07: pass\\\"' because it retires tickets prematurely, meeting the 'expert-grade anti-patterns with WHY' band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description clearly answers WHAT (detect and triage OWASP AST07 Update Drift), WHEN (during audits of pin discipline or update mechanisms), and includes keywords like 'immutable pinning' and 'Rollback Attack', meeting the 'perfect: comprehensive description' band.\"}, \"D5\": {\"score\": 15, \"why\": \"It implements perfect progressive disclosure with clear MANDATORY triggers like 'Do NOT load coverage-matrix.md for triage' and conditional loading guidance, meeting the 'perfect: decision trees + explicit triggers + \\\"Do NOT Load\\\"' band.\"}, \"D6\": {\"score\": 14, \"why\": \"The skill calibrates freedom appropriately for fragile operations with rigid constraints like 'Do NOT modify the script' equivalents in procedural steps, though slightly less prescriptive than full script mandates, meeting the 'perfect freedom calibration' band.\"}, \"D7\": {\"score\": 10, \"why\": \"It follows the 'Mindset' pattern (~50 lines, thinking-focused, strong NEVER list, high freedom in judgment but low in procedure) appropriate for a task requiring expert judgment, meeting the 'masterful application of appropriate pattern' band.\"}, \"D8\": {\"score\": 15, \"why\": \"The skill offers comprehensive usability with decision trees, clear fallback paths for missing evidence, and edge-case handling like what to do when predecessor data cannot be obtained, meeting the 'comprehensive coverage including edge cases and error handling' band.\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 15.0,
+        "D2": 14.0,
+        "D3": 13.0,
+        "D4": 15.0,
+        "D5": 11.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "Paragraphs like 'Decision rule 1... applied to the installed skill itself rather than to a nested dependency' show pure expert knowledge about AST principles that Claude wouldn't know.",
+        "D2": "Provides thinking patterns like 'Rule 2's discriminator has two halves' and domain-specific procedures Claude wouldn't know, like 'Step 1... open the manifest and read it yourself' for auditing.",
+        "D3": "The NEVER list includes expert-grade anti-patterns with reasoning like 'NEVER file either artifact signal under an AST07 scenario id... yields a coverage table that looks complete over a measurement of nothing'.",
+        "D4": "Description perfectly answers WHAT, WHEN, and includes keywords like 'auditing an installed skill's pin discipline' and 'Rollback Attack / Hot-Reload Abuse' as trigger scenarios.",
+        "D5": "Shows good layering with triggers like 'Do NOT load scripts/detector.py looking for a check' but lacks 'MANDATORY triggers in workflow steps' structure.",
+        "D6": "Perfectly calibrated low freedom for fragile security auditing with rigid decision rules like 'Rule 1... A sha256: pin is unambiguous', matching high consequence.",
+        "D7": "Clearly follows the Mindset pattern with 'bestows thinking patterns rather than procedures' structure and strong NEVER list, with minor deviations.",
+        "D8": "Provides comprehensive decision trees like the routing table, actionable steps for reviewers, and edge case handling like 'Cannot get it: S01 is undecided. Say so'."
+      },
+      "total": 106.0,
+      "raw_response": "```json\n{\n  \"D1\": {\"score\": 15, \"why\": \"Paragraphs like 'Decision rule 1... applied to the installed skill itself rather than to a nested dependency' show pure expert knowledge about AST principles that Claude wouldn't know.\"},\n  \"D2\": {\"score\": 14, \"why\": \"Provides thinking patterns like 'Rule 2's discriminator has two halves' and domain-specific procedures Claude wouldn't know, like 'Step 1... open the manifest and read it yourself' for auditing.\"},\n  \"D3\": {\"score\": 13, \"why\": \"The NEVER list includes expert-grade anti-patterns with reasoning like 'NEVER file either artifact signal under an AST07 scenario id... yields a coverage table that looks complete over a measurement of nothing'.\"},\n  \"D4\": {\"score\": 15, \"why\": \"Description perfectly answers WHAT, WHEN, and includes keywords like 'auditing an installed skill's pin discipline' and 'Rollback Attack / Hot-Reload Abuse' as trigger scenarios.\"},\n  \"D5\": {\"score\": 11, \"why\": \"Shows good layering with triggers like 'Do NOT load scripts/detector.py looking for a check' but lacks 'MANDATORY triggers in workflow steps' structure.\"},\n  \"D6\": {\"score\": 14, \"why\": \"Perfectly calibrated low freedom for fragile security auditing with rigid decision rules like 'Rule 1... A sha256: pin is unambiguous', matching high consequence.\"},\n  \"D7\": {\"score\": 9, \"why\": \"Clearly follows the Mindset pattern with 'bestows thinking patterns rather than procedures' structure and strong NEVER list, with minor deviations.\"},\n  \"D8\": {\"score\": 15, \"why\": \"Provides comprehensive decision trees like the routing table, actionable steps for reviewers, and edge case handling like 'Cannot get it: S01 is undecided. Say so'.\"}\n}\n```"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 14.0,
+        "D4": 15.0,
+        "D5": 13.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The skill provides expert knowledge on the nuances of OWASP AST07 Update Drift, including specific decision rules and NEVER lists that are not obvious to a novice.",
+        "D2": "The skill provides domain-specific procedures and thinking patterns, though it could benefit from more explicit thinking frameworks.",
+        "D3": "The skill includes a detailed NEVER list with specific reasoning, covering expert-grade anti-patterns.",
+        "D4": "The description is comprehensive, specifying WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.",
+        "D5": "The skill has good layering with mandatory triggers present, though it could improve by adding explicit 'Do NOT Load' guidance.",
+        "D6": "The level of specificity is well-calibrated for the task's fragility, providing exact steps where necessary.",
+        "D7": "The skill follows the 'Knowledge' pattern well, though with minor deviations.",
+        "D8": "The skill provides clear guidance for common cases and includes decision trees and fallbacks, though it could improve edge case coverage."
+      },
+      "total": 110.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"The skill provides expert knowledge on the nuances of OWASP AST07 Update Drift, including specific decision rules and NEVER lists that are not obvious to a novice.\"\n  },\n  \"D2\": {\n    \"score\": 13,\n    \"why\": \"The skill provides domain-specific procedures and thinking patterns, though it could benefit from more explicit thinking frameworks.\"\n  },\n  \"D3\": {\n    \"score\": 14,\n    \"why\": \"The skill includes a detailed NEVER list with specific reasoning, covering expert-grade anti-patterns.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, specifying WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS.\"\n  },\n  \"D5\": {\n    \"score\": 13,\n    \"why\": \"The skill has good layering with mandatory triggers present, though it could improve by adding explicit 'Do NOT Load' guidance.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"The level of specificity is well-calibrated for the task's fragility, providing exact steps where necessary.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"The skill follows the 'Knowledge' pattern well, though with minor deviations.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"The skill provides clear guidance for common cases and includes decision trees and fallbacks, though it could improve edge case coverage.\"\n  }\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 19.0,
+        "D2": 14.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 14.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Decision rule 1's framing that 'a version string is an attacker-controlled claim, not a security property' and the AST01/AST05/AST08 boundary analysis are non-obvious expert distinctions with essentially no generic filler, putting it in the 16-20 pure-knowledge-delta band.",
+        "D2": "It pairs a thinking framework ('Why patch lag and blind auto-update are the same root cause read two ways') with a genuine domain procedure (the four-step by-hand evidence-sufficiency checklist for S01-S03), matching the 12-15 'shapes thinking AND provides procedures' band.",
+        "D3": "The NEVER list ties each item to a concrete artifact check (e.g. 'NEVER write \"AST07: pass\"... pinned by test_ast07_detector.py::test_s007_empty_tier_never_manufactures_an_f1') rather than vague cautions, meeting the 12-15 expert-grade-with-WHY band.",
+        "D4": "The description states WHAT (detect Update Drift, Rollback Attack, Hot-Reload Abuse), WHEN in four explicit clauses ('Use when auditing...', 'when an update mechanism applies...'), and keywords (pin discipline, hash vs. version range), landing in the 14-15 perfect band.",
+        "D5": "It gives MANDATORY-style embedded triggers ('Do NOT load scripts/detector.py looking for a check... Load it only to verify that the map is in fact empty' and 'Do NOT load coverage-matrix.md for triage') scoped to specific needs, matching the 14-15 'decision trees + explicit triggers + Do NOT Load' band.",
+        "D6": "Freedom is tightly calibrated to a fragile security-verdict task \u2014 exact verdict vocabulary ('declared-and-uncovered'), sufficiency/insufficiency criteria per scenario, and a ban on inventing coverage \u2014 consistent with the 14-15 near-perfect calibration band for a low-freedom classification task.",
+        "D7": "It follows the Process pattern (phased 'Orientation \u2192 Decision rules \u2192 by-hand procedure \u2192 NEVER list' with checkpoints) but runs well past the ~200-line guideline for that pattern, fitting the 7-8 'clear pattern with minor deviations' band.",
+        "D8": "It gives concrete fallback commands ('node cli/bin/cli.js audit <package>' and '/ast:audit-ast07 <package> --evidence-plan') plus explicit sufficient/insufficient/cannot-get-it branches for each of the three out-of-artifact scenarios, matching the 14-15 comprehensive-edge-case band."
+      },
+      "total": 114.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Decision rule 1's framing that 'a version string is an attacker-controlled claim, not a security property' and the AST01/AST05/AST08 boundary analysis are non-obvious expert distinctions with essentially no generic filler, putting it in the 16-20 pure-knowledge-delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"It pairs a thinking framework ('Why patch lag and blind auto-update are the same root cause read two ways') with a genuine domain procedure (the four-step by-hand evidence-sufficiency checklist for S01-S03), matching the 12-15 'shapes thinking AND provides procedures' band.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER list ties each item to a concrete artifact check (e.g. 'NEVER write \\\"AST07: pass\\\"... pinned by test_ast07_detector.py::test_s007_empty_tier_never_manufactures_an_f1') rather than vague cautions, meeting the 12-15 expert-grade-with-WHY band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description states WHAT (detect Update Drift, Rollback Attack, Hot-Reload Abuse), WHEN in four explicit clauses ('Use when auditing...', 'when an update mechanism applies...'), and keywords (pin discipline, hash vs. version range), landing in the 14-15 perfect band.\"}, \"D5\": {\"score\": 15, \"why\": \"It gives MANDATORY-style embedded triggers ('Do NOT load scripts/detector.py looking for a check... Load it only to verify that the map is in fact empty' and 'Do NOT load coverage-matrix.md for triage') scoped to specific needs, matching the 14-15 'decision trees + explicit triggers + Do NOT Load' band.\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom is tightly calibrated to a fragile security-verdict task \u2014 exact verdict vocabulary ('declared-and-uncovered'), sufficiency/insufficiency criteria per scenario, and a ban on inventing coverage \u2014 consistent with the 14-15 near-perfect calibration band for a low-freedom classification task.\"}, \"D7\": {\"score\": 8, \"why\": \"It follows the Process pattern (phased 'Orientation \u2192 Decision rules \u2192 by-hand procedure \u2192 NEVER list' with checkpoints) but runs well past the ~200-line guideline for that pattern, fitting the 7-8 'clear pattern with minor deviations' band.\"}, \"D8\": {\"score\": 14, \"why\": \"It gives concrete fallback commands ('node cli/bin/cli.js audit <package>' and '/ast:audit-ast07 <package> --evidence-plan') plus explicit sufficient/insufficient/cannot-get-it branches for each of the three out-of-artifact scenarios, matching the 14-15 comprehensive-edge-case band.\"}}\n"
+    },
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 17.0,
+        "D2": 13.0,
+        "D3": 14.0,
+        "D4": 14.0,
+        "D5": 12.0,
+        "D6": 14.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The rule \u201cPin to content hash, never to a version string\u201d provides expert, non\u2011obvious guidance, putting it in the 16\u201120 knowledge\u2011delta band.",
+        "D2": "The four detailed audit steps (e.g., \u201cObtain the predecessor\u2026\u201d) are domain\u2011specific procedures coupled with thinking about sufficient evidence, fitting the 12\u201115 band.",
+        "D3": "The extensive bullet\u2011point \u201cNEVER \u2026\u201d list with concrete reasons (e.g., \u201cNEVER write \u2018AST07: pass\u2019\u2026\u201d) supplies expert anti\u2011patterns, landing in the 12\u201115 band.",
+        "D4": "The description explicitly states the WHAT and WHEN (\u201cDetect and triage\u2026 Use when auditing\u2026\u201d) and keywords, meeting the perfect 14\u201115 description criteria.",
+        "D5": "It contains mandatory loading triggers such as \u201cDo NOT load `scripts/detector.py`\u201d and conditional loading guidance, satisfying the good\u2011layering 11\u201113 band.",
+        "D6": "The skill\u2019s low\u2011freedom, step\u2011by\u2011step mandate (e.g., \u201cstop if you cannot get the intent half\u201d) matches the fragile nature, earning a 14\u201115 calibration score.",
+        "D7": "Its structured sections (Orientation, Decision rules, reviewer steps) follow the official Process pattern, aligning with the 7\u20118 to 9\u201110 band; we assign 8.",
+        "D8": "Clear decision rules, concrete audit workflow, error handling and fall\u2011backs (e.g., \u201cIf cannot get telemetry\u2026 stop\u201d) make it readily usable, fitting the 14\u201115 usability band."
+      },
+      "total": 106.0,
+      "raw_response": "{\"D1\": {\"score\": 17, \"why\": \"The rule \u201cPin to content hash, never to a version string\u201d provides expert, non\u2011obvious guidance, putting it in the 16\u201120 knowledge\u2011delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"The four detailed audit steps (e.g., \u201cObtain the predecessor\u2026\u201d) are domain\u2011specific procedures coupled with thinking about sufficient evidence, fitting the 12\u201115 band.\"}, \"D3\": {\"score\": 14, \"why\": \"The extensive bullet\u2011point \u201cNEVER \u2026\u201d list with concrete reasons (e.g., \u201cNEVER write \u2018AST07: pass\u2019\u2026\u201d) supplies expert anti\u2011patterns, landing in the 12\u201115 band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description explicitly states the WHAT and WHEN (\u201cDetect and triage\u2026 Use when auditing\u2026\u201d) and keywords, meeting the perfect 14\u201115 description criteria.\"}, \"D5\": {\"score\": 12, \"why\": \"It contains mandatory loading triggers such as \u201cDo NOT load `scripts/detector.py`\u201d and conditional loading guidance, satisfying the good\u2011layering 11\u201113 band.\"}, \"D6\": {\"score\": 14, \"why\": \"The skill\u2019s low\u2011freedom, step\u2011by\u2011step mandate (e.g., \u201cstop if you cannot get the intent half\u201d) matches the fragile nature, earning a 14\u201115 calibration score.\"}, \"D7\": {\"score\": 8, \"why\": \"Its structured sections (Orientation, Decision rules, reviewer steps) follow the official Process pattern, aligning with the 7\u20118 to 9\u201110 band; we assign 8.\"}, \"D8\": {\"score\": 14, \"why\": \"Clear decision rules, concrete audit workflow, error handling and fall\u2011backs (e.g., \u201cIf cannot get telemetry\u2026 stop\u201d) make it readily usable, fitting the 14\u201115 usability band.\"}}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 20.0,
+        "D2": 15.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "Provides pure knowledge delta with decision rules like 'Pin to content hash, never to a version string' that explain non-obvious security reasoning only an expert would know, meeting the 'Pure knowledge delta' band",
+        "D2": "Transfers expert thinking patterns (e.g., 'Before judging a pin, ask if the target version is verified') and domain-specific procedures (e.g., obtaining predecessor records for Malicious Update) that Claude wouldn't know, meeting the 'Expert-level' band",
+        "D3": "Contains expert-grade anti-patterns with detailed reasoning such as 'NEVER write \"AST07: pass\"' because it stops further investigation, which reflects hard-won experience, meeting the 'Expert-grade' band",
+        "D4": "Description clearly answers WHAT (detect/update drift), WHEN (during audits of pin discipline), and includes keywords (Rollback Attack, Hot-Reload Abuse), meeting the 'Perfect' band",
+        "D5": "Implements excellent progressive disclosure with mandatory triggers like 'Do NOT load `scripts/detector.py`' and conditional loading guidance, meeting the 'Excellent' band",
+        "D6": "Perfect freedom calibration with low freedom for fragile operations like pinning, mandating exact rules (e.g., 'Pin to content hash') where mistakes have high consequences, meeting the 'Perfect' band",
+        "D7": "Follows the Tool pattern masterfully with ~300 lines, decision trees, and exact procedures for format-specific operations, meeting the 'Masterful application' band",
+        "D8": "Offers comprehensive usability with decision trees, error fallbacks, and edge cases like what to do when predecessor records cannot be obtained, meeting the 'Comprehensive coverage' band"
+      },
+      "total": 119.0,
+      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"Provides pure knowledge delta with decision rules like 'Pin to content hash, never to a version string' that explain non-obvious security reasoning only an expert would know, meeting the 'Pure knowledge delta' band\"}, \"D2\": {\"score\": 15, \"why\": \"Transfers expert thinking patterns (e.g., 'Before judging a pin, ask if the target version is verified') and domain-specific procedures (e.g., obtaining predecessor records for Malicious Update) that Claude wouldn't know, meeting the 'Expert-level' band\"}, \"D3\": {\"score\": 15, \"why\": \"Contains expert-grade anti-patterns with detailed reasoning such as 'NEVER write \\\"AST07: pass\\\"' because it stops further investigation, which reflects hard-won experience, meeting the 'Expert-grade' band\"}, \"D4\": {\"score\": 15, \"why\": \"Description clearly answers WHAT (detect/update drift), WHEN (during audits of pin discipline), and includes keywords (Rollback Attack, Hot-Reload Abuse), meeting the 'Perfect' band\"}, \"D5\": {\"score\": 14, \"why\": \"Implements excellent progressive disclosure with mandatory triggers like 'Do NOT load `scripts/detector.py`' and conditional loading guidance, meeting the 'Excellent' band\"}, \"D6\": {\"score\": 15, \"why\": \"Perfect freedom calibration with low freedom for fragile operations like pinning, mandating exact rules (e.g., 'Pin to content hash') where mistakes have high consequences, meeting the 'Perfect' band\"}, \"D7\": {\"score\": 10, \"why\": \"Follows the Tool pattern masterfully with ~300 lines, decision trees, and exact procedures for format-specific operations, meeting the 'Masterful application' band\"}, \"D8\": {\"score\": 15, \"why\": \"Offers comprehensive usability with decision trees, error fallbacks, and edge cases like what to do when predecessor records cannot be obtained, meeting the 'Comprehensive coverage' band\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 16.0,
+        "D2": 14.0,
+        "D3": 14.0,
+        "D4": 15.0,
+        "D5": 12.0,
+        "D6": 11.0,
+        "D7": 9.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "Every paragraph adds expert knowledge about the boundary between static analysis and runtime properties (\"decision rule 1\"), which meets the 'pure knowledge delta' band.",
+        "D2": "The skill provides expert thinking patterns (\"distinguishing AST07 from its neighbors\" table) and domain-specific procedures for manual auditing that Claude wouldn't know, in the 'expert-level' band.",
+        "D3": "The 'NEVER \u2014 the ways an empty tier gets written up as a result' section provides specific, expert-grade anti-patterns with clear reasoning (\"NEVER file either artifact signal under an AST07 scenario id.\"), placing it in the 12-15 band.",
+        "D4": "The description explicitly answers WHAT (detect and triage OWASP AST07 Update Drift, Rollback Attack, Hot-Reload Abuse), WHEN (\"Use when auditing an installed skill's pin discipline...\"), and includes KEYWORDS, meeting 'perfect' criteria.",
+        "D5": "It provides explicit 'Do NOT load' guidance for scripts/detector.py and conditional loading triggers for coverage-matrix.md, placing it in the 'good layering with MANDATORY triggers present' band.",
+        "D6": "The skill calibrates freedom appropriately with medium-rigid guidance (specific decision rules, by-hand procedures) for a fragile security auditing task, fitting the 'good calibration for most scenarios' band.",
+        "D7": "The skill masterfully applies the 'Mindset' pattern (~50 lines core content, strong NEVER list, emphasis on expert thinking) with minimal deviation, earning a 9-10 band.",
+        "D8": "The 'What a reviewer must do by hand' section provides comprehensive, actionable decision trees and error-handling pathways (\"Cannot get it: S01 is undecided. Say so; do not downgrade it...\") for edge cases, meeting the 'comprehensive coverage' band."
+      },
+      "total": 106.0,
+      "raw_response": "```json\n{\n    \"D1\": {\"score\": 16, \"why\": \"Every paragraph adds expert knowledge about the boundary between static analysis and runtime properties (\\\"decision rule 1\\\"), which meets the 'pure knowledge delta' band.\"},\n    \"D2\": {\"score\": 14, \"why\": \"The skill provides expert thinking patterns (\\\"distinguishing AST07 from its neighbors\\\" table) and domain-specific procedures for manual auditing that Claude wouldn't know, in the 'expert-level' band.\"},\n    \"D3\": {\"score\": 14, \"why\": \"The 'NEVER \u2014 the ways an empty tier gets written up as a result' section provides specific, expert-grade anti-patterns with clear reasoning (\\\"NEVER file either artifact signal under an AST07 scenario id.\\\"), placing it in the 12-15 band.\"},\n    \"D4\": {\"score\": 15, \"why\": \"The description explicitly answers WHAT (detect and triage OWASP AST07 Update Drift, Rollback Attack, Hot-Reload Abuse), WHEN (\\\"Use when auditing an installed skill's pin discipline...\\\"), and includes KEYWORDS, meeting 'perfect' criteria.\"},\n    \"D5\": {\"score\": 12, \"why\": \"It provides explicit 'Do NOT load' guidance for scripts/detector.py and conditional loading triggers for coverage-matrix.md, placing it in the 'good layering with MANDATORY triggers present' band.\"},\n    \"D6\": {\"score\": 11, \"why\": \"The skill calibrates freedom appropriately with medium-rigid guidance (specific decision rules, by-hand procedures) for a fragile security auditing task, fitting the 'good calibration for most scenarios' band.\"},\n    \"D7\": {\"score\": 9, \"why\": \"The skill masterfully applies the 'Mindset' pattern (~50 lines core content, strong NEVER list, emphasis on expert thinking) with minimal deviation, earning a 9-10 band.\"},\n    \"D8\": {\"score\": 15, \"why\": \"The 'What a reviewer must do by hand' section provides comprehensive, actionable decision trees and error-handling pathways (\\\"Cannot get it: S01 is undecided. Say so; do not downgrade it...\\\") for edge cases, meeting the 'comprehensive coverage' band.\"}\n}\n```"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 16.0,
+        "D2": 12.0,
+        "D3": 12.0,
+        "D4": 14.0,
+        "D5": 13.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Provides expert knowledge on security vulnerabilities related to skill updates and version pinning, with specific decision rules and NEVER lists.",
+        "D2": "Transfers expert thinking patterns and domain-specific procedures for auditing and triaging update drift scenarios.",
+        "D3": "Contains specific NEVER lists with reasoning for avoiding common pitfalls in update drift scenarios.",
+        "D4": "Description is comprehensive, listing specific capabilities, trigger scenarios, and keywords.",
+        "D5": "Good layering with mandatory triggers present, though could improve with more explicit 'Do NOT Load' guidance.",
+        "D6": "Good calibration for the task's fragility, providing specific scripts and exact steps where necessary.",
+        "D7": "Follows the 'Knowledge' pattern with minor deviations, providing decision rules and clear guidance.",
+        "D8": "Comprehensive coverage including edge cases and error handling, with clear decision trees and actionable guidance."
+      },
+      "total": 103.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 16,\n    \"why\": \"Provides expert knowledge on security vulnerabilities related to skill updates and version pinning, with specific decision rules and NEVER lists.\"\n  },\n  \"D2\": {\n    \"score\": 12,\n    \"why\": \"Transfers expert thinking patterns and domain-specific procedures for auditing and triaging update drift scenarios.\"\n  },\n  \"D3\": {\n    \"score\": 12,\n    \"why\": \"Contains specific NEVER lists with reasoning for avoiding common pitfalls in update drift scenarios.\"\n  },\n  \"D4\": {\n    \"score\": 14,\n    \"why\": \"Description is comprehensive, listing specific capabilities, trigger scenarios, and keywords.\"\n  },\n  \"D5\": {\n    \"score\": 13,\n    \"why\": \"Good layering with mandatory triggers present, though could improve with more explicit 'Do NOT Load' guidance.\"\n  },\n  \"D6\": {\n    \"score\": 13,\n    \"why\": \"Good calibration for the task's fragility, providing specific scripts and exact steps where necessary.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"Follows the 'Knowledge' pattern with minor deviations, providing decision rules and clear guidance.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"Comprehensive coverage including edge cases and error handling, with clear decision trees and actionable guidance.\"\n  }\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 14.0,
+        "D4": 14.0,
+        "D5": 14.0,
+        "D6": 12.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Decision rule 1 ('a version string is an attacker-controlled claim, not a security property') and the four other decision rules deliver non-obvious expert reasoning with almost no generic filler, placing it in the 16-20 'pure knowledge delta' band.",
+        "D2": "The skill pairs a thinking frame ('Why patch lag and blind auto-update are the same root cause') with a domain-specific four-step by-hand procedure (predecessor record, resolver decision record, reload telemetry) that Claude would not otherwise know, matching the 12-15 'expert-level' band.",
+        "D3": "The NEVER list gives specific, reasoned prohibitions tied to artifacts (e.g. 'NEVER admit a fixture to this category to give it a number' citing fixtures/manifest.yaml's declared_expected_cases: 0), landing in the 12-15 expert-grade band.",
+        "D4": "The description states WHAT (detect and triage AST07 Update Drift, Rollback Attack, Hot-Reload Abuse) and WHEN ('Use when auditing an installed skill's pin discipline... when a downgrade needs distinguishing from a legitimate version bump') with concrete trigger keywords, fitting the 14-15 band though slightly less example-laden than the rubric's model description.",
+        "D5": "Loading triggers are embedded in the workflow itself ('Do NOT load coverage-matrix.md for triage... Load it when you need the full per-scenario evidence enumeration'), matching the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.",
+        "D6": "Given the high cost of false accusations, the skill correctly imposes low-freedom, strict rules ('NEVER convict Rollback Attack on the resolved version decreased') rather than vague caution, landing in the 11-13 'good calibration' band.",
+        "D7": "The routing table plus by-hand decision procedure resembles a Tool/Navigation hybrid with only minor deviation from an established pattern, placing it in the 7-8 'clear pattern with minor deviations' band.",
+        "D8": "The by-hand procedure's Sufficient/Insufficient/Cannot-get-it structure for each of steps 2-4 gives concrete fallback guidance for real edge cases, matching the 14-15 'comprehensive coverage including edge cases' band."
+      },
+      "total": 107.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Decision rule 1 ('a version string is an attacker-controlled claim, not a security property') and the four other decision rules deliver non-obvious expert reasoning with almost no generic filler, placing it in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"The skill pairs a thinking frame ('Why patch lag and blind auto-update are the same root cause') with a domain-specific four-step by-hand procedure (predecessor record, resolver decision record, reload telemetry) that Claude would not otherwise know, matching the 12-15 'expert-level' band.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list gives specific, reasoned prohibitions tied to artifacts (e.g. 'NEVER admit a fixture to this category to give it a number' citing fixtures/manifest.yaml's declared_expected_cases: 0), landing in the 12-15 expert-grade band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description states WHAT (detect and triage AST07 Update Drift, Rollback Attack, Hot-Reload Abuse) and WHEN ('Use when auditing an installed skill's pin discipline... when a downgrade needs distinguishing from a legitimate version bump') with concrete trigger keywords, fitting the 14-15 band though slightly less example-laden than the rubric's model description.\"}, \"D5\": {\"score\": 14, \"why\": \"Loading triggers are embedded in the workflow itself ('Do NOT load coverage-matrix.md for triage... Load it when you need the full per-scenario evidence enumeration'), matching the 14-15 'decision trees + explicit triggers + Do NOT Load guidance' band.\"}, \"D6\": {\"score\": 12, \"why\": \"Given the high cost of false accusations, the skill correctly imposes low-freedom, strict rules ('NEVER convict Rollback Attack on the resolved version decreased') rather than vague caution, landing in the 11-13 'good calibration' band.\"}, \"D7\": {\"score\": 8, \"why\": \"The routing table plus by-hand decision procedure resembles a Tool/Navigation hybrid with only minor deviation from an established pattern, placing it in the 7-8 'clear pattern with minor deviations' band.\"}, \"D8\": {\"score\": 14, \"why\": \"The by-hand procedure's Sufficient/Insufficient/Cannot-get-it structure for each of steps 2-4 gives concrete fallback guidance for real edge cases, matching the 14-15 'comprehensive coverage including edge cases' band.\"}}\n"
+    },
+    {
+      "provider": "anthropic-compatible/glm-5.2",
+      "scores": {
+        "D1": 19.0,
+        "D2": 14.0,
+        "D3": 14.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Nearly every paragraph is expert-only delta, e.g. 'a hash-pinned skill can still be maliciously updated the moment an operator accepts the new hash' and the deleted-fixtures anecdote about a slug 'AST07-S3' masquerading as registry id AST07-S03 \u2014 nothing Claude would already know, placing it in the 16-20 pure-knowledge-delta band.",
+        "D2": "The four-step 'What a reviewer must do by hand' pairs domain procedures Claude wouldn't know (obtain a signed release-transparency entry binding version\u2192hash\u2192publisher key) with thinking frameworks like the two-complaints-one-root-cause framing in 'Why patch lag and blind auto-update are the same root cause', matching the 12-15 expert band.",
+        "D3": "The NEVER list is expert-grade with reasons only experience teaches, e.g. 'NEVER convict Rollback Attack on \"the resolved version decreased\"' because it 'convicts every admin who rolled back a bad release', squarely in the 12-15 band.",
+        "D4": "The description answers WHAT ('detect and triage OWASP AST07 Update Drift'), WHEN ('when auditing an installed skill's pin discipline', 'when a downgrade needs distinguishing'), and keywords (Rollback Attack, Hot-Reload Abuse, hash vs. version range) \u2014 perfect per the 14-15 band.",
+        "D5": "Excellent loading triggers embedded in the orientation block \u2014 'Do NOT load scripts/detector.py looking for a check' and 'Do NOT load coverage-matrix.md for triage' with explicit conditions for when each should be loaded, hitting the perfect 14-15 band.",
+        "D6": "Freedom matches fragility: an audit verification task gets a single mandated verdict word 'declared-and-uncovered' and ordered steps, while triage path selection is left to need-based descent \u2014 near-perfect calibration for a 14-15 score.",
+        "D7": "Masterful application of the Navigation pattern (a ~30-line router routing to sub-files by symptom) fused with Knowledge content, with the symptom-routing table to AST01/02/05/08 doing exactly what the pattern is for \u2014 the 9-10 band.",
+        "D8": "Every step in the by-hand procedure includes a fallback branch ('Cannot get the intent half: stop', 'S01 is undecided. Say so; do not downgrade it'), covering the edge cases and failure paths the 14-15 band requires."
+      },
+      "total": 114.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Nearly every paragraph is expert-only delta, e.g. 'a hash-pinned skill can still be maliciously updated the moment an operator accepts the new hash' and the deleted-fixtures anecdote about a slug 'AST07-S3' masquerading as registry id AST07-S03 \u2014 nothing Claude would already know, placing it in the 16-20 pure-knowledge-delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"The four-step 'What a reviewer must do by hand' pairs domain procedures Claude wouldn't know (obtain a signed release-transparency entry binding version\u2192hash\u2192publisher key) with thinking frameworks like the two-complaints-one-root-cause framing in 'Why patch lag and blind auto-update are the same root cause', matching the 12-15 expert band.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list is expert-grade with reasons only experience teaches, e.g. 'NEVER convict Rollback Attack on \\\"the resolved version decreased\\\"' because it 'convicts every admin who rolled back a bad release', squarely in the 12-15 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description answers WHAT ('detect and triage OWASP AST07 Update Drift'), WHEN ('when auditing an installed skill's pin discipline', 'when a downgrade needs distinguishing'), and keywords (Rollback Attack, Hot-Reload Abuse, hash vs. version range) \u2014 perfect per the 14-15 band.\"}, \"D5\": {\"score\": 15, \"why\": \"Excellent loading triggers embedded in the orientation block \u2014 'Do NOT load scripts/detector.py looking for a check' and 'Do NOT load coverage-matrix.md for triage' with explicit conditions for when each should be loaded, hitting the perfect 14-15 band.\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom matches fragility: an audit verification task gets a single mandated verdict word 'declared-and-uncovered' and ordered steps, while triage path selection is left to need-based descent \u2014 near-perfect calibration for a 14-15 score.\"}, \"D7\": {\"score\": 9, \"why\": \"Masterful application of the Navigation pattern (a ~30-line router routing to sub-files by symptom) fused with Knowledge content, with the symptom-routing table to AST01/02/05/08 doing exactly what the pattern is for \u2014 the 9-10 band.\"}, \"D8\": {\"score\": 14, \"why\": \"Every step in the by-hand procedure includes a fallback branch ('Cannot get the intent half: stop', 'S01 is undecided. Say so; do not downgrade it'), covering the edge cases and failure paths the 14-15 band requires.\"}}"
+    }
+  ],
+  "aggregate": {
+    "n": 17,
+    "mean": 110.3,
+    "median": 110.0,
+    "min": 103.0,
+    "max": 119.0,
+    "range": 16.0,
+    "stdev": 5.22,
+    "lower_bound": 105.1,
+    "judgments": [
+      105.0,
+      119.0,
+      112.0,
+      111.0,
+      109.0,
+      110.0,
+      105.0,
+      119.0,
+      106.0,
+      110.0,
+      114.0,
+      106.0,
+      119.0,
+      106.0,
+      103.0,
+      107.0,
+      114.0
+    ],
+    "method": "multi-round-independent-pooled",
+    "rubric_sha": "3027f20f3181758385a1bb8c022d4041dfb4de84",
+    "rubric_content_sha256": "737ef3628f0e11353114c3bd05a1c9d0c448dbfec1ae85db839253cbe93198b6",
+    "dim_n": 17,
+    "dim_means": {
+      "D1": 17.9,
+      "D2": 13.6,
+      "D3": 14.1,
+      "D4": 14.6,
+      "D5": 13.5,
+      "D6": 13.5,
+      "D7": 8.9,
+      "D8": 14.2
+    }
+  },
+  "verdict": "SHIP",
+  "verdict_reason": ""
+}

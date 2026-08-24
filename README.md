@@ -310,47 +310,70 @@ overclaim the labels exist to block:
   a labeled string; its scope is `scenario-level`, carried in the sibling `f1_scope` field
   and printed beside it by `python3 cli/ast10.py status`.
 
-**Judged (run 4)** — the verdict `scripts/ship_floor.py` computes for that skill's
+**Judged (run 5)** — the verdict `scripts/ship_floor.py` computes for that skill's
 `SKILL.md` from `eval/scorecards/<AST>.json`, with its pooled mean, recomputed from the
-recorded judgments rather than copied from a stored field. **Nine of the eleven skills clear
-the ship rule**: pooled mean ≥ 108, pooled `mean − σ` ≥ 105, and all eight dimension means
-above their floors, over 14 to 18 pooled judgments from six independent judges. No gate
-constant changed across any of the four recorded runs. The two that do not clear it
-are `AST01`, blocked on the `D3` Anti-Pattern Quality floor, and `AST09`, which clears every
-floor and is held only by the `mean − σ` clause — a defect recorded in
-[ADR-0005](docs/adr/0005-judge-panel-calibration-and-the-lower-bound.md) and deliberately not
-fixed on the run it would have benefited.
-
-**The gate has since been changed exactly once.** After run 4 was published,
-[ADR-0006](docs/adr/0006-confidence-bound-on-the-pooled-mean.md) retired the `mean − σ ≥ 105`
-clause and replaced it with `mean − 1.0 × σ/√n ≥ 108` — a confidence bound on the mean instead
-of a spread statistic — because the retired clause was shown not to be a function of the
-artifact: `AST08`'s `SKILL.md` is byte-identical between runs 3 and 4 and that clause alone
-flipped its verdict. The replacement constant was recorded **before** the run that will be judged
-by it, and it buys nothing on the data in hand: nine of eleven ship under either rule and no
-verdict changes. Everything above is run 4 under the rule that produced it and is not re-gated;
-run 5 is the first run judged under the new clause. This column is a judgement about the
-knowledge package and says
-nothing about the detector; the two are separate gates and
+recorded judgments rather than copied from a stored field. **Eleven of the eleven skills clear
+the ship rule**: pooled mean ≥ 108, the confidence bound `mean − 1.0 × σ/√n` ≥ 108, and all eight
+dimension means above their floors, over 16 to 18 pooled judgments from six independent judges.
+**The same board is 8 of 11 without the panel's least discriminating judge, and one of the eleven
+does not survive imputation of its own missing judgments** — both measured, both in [How fragile 11
+of 11 is](docs/skill-judge-dashboard.md#how-fragile-11-of-11-is). Read that number with them and
+with [What 11 of 11 is, and what it is
+not](#what-11-of-11-is-and-what-it-is-not) below — it is four paragraphs and it is not
+decoration. This column is a judgement about the knowledge package and says nothing about the
+detector; the two are separate gates and
 [`docs/skill-judge-dashboard.md`](docs/skill-judge-dashboard.md) is the full board.
+
+**The gate has been changed exactly once, and run 5 is the first corpus judged under the change.**
+After run 4 was published, [ADR-0006](docs/adr/0006-confidence-bound-on-the-pooled-mean.md)
+retired the `mean − σ ≥ 105` clause and replaced it with `mean − 1.0 × σ/√n ≥ 108` — a confidence
+bound on the mean instead of a spread statistic — because the retired clause was shown not to be a
+function of the artifact: `AST08`'s `SKILL.md` is byte-identical between runs 3 and 4 and that
+clause alone flipped its verdict. The replacement constant was recorded **before** the run judged
+by it, and it bought nothing **on the corpus it was adopted against**: nine of eleven shipped under
+either rule on the run-4 corpus, and no verdict changed. That is checked, not asserted —
+`tests/test_generate_dashboard.py` re-derives all eleven run-4 verdicts through today's gate
+against the frozen `eval/scorecards-run4/`.
+
+**On run 5 it bought a ship, and that has to be said in the same breath.** Under the retired clause
+run 5 is **10 of 11**: `AST01` clears the mean (110.1 ≥ 108) and misses `mean − σ` at
+110.1 − 6.65 = **103.4**, against 105. Under the clause in force it is 11 of 11. The change was
+recorded before the run and no constant moved to produce that, but "the new rule costs nothing" is
+a claim about run 4 and is false about run 5.
+
+Nor is the confidence bound reliably the *stricter* rule. `mean − σ ≥ 105` and
+`mean − σ/√n ≥ 108` are the bars `mean ≥ 105 + σ` and `mean ≥ 108 + σ/√n`, so the adopted clause
+demands more only when `σ < 3/(1 − 1/√n)` — about 4.0 at `n = 16`. **At every one of run 5's eleven
+`(n, σ)` pairs the adopted clause demands a lower mean than the retired one**, by 0.12 to 1.99
+points, because this run's per-skill σ never falls below 4.16. Across all five recorded runs — 55
+skill-runs — it has demanded a strictly higher mean on exactly three (`advisory` in run 3 at
+σ 3.44, and `AST04` and `AST05` in run 4), with one exact tie (`AST06` in run 4, both clauses
+demanding 109.04) counted apart from them. ADR-0006 replaced a clause that was **not a function of the artifact**;
+it did not replace it with a uniformly stricter one, and on the corpus it now gates it is the more
+permissive of the two.
+
+`AST01` is the row where all of this lands at once: it is the skill the gate change buys, the skill
+three of six single-judge exclusions block, and the skill whose two missing judgments flip it when
+they are refilled at the means of the judges that lost them. See
+[How fragile 11 of 11 is](docs/skill-judge-dashboard.md#how-fragile-11-of-11-is).
 
 The "What the shipped detector decides" column describes **only checks that exist and run
 today** — it is the check roster, not the category's subject matter. For what each category
 *covers as knowledge*, read its `SKILL.md`; for what is decidable and refused, read its
 `coverage-matrix.md`.
 
-| AST | Skill | What the shipped detector decides | Detector state | F1 | Judged (run 4) |
+| AST | Skill | What the shipped detector decides | Detector state | F1 | Judged (run 5) |
 | --- | --- | --- | --- | --- | --- |
-| AST01 | `ast01-malicious-skills` | Ten checks: `content_hash` absent or mismatched; install prose that pipes a remote fetch into a shell; a declared or coded write to `SOUL.md`; the same for `MEMORY.md`; a script that both reads an identity artifact and sends outbound; a WebSocket to an undeclared host; a hardcoded egress destination outside the declared allowlist; concealed instructions in the package's own output templates; an encoded blob decoded into an execution sink | `implemented` | `scenario-level 1.000 (8 labeled checks, n=16)` | BLOCKED 108.5 |
-| AST02 | `ast02-supply-chain-compromise` | One check: a command-bearing value in a config file the host auto-executes **at project open** — `.claude/settings.json` hooks, an MCP/env control-plane override, a `.vscode/tasks.json` `folderOpen` task. Registry flooding, dependency confusion and maintainer-account takeover are tiered `out-of-artifact` and no check claims them | `implemented` | `scenario-level 1.000 (AST02-S03, n=6)` | **SHIP** 112.3 |
-| AST03 | `ast03-over-privileged-skills` | Four checks: a declared write grant reaching the agent's own identity files (`SOUL.md`, `MEMORY.md`, `AGENTS.md`); no declared write floor at all; shell execution combined with unbounded egress; a blanket or wildcard egress declaration in place of an enumerated domain allowlist. Only the first covers a named scenario — the other three are a precondition and two signals | `implemented` | `scenario-level 1.00 (AST03-S03, n=2); artifact-signal-only 1.00 (n=4)` | **SHIP** 110.7 |
-| AST04 | `ast04-insecure-metadata` | Six checks: a declared allowlist contradicted by the destination a bundled script actually reaches; `risk_tier` below the floor its own permissions derive; code-executing YAML tags and unsafe loaders; `__proto__` / `constructor` keys in shipped JSON next to an unsafe merge site; redefined TOML tables; invisible code points (flagged as a carrier class and stopped there, not convicted as an instruction) | `implemented` | `scenario-level 1.00 (n=10)` | **SHIP** 112.6 |
-| AST05 | `ast05-untrusted-external-instructions` | Five checks, **every one a precondition**: a fetched document reaching an instruction sink; a remote response body reaching an executable sink; decision rules that consume upstream content with no provenance boundary; a blanket egress grant; a wildcard entry in the declared allowlist. The registry tiers all six AST05 scenarios `agent-judgable` or `out-of-artifact`, so none of these covers one | `implemented` | `artifact-signal-only 1.00 (n=6)` | **SHIP** 111.2 |
-| AST06 | `ast06-weak-isolation` | Five checks: a bundled script that shell-execs or writes a host-persistence path; a declared write scope reaching the filesystem root or the home directory; shell granted with no bounding command list; declared writes into a shared workspace namespace; an absent or empty permissions block. The first two decide AST06-S01's two disjuncts; the rest are a precondition and two signals | `implemented` | `scenario-level 1.00 (AST06-S01, n=4); artifact-signal-only 1.00 (n=2)` | **SHIP** 111.3 |
-| AST07 | `ast07-update-drift` | **No check ships, and none can.** All three AST07 scenarios — malicious update, rollback, hot-reload abuse — are defined by a *change between versions*, and one package at one moment carries no second version to compare against. The skill is knowledge only; `coverage-matrix.md` names the version-history evidence that would decide each one | `declared-and-uncovered` | `declared-and-uncovered` | **SHIP** 110.3 |
-| AST08 | `ast08-poor-scanning` | Four checks: an obfuscated instruction found by decode-and-rescan over the normalized view (comparing match counts per view, so a decoy in the clear cannot mask a smuggled copy); a branch that arms only under a specific environment; scanner-host hazards (padding runs, recursive archives, decompression ratio, symlink escape); bytecode the import machinery would prefer over its own source | `implemented` | `scenario-level 1.00 (4 scenario checks, n=8)` | **SHIP** 110.8 |
-| AST09 | `ast09-no-governance` | **No check ships, and none can.** All seven AST09 scenarios are `out-of-artifact`: inventory, approval, ownership and offboarding live in an organisation's process, not in a package. The skill is knowledge only; `coverage-matrix.md` names the governance-system evidence that would decide each one | `declared-and-uncovered` | `declared-and-uncovered` | BLOCKED 108.2 |
-| AST10 | `ast10-cross-platform-reuse` | One check: a payload hidden in an encoded blob that survives a port — decoded (base64, hex escapes, gzip-under-base64), then judged at the *content* layer, so a package carrying a legitimate encoded blob is not convicted for carrying one. Security metadata stripped during a port can be narrated inside a fake `SKILL.md`, so it is tiered `out-of-artifact` and no check claims it | `implemented` | `1.0` | **SHIP** 113.2 |
+| AST01 | `ast01-malicious-skills` | Ten checks: `content_hash` absent or mismatched; install prose that pipes a remote fetch into a shell; a declared or coded write to `SOUL.md`; the same for `MEMORY.md`; a script that both reads an identity artifact and sends outbound; a WebSocket to an undeclared host; a hardcoded egress destination outside the declared allowlist; concealed instructions in the package's own output templates; an encoded blob decoded into an execution sink | `implemented` | `scenario-level 1.000 (8 labeled checks, n=16)` | **SHIP** 110.1 |
+| AST02 | `ast02-supply-chain-compromise` | One check: a command-bearing value in a config file the host auto-executes **at project open** — `.claude/settings.json` hooks, an MCP/env control-plane override, a `.vscode/tasks.json` `folderOpen` task. Registry flooding, dependency confusion and maintainer-account takeover are tiered `out-of-artifact` and no check claims them | `implemented` | `scenario-level 1.000 (AST02-S03, n=6)` | **SHIP** 111.8 |
+| AST03 | `ast03-over-privileged-skills` | Four checks: a declared write grant reaching the agent's own identity files (`SOUL.md`, `MEMORY.md`, `AGENTS.md`); no declared write floor at all; shell execution combined with unbounded egress; a blanket or wildcard egress declaration in place of an enumerated domain allowlist. Only the first covers a named scenario — the other three are a precondition and two signals | `implemented` | `scenario-level 1.00 (AST03-S03, n=2); artifact-signal-only 1.00 (n=4)` | **SHIP** 112.2 |
+| AST04 | `ast04-insecure-metadata` | Six checks: a declared allowlist contradicted by the destination a bundled script actually reaches; `risk_tier` below the floor its own permissions derive; code-executing YAML tags and unsafe loaders; `__proto__` / `constructor` keys in shipped JSON next to an unsafe merge site; redefined TOML tables; invisible code points (flagged as a carrier class and stopped there, not convicted as an instruction) | `implemented` | `scenario-level 1.00 (n=10)` | **SHIP** 111.6 |
+| AST05 | `ast05-untrusted-external-instructions` | Five checks, **every one a precondition**: a fetched document reaching an instruction sink; a remote response body reaching an executable sink; decision rules that consume upstream content with no provenance boundary; a blanket egress grant; a wildcard entry in the declared allowlist. The registry tiers all six AST05 scenarios `agent-judgable` or `out-of-artifact`, so none of these covers one | `implemented` | `artifact-signal-only 1.00 (n=6)` | **SHIP** 110.6 |
+| AST06 | `ast06-weak-isolation` | Five checks: a bundled script that shell-execs or writes a host-persistence path; a declared write scope reaching the filesystem root or the home directory; shell granted with no bounding command list; declared writes into a shared workspace namespace; an absent or empty permissions block. The first two decide AST06-S01's two disjuncts; the rest are a precondition and two signals | `implemented` | `scenario-level 1.00 (AST06-S01, n=4); artifact-signal-only 1.00 (n=2)` | **SHIP** 112.1 |
+| AST07 | `ast07-update-drift` | **No check ships, and none can.** All three AST07 scenarios — malicious update, rollback, hot-reload abuse — are defined by a *change between versions*, and one package at one moment carries no second version to compare against. The skill is knowledge only; `coverage-matrix.md` names the version-history evidence that would decide each one | `declared-and-uncovered` | `declared-and-uncovered` | **SHIP** 110.2 |
+| AST08 | `ast08-poor-scanning` | Four checks: an obfuscated instruction found by decode-and-rescan over the normalized view (comparing match counts per view, so a decoy in the clear cannot mask a smuggled copy); a branch that arms only under a specific environment; scanner-host hazards (padding runs, recursive archives, decompression ratio, symlink escape); bytecode the import machinery would prefer over its own source | `implemented` | `scenario-level 1.00 (4 scenario checks, n=8)` | **SHIP** 109.7 |
+| AST09 | `ast09-no-governance` | **No check ships, and none can.** All seven AST09 scenarios are `out-of-artifact`: inventory, approval, ownership and offboarding live in an organisation's process, not in a package. The skill is knowledge only; `coverage-matrix.md` names the governance-system evidence that would decide each one | `declared-and-uncovered` | `declared-and-uncovered` | **SHIP** 111.1 |
+| AST10 | `ast10-cross-platform-reuse` | One check: a payload hidden in an encoded blob that survives a port — decoded (base64, hex escapes, gzip-under-base64), then judged at the *content* layer, so a package carrying a legitimate encoded blob is not convicted for carrying one. Security metadata stripped during a port can be narrated inside a fake `SKILL.md`, so it is tiered `out-of-artifact` and no check claims it | `implemented` | `1.0` | **SHIP** 112.4 |
 | — | `advisory` | Not a detector. Routes a free-text finding to its primary AST category via the whitepaper's decision tree and returns category-specific remediation | n/a — not a detector | not scored on F1 (judged on guidance quality) | **SHIP** 112.2 |
 
 Four readings of that table are worth spelling out, because each is easy to get backwards.
@@ -385,6 +408,68 @@ caveat applies to every 1.00 in the column.
 
 ---
 
+## What 11 of 11 is, and what it is not
+
+Every skill in the table above clears the ship rule. That is the best number this repository has
+ever published and it is the one most likely to be misread, so the four limits on it sit here
+rather than in a footnote. The full board, the per-judge bias table and the judge-quality
+diagnostics are in
+[`docs/skill-judge-dashboard.md`](docs/skill-judge-dashboard.md).
+
+**The corpus is self-authored.** The same project wrote the eleven skills, the fixtures, the
+scenario registry *and* the rubric-grounded prompt the judges read. A high pooled score is
+therefore evidence of **internal consistency** — these artifacts satisfy this repository's own
+statement of what a good skill is — and it is **not** external validation. Nobody outside this
+project has scored these files.
+
+**The panel disagrees by most of a grade band.** Across the same eleven files the six judges span
+an **11.4-point spread**, from `bedrock/qwen3-235b` at +6.5 to `bedrock/gpt-oss-120b` at −4.9,
+while no judge moves more than 2.3 points between its own rounds — so the spread is systematic
+bias, not noise. `bedrock/qwen3-235b` is `COARSE` on this run (79% of its dimension scores sit at
+a dimension's maximum and 34% of its judgments return the full 120) and was flagged
+`NON-DISCRIMINATING` on run 4; it is pooled into every published figure in both states, because
+dropping a judge for what it said needs its own recorded decision. **Dropping it alone takes the
+board to 8 of 11**: `AST01`, `AST07` and `AST08` fall below the confidence bound, at 106.7, 107.7
+and 107.5. `AST01` fails on two further single-judge exclusions as well — drop
+`anthropic-compatible/glm-5.2` and it reads 107.2, drop `claude-cli/sonnet` and it reads 107.7 —
+so **three of the six possible single-judge exclusions block it**, and only three of the six leave
+the board whole. The full table is in [How fragile 11 of 11
+is](docs/skill-judge-dashboard.md#how-fragile-11-of-11-is). A pooled mean is a statement
+about *the rubric as read by these six judges*, and
+[ADR-0005](docs/adr/0005-judge-panel-calibration-and-the-lower-bound.md) explains why it may not
+be quoted beside a single-judge score.
+
+**`k = 1.0` is one standard error of margin, and it is not a confidence level.** The judgments
+behind a pooled mean are clustered — six judges read about three times each, each carrying a large
+fixed offset — so they are not independent draws. Measured on run 4, the panel's intraclass
+correlation is 0.666 and its design effect 2.15, which means `σ/√n` **understates** the true
+standard error of the mean by roughly **1.47×**. The clause is published in points (it moves the
+effective bar from 108.0 to about 109.2 here) and never as a percentage, and
+[ADR-0006](docs/adr/0006-confidence-bound-on-the-pooled-mean.md) records the shortfall as the
+first thing a future record should fix.
+
+**Ten of the 198 attempted judgments never reached the pool, and the run that discarded them
+recorded nothing.** The board is 188 binding judgments; the harness that refused the other ten
+built its audit trail in memory, and the reasons and the raw responses are gone. Which skill,
+judge and round each was IS recoverable from the order the surviving judgments are stored in, and
+[`eval/run5-refusals.md`](eval/run5-refusals.md) is that reconstruction. It matters because the
+gap is not neutral: **`AST01` lost the two judges that scored `AST01` lowest** (100.5 and 104.5
+against its pooled 110.1), and replacing each missing attempt with that judge's own observed mean
+on that skill puts `AST01` at 109.2 with a confidence bound of 107.6 — below the bar. Nothing is
+imputed into any published figure and no verdict is re-issued; the eleventh ship simply depends on
+two judgments nobody can produce. The harness now persists every refusal, and
+`python3 scripts/refusal_ledger.py` fails if a scorecard's pooled `n` ever again falls below its
+attempted `n` with nothing accounting for the difference.
+
+Two further things a reader is entitled to know before quoting the count. `AST01` and `AST08`
+clear the confidence bound by 0.4 and 0.7 points respectively, and this repository's own doctrine
+says a threshold cleared by less than the instrument's run-to-run movement is not cleared.
+And `AST09` went BLOCKED → SHIP between runs 4 and 5 **without its `SKILL.md` changing by a
+byte**, on a pooled mean that rose 2.9 points: ADR-0006 stopped the gate depending on how much the
+panel agreed, but nothing stops the mean itself moving between runs.
+
+---
+
 ## What this does not do
 
 The single hardest limit: **a detector reads one skill package at one moment in time.**
@@ -415,10 +500,12 @@ pretend otherwise rather than shipping a proxy that scores well.
   today**: every labeled corpus in the repository is read by a detector, and
   `tests/test_coverage_matrix.py::test_every_authored_category_has_a_wired_corpus_or_is_declared_unwired`
   fails any category that publishes `pending-detector` while its corpus is wired. The coverage matrices name every gap.
-- **The judge scores are a panel's reading, not a measurement of quality.** Four runs are
-  recorded and nine of eleven skills clear the ship rule on the fourth, but a pooled mean is
-  a statement about the rubric *as read by these six judges*: they span 11.6 points on the
-  same eleven files, and one of them is flagged NON-DISCRIMINATING and still pooled.
+- **The judge scores are a panel's reading, not a measurement of quality.** Five runs are
+  recorded and all eleven skills clear the ship rule on the fifth, but a pooled mean is
+  a statement about the rubric *as read by these six judges*: they span 11.4 points on the
+  same eleven files, the corpus and the rubric prompt are both self-authored, and the most
+  generous judge is `COARSE` and still pooled. See
+  [What 11 of 11 is, and what it is not](#what-11-of-11-is-and-what-it-is-not) above.
   [`docs/skill-judge-dashboard.md`](docs/skill-judge-dashboard.md) publishes the whole panel,
   the per-judge bias, the judge-quality diagnostics, and the providers that are unavailable
   from this environment and why. Do not quote a number from it next to a single-judge score:
@@ -469,9 +556,14 @@ python3 -m pytest -q                            # the full suite
 python3 validators/usf.py skills/*/skill.usf.yaml   # every shipped manifest
 python3 validators/tier_lock.py fixtures/manifest.yaml   # tier-drift check
 python3 scripts/dogfood.py                      # our detectors over our own skills
-python3 scripts/ship_floor.py                   # recompute every stored judge verdict
+python3 scripts/ship_floor.py                   # recompute every stored judge verdict in
+                                                # eval/scorecards/ (and scores.json if present);
+                                                # exits 1 if it finds neither
 python3 eval/generate_f1_report.py              # re-measure every corpus, rewrite the F1 report
 python3 eval/generate_dashboard.py              # rewrite the dashboard results table
+python3 eval/calibration.py                     # judge bias, judge quality, and the robustness block
+python3 eval/robustness.py                      # leave-one-judge-out + missing-data sensitivity alone
+python3 scripts/refusal_ledger.py               # every discarded judgment must be on the record
 ruff check . && ruff format --check .           # exactly what CI runs; see ruff.toml
 ```
 

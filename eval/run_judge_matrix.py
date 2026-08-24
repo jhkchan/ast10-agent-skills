@@ -8,13 +8,20 @@ scorecard per skill to eval/scorecards/<name>.json.
 
 The second clause read `mean - stdev >= 105` through run 4 and was retired on
 2026-08-24 by docs/adr/0006-confidence-bound-on-the-pooled-mean.md -- the gate's
-first and only change, recorded before the run it judges. Scorecards written from
-here on therefore carry two statistics run 4's do not, `sem` and `ci_lower`.
-ARCHIVE eval/scorecards/ before overwriting it (CONTRIBUTING.md): run 4 was judged
-under the retired clause and must not be re-gated under this one.
+first and only change, recorded before the run it judges. Run 5 is the first corpus
+judged under it and the first to carry the two statistics that clause publishes,
+`sem` and `ci_lower`; the four archived runs do not have them.
+ARCHIVE eval/scorecards/ before overwriting it (CONTRIBUTING.md). Every archived
+run stays gated by the rule that scored it and must not be re-gated under a later
+one.
 
 Providers that are unavailable are recorded in config/audit.yml with a reason by
-adapters.base.build_roster -- never silently dropped (spec.md S-004).
+adapters.base.build_roster -- never silently dropped (spec.md S-004). A provider
+that ANSWERS and is refused is recorded the same way, by scripts.judge_harness.run_judge,
+and the entries are copied into the scorecard as `attempted`, `pooled`, `refusals` and
+`refusals_by_provider` so one scorecard shows its own gaps. Run 5 predates that and lost
+ten judgments with no record; eval/run5-refusals.md reconstructs what the bytes allow and
+scripts/refusal_ledger.py fails the build if it ever happens again.
 
 Usage:
     python3 eval/run_judge_matrix.py [--rounds N] [--skills AST01,AST04] [--dry-run]
@@ -56,6 +63,20 @@ def _zai_key() -> str | None:
     return None
 
 
+def _count_by_provider(refusals: list[dict]) -> dict[str, int]:
+    """{provider: refused count} for one skill's scorecard.
+
+    A one-line answer to "which judges are missing from this number", which
+    is the first question the pooled mean invites and the one run 5 could not
+    answer from its own files.
+    """
+    counts: dict[str, int] = {}
+    for entry in refusals:
+        provider = str(entry.get("provider", "unknown"))
+        counts[provider] = counts.get(provider, 0) + 1
+    return counts
+
+
 def build_adapters() -> list:
     """The roster verified live 2026-08-21. Unavailable ones are declared, not dropped."""
     adapters = [
@@ -71,12 +92,20 @@ def build_adapters() -> list:
     return adapters
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--rounds", type=int, default=3, help="pooled judgment rounds per skill")
     ap.add_argument("--skills", default="", help="comma-separated subset, e.g. AST01,AST04")
     ap.add_argument("--dry-run", action="store_true", help="build the roster and exit")
-    args = ap.parse_args()
+    ap.add_argument(
+        "--audit-path",
+        default=None,
+        help=(
+            "where refusals are appended (default: config/audit.yml). There is no value that means "
+            "'do not record'; tests point this at a scratch file."
+        ),
+    )
+    args = ap.parse_args(argv)
 
     adapters = build_adapters()
     roster = build_roster(adapters)
@@ -106,12 +135,33 @@ def main() -> int:
         for r in range(args.rounds):
             out = SCORECARDS / f".{d.name}.round{r}.json"
             t0 = time.time()
-            res = run_judge(d / "SKILL.md", available, output_path=out, timeout=180.0)
+            res = run_judge(
+                d / "SKILL.md",
+                available,
+                output_path=out,
+                timeout=180.0,
+                skill=d.name,
+                round_index=r + 1,
+                audit_path=args.audit_path,
+            )
             rounds.append(res)
             n = len(res.get("judgments") or [])
-            print(f"  {d.name} round {r + 1}/{args.rounds}: {res['status']} ({n} judgments, {time.time() - t0:.0f}s)")
+            refused = len(res.get("audit_trail") or [])
+            note = f", {refused} refused" if refused else ""
+            print(
+                f"  {d.name} round {r + 1}/{args.rounds}: {res['status']} "
+                f"({n} judgments{note}, {time.time() - t0:.0f}s)"
+            )
 
         judgments = [j for r in rounds for j in (r.get("judgments") or [])]
+        # The per-round scores.json files are deleted at the end of this loop, so
+        # anything a refusal knows has to be lifted out of them HERE. Run 5 did
+        # not do this and lost ten refusals with the temp files
+        # (eval/run5-refusals.md); config/audit.yml now holds the same entries
+        # independently, and this block is the copy a reader of one scorecard
+        # can see without leaving the file.
+        refusals = [dict(entry) for r in rounds for entry in (r.get("audit_trail") or [])]
+        attempted = args.rounds * len(available)
         totals, dimsets = [], []
         for j in judgments:
             sc = j.get("scores") or {}
@@ -149,6 +199,13 @@ def main() -> int:
             "providers_unavailable": [
                 {"provider": getattr(u, "provider", str(u)), "reason": getattr(u, "reason", "")} for u in unavailable
             ],
+            # attempted - pooled == len(refusals), asserted by
+            # tests/test_refusal_ledger.py. A scorecard that cannot say what
+            # happened to its own missing judgments does not ship.
+            "attempted": attempted,
+            "pooled": len(judgments),
+            "refusals": refusals,
+            "refusals_by_provider": _count_by_provider(refusals),
             "judgments": judgments,
             "aggregate": agg,
             "verdict": verdict,
@@ -159,6 +216,9 @@ def main() -> int:
             (SCORECARDS / f".{d.name}.round{r}.json").unlink(missing_ok=True)
 
         mean = (agg or {}).get("mean")
+        if len(judgments) != attempted:
+            gap = attempted - len(judgments)
+            print(f"  {d.name}: {gap} of {attempted} attempted judgments refused — {_count_by_provider(refusals)}")
         print(f"{d.name}: {verdict} — {reason} (mean={mean}, n={len(totals)})")
         summary.append((d.name, verdict, mean, len(totals)))
 

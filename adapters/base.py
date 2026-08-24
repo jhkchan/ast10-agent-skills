@@ -20,12 +20,72 @@ import abc
 import dataclasses
 import datetime
 import pathlib
+import re
 from collections.abc import Sequence
 
 import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 AUDIT_PATH = ROOT / "config" / "audit.yml"
+
+#: Statuses a runtime entry may carry. "failed" is a provider that raised
+#: (timeout, auth, crash); "malformed" is a provider that answered but whose
+#: answer would not bind (spec.md S-008 vs the justification contract in
+#: scripts/judge_harness.py). They are kept distinct because "the provider was
+#: down" and "the provider refused to explain its scores" are different facts
+#: about a run, and a reader of config/audit.yml must be able to tell them
+#: apart without reading the error string.
+RECORDABLE_STATUSES = frozenset({"failed", "malformed"})
+
+#: How many characters of a refused response are kept in the audit trail. Long
+#: enough to see the shape of what came back (which keys, which dimension is
+#: missing, whether it was prose instead of JSON); short enough that a run
+#: which refuses ten judgments does not turn config/audit.yml into a corpus.
+#: The FULL length is recorded alongside the excerpt, so a truncated record
+#: says so in numbers rather than pretending it is complete.
+MAX_RESPONSE_EXCERPT = 800
+
+#: Credential shapes redacted out of a recorded response before it is written
+#: to disk. A judge response should never contain one, which is exactly why a
+#: response that does must not be committed verbatim into an append-only file:
+#: the audit trail is the one artifact nobody re-reads before publishing.
+_SECRET_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"sk-[A-Za-z0-9_\-]{12,}"), "<redacted:api-key>"),
+    (re.compile(r"AKIA[0-9A-Z]{16}"), "<redacted:aws-access-key-id>"),
+    (re.compile(r"ASIA[0-9A-Z]{16}"), "<redacted:aws-session-key-id>"),
+    (re.compile(r"AIza[0-9A-Za-z_\-]{20,}"), "<redacted:google-api-key>"),
+    (re.compile(r"gh[pousr]_[A-Za-z0-9]{20,}"), "<redacted:github-token>"),
+    (re.compile(r"(?i)\bbearer\s+[A-Za-z0-9._\-]{12,}"), "<redacted:bearer-token>"),
+    (re.compile(r"(?i)\b([A-Z0-9_]*(?:API_KEY|SECRET|TOKEN|PASSWORD))\b\s*[=:]\s*\S+"), r"\1=<redacted>"),
+)
+
+
+def redact_secrets(text: str) -> str:
+    """Blank out anything credential-shaped in `text`, naming what was removed.
+
+    Named rather than deleted: a record that says ``<redacted:bearer-token>``
+    still tells a reader what the response contained, which is the difference
+    between redaction and omission.
+    """
+    for pattern, replacement in _SECRET_PATTERNS:
+        text = pattern.sub(replacement, text)
+    return text
+
+
+def response_excerpt(text: str, limit: int = MAX_RESPONSE_EXCERPT) -> tuple[str, int]:
+    """Return ``(excerpt, original_character_count)`` for a refused response.
+
+    Redacted first, then truncated with an explicit marker. Never returns the
+    empty string for a non-empty input, and never silently drops the tail: the
+    marker names how many characters were cut, so "we kept 800 of 4,102" is
+    readable off the record itself.
+    """
+    cleaned = redact_secrets(text)
+    original = len(text)
+    if len(cleaned) <= limit:
+        return cleaned, original
+    cut = len(cleaned) - limit
+    return f"{cleaned[:limit]}… [truncated {cut} more characters]", original
 
 
 class AdapterError(RuntimeError):
@@ -124,20 +184,76 @@ def record_unavailable(provider: str, reason: str, path: pathlib.Path = AUDIT_PA
     return _append_runtime_entry(entry, path)
 
 
-def record_failure(provider: str, error: str, path: pathlib.Path = AUDIT_PATH) -> dict:
+def record_failure(
+    provider: str,
+    error: str,
+    path: pathlib.Path = AUDIT_PATH,
+    *,
+    status: str = "failed",
+    skill: str | None = None,
+    round_index: int | None = None,
+    response: str | None = None,
+) -> dict:
     """Append a mid-round failure entry (spec.md S-008: "an audit-trail
     entry (timestamp, provider name, error message)"). The judgment itself
-    is excluded from the pool by the caller (call_adapter); this only
-    records why."""
+    is excluded from the pool by the caller (call_adapter or
+    scripts.judge_harness.run_judge); this is what makes the exclusion
+    survive the process that made it.
+
+    The four keyword arguments exist because "an audit-trail entry" was not
+    enough to answer the only question anyone asks of a discarded judgment
+    six weeks later — WHICH one was discarded. Run 5 of this repo's judge
+    matrix refused 10 of 198 attempted judgments and recorded none of them
+    (see eval/run5-refusals.md); the loss was total because the harness
+    built its audit trail in memory and never called this function. So:
+
+    * ``status`` — "failed" (the provider raised) or "malformed" (the
+      provider answered and the answer would not bind). Restricted to
+      RECORDABLE_STATUSES so a typo cannot invent a third category that
+      every reader then has to guess at.
+    * ``skill`` and ``round_index`` — WHICH attempt this was. A refusal
+      that names only the provider cannot be matched against a scorecard's
+      missing row, which is precisely the gap run 5 left. ``round_index``
+      is the 1-based round number as printed by the harness.
+    * ``response`` — enough of what the provider actually said to diagnose
+      it, redacted and truncated by :func:`response_excerpt` and recorded
+      with its original length. Never omitted when a response existed: the
+      excerpt is the only copy that outlives the run.
+
+    All four are optional so that the pre-existing callers
+    (:func:`call_adapter`, which has no skill/round context) keep working
+    unchanged; nothing about them is optional for the judge harness, whose
+    tests assert every one of them is present.
+    """
     if not error.strip():
         raise ValueError("record_failure requires a non-empty error message")
+    if status not in RECORDABLE_STATUSES:
+        raise ValueError(f"record_failure status must be one of {sorted(RECORDABLE_STATUSES)}, got {status!r}")
     entry = {
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "provider": provider,
-        "status": "failed",
+        "status": status,
         "reason": error,
     }
+    if skill is not None:
+        entry["skill"] = skill
+    if round_index is not None:
+        entry["round"] = int(round_index)
+    if response is not None:
+        excerpt, original = response_excerpt(response)
+        entry["response_excerpt"] = excerpt
+        entry["response_chars"] = original
     return _append_runtime_entry(entry, path)
+
+
+def runtime_entries(path: pathlib.Path = AUDIT_PATH) -> list[dict]:
+    """Read back the append-only runtime entries recorded at `path`.
+
+    The counterpart to record_unavailable/record_failure, and the reason it
+    exists is the guard in scripts/refusal_guard.py: a record nothing reads
+    is a record nobody notices the absence of.
+    """
+    return list(_load_audit(path).get("runtime_entries") or [])
 
 
 def static_unavailable(path: pathlib.Path = AUDIT_PATH) -> list[AdapterStatus]:

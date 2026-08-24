@@ -16,30 +16,180 @@
       "scores": {
         "D1": 18.0,
         "D2": 13.0,
-        "D3": 14.0,
+        "D3": 15.0,
         "D4": 15.0,
-        "D5": 11.0,
-        "D6": 14.0,
-        "D7": 9.0,
-        "D8": 13.0
+        "D5": 7.0,
+        "D6": 13.0,
+        "D7": 8.0,
+        "D8": 12.0
       },
       "justifications": {
-        "D1": "Rule\u202f1\u2019s statement that `deny_write` always wins over `write` (a non\u2011obvious precedence rule) shows pure expert knowledge, placing it in the 16\u201120 band.",
-        "D2": "The skill\u2019s mindset cue \u201cPorting is a re\u2011validation trigger, never an equivalence assumption\u201d together with the step\u2011by\u2011step validator commands exemplifies expert thinking plus domain\u2011specific procedures, fitting the 12\u201115 band.",
-        "D3": "The extensive \u2018NEVER\u2019 list (e.g., \u201cNEVER read `OK (signature=signed, \u2026)` as a verified signature\u201d) provides specific anti\u2011patterns with reasoning, landing it in the 12\u201115 band.",
-        "D4": "The description names the capability, trigger scenarios and keywords (manifest validation, porting across runtimes, permission binding), satisfying the perfect\u2011description criteria.",
-        "D5": "The skill includes explicit \u2018Do NOT open coverage\u2011matrix.md unless\u2026\u2019 and \u2018Do NOT reach for scripts/detector.py\u2019 directives, giving mandatory loading triggers and thus meeting the good\u2011layering band.",
-        "D6": "By enforcing exact precedence logic, mandatory re\u2011validation on porting, and strict \u201cNEVER\u201d constraints, the freedom level matches the low\u2011fragility requirement, earning the 14\u201115 band.",
-        "D7": "Its structure\u2014decision rules, precise workflow steps, and a heavy \u201cNEVER\u201d section\u2014matches the official \u2018Tool\u2019 pattern and does so with only minor deviations, placing it in the 7\u20119 band.",
-        "D8": "The skill provides concrete commands, decision tables, error\u2011handling notes and fallback guidance (e.g., handling encoded blobs), making it readily actionable for an agent, fitting the 11\u201113 band."
+        "D1": "The 'The manifest's own precedence rules \u2014 get these exactly right' section details non\u2011obvious expert rules such as most\u2011specific\u2011wins for deny_write and canonical JCS signature handling, placing it in the 16\u201120 pure knowledge\u2011delta band.",
+        "D2": "The 'Decision rules for the porting event itself' segment teaches the expert mindset ('Porting is a re\u2011validation trigger, never an equivalence assumption') and provides concrete workflow steps, fitting the 12\u201115 expert\u2011level balance band.",
+        "D3": "The extensive 'NEVER' list (e.g., 'NEVER read OK (signature=signed, \u2026) as a verified signature') gives specific anti\u2011patterns with reasoning, meeting the 12\u201115 expert\u2011grade anti\u2011pattern band.",
+        "D4": "The description explicitly states the capability, trigger scenarios ('Use when validating a manifest\u2026 when a skill is being ported\u2026') and includes keywords like 'manifest' and 'AST10', achieving the perfect 14\u201115 description compliance band.",
+        "D5": "While the skill references files such as `coverage-matrix.md` and `scripts/detector.py`, it provides no explicit MANDATORY loading triggers, fitting the 6\u201110 band for unclear reference loading.",
+        "D6": "The skill enforces strict procedures (run `validators/usf.py`, enforce deny_write precedence) and limits flexibility, matching the 11\u201113 good freedom\u2011calibration band for a fragile security operation.",
+        "D7": "Its organization into rule sections, command snippets, and decision tables follows the official 'Tool' pattern for precise format handling, placing it in the 7\u20118 clear\u2011pattern band.",
+        "D8": "It supplies actionable commands, decision trees and error\u2011handling notes (e.g., run validator, follow rule 1\u20115, heed NEVER list), enabling an agent to operate effectively, satisfying the 11\u201113 usability band."
       },
-      "total": 107.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"Rule\u202f1\u2019s statement that `deny_write` always wins over `write` (a non\u2011obvious precedence rule) shows pure expert knowledge, placing it in the 16\u201120 band.\"},\n  \"D2\": {\"score\": 13, \"why\": \"The skill\u2019s mindset cue \u201cPorting is a re\u2011validation trigger, never an equivalence assumption\u201d together with the step\u2011by\u2011step validator commands exemplifies expert thinking plus domain\u2011specific procedures, fitting the 12\u201115 band.\"},\n  \"D3\": {\"score\": 14, \"why\": \"The extensive \u2018NEVER\u2019 list (e.g., \u201cNEVER read `OK (signature=signed, \u2026)` as a verified signature\u201d) provides specific anti\u2011patterns with reasoning, landing it in the 12\u201115 band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description names the capability, trigger scenarios and keywords (manifest validation, porting across runtimes, permission binding), satisfying the perfect\u2011description criteria.\"},\n  \"D5\": {\"score\": 11, \"why\": \"The skill includes explicit \u2018Do NOT open coverage\u2011matrix.md unless\u2026\u2019 and \u2018Do NOT reach for scripts/detector.py\u2019 directives, giving mandatory loading triggers and thus meeting the good\u2011layering band.\"},\n  \"D6\": {\"score\": 14, \"why\": \"By enforcing exact precedence logic, mandatory re\u2011validation on porting, and strict \u201cNEVER\u201d constraints, the freedom level matches the low\u2011fragility requirement, earning the 14\u201115 band.\"},\n  \"D7\": {\"score\": 9, \"why\": \"Its structure\u2014decision rules, precise workflow steps, and a heavy \u201cNEVER\u201d section\u2014matches the official \u2018Tool\u2019 pattern and does so with only minor deviations, placing it in the 7\u20119 band.\"},\n  \"D8\": {\"score\": 13, \"why\": \"The skill provides concrete commands, decision tables, error\u2011handling notes and fallback guidance (e.g., handling encoded blobs), making it readily actionable for an agent, fitting the 11\u201113 band.\"}\n}"
+      "total": 101.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 18, \"why\": \"The 'The manifest's own precedence rules \u2014 get these exactly right' section details non\u2011obvious expert rules such as most\u2011specific\u2011wins for deny_write and canonical JCS signature handling, placing it in the 16\u201120 pure knowledge\u2011delta band.\"},\n  \"D2\": {\"score\": 13, \"why\": \"The 'Decision rules for the porting event itself' segment teaches the expert mindset ('Porting is a re\u2011validation trigger, never an equivalence assumption') and provides concrete workflow steps, fitting the 12\u201115 expert\u2011level balance band.\"},\n  \"D3\": {\"score\": 15, \"why\": \"The extensive 'NEVER' list (e.g., 'NEVER read OK (signature=signed, \u2026) as a verified signature') gives specific anti\u2011patterns with reasoning, meeting the 12\u201115 expert\u2011grade anti\u2011pattern band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description explicitly states the capability, trigger scenarios ('Use when validating a manifest\u2026 when a skill is being ported\u2026') and includes keywords like 'manifest' and 'AST10', achieving the perfect 14\u201115 description compliance band.\"},\n  \"D5\": {\"score\": 7, \"why\": \"While the skill references files such as `coverage-matrix.md` and `scripts/detector.py`, it provides no explicit MANDATORY loading triggers, fitting the 6\u201110 band for unclear reference loading.\"},\n  \"D6\": {\"score\": 13, \"why\": \"The skill enforces strict procedures (run `validators/usf.py`, enforce deny_write precedence) and limits flexibility, matching the 11\u201113 good freedom\u2011calibration band for a fragile security operation.\"},\n  \"D7\": {\"score\": 8, \"why\": \"Its organization into rule sections, command snippets, and decision tables follows the official 'Tool' pattern for precise format handling, placing it in the 7\u20118 clear\u2011pattern band.\"},\n  \"D8\": {\"score\": 12, \"why\": \"It supplies actionable commands, decision trees and error\u2011handling notes (e.g., run validator, follow rule 1\u20115, heed NEVER list), enabling an agent to operate effectively, satisfying the 11\u201113 usability band.\"}\n}"
     },
     {
       "provider": "bedrock/qwen3-235b",
       "scores": {
         "D1": 19.0,
+        "D2": 14.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The skill demonstrates pure knowledge delta with expert-level insights such as 'deny_write always wins over write' and 'network.allow is evaluated default-deny', which are non-obvious trade-offs only an expert would know, placing it in the 16-20 band.",
+        "D2": "The skill provides expert thinking patterns like asking whether a finding is about a missing field versus a wrong value, and domain-specific procedures such as the exact validation sequence for USF manifests, meeting the 12-15 band for expert-level guidance.",
+        "D3": "The NEVER list contains expert-grade anti-patterns with clear reasoning, such as 'NEVER read `OK (signature=signed, ...)` as a verified signature' due to unverified shape matching, which reflects hard-won experience and meets the 12-15 band.",
+        "D4": "The description clearly answers WHAT (detect and triage AST10 issues), WHEN (during manifest validation or skill porting), and includes keywords like 'Universal Skill Format' and 'risk_tier', meeting the 14-15 band for perfect specification compliance.",
+        "D5": "The skill implements excellent progressive disclosure with MANDATORY triggers like 'read rules 1\u20135' based on finding type and explicit 'Do NOT open' guidance for `coverage-matrix.md`, achieving the 14-15 band.",
+        "D6": "Freedom is perfectly calibrated to the fragile nature of security metadata validation, mandating exact scripts and strict evaluation rules rather than suggestions, which matches the low-freedom requirement for file-format-like operations, scoring in the 14-15 band.",
+        "D7": "The skill follows the 'Tool' pattern masterfully with decision trees, code examples, and low freedom, matching the 300-line pattern for precise format operations, placing it in the 9-10 band.",
+        "D8": "The skill provides comprehensive usability with decision trees for different findings, fallback logic in tool usage, and explicit error handling for edge cases like unverifiable signatures, meeting the 14-15 band for practical usability."
+      },
+      "total": 117.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"The skill demonstrates pure knowledge delta with expert-level insights such as 'deny_write always wins over write' and 'network.allow is evaluated default-deny', which are non-obvious trade-offs only an expert would know, placing it in the 16-20 band.\"}, \"D2\": {\"score\": 14, \"why\": \"The skill provides expert thinking patterns like asking whether a finding is about a missing field versus a wrong value, and domain-specific procedures such as the exact validation sequence for USF manifests, meeting the 12-15 band for expert-level guidance.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER list contains expert-grade anti-patterns with clear reasoning, such as 'NEVER read `OK (signature=signed, ...)` as a verified signature' due to unverified shape matching, which reflects hard-won experience and meets the 12-15 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description clearly answers WHAT (detect and triage AST10 issues), WHEN (during manifest validation or skill porting), and includes keywords like 'Universal Skill Format' and 'risk_tier', meeting the 14-15 band for perfect specification compliance.\"}, \"D5\": {\"score\": 14, \"why\": \"The skill implements excellent progressive disclosure with MANDATORY triggers like 'read rules 1\u20135' based on finding type and explicit 'Do NOT open' guidance for `coverage-matrix.md`, achieving the 14-15 band.\"}, \"D6\": {\"score\": 15, \"why\": \"Freedom is perfectly calibrated to the fragile nature of security metadata validation, mandating exact scripts and strict evaluation rules rather than suggestions, which matches the low-freedom requirement for file-format-like operations, scoring in the 14-15 band.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill follows the 'Tool' pattern masterfully with decision trees, code examples, and low freedom, matching the 300-line pattern for precise format operations, placing it in the 9-10 band.\"}, \"D8\": {\"score\": 15, \"why\": \"The skill provides comprehensive usability with decision trees for different findings, fallback logic in tool usage, and explicit error handling for edge cases like unverifiable signatures, meeting the 14-15 band for practical usability.\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 18.0,
+        "D2": 14.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "The rule distinguishing between missing fields (AST10) and wrong field values (AST01-09) is pure knowledge delta, scoring in the 16-20 'pure knowledge delta' band.",
+        "D2": "It provides expert thinking patterns like 'Porting is a re-validation trigger, never an equivalence assumption' and domain-specific procedures like the manifest precedence rules, scoring in the 12-15 'shapes thinking AND provides procedures' band.",
+        "D3": "The extensive 'NEVER' list with specific, experience-based warnings like 'NEVER read OK (signature=signed, ...) as a verified signature' fulfills the 12-15 'expert-grade anti-patterns with WHY' criteria.",
+        "D4": "The description explicitly includes WHAT, WHEN, and keywords like 'Universal Skill Format' and 'porting', meeting the perfect 14-15 band criteria.",
+        "D5": "The table 'If the finding is...' provides mandatory triggers for reading sub-sections and explicit 'Do NOT open' guidance, scoring in the 14-15 'perfect layering' band.",
+        "D6": "It calibrates low freedom for fragile manifest validation with exact rule scripts and high freedom for creative triage decisions, perfectly matching task fragility for a 14-15 score.",
+        "D7": "It masterfully applies the 'Mindset' pattern with dense expert knowledge, strong NEVER list, and high freedom for judgment, fitting the 'Creative tasks requiring taste' use case for a 9-10 score.",
+        "D8": "It offers clear decision trees, actionable code paths, error handling fallbacks ('Call verify_signature explicitly'), and edge-case coverage, meeting the 14-15 'comprehensive coverage' criteria."
+      },
+      "total": 116.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"The rule distinguishing between missing fields (AST10) and wrong field values (AST01-09) is pure knowledge delta, scoring in the 16-20 'pure knowledge delta' band.\"\n  },\n  \"D2\": {\n    \"score\": 14,\n    \"why\": \"It provides expert thinking patterns like 'Porting is a re-validation trigger, never an equivalence assumption' and domain-specific procedures like the manifest precedence rules, scoring in the 12-15 'shapes thinking AND provides procedures' band.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"The extensive 'NEVER' list with specific, experience-based warnings like 'NEVER read OK (signature=signed, ...) as a verified signature' fulfills the 12-15 'expert-grade anti-patterns with WHY' criteria.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description explicitly includes WHAT, WHEN, and keywords like 'Universal Skill Format' and 'porting', meeting the perfect 14-15 band criteria.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"The table 'If the finding is...' provides mandatory triggers for reading sub-sections and explicit 'Do NOT open' guidance, scoring in the 14-15 'perfect layering' band.\"\n  },\n  \"D6\": {\n    \"score\": 15,\n    \"why\": \"It calibrates low freedom for fragile manifest validation with exact rule scripts and high freedom for creative triage decisions, perfectly matching task fragility for a 14-15 score.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"It masterfully applies the 'Mindset' pattern with dense expert knowledge, strong NEVER list, and high freedom for judgment, fitting the 'Creative tasks requiring taste' use case for a 9-10 score.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"It offers clear decision trees, actionable code paths, error handling fallbacks ('Call verify_signature explicitly'), and edge-case coverage, meeting the 14-15 'comprehensive coverage' criteria.\"\n  }\n}"
+    },
+    {
+      "provider": "bedrock/nova-pro",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 14.0,
+        "D4": 14.0,
+        "D5": 14.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Provides deep expert knowledge on OWASP AST10 Cross-Platform Reuse with specific decision rules and detailed explanations.",
+        "D2": "Offers domain-specific procedures and thinking patterns, though some generic procedures are included.",
+        "D3": "Contains a comprehensive NEVER list with specific reasoning, covering common pitfalls and misunderstandings.",
+        "D4": "Description is comprehensive, detailing WHAT, WHEN, and KEYWORDS, though it could be slightly more concise.",
+        "D5": "Implements good content layering with explicit triggers and guidance on when to load additional resources.",
+        "D6": "Appropriate level of specificity for the task's fragility, though some sections could benefit from more freedom.",
+        "D7": "Follows the 'Tool' pattern closely with minor deviations, providing decision trees and code examples.",
+        "D8": "High practical usability with clear guidance, decision trees, and error handling, though edge cases could be more explicitly covered."
+      },
+      "total": 109.0,
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"Provides deep expert knowledge on OWASP AST10 Cross-Platform Reuse with specific decision rules and detailed explanations.\"\n  },\n  \"D2\": {\n    \"score\": 13,\n    \"why\": \"Offers domain-specific procedures and thinking patterns, though some generic procedures are included.\"\n  },\n  \"D3\": {\n    \"score\": 14,\n    \"why\": \"Contains a comprehensive NEVER list with specific reasoning, covering common pitfalls and misunderstandings.\"\n  },\n  \"D4\": {\n    \"score\": 14,\n    \"why\": \"Description is comprehensive, detailing WHAT, WHEN, and KEYWORDS, though it could be slightly more concise.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"Implements good content layering with explicit triggers and guidance on when to load additional resources.\"\n  },\n  \"D6\": {\n    \"score\": 13,\n    \"why\": \"Appropriate level of specificity for the task's fragility, though some sections could benefit from more freedom.\"\n  },\n  \"D7\": {\n    \"score\": 9,\n    \"why\": \"Follows the 'Tool' pattern closely with minor deviations, providing decision trees and code examples.\"\n  },\n  \"D8\": {\n    \"score\": 14,\n    \"why\": \"High practical usability with clear guidance, decision trees, and error handling, though edge cases could be more explicitly covered.\"\n  }\n}"
+    },
+    {
+      "provider": "claude-cli/sonnet",
+      "scores": {
+        "D1": 18.0,
+        "D2": 13.0,
+        "D3": 14.0,
+        "D4": 14.0,
+        "D5": 14.0,
+        "D6": 13.0,
+        "D7": 9.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "The precedence rules (e.g. 'deny_write always wins... most-specific-wins, not first-match' and the JCS/RFC 8785 canonicalization requirement for signatures) are pure expert knowledge with no basics-tutorial content, placing it in the 16-20 band.",
+        "D2": "The 'Fires on / Decides / Does not decide' framing plus the 'Run first, then read only what the finding needs' workflow combines a thinking pattern with a non-generic domain procedure, matching the 12-15 'good balance' band.",
+        "D3": "The NEVER list cites exact code locations ('signature_state (validators/usf.py line 579)... never calls verify_signature') with concrete failure consequences, meeting the 12-15 'expert-grade anti-patterns with WHY' band rather than generic warnings.",
+        "D4": "The description names WHAT (manifest validation, cross-registry arbitrage), WHEN (validating a manifest, porting across runtimes, binding a permission finding), and keywords (deny_write, risk_tier, OpenClaw/Cursor/VS Code), landing in the 14-15 band though it stops short of an explicit numbered trigger list like the exemplar.",
+        "D5": "The routing table ('If the finding is... | Read') paired with explicit 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py' guidance is the 'Excellent' loading-trigger pattern the rubric calls for in the 14-15 band.",
+        "D6": "The skill stays low-freedom throughout (exact field precedence, line-number citations, bounded decode limits) which correctly matches the fragility of manifest/security-metadata validation, landing in the 11-13 'good calibration' band.",
+        "D7": "The structure (decision tables, code/YAML examples, low freedom, precise field-level rules) is a clear instance of the 'Tool' pattern with only minor deviation via its navigation-style routing table, fitting the 7-8 band at minimum and arguably the 9-10 'masterful' tier.",
+        "D8": "Concrete fallback guidance like 'C2 follows the decode to a sink across at most one assignment... Two hops... breaks the link' documents a specific edge case and its failure mode, meeting the 14-15 'comprehensive coverage including edge cases' band."
+      },
+      "total": 109.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The precedence rules (e.g. 'deny_write always wins... most-specific-wins, not first-match' and the JCS/RFC 8785 canonicalization requirement for signatures) are pure expert knowledge with no basics-tutorial content, placing it in the 16-20 band.\"}, \"D2\": {\"score\": 13, \"why\": \"The 'Fires on / Decides / Does not decide' framing plus the 'Run first, then read only what the finding needs' workflow combines a thinking pattern with a non-generic domain procedure, matching the 12-15 'good balance' band.\"}, \"D3\": {\"score\": 14, \"why\": \"The NEVER list cites exact code locations ('signature_state (validators/usf.py line 579)... never calls verify_signature') with concrete failure consequences, meeting the 12-15 'expert-grade anti-patterns with WHY' band rather than generic warnings.\"}, \"D4\": {\"score\": 14, \"why\": \"The description names WHAT (manifest validation, cross-registry arbitrage), WHEN (validating a manifest, porting across runtimes, binding a permission finding), and keywords (deny_write, risk_tier, OpenClaw/Cursor/VS Code), landing in the 14-15 band though it stops short of an explicit numbered trigger list like the exemplar.\"}, \"D5\": {\"score\": 14, \"why\": \"The routing table ('If the finding is... | Read') paired with explicit 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py' guidance is the 'Excellent' loading-trigger pattern the rubric calls for in the 14-15 band.\"}, \"D6\": {\"score\": 13, \"why\": \"The skill stays low-freedom throughout (exact field precedence, line-number citations, bounded decode limits) which correctly matches the fragility of manifest/security-metadata validation, landing in the 11-13 'good calibration' band.\"}, \"D7\": {\"score\": 9, \"why\": \"The structure (decision tables, code/YAML examples, low freedom, precise field-level rules) is a clear instance of the 'Tool' pattern with only minor deviation via its navigation-style routing table, fitting the 7-8 band at minimum and arguably the 9-10 'masterful' tier.\"}, \"D8\": {\"score\": 14, \"why\": \"Concrete fallback guidance like 'C2 follows the decode to a sink across at most one assignment... Two hops... breaks the link' documents a specific edge case and its failure mode, meeting the 14-15 'comprehensive coverage including edge cases' band.\"}}\n"
+    },
+    {
+      "provider": "anthropic-compatible/glm-5.2",
+      "scores": {
+        "D1": 19.0,
+        "D2": 14.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 14.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "Rules like 'deny: \"*\" is redundant auditability, not an override' and JCS-canonical-signature semantics are pure expert delta \u2014 every paragraph (e.g. rule 4's canonicalization rationale) earns its tokens, matching the 16-20 'pure knowledge delta' band.",
+        "D2": "The 'Run first, then read only what the finding needs' section pairs non-obvious procedures (usf.py for rules 1-5, cli audit for rule 9) with expert framing like 'AST10 is not a protocol problem... no shared vocabulary for security metadata itself' \u2014 expert-level thinking plus domain-specific workflows band.",
+        "D3": "The NEVER list is expert-grade with WHY at line-number specificity, e.g. 'signature_state (validators/usf.py line 579) is a regex... validate_manifest never calls verify_signature' \u2014 things only experience teaches, top band.",
+        "D4": "The description gives WHAT (detect/triage AST10, manifest validation), WHEN ('when a skill is being ported across runtimes and needs a re-validation gate'), and keywords (deny_write precedence, network allowlist default-deny, signed content hash) \u2014 perfect WHAT+WHEN+KEYWORDS band.",
+        "D5": "The 'If the finding is\u2026 | Read' table embeds mandatory triggers plus explicit negative guidance ('Do NOT open coverage-matrix.md unless...', 'Do NOT reach for detector.py for rules 1-5') \u2014 perfect decision-tree-with-Do-NOT-Load band.",
+        "D6": "For a fragile validation task it prescribes exact tools and scripts ('python3 validators/usf.py <manifest>', 'Run --strict') while leaving judgment calls (e.g. rule 9's decoded-content vs decode-to-execution-path) to the agent \u2014 near-perfect freedom calibration.",
+        "D7": "It cleanly applies the Navigation pattern (routing table to sub-resources) with Tool-pattern precision in the precedence rules \u2014 clear pattern with minor deviations.",
+        "D8": "The 'Where the one shipped check goes quiet' section enumerates concrete detector limits (C2 breaks across two hops, decode depth 2 / 256 KiB / 400 candidates) with fallback guidance ('needs a manual pass, not a re-run') \u2014 comprehensive edge-case and error-handling coverage."
+      },
+      "total": 114.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Rules like 'deny: \\\"*\\\" is redundant auditability, not an override' and JCS-canonical-signature semantics are pure expert delta \u2014 every paragraph (e.g. rule 4's canonicalization rationale) earns its tokens, matching the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 14, \"why\": \"The 'Run first, then read only what the finding needs' section pairs non-obvious procedures (usf.py for rules 1-5, cli audit for rule 9) with expert framing like 'AST10 is not a protocol problem... no shared vocabulary for security metadata itself' \u2014 expert-level thinking plus domain-specific workflows band.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER list is expert-grade with WHY at line-number specificity, e.g. 'signature_state (validators/usf.py line 579) is a regex... validate_manifest never calls verify_signature' \u2014 things only experience teaches, top band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description gives WHAT (detect/triage AST10, manifest validation), WHEN ('when a skill is being ported across runtimes and needs a re-validation gate'), and keywords (deny_write precedence, network allowlist default-deny, signed content hash) \u2014 perfect WHAT+WHEN+KEYWORDS band.\"}, \"D5\": {\"score\": 15, \"why\": \"The 'If the finding is\u2026 | Read' table embeds mandatory triggers plus explicit negative guidance ('Do NOT open coverage-matrix.md unless...', 'Do NOT reach for detector.py for rules 1-5') \u2014 perfect decision-tree-with-Do-NOT-Load band.\"}, \"D6\": {\"score\": 14, \"why\": \"For a fragile validation task it prescribes exact tools and scripts ('python3 validators/usf.py <manifest>', 'Run --strict') while leaving judgment calls (e.g. rule 9's decoded-content vs decode-to-execution-path) to the agent \u2014 near-perfect freedom calibration.\"}, \"D7\": {\"score\": 8, \"why\": \"It cleanly applies the Navigation pattern (routing table to sub-resources) with Tool-pattern precision in the precedence rules \u2014 clear pattern with minor deviations.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Where the one shipped check goes quiet' section enumerates concrete detector limits (C2 breaks across two hops, decode depth 2 / 256 KiB / 400 candidates) with fallback guidance ('needs a manual pass, not a re-run') \u2014 comprehensive edge-case and error-handling coverage.\"}}"
+    },
+    {
+      "provider": "bedrock/gpt-oss-120b",
+      "scores": {
+        "D1": 17.0,
+        "D2": 13.0,
+        "D3": 14.0,
+        "D4": 15.0,
+        "D5": 12.0,
+        "D6": 13.0,
+        "D7": 8.0,
+        "D8": 14.0
+      },
+      "justifications": {
+        "D1": "includes expert rule 'deny_write always wins over write' illustrating non\u2011obvious precedence knowledge",
+        "D2": "offers mindset line 'Porting is a re-validation trigger, never an equivalence assumption' plus concrete validator procedures",
+        "D3": "contains detailed NEVER list such as 'NEVER read OK (signature=signed, ...) as a verified signature' with explicit reasoning",
+        "D4": "description lists WHAT, WHEN, and keywords like 'manifest' and 'Universal Skill Format', meeting perfect description criteria",
+        "D5": "provides loading guidance ('Do NOT open coverage-matrix.md unless...') and references files, showing layered disclosure without full mandatory triggers",
+        "D6": "applies low\u2011freedom constraints like mandatory validator commands and precise precedence rules appropriate for fragile security metadata",
+        "D7": "structure follows the Process pattern with phased workflow and decision rules, matching an official pattern",
+        "D8": "offers actionable commands, decision tables, and edge\u2011case handling (e.g., encoded blob detection) enabling effective agent use"
+      },
+      "total": 106.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 17, \"why\": \"includes expert rule 'deny_write always wins over write' illustrating non\u2011obvious precedence knowledge\"},\n  \"D2\": {\"score\": 13, \"why\": \"offers mindset line 'Porting is a re-validation trigger, never an equivalence assumption' plus concrete validator procedures\"},\n  \"D3\": {\"score\": 14, \"why\": \"contains detailed NEVER list such as 'NEVER read OK (signature=signed, ...) as a verified signature' with explicit reasoning\"},\n  \"D4\": {\"score\": 15, \"why\": \"description lists WHAT, WHEN, and keywords like 'manifest' and 'Universal Skill Format', meeting perfect description criteria\"},\n  \"D5\": {\"score\": 12, \"why\": \"provides loading guidance ('Do NOT open coverage-matrix.md unless...') and references files, showing layered disclosure without full mandatory triggers\"},\n  \"D6\": {\"score\": 13, \"why\": \"applies low\u2011freedom constraints like mandatory validator commands and precise precedence rules appropriate for fragile security metadata\"},\n  \"D7\": {\"score\": 8, \"why\": \"structure follows the Process pattern with phased workflow and decision rules, matching an official pattern\"},\n  \"D8\": {\"score\": 14, \"why\": \"offers actionable commands, decision tables, and edge\u2011case handling (e.g., encoded blob detection) enabling effective agent use\"}\n}"
+    },
+    {
+      "provider": "bedrock/qwen3-235b",
+      "scores": {
+        "D1": 20.0,
         "D2": 15.0,
         "D3": 15.0,
         "D4": 15.0,
@@ -49,17 +199,42 @@
         "D8": 15.0
       },
       "justifications": {
-        "D1": "The skill provides pure knowledge delta with expert-level decision trees and trade-offs only an expert would know, such as rule 1's 'deny_write always wins over write \u2014 most-specific-wins, not first-match,' meeting the 16-20 band.",
-        "D2": "It expertly combines thinking patterns like 'Before deciding, ask if the field is missing or the value is wrong' with domain-specific procedures such as the exact precedence rules in manifest evaluation, meeting the 12-15 band.",
-        "D3": "The 'NEVER' list contains expert-grade anti-patterns with non-obvious reasoning, like 'NEVER read `OK (signature=signed, ...)` as a verified signature' due to shape-checking without actual verification, meeting the 12-15 band.",
-        "D4": "The description comprehensively answers WHAT, WHEN, and includes trigger keywords like 'Universal Skill Format manifest validation' and 'cross-registry arbitrage,' making it perfectly compliant per the 14-15 band.",
-        "D5": "It implements excellent progressive disclosure with MANDATORY triggers embedded in workflows, such as 'Read rules 1\u20135, then stop' based on finding type, meeting the 14-15 band.",
-        "D6": "Freedom is perfectly calibrated with low freedom for fragile operations, mandating exact tool use like `python3 validators/usf.py <manifest>` and prohibiting script modification, fitting the 14-15 band.",
-        "D7": "The skill masterfully follows the Tool pattern with decision trees, code examples, and precise operations on a specific format, clearly aligning with the ~300-line Tool pattern for precise format operations, meeting the 9-10 band.",
-        "D8": "It provides comprehensive practical usability with decision trees, working code examples, fallback guidance, and edge case handling like decoder depth and size limits, meeting the 14-15 band."
+        "D1": "The skill exhibits pure knowledge delta with expert-level decision trees and trade-offs like 'deny_write always wins over write' and 'network.allow is default-deny', which are non-obvious security semantics that Claude would not inherently know, placing it in the 16-20 band.",
+        "D2": "It provides expert thinking patterns such as 'Before deciding, ask if the field is missing or just misrepresented' and domain-specific procedures like the exact precedence evaluation in manifests, meeting the 12-15 expert-level criteria.",
+        "D3": "The 'NEVER' list contains expert-grade anti-patterns with deep reasoning, such as 'NEVER read OK (signature=signed...) as a verified signature' explaining how shape checks mislead, satisfying the 12-15 band for hard-won, experience-based insights.",
+        "D4": "The description clearly answers WHAT (detect AST10 issues), WHEN (during manifest validation or cross-runtime porting), and includes keywords like 'Universal Skill Format', 'risk_tier', and 'deny_write precedence', meeting the 14-15 perfect description criteria.",
+        "D5": "It implements perfect progressive disclosure with MANDATORY triggers like 'Read rules 1\u20135, then stop' and explicit 'Do NOT open coverage-matrix.md' guidance, fulfilling the 14-15 excellent trigger quality band.",
+        "D6": "Freedom is perfectly calibrated to the fragile nature of security metadata handling, with low freedom directives like 'Call verify_signature(manifest) explicitly', matching the 14-15 criteria for high-consequence operations.",
+        "D7": "The skill masterfully follows the 'Tool' pattern with ~300 lines, decision trees, code validation scripts, and low freedom, aligning with the official pattern for precise format operations, scoring 9-10.",
+        "D8": "It offers comprehensive practical usability through clear decision trees, executable validation commands, fallback analysis for scanner limitations, and edge case handling like MAX_DECODE_DEPTH, meeting the 14-15 band for full coverage."
+      },
+      "total": 120.0,
+      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"The skill exhibits pure knowledge delta with expert-level decision trees and trade-offs like 'deny_write always wins over write' and 'network.allow is default-deny', which are non-obvious security semantics that Claude would not inherently know, placing it in the 16-20 band.\"}, \"D2\": {\"score\": 15, \"why\": \"It provides expert thinking patterns such as 'Before deciding, ask if the field is missing or just misrepresented' and domain-specific procedures like the exact precedence evaluation in manifests, meeting the 12-15 expert-level criteria.\"}, \"D3\": {\"score\": 15, \"why\": \"The 'NEVER' list contains expert-grade anti-patterns with deep reasoning, such as 'NEVER read OK (signature=signed...) as a verified signature' explaining how shape checks mislead, satisfying the 12-15 band for hard-won, experience-based insights.\"}, \"D4\": {\"score\": 15, \"why\": \"The description clearly answers WHAT (detect AST10 issues), WHEN (during manifest validation or cross-runtime porting), and includes keywords like 'Universal Skill Format', 'risk_tier', and 'deny_write precedence', meeting the 14-15 perfect description criteria.\"}, \"D5\": {\"score\": 15, \"why\": \"It implements perfect progressive disclosure with MANDATORY triggers like 'Read rules 1\u20135, then stop' and explicit 'Do NOT open coverage-matrix.md' guidance, fulfilling the 14-15 excellent trigger quality band.\"}, \"D6\": {\"score\": 15, \"why\": \"Freedom is perfectly calibrated to the fragile nature of security metadata handling, with low freedom directives like 'Call verify_signature(manifest) explicitly', matching the 14-15 criteria for high-consequence operations.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill masterfully follows the 'Tool' pattern with ~300 lines, decision trees, code validation scripts, and low freedom, aligning with the official pattern for precise format operations, scoring 9-10.\"}, \"D8\": {\"score\": 15, \"why\": \"It offers comprehensive practical usability through clear decision trees, executable validation commands, fallback analysis for scanner limitations, and edge case handling like MAX_DECODE_DEPTH, meeting the 14-15 band for full coverage.\"}}"
+    },
+    {
+      "provider": "bedrock/deepseek-v3.2",
+      "scores": {
+        "D1": 20.0,
+        "D2": 15.0,
+        "D3": 15.0,
+        "D4": 15.0,
+        "D5": 14.0,
+        "D6": 15.0,
+        "D7": 10.0,
+        "D8": 15.0
+      },
+      "justifications": {
+        "D1": "Every paragraph like 'encoding is not the finding' and 'nor is an unreadable payload a clean one' passes the pure knowledge delta test \u2014 all content exceeds Claude's baseline security/metadata knowledge.",
+        "D2": "The 'Decision rules for the porting event itself' section provides expert thinking patterns AND domain procedures like cross-registry arbitrage detection, achieving the expert-level band.",
+        "D3": "The 'NEVER' list contains expert-grade anti-patterns like 'NEVER read a matching content_hash as integrity over the package' with specific reasoning, meeting the highest criteria.",
+        "D4": "The description perfectly addresses WHAT, WHEN, and includes explicit trigger keywords like 'validating a manifest', 'skill is being ported', fulfilling the comprehensive requirement.",
+        "D5": "Flow table provides 'If the finding is\u2026 Read' triggers and 'Do NOT open' guidance, achieving good layering with explicit MANDATORY triggers embedded in workflow.",
+        "D6": "Specifies when to use scripts ('Run first, then read only what the finding needs') and when to apply judgment, perfectly calibrating freedom to the fragility of security metadata validation.",
+        "D7": "Masterfully applies the 'Mindset' pattern with a strong focus on decision rules and thinking patterns around security metadata, exactly matching its characteristics.",
+        "D8": "Decision trees like the finding-mapping table and detailed error handling ('Call verify_signature explicitly: it raises...') provide comprehensive and immediately actionable guidance for all scenarios."
       },
       "total": 119.0,
-      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"The skill provides pure knowledge delta with expert-level decision trees and trade-offs only an expert would know, such as rule 1's 'deny_write always wins over write \u2014 most-specific-wins, not first-match,' meeting the 16-20 band.\"}, \"D2\": {\"score\": 15, \"why\": \"It expertly combines thinking patterns like 'Before deciding, ask if the field is missing or the value is wrong' with domain-specific procedures such as the exact precedence rules in manifest evaluation, meeting the 12-15 band.\"}, \"D3\": {\"score\": 15, \"why\": \"The 'NEVER' list contains expert-grade anti-patterns with non-obvious reasoning, like 'NEVER read `OK (signature=signed, ...)` as a verified signature' due to shape-checking without actual verification, meeting the 12-15 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description comprehensively answers WHAT, WHEN, and includes trigger keywords like 'Universal Skill Format manifest validation' and 'cross-registry arbitrage,' making it perfectly compliant per the 14-15 band.\"}, \"D5\": {\"score\": 15, \"why\": \"It implements excellent progressive disclosure with MANDATORY triggers embedded in workflows, such as 'Read rules 1\u20135, then stop' based on finding type, meeting the 14-15 band.\"}, \"D6\": {\"score\": 15, \"why\": \"Freedom is perfectly calibrated with low freedom for fragile operations, mandating exact tool use like `python3 validators/usf.py <manifest>` and prohibiting script modification, fitting the 14-15 band.\"}, \"D7\": {\"score\": 10, \"why\": \"The skill masterfully follows the Tool pattern with decision trees, code examples, and precise operations on a specific format, clearly aligning with the ~300-line Tool pattern for precise format operations, meeting the 9-10 band.\"}, \"D8\": {\"score\": 15, \"why\": \"It provides comprehensive practical usability with decision trees, working code examples, fallback guidance, and edge case handling like decoder depth and size limits, meeting the 14-15 band.\"}}"
+      "raw_response": "{\n  \"D1\": {\"score\": 20, \"why\": \"Every paragraph like 'encoding is not the finding' and 'nor is an unreadable payload a clean one' passes the pure knowledge delta test \u2014 all content exceeds Claude's baseline security/metadata knowledge.\"},\n  \"D2\": {\"score\": 15, \"why\": \"The 'Decision rules for the porting event itself' section provides expert thinking patterns AND domain procedures like cross-registry arbitrage detection, achieving the expert-level band.\"},\n  \"D3\": {\"score\": 15, \"why\": \"The 'NEVER' list contains expert-grade anti-patterns like 'NEVER read a matching content_hash as integrity over the package' with specific reasoning, meeting the highest criteria.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description perfectly addresses WHAT, WHEN, and includes explicit trigger keywords like 'validating a manifest', 'skill is being ported', fulfilling the comprehensive requirement.\"},\n  \"D5\": {\"score\": 14, \"why\": \"Flow table provides 'If the finding is\u2026 Read' triggers and 'Do NOT open' guidance, achieving good layering with explicit MANDATORY triggers embedded in workflow.\"},\n  \"D6\": {\"score\": 15, \"why\": \"Specifies when to use scripts ('Run first, then read only what the finding needs') and when to apply judgment, perfectly calibrating freedom to the fragility of security metadata validation.\"},\n  \"D7\": {\"score\": 10, \"why\": \"Masterfully applies the 'Mindset' pattern with a strong focus on decision rules and thinking patterns around security metadata, exactly matching its characteristics.\"},\n  \"D8\": {\"score\": 15, \"why\": \"Decision trees like the finding-mapping table and detailed error handling ('Call verify_signature explicitly: it raises...') provide comprehensive and immediately actionable guidance for all scenarios.\"}\n}"
     },
     {
       "provider": "bedrock/nova-pro",
@@ -74,48 +249,23 @@
         "D8": 15.0
       },
       "justifications": {
-        "D1": "Pure knowledge delta with expert-level insights on security metadata handling across platforms, as evidenced by the detailed decision rules and NEVER lists.",
-        "D2": "Expert-level thinking patterns and domain-specific procedures are provided, such as the detailed decision rules for manifest validation and porting events.",
-        "D3": "Comprehensive NEVER lists with specific reasoning, such as 'NEVER read `OK (signature=signed,...)` as a verified signature.'",
-        "D4": "The description is comprehensive, specifying WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS like 'OWASP AST10 Cross-Platform Reuse' and 'Universal Skill Format manifest validation'.",
-        "D5": "Proper content layering with explicit triggers and 'Do NOT Load' guidance, as seen in the sections directing when to read specific rules and when not to open certain files.",
-        "D6": "Perfect freedom calibration throughout, with low freedom for fragile operations like manifest validation and high freedom for creative tasks like deciding on security metadata.",
-        "D7": "Masterful application of the 'Tool' pattern, with decision trees, code examples, and low freedom as required for precise operations on specific formats.",
-        "D8": "Comprehensive coverage including edge cases and error handling, with clear decision trees and actionable guidance for handling various scenarios."
+        "D1": "Pure knowledge delta, every paragraph earns its tokens, no redundant content.",
+        "D2": "Expert-level: shapes thinking AND provides procedures Claude wouldn't know.",
+        "D3": "Expert-grade anti-patterns with WHY \u2014 things only experience teaches.",
+        "D4": "Perfect: comprehensive description with WHAT, WHEN, and trigger keywords.",
+        "D5": "Perfect: decision trees + explicit triggers + 'Do NOT Load' guidance.",
+        "D6": "Perfect freedom calibration throughout.",
+        "D7": "Masterful application of appropriate pattern.",
+        "D8": "Comprehensive coverage including edge cases and error handling."
       },
       "total": 120.0,
-      "raw_response": "{\n  \"D1\": {\n    \"score\": 20,\n    \"why\": \"Pure knowledge delta with expert-level insights on security metadata handling across platforms, as evidenced by the detailed decision rules and NEVER lists.\"\n  },\n  \"D2\": {\n    \"score\": 15,\n    \"why\": \"Expert-level thinking patterns and domain-specific procedures are provided, such as the detailed decision rules for manifest validation and porting events.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"Comprehensive NEVER lists with specific reasoning, such as 'NEVER read `OK (signature=signed,...)` as a verified signature.'\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"The description is comprehensive, specifying WHAT the skill does, WHEN it should be used, and including relevant KEYWORDS like 'OWASP AST10 Cross-Platform Reuse' and 'Universal Skill Format manifest validation'.\"\n  },\n  \"D5\": {\n    \"score\": 15,\n    \"why\": \"Proper content layering with explicit triggers and 'Do NOT Load' guidance, as seen in the sections directing when to read specific rules and when not to open certain files.\"\n  },\n  \"D6\": {\n    \"score\": 15,\n    \"why\": \"Perfect freedom calibration throughout, with low freedom for fragile operations like manifest validation and high freedom for creative tasks like deciding on security metadata.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"Masterful application of the 'Tool' pattern, with decision trees, code examples, and low freedom as required for precise operations on specific formats.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"Comprehensive coverage including edge cases and error handling, with clear decision trees and actionable guidance for handling various scenarios.\"\n  }\n}"
+      "raw_response": "{\n  \"D1\": {\n    \"score\": 20,\n    \"why\": \"Pure knowledge delta, every paragraph earns its tokens, no redundant content.\"\n  },\n  \"D2\": {\n    \"score\": 15,\n    \"score\": 15,\n    \"why\": \"Expert-level: shapes thinking AND provides procedures Claude wouldn't know.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"Expert-grade anti-patterns with WHY \u2014 things only experience teaches.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"Perfect: comprehensive description with WHAT, WHEN, and trigger keywords.\"\n  },\n  \"D5\": {\n    \"score\": 15,\n    \"why\": \"Perfect: decision trees + explicit triggers + 'Do NOT Load' guidance.\"\n  },\n  \"D6\": {\n    \"score\": 15,\n    \"why\": \"Perfect freedom calibration throughout.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"Masterful application of appropriate pattern.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"Comprehensive coverage including edge cases and error handling.\"\n  }\n}"
     },
     {
       "provider": "claude-cli/sonnet",
       "scores": {
         "D1": 18.0,
         "D2": 13.0,
-        "D3": 15.0,
-        "D4": 14.0,
-        "D5": 15.0,
-        "D6": 14.0,
-        "D7": 8.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "The precedence rules section states 'network.allow is evaluated default-deny; the deny: \"*\" line is redundant auditability, not an override' \u2014 a non-obvious trade-off only an expert would know, putting this in the 16-20 pure-knowledge-delta band.",
-        "D2": "The 'Run first, then read only what the finding needs' table pairs a domain-specific tool sequence (validators/usf.py then cli/bin/cli.js audit) with an explicit thinking rule ('Read the rule text when a tool's output is contested'), landing in the 12-15 expert-level band rather than generic step lists.",
-        "D3": "The NEVER list gives file-and-line-grounded reasoning like 'signature_state (validators/usf.py line 579) is a regex on the shape ed25519:<128 hex> and nothing more' rather than vague cautions, meeting the 12-15 expert-grade band.",
-        "D4": "The description names WHAT (manifest validation, cross-registry arbitrage, USF checks) and WHEN ('Use when validating a manifest...', 'when a skill is being ported...') with concrete trigger keywords, placing it in the 14-15 band though it lacks the explicit numbered '(1)(2)(3)' scenario list the rubric's excellent example uses.",
-        "D5": "The skill gives explicit conditional triggers plus negative guidance \u2014 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py for rules 1-5' \u2014 matching the rubric's 'Excellent' loading-trigger example almost verbatim, earning the 14-15 band.",
-        "D6": "For a fragile manifest-validation task the skill mandates exact tool invocations and precise field semantics ('deny_write always wins over write ... most-specific-wins, not first-match') rather than leaving interpretation open, matching the low-freedom calibration the rubric prescribes for format operations (11-15 band).",
-        "D7": "The skill mixes the Tool pattern's decision tables and code examples with a Navigation-style routing table ('If the finding is... Read'), a clear but slightly hybridized pattern application landing in the 7-8 band rather than a single masterful template.",
-        "D8": "The 'Where the one shipped check goes quiet' section documents exact failure boundaries (C1/C2 arms, depth-2/256KiB/400-candidate limits) so an Agent knows precisely when the automated check is insufficient, meeting the 14-15 comprehensive-edge-case band."
-      },
-      "total": 111.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The precedence rules section states 'network.allow is evaluated default-deny; the deny: \\\"*\\\" line is redundant auditability, not an override' \u2014 a non-obvious trade-off only an expert would know, putting this in the 16-20 pure-knowledge-delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"The 'Run first, then read only what the finding needs' table pairs a domain-specific tool sequence (validators/usf.py then cli/bin/cli.js audit) with an explicit thinking rule ('Read the rule text when a tool's output is contested'), landing in the 12-15 expert-level band rather than generic step lists.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER list gives file-and-line-grounded reasoning like 'signature_state (validators/usf.py line 579) is a regex on the shape ed25519:<128 hex> and nothing more' rather than vague cautions, meeting the 12-15 expert-grade band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description names WHAT (manifest validation, cross-registry arbitrage, USF checks) and WHEN ('Use when validating a manifest...', 'when a skill is being ported...') with concrete trigger keywords, placing it in the 14-15 band though it lacks the explicit numbered '(1)(2)(3)' scenario list the rubric's excellent example uses.\"}, \"D5\": {\"score\": 15, \"why\": \"The skill gives explicit conditional triggers plus negative guidance \u2014 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py for rules 1-5' \u2014 matching the rubric's 'Excellent' loading-trigger example almost verbatim, earning the 14-15 band.\"}, \"D6\": {\"score\": 14, \"why\": \"For a fragile manifest-validation task the skill mandates exact tool invocations and precise field semantics ('deny_write always wins over write ... most-specific-wins, not first-match') rather than leaving interpretation open, matching the low-freedom calibration the rubric prescribes for format operations (11-15 band).\"}, \"D7\": {\"score\": 8, \"why\": \"The skill mixes the Tool pattern's decision tables and code examples with a Navigation-style routing table ('If the finding is... Read'), a clear but slightly hybridized pattern application landing in the 7-8 band rather than a single masterful template.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Where the one shipped check goes quiet' section documents exact failure boundaries (C1/C2 arms, depth-2/256KiB/400-candidate limits) so an Agent knows precisely when the automated check is insufficient, meeting the 14-15 comprehensive-edge-case band.\"}}\n"
-    },
-    {
-      "provider": "anthropic-compatible/glm-5.2",
-      "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
         "D3": 15.0,
         "D4": 15.0,
         "D5": 14.0,
@@ -124,142 +274,42 @@
         "D8": 14.0
       },
       "justifications": {
-        "D1": "Nearly every paragraph is expert-only knowledge, e.g. rule 4's explanation that signature verification must use JCS canonical serialization and rule 1's most-specific-wins deny_write resolution \u2014 knowledge Claude does not have \u2014 putting it in the 16-20 pure-delta band.",
-        "D2": "Combines thinking patterns (\"Porting is a re-validation trigger, never an equivalence assumption\") with domain procedures Claude wouldn't know (\"Run first, then read only what the finding needs\" routing to validators/usf.py and the CLI audit), matching the 12-15 expert band.",
-        "D3": "The NEVER section is expert-grade with WHY at code-line specificity, e.g. \"NEVER read OK (signature=signed, ...) as a verified signature\" because signature_state at validators/usf.py line 579 is only a regex and validate_manifest never calls verify_signature \u2014 top band.",
-        "D4": "The description gives WHAT (detect and triage security-metadata dropping, manifest validation), WHEN (\"Use when validating a manifest... when a skill is being ported across runtimes\"), and searchable keywords (risk_tier, deny_write precedence, Universal Skill Format) \u2014 perfect band.",
-        "D5": "Loading triggers are embedded as a MANDATORY routing table keyed to finding type, plus explicit \"Do NOT open coverage-matrix.md\" and \"Do NOT reach for detector.py\" negative guidance \u2014 the 14-15 band.",
-        "D6": "Fragile validation gets low freedom (exact precedence rules, exact tool invocations) while judgment calls like \"judge the decoded content layer where you can read it, and the decode-to-execution path where you cannot\" allow appropriate discretion \u2014 good calibration for most scenarios.",
-        "D7": "Follows the Navigation/Tool hybrid pattern cleanly \u2014 a routing table over rules and reference files with a validator script \u2014 with only minor deviation from a pure pattern, landing in the 7-8 band.",
-        "D8": "Edge cases and failure modes are exhaustively covered, e.g. \"Where the one shipped check goes quiet\" documents C2's single-assignment limit and the depth-2/256KiB/400-candidate decode bounds with the manual-pass fallback \u2014 near the top band."
+        "D1": "Rules like 'signature covers the canonical JCS (RFC 8785) serialization... excluding signature itself and including content_hash' and the deny_write/write most-specific-wins precedence are non-obvious expert knowledge with almost no generic filler, placing it in the 16-20 band.",
+        "D2": "The 'Fires on / Decides / Does not decide' framing is a thinking pattern and the routing table ('If the finding is\u2026 Read\u2026') plus 'run validators/usf.py first' is a genuine domain-specific procedure, matching the 8-11/12-15 'good balance' criteria.",
+        "D3": "The NEVER section ties each warning to actual implementation behavior (e.g. '_identity_state matches by basename... while _write_allowed matches a path-form entry against that exact path only') rather than generic caution, meeting the 12-15 'expert-grade anti-patterns with WHY' band.",
+        "D4": "The description packs WHAT (risk_tier, permissions, signatures), WHEN ('Use when validating a manifest...', 'when a skill is being ported...') and keywords (OpenClaw, Cursor, VS Code, deny_write, content hash), satisfying the 14-15 'comprehensive' band.",
+        "D5": "Explicit 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py for rules 1-5' are exactly the 'Do NOT Load' guidance the 14-15 band calls for.",
+        "D6": "Line-anchored precision like 'signature_state (validators/usf.py line 579) is a regex... and nothing more' matches the low-freedom calibration the rubric prescribes for fragile format/validation operations, landing in the 11-13 'good calibration' band.",
+        "D7": "The decision table plus scripts (validators/usf.py, cli/bin/cli.js) and reference file (coverage-matrix.md) is a clear Tool/Navigation hybrid pattern with only minor deviation from the canonical ~300-line Tool template, fitting the 7-8 band.",
+        "D8": "Coverage of failure modes such as 'C2 follows the decode to a sink across at most one assignment... Two hops... breaks the link' documents concrete edge cases and detector blind spots, meeting the 14-15 'comprehensive coverage including edge cases' band."
       },
-      "total": 111.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Nearly every paragraph is expert-only knowledge, e.g. rule 4's explanation that signature verification must use JCS canonical serialization and rule 1's most-specific-wins deny_write resolution \u2014 knowledge Claude does not have \u2014 putting it in the 16-20 pure-delta band.\"}, \"D2\": {\"score\": 14, \"why\": \"Combines thinking patterns (\\\"Porting is a re-validation trigger, never an equivalence assumption\\\") with domain procedures Claude wouldn't know (\\\"Run first, then read only what the finding needs\\\" routing to validators/usf.py and the CLI audit), matching the 12-15 expert band.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER section is expert-grade with WHY at code-line specificity, e.g. \\\"NEVER read OK (signature=signed, ...) as a verified signature\\\" because signature_state at validators/usf.py line 579 is only a regex and validate_manifest never calls verify_signature \u2014 top band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description gives WHAT (detect and triage security-metadata dropping, manifest validation), WHEN (\\\"Use when validating a manifest... when a skill is being ported across runtimes\\\"), and searchable keywords (risk_tier, deny_write precedence, Universal Skill Format) \u2014 perfect band.\"}, \"D5\": {\"score\": 14, \"why\": \"Loading triggers are embedded as a MANDATORY routing table keyed to finding type, plus explicit \\\"Do NOT open coverage-matrix.md\\\" and \\\"Do NOT reach for detector.py\\\" negative guidance \u2014 the 14-15 band.\"}, \"D6\": {\"score\": 13, \"why\": \"Fragile validation gets low freedom (exact precedence rules, exact tool invocations) while judgment calls like \\\"judge the decoded content layer where you can read it, and the decode-to-execution path where you cannot\\\" allow appropriate discretion \u2014 good calibration for most scenarios.\"}, \"D7\": {\"score\": 8, \"why\": \"Follows the Navigation/Tool hybrid pattern cleanly \u2014 a routing table over rules and reference files with a validator script \u2014 with only minor deviation from a pure pattern, landing in the 7-8 band.\"}, \"D8\": {\"score\": 14, \"why\": \"Edge cases and failure modes are exhaustively covered, e.g. \\\"Where the one shipped check goes quiet\\\" documents C2's single-assignment limit and the depth-2/256KiB/400-candidate decode bounds with the manual-pass fallback \u2014 near the top band.\"}}"
+      "total": 110.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Rules like 'signature covers the canonical JCS (RFC 8785) serialization... excluding signature itself and including content_hash' and the deny_write/write most-specific-wins precedence are non-obvious expert knowledge with almost no generic filler, placing it in the 16-20 band.\"}, \"D2\": {\"score\": 13, \"why\": \"The 'Fires on / Decides / Does not decide' framing is a thinking pattern and the routing table ('If the finding is\u2026 Read\u2026') plus 'run validators/usf.py first' is a genuine domain-specific procedure, matching the 8-11/12-15 'good balance' criteria.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER section ties each warning to actual implementation behavior (e.g. '_identity_state matches by basename... while _write_allowed matches a path-form entry against that exact path only') rather than generic caution, meeting the 12-15 'expert-grade anti-patterns with WHY' band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description packs WHAT (risk_tier, permissions, signatures), WHEN ('Use when validating a manifest...', 'when a skill is being ported...') and keywords (OpenClaw, Cursor, VS Code, deny_write, content hash), satisfying the 14-15 'comprehensive' band.\"}, \"D5\": {\"score\": 14, \"why\": \"Explicit 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py for rules 1-5' are exactly the 'Do NOT Load' guidance the 14-15 band calls for.\"}, \"D6\": {\"score\": 13, \"why\": \"Line-anchored precision like 'signature_state (validators/usf.py line 579) is a regex... and nothing more' matches the low-freedom calibration the rubric prescribes for fragile format/validation operations, landing in the 11-13 'good calibration' band.\"}, \"D7\": {\"score\": 8, \"why\": \"The decision table plus scripts (validators/usf.py, cli/bin/cli.js) and reference file (coverage-matrix.md) is a clear Tool/Navigation hybrid pattern with only minor deviation from the canonical ~300-line Tool template, fitting the 7-8 band.\"}, \"D8\": {\"score\": 14, \"why\": \"Coverage of failure modes such as 'C2 follows the decode to a sink across at most one assignment... Two hops... breaks the link' documents concrete edge cases and detector blind spots, meeting the 14-15 'comprehensive coverage including edge cases' band.\"}}\n"
     },
     {
-      "provider": "bedrock/qwen3-235b",
+      "provider": "anthropic-compatible/glm-5.2",
       "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
+        "D1": 19.0,
+        "D2": 15.0,
         "D3": 15.0,
         "D4": 15.0,
-        "D5": 14.0,
-        "D6": 14.0,
-        "D7": 10.0,
-        "D8": 15.0
-      },
-      "justifications": {
-        "D1": "The skill demonstrates pure knowledge delta with expert-level insights like 'deny_write always wins over write' and precedence rules that only an expert would know, meeting the 16-20 band",
-        "D2": "It provides expert thinking patterns such as asking whether a field is missing vs. whether its value is wrong, and domain-specific procedures like the exact command to run validators, meeting the 12-15 band",
-        "D3": "The 'NEVER' list contains expert-grade anti-patterns with deep technical reasoning such as 'NEVER read OK (signature=signed, ...) as a verified signature' which reflects hard-won experience, meeting the 12-15 band",
-        "D4": "The description fully answers WHAT, WHEN, and includes trigger keywords like 'manifest validation' and 'skill porting', making it perfectly aligned with the 14-15 band",
-        "D5": "The skill implements excellent progressive disclosure with conditional triggers like 'Read rules 1\u20135, then stop' and explicit 'Do NOT open' guidance, meeting the 14-15 band",
-        "D6": "Freedom is perfectly calibrated to the fragile nature of security metadata validation, with rigid enforcement such as 'call verify_signature(manifest) explicitly', meeting the 14-15 band",
-        "D7": "The skill follows the Tool pattern masterfully with decision trees, code examples, and precise operational steps for a format-specific task, meeting the 9-10 band",
-        "D8": "It offers comprehensive practical usability with decision trees for findings, fallback logic, and edge case handling like bounded decode depth, meeting the 14-15 band"
-      },
-      "total": 115.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill demonstrates pure knowledge delta with expert-level insights like 'deny_write always wins over write' and precedence rules that only an expert would know, meeting the 16-20 band\"}, \"D2\": {\"score\": 14, \"why\": \"It provides expert thinking patterns such as asking whether a field is missing vs. whether its value is wrong, and domain-specific procedures like the exact command to run validators, meeting the 12-15 band\"}, \"D3\": {\"score\": 15, \"why\": \"The 'NEVER' list contains expert-grade anti-patterns with deep technical reasoning such as 'NEVER read OK (signature=signed, ...) as a verified signature' which reflects hard-won experience, meeting the 12-15 band\"}, \"D4\": {\"score\": 15, \"why\": \"The description fully answers WHAT, WHEN, and includes trigger keywords like 'manifest validation' and 'skill porting', making it perfectly aligned with the 14-15 band\"}, \"D5\": {\"score\": 14, \"why\": \"The skill implements excellent progressive disclosure with conditional triggers like 'Read rules 1\u20135, then stop' and explicit 'Do NOT open' guidance, meeting the 14-15 band\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom is perfectly calibrated to the fragile nature of security metadata validation, with rigid enforcement such as 'call verify_signature(manifest) explicitly', meeting the 14-15 band\"}, \"D7\": {\"score\": 10, \"why\": \"The skill follows the Tool pattern masterfully with decision trees, code examples, and precise operational steps for a format-specific task, meeting the 9-10 band\"}, \"D8\": {\"score\": 15, \"why\": \"It offers comprehensive practical usability with decision trees for findings, fallback logic, and edge case handling like bounded decode depth, meeting the 14-15 band\"}}"
-    },
-    {
-      "provider": "bedrock/deepseek-v3.2",
-      "scores": {
-        "D1": 16.0,
-        "D2": 12.0,
-        "D3": 14.0,
-        "D4": 14.0,
-        "D5": 13.0,
-        "D6": 14.0,
+        "D5": 15.0,
+        "D6": 13.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "Every paragraph adds expert knowledge, like the precise decoding-depth and candidate-selection logic in rule 9 and its follow-up section, meeting the 'Pure knowledge delta' criteria.",
-        "D2": "It provides expert thinking patterns like distinguishing AST10 from its neighbors and domain-specific procedures for manifest precedence rules Claude wouldn't know, placing it in the 'Expert-level' band.",
-        "D3": "The extensive 'NEVER' list contains specific anti-patterns with reasoning, such as 'NEVER read OK (signature=signed, ...) as a verified signature', meeting 'Expert-grade anti-patterns with WHY'.",
-        "D4": "The description explicitly states WHAT, WHEN, and KEYWORDS ('manifest validation...porting...AST10'), making it comprehensive as required for the 'Perfect' band.",
-        "D5": "It shows good layering with explicit triggers like 'Read the rule text when a tool's output is contested' and 'Do NOT open' directives, fitting the 'Good layering' criteria.",
-        "D6": "It is perfectly calibrated, providing low-freedom 'exact steps' for manifest precedence (high consequence) and high-freedom reasoning for distinguishing AST10, meeting 'Perfect freedom calibration'.",
-        "D7": "Its structure strongly follows the Tool pattern with decision trees, exact rules, and code example references, representing 'Clear pattern with minor deviations'.",
-        "D8": "It provides comprehensive, actionable guidance including decision tables, explicit fallback analysis, and edge-case warnings like C1/C2 edges, meeting 'Comprehensive coverage'."
-      },
-      "total": 106.0,
-      "raw_response": "{\n    \"D1\": {\n        \"score\": 16,\n        \"why\": \"Every paragraph adds expert knowledge, like the precise decoding-depth and candidate-selection logic in rule 9 and its follow-up section, meeting the 'Pure knowledge delta' criteria.\"\n    },\n    \"D2\": {\n        \"score\": 12,\n        \"why\": \"It provides expert thinking patterns like distinguishing AST10 from its neighbors and domain-specific procedures for manifest precedence rules Claude wouldn't know, placing it in the 'Expert-level' band.\"\n    },\n    \"D3\": {\n        \"score\": 14,\n        \"why\": \"The extensive 'NEVER' list contains specific anti-patterns with reasoning, such as 'NEVER read OK (signature=signed, ...) as a verified signature', meeting 'Expert-grade anti-patterns with WHY'.\"\n    },\n    \"D4\": {\n        \"score\": 14,\n        \"why\": \"The description explicitly states WHAT, WHEN, and KEYWORDS ('manifest validation...porting...AST10'), making it comprehensive as required for the 'Perfect' band.\"\n    },\n    \"D5\": {\n        \"score\": 13,\n        \"why\": \"It shows good layering with explicit triggers like 'Read the rule text when a tool's output is contested' and 'Do NOT open' directives, fitting the 'Good layering' criteria.\"\n    },\n    \"D6\": {\n        \"score\": 14,\n        \"why\": \"It is perfectly calibrated, providing low-freedom 'exact steps' for manifest precedence (high consequence) and high-freedom reasoning for distinguishing AST10, meeting 'Perfect freedom calibration'.\"\n    },\n    \"D7\": {\n        \"score\": 9,\n        \"why\": \"Its structure strongly follows the Tool pattern with decision trees, exact rules, and code example references, representing 'Clear pattern with minor deviations'.\"\n    },\n    \"D8\": {\n        \"score\": 14,\n        \"why\": \"It provides comprehensive, actionable guidance including decision tables, explicit fallback analysis, and edge-case warnings like C1/C2 edges, meeting 'Comprehensive coverage'.\"\n    }\n}"
-    },
-    {
-      "provider": "bedrock/nova-pro",
-      "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
-        "D3": 15.0,
-        "D4": 15.0,
-        "D5": 14.0,
-        "D6": 14.0,
-        "D7": 10.0,
-        "D8": 15.0
-      },
-      "justifications": {
-        "D1": "Pure knowledge delta with expert insights on security metadata and cross-platform reuse.",
-        "D2": "Provides both expert thinking patterns and domain-specific procedures for validating manifests and porting skills.",
-        "D3": "Comprehensive NEVER list with specific reasoning on what not to do when validating manifests and porting skills.",
-        "D4": "Description is comprehensive, detailing WHAT the skill does, WHEN to use it, and including relevant KEYWORDS.",
-        "D5": "Good layering with clear mandatory triggers and decision trees for loading references.",
-        "D6": "Appropriate level of specificity matched to the task's fragility, with exact steps for critical operations.",
-        "D7": "Masterful application of the 'Tool' pattern for precise operations on specific formats.",
-        "D8": "Comprehensive coverage including edge cases and error handling, with actionable decision trees and fallbacks."
+        "D1": "Nearly every paragraph is non-obvious expert knowledge, e.g. the JCS canonicalization rationale in rule 4 and the SURFACE_GLOBS hash-surface gap in the NEVER list \u2014 pure knowledge delta band (16-20).",
+        "D2": "Pairs thinking frameworks ('porting is a re-validation trigger, never an equivalence assumption' in rule 6) with domain procedures Claude wouldn't know ('Run first, then read only what the finding needs' mapping findings to validators/usf.py and node cli/bin/cli.js audit) \u2014 expert-level band.",
+        "D3": "The NEVER section contains eight expert-grade entries grounded in specific implementation facts, such as signature_state being 'a regex on the shape ed25519:<128 hex> and nothing more' \u2014 expert-grade anti-patterns with WHY.",
+        "D4": "The description gives WHAT (manifest validation, deny_write precedence, signed content hash), WHEN ('when a skill is being ported across runtimes and needs a re-validation gate'), and rich trigger keywords \u2014 perfect band.",
+        "D5": "Excellent loading discipline: an embedded routing table mapping finding types to rules, plus explicit 'Do NOT open coverage-matrix.md' and 'Do NOT reach for skills/AST10/scripts/detector.py' triggers \u2014 decision trees + explicit triggers + Do-NOT-Load guidance.",
+        "D6": "Calibration is well-matched to a fragile validation task \u2014 exact scripts and line-level anchors ('validators/usf.py line 579') where bytes matter, judgment language in the blob-analysis section \u2014 good calibration with only minor looseness in the porting-event rules.",
+        "D7": "A masterful hybrid of the Tool and Navigation patterns: decision table, exact scripts, and sub-file routing at ~150 lines, appropriate for precise format operations.",
+        "D8": "Comprehensive coverage including failure modes and edge cases: the 'Where the one shipped check goes quiet' section enumerates C1/C2 blind spots, decode bounds (depth 2, 256 KiB, 400 candidates), and fallback guidance ('needs a manual pass, not a re-run')."
       },
       "total": 115.0,
-      "raw_response": "{\n  \"D1\": {\n    \"score\": 18,\n    \"why\": \"Pure knowledge delta with expert insights on security metadata and cross-platform reuse.\"\n  },\n  \"D2\": {\n    \"score\": 14,\n    \"score\": 14,\n    \"why\": \"Provides both expert thinking patterns and domain-specific procedures for validating manifests and porting skills.\"\n  },\n  \"D3\": {\n    \"score\": 15,\n    \"why\": \"Comprehensive NEVER list with specific reasoning on what not to do when validating manifests and porting skills.\"\n  },\n  \"D4\": {\n    \"score\": 15,\n    \"why\": \"Description is comprehensive, detailing WHAT the skill does, WHEN to use it, and including relevant KEYWORDS.\"\n  },\n  \"D5\": {\n    \"score\": 14,\n    \"why\": \"Good layering with clear mandatory triggers and decision trees for loading references.\"\n  },\n  \"D6\": {\n    \"score\": 14,\n    \"why\": \"Appropriate level of specificity matched to the task's fragility, with exact steps for critical operations.\"\n  },\n  \"D7\": {\n    \"score\": 10,\n    \"why\": \"Masterful application of the 'Tool' pattern for precise operations on specific formats.\"\n  },\n  \"D8\": {\n    \"score\": 15,\n    \"why\": \"Comprehensive coverage including edge cases and error handling, with actionable decision trees and fallbacks.\"\n  }\n}"
-    },
-    {
-      "provider": "claude-cli/sonnet",
-      "scores": {
-        "D1": 19.0,
-        "D2": 13.0,
-        "D3": 15.0,
-        "D4": 14.0,
-        "D5": 15.0,
-        "D6": 14.0,
-        "D7": 8.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "Rules like 'signature covers the canonical JCS (RFC 8785) serialization... excluding signature itself and including content_hash' and the deny_write/write basename-vs-path mismatch are non-obvious expert facts tied to specific code lines, placing this in the 16-20 pure-knowledge-delta band with no 'what is X' filler.",
-        "D2": "The 'Run first, then read only what the finding needs' routing table plus rules 6-8 on porting-as-re-validation-trigger combine a thinking pattern with domain-specific tool invocation (usf.py, cli.js audit), landing in the 12-15 expert-level band rather than merely listing generic steps.",
-        "D3": "The NEVER list gives reasoned, code-grounded landmines like '_identity_state matches by basename... while _write_allowed matches a path-form entry against that exact path only' \u2014 exactly the 12-15 band's 'things only experience teaches', not the vague 'be careful' band.",
-        "D4": "The description states WHAT (risk_tier, permissions, signatures, manifest validation) and WHEN ('Use when validating a manifest...', 'when a skill is being ported...') with concrete keywords (OpenClaw, Universal Skill Format), fitting the 14-15 band though it stops short of an explicit numbered trigger list like the rubric's 'excellent' example.",
-        "D5": "Explicit 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py for rules 1-5' triggers embedded in the routing table match the 14-15 band's 'decision trees + explicit triggers + Do NOT Load guidance' exactly.",
-        "D6": "For a fragile, precision-critical validation task the skill gives exact scripts to run (`python3 validators/usf.py`) and byte-exact matching rules (host 'exact-or-suffix-at-a-label-boundary') rather than vague prose, matching the 14-15 low-freedom calibration the task demands.",
-        "D7": "The routing table plus numbered precedence rules and a shipped-check deep-dive mirror the rubric's 'Tool' pattern (decision trees, code examples, low freedom) with only minor deviation from the canonical ~300-line shape, placing it in the 7-8 band.",
-        "D8": "The 'Where the one shipped check goes quiet' section names concrete failure edges (C1 signature-vocabulary gaps, C2's 'two hops... breaks the link') that function as fallback/edge-case guidance, matching the 14-15 comprehensive-coverage band."
-      },
-      "total": 112.0,
-      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Rules like 'signature covers the canonical JCS (RFC 8785) serialization... excluding signature itself and including content_hash' and the deny_write/write basename-vs-path mismatch are non-obvious expert facts tied to specific code lines, placing this in the 16-20 pure-knowledge-delta band with no 'what is X' filler.\"}, \"D2\": {\"score\": 13, \"why\": \"The 'Run first, then read only what the finding needs' routing table plus rules 6-8 on porting-as-re-validation-trigger combine a thinking pattern with domain-specific tool invocation (usf.py, cli.js audit), landing in the 12-15 expert-level band rather than merely listing generic steps.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER list gives reasoned, code-grounded landmines like '_identity_state matches by basename... while _write_allowed matches a path-form entry against that exact path only' \u2014 exactly the 12-15 band's 'things only experience teaches', not the vague 'be careful' band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description states WHAT (risk_tier, permissions, signatures, manifest validation) and WHEN ('Use when validating a manifest...', 'when a skill is being ported...') with concrete keywords (OpenClaw, Universal Skill Format), fitting the 14-15 band though it stops short of an explicit numbered trigger list like the rubric's 'excellent' example.\"}, \"D5\": {\"score\": 15, \"why\": \"Explicit 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py for rules 1-5' triggers embedded in the routing table match the 14-15 band's 'decision trees + explicit triggers + Do NOT Load guidance' exactly.\"}, \"D6\": {\"score\": 14, \"why\": \"For a fragile, precision-critical validation task the skill gives exact scripts to run (`python3 validators/usf.py`) and byte-exact matching rules (host 'exact-or-suffix-at-a-label-boundary') rather than vague prose, matching the 14-15 low-freedom calibration the task demands.\"}, \"D7\": {\"score\": 8, \"why\": \"The routing table plus numbered precedence rules and a shipped-check deep-dive mirror the rubric's 'Tool' pattern (decision trees, code examples, low freedom) with only minor deviation from the canonical ~300-line shape, placing it in the 7-8 band.\"}, \"D8\": {\"score\": 14, \"why\": \"The 'Where the one shipped check goes quiet' section names concrete failure edges (C1 signature-vocabulary gaps, C2's 'two hops... breaks the link') that function as fallback/edge-case guidance, matching the 14-15 comprehensive-coverage band.\"}}\n"
-    },
-    {
-      "provider": "anthropic-compatible/glm-5.2",
-      "scores": {
-        "D1": 18.0,
-        "D2": 14.0,
-        "D3": 15.0,
-        "D4": 15.0,
-        "D5": 14.0,
-        "D6": 13.0,
-        "D7": 8.0,
-        "D8": 14.0
-      },
-      "justifications": {
-        "D1": "Rules 1\u20139 deliver pure expert delta \u2014 e.g. the JCS/RFC 8785 canonicalization requirement for signature verification and the C2 single-assignment decode-to-sink limit are things only hard-won experience teaches, placing this in the 16-20 'every paragraph earns its tokens' band.",
-        "D2": "The 'Run first, then read only what the finding needs' section combines a routing-table thinking framework with concrete domain procedures (usf.py for rules 1\u20135, cli.js audit for rule 9) Claude could not know, hitting the expert-level 12-15 band for both thinking AND procedures.",
-        "D3": "The NEVER section's entries like 'NEVER read OK (signature=signed) as a verified signature' cite exact line numbers (validators/usf.py line 579) and non-obvious reasons (regex shape check, verify_signature never called), squarely in the 12-15 expert-grade band.",
-        "D4": "The description answers WHAT (manifest validation, deny_write precedence, signed content hash), WHEN ('Use when validating a manifest...', 'when a skill is being ported'), and keywords (risk_tier, OpenClaw, Cursor, VS Code), meeting the 14-15 perfect band.",
-        "D5": "The finding-to-reference routing table embeds MANDATORY conditional triggers ('a write-up about to quote a validator OK \u2192 read NEVER') plus explicit 'Do NOT open coverage-matrix.md' and 'Do NOT reach for detector.py' guidance \u2014 the 14-15 excellent trigger quality band.",
-        "D6": "Freedom calibration is appropriate for fragile manifest-validation ops \u2014 exact precedence rules and mandated scripts/commands (python3 validators/usf.py, --strict) for high-consequence checks \u2014 though some judgment calls (manual pass past decode bounds) are left appropriately open, fitting 11-13 with near-perfect matching.",
-        "D7": "It follows a hybrid Navigation/Tool pattern \u2014 a ~200-line SKILL.md routing to validators and reference files with decision rules \u2014 with clear structure and only minor deviations, landing in the 7-8 'clear pattern' band.",
-        "D8": "Edge cases and failure modes are covered concretely \u2014 e.g. 'two hops \u2014 decode, store on an attribute, execute later \u2014 breaks the link' and the bounded-decode limits (depth 2, 256 KiB, 400 candidates) telling the Agent when to do a manual pass \u2014 reaching the 14-15 comprehensive band."
-      },
-      "total": 111.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"Rules 1\u20139 deliver pure expert delta \u2014 e.g. the JCS/RFC 8785 canonicalization requirement for signature verification and the C2 single-assignment decode-to-sink limit are things only hard-won experience teaches, placing this in the 16-20 'every paragraph earns its tokens' band.\"}, \"D2\": {\"score\": 14, \"why\": \"The 'Run first, then read only what the finding needs' section combines a routing-table thinking framework with concrete domain procedures (usf.py for rules 1\u20135, cli.js audit for rule 9) Claude could not know, hitting the expert-level 12-15 band for both thinking AND procedures.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER section's entries like 'NEVER read OK (signature=signed) as a verified signature' cite exact line numbers (validators/usf.py line 579) and non-obvious reasons (regex shape check, verify_signature never called), squarely in the 12-15 expert-grade band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description answers WHAT (manifest validation, deny_write precedence, signed content hash), WHEN ('Use when validating a manifest...', 'when a skill is being ported'), and keywords (risk_tier, OpenClaw, Cursor, VS Code), meeting the 14-15 perfect band.\"}, \"D5\": {\"score\": 14, \"why\": \"The finding-to-reference routing table embeds MANDATORY conditional triggers ('a write-up about to quote a validator OK \u2192 read NEVER') plus explicit 'Do NOT open coverage-matrix.md' and 'Do NOT reach for detector.py' guidance \u2014 the 14-15 excellent trigger quality band.\"}, \"D6\": {\"score\": 13, \"why\": \"Freedom calibration is appropriate for fragile manifest-validation ops \u2014 exact precedence rules and mandated scripts/commands (python3 validators/usf.py, --strict) for high-consequence checks \u2014 though some judgment calls (manual pass past decode bounds) are left appropriately open, fitting 11-13 with near-perfect matching.\"}, \"D7\": {\"score\": 8, \"why\": \"It follows a hybrid Navigation/Tool pattern \u2014 a ~200-line SKILL.md routing to validators and reference files with decision rules \u2014 with clear structure and only minor deviations, landing in the 7-8 'clear pattern' band.\"}, \"D8\": {\"score\": 14, \"why\": \"Edge cases and failure modes are covered concretely \u2014 e.g. 'two hops \u2014 decode, store on an attribute, execute later \u2014 breaks the link' and the bounded-decode limits (depth 2, 256 KiB, 400 candidates) telling the Agent when to do a manual pass \u2014 reaching the 14-15 comprehensive band.\"}}"
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Nearly every paragraph is non-obvious expert knowledge, e.g. the JCS canonicalization rationale in rule 4 and the SURFACE_GLOBS hash-surface gap in the NEVER list \u2014 pure knowledge delta band (16-20).\"},\n\"D2\": {\"score\": 15, \"why\": \"Pairs thinking frameworks ('porting is a re-validation trigger, never an equivalence assumption' in rule 6) with domain procedures Claude wouldn't know ('Run first, then read only what the finding needs' mapping findings to validators/usf.py and node cli/bin/cli.js audit) \u2014 expert-level band.\"},\n\"D3\": {\"score\": 15, \"why\": \"The NEVER section contains eight expert-grade entries grounded in specific implementation facts, such as signature_state being 'a regex on the shape ed25519:<128 hex> and nothing more' \u2014 expert-grade anti-patterns with WHY.\"},\n\"D4\": {\"score\": 15, \"why\": \"The description gives WHAT (manifest validation, deny_write precedence, signed content hash), WHEN ('when a skill is being ported across runtimes and needs a re-validation gate'), and rich trigger keywords \u2014 perfect band.\"},\n\"D5\": {\"score\": 15, \"why\": \"Excellent loading discipline: an embedded routing table mapping finding types to rules, plus explicit 'Do NOT open coverage-matrix.md' and 'Do NOT reach for skills/AST10/scripts/detector.py' triggers \u2014 decision trees + explicit triggers + Do-NOT-Load guidance.\"},\n\"D6\": {\"score\": 13, \"why\": \"Calibration is well-matched to a fragile validation task \u2014 exact scripts and line-level anchors ('validators/usf.py line 579') where bytes matter, judgment language in the blob-analysis section \u2014 good calibration with only minor looseness in the porting-event rules.\"},\n\"D7\": {\"score\": 9, \"why\": \"A masterful hybrid of the Tool and Navigation patterns: decision table, exact scripts, and sub-file routing at ~150 lines, appropriate for precise format operations.\"},\n\"D8\": {\"score\": 14, \"why\": \"Comprehensive coverage including failure modes and edge cases: the 'Where the one shipped check goes quiet' section enumerates C1/C2 blind spots, decode bounds (depth 2, 256 KiB, 400 candidates), and fallback guidance ('needs a manual pass, not a re-run').\"}}"
     },
     {
       "provider": "bedrock/gpt-oss-120b",
@@ -267,99 +317,99 @@
         "D1": 18.0,
         "D2": 13.0,
         "D3": 14.0,
-        "D4": 14.0,
-        "D5": 8.0,
-        "D6": 13.0,
+        "D4": 15.0,
+        "D5": 9.0,
+        "D6": 14.0,
         "D7": 8.0,
         "D8": 13.0
       },
       "justifications": {
-        "D1": "The skill explains expert-level precedence rule \"`deny_write` always wins over `write` for any path it lists \u2014 most-specific-wins\" placing it in the 16\u201120 pure knowledge delta band.",
-        "D2": "It provides thinking patterns like \"Porting is a re\u2011validation trigger, never an equivalence assumption\" plus concrete domain procedures such as running `python3 validators/usf.py <manifest>`, fitting the 8\u201111 good\u2011balance band.",
-        "D3": "The extensive specific NEVER list (e.g., \"NEVER read `OK (signature=signed, ...)` as a verified signature\") with reasoning lands it in the 12\u201115 expert\u2011grade anti\u2011pattern band.",
-        "D4": "The description lists WHAT, WHEN, and keywords (manifest, AST10, cross\u2011platform) satisfying the 14\u201115 perfect description band.",
-        "D5": "References like `coverage-matrix.md` are mentioned with \"Do NOT open... unless...\" but lack explicit loading triggers, placing it in the 6\u201110 good\u2011layering\u2011with\u2011issues band.",
-        "D6": "The skill enforces low\u2011freedom constraints such as exact precedence rules and signature checks, matching the 11\u201113 good calibration band for fragile tasks.",
-        "D7": "The structure follows a Process pattern with phased decision rules and workflow steps, aligning with the 7\u20118 clear\u2011pattern band.",
-        "D8": "Clear actionable steps (e.g., run the validator, decision trees, error reasoning) make it usable, fitting the 11\u201113 clear\u2011guidance band."
+        "D1": "The skill presents expert-level rules such as \u201cdeny_write always wins over write \u2026 most-specific-wins\u201d (Rule\u202f1) and detailed porting re\u2011validation triggers, placing it in the 16\u201120 knowledge\u2011delta band.",
+        "D2": "It combines thinking patterns like \u201cPorting is a re\u2011validation trigger, never an equivalence assumption\u201d (Rule\u202f6) with concrete procedures (run `validators/usf.py`, avoid opening `coverage\u2011matrix.md`), fitting the 12\u201115 mindset\u2011procedure band.",
+        "D3": "The extensive \u201cNEVER\u201d list (e.g., \u201cNEVER read OK (signature=signed, \u2026) as a verified signature\u201d) provides specific reasons, earning the 12\u201115 anti\u2011pattern band.",
+        "D4": "The description lists WHAT, WHEN and keywords (e.g., \u201cUse when validating a manifest \u2026 when a skill is being ported \u2026\u201d), satisfying all criteria, achieving the top 15\u201115 band.",
+        "D5": "Although it mentions external files, it lacks explicit loading triggers, resulting in a moderate 6\u201110 progressive\u2011disclosure band (score 9).",
+        "D6": "The skill\u2019s many mandatory rules and low\u2011freedom directives (e.g., strict precedence handling, NEVER list) match the high\u2011consequence, low\u2011freedom requirement, earning the 14\u201115 band.",
+        "D7": "Its organized sections, phased decision rules (1\u20119) and workflow steps correspond to the \u201cProcess\u201d pattern, fitting the 7\u20118 pattern\u2011recognition band.",
+        "D8": "The concrete commands, decision trees and edge\u2011case handling (e.g., rule\u202f9 payload detection) make it broadly usable, placing it in the 11\u201113 usability band."
       },
-      "total": 101.0,
-      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill explains expert-level precedence rule \\\"`deny_write` always wins over `write` for any path it lists \u2014 most-specific-wins\\\" placing it in the 16\u201120 pure knowledge delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"It provides thinking patterns like \\\"Porting is a re\u2011validation trigger, never an equivalence assumption\\\" plus concrete domain procedures such as running `python3 validators/usf.py <manifest>`, fitting the 8\u201111 good\u2011balance band.\"}, \"D3\": {\"score\": 14, \"why\": \"The extensive specific NEVER list (e.g., \\\"NEVER read `OK (signature=signed, ...)` as a verified signature\\\") with reasoning lands it in the 12\u201115 expert\u2011grade anti\u2011pattern band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description lists WHAT, WHEN, and keywords (manifest, AST10, cross\u2011platform) satisfying the 14\u201115 perfect description band.\"}, \"D5\": {\"score\": 8, \"why\": \"References like `coverage-matrix.md` are mentioned with \\\"Do NOT open... unless...\\\" but lack explicit loading triggers, placing it in the 6\u201110 good\u2011layering\u2011with\u2011issues band.\"}, \"D6\": {\"score\": 13, \"why\": \"The skill enforces low\u2011freedom constraints such as exact precedence rules and signature checks, matching the 11\u201113 good calibration band for fragile tasks.\"}, \"D7\": {\"score\": 8, \"why\": \"The structure follows a Process pattern with phased decision rules and workflow steps, aligning with the 7\u20118 clear\u2011pattern band.\"}, \"D8\": {\"score\": 13, \"why\": \"Clear actionable steps (e.g., run the validator, decision trees, error reasoning) make it usable, fitting the 11\u201113 clear\u2011guidance band.\"}}"
+      "total": 104.0,
+      "raw_response": "{\"D1\": {\"score\": 18, \"why\": \"The skill presents expert-level rules such as \u201cdeny_write always wins over write \u2026 most-specific-wins\u201d (Rule\u202f1) and detailed porting re\u2011validation triggers, placing it in the 16\u201120 knowledge\u2011delta band.\"}, \"D2\": {\"score\": 13, \"why\": \"It combines thinking patterns like \u201cPorting is a re\u2011validation trigger, never an equivalence assumption\u201d (Rule\u202f6) with concrete procedures (run `validators/usf.py`, avoid opening `coverage\u2011matrix.md`), fitting the 12\u201115 mindset\u2011procedure band.\"}, \"D3\": {\"score\": 14, \"why\": \"The extensive \u201cNEVER\u201d list (e.g., \u201cNEVER read OK (signature=signed, \u2026) as a verified signature\u201d) provides specific reasons, earning the 12\u201115 anti\u2011pattern band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description lists WHAT, WHEN and keywords (e.g., \u201cUse when validating a manifest \u2026 when a skill is being ported \u2026\u201d), satisfying all criteria, achieving the top 15\u201115 band.\"}, \"D5\": {\"score\": 9, \"why\": \"Although it mentions external files, it lacks explicit loading triggers, resulting in a moderate 6\u201110 progressive\u2011disclosure band (score 9).\"}, \"D6\": {\"score\": 14, \"why\": \"The skill\u2019s many mandatory rules and low\u2011freedom directives (e.g., strict precedence handling, NEVER list) match the high\u2011consequence, low\u2011freedom requirement, earning the 14\u201115 band.\"}, \"D7\": {\"score\": 8, \"why\": \"Its organized sections, phased decision rules (1\u20119) and workflow steps correspond to the \u201cProcess\u201d pattern, fitting the 7\u20118 pattern\u2011recognition band.\"}, \"D8\": {\"score\": 13, \"why\": \"The concrete commands, decision trees and edge\u2011case handling (e.g., rule\u202f9 payload detection) make it broadly usable, placing it in the 11\u201113 usability band.\"}}"
     },
     {
       "provider": "bedrock/qwen3-235b",
       "scores": {
-        "D1": 20.0,
-        "D2": 15.0,
+        "D1": 19.0,
+        "D2": 14.0,
         "D3": 15.0,
         "D4": 15.0,
         "D5": 14.0,
-        "D6": 14.0,
+        "D6": 15.0,
         "D7": 10.0,
-        "D8": 15.0
+        "D8": 14.0
       },
       "justifications": {
-        "D1": "The skill demonstrates pure knowledge delta with expert insights like 'deny_write always wins over write' and 'network.allow is evaluated default-deny', which are non-obvious precedence rules only an expert would know, meeting the 16-20 band.",
-        "D2": "It provides expert-level thinking patterns such as evaluating `write_allowed(manifest, \\\"SOUL.md\\\")` over reading warnings, and domain-specific procedures like the exact evaluation order in `validators/usf.py`, meeting the 12-15 band.",
-        "D3": "The NEVER section contains expert-grade anti-patterns with deep reasoning like 'NEVER read `OK (signature=signed, ...)` as a verified signature' due to regex-only validation, reflecting hard-won experience, meeting the 12-15 band.",
-        "D4": "The description comprehensively answers WHAT (detect and triage OWASP AST10), WHEN (during manifest validation, porting, etc.), and includes trigger keywords like 'Universal Skill Format', meeting the 14-15 band.",
-        "D5": "It implements excellent progressive disclosure with mandatory triggers like 'Read rules 1\u20135' based on finding type and explicit 'Do NOT open' guidance, demonstrating scenario detection and conditional loading, meeting the 14-15 band.",
-        "D6": "Freedom is perfectly calibrated to the fragile domain of security metadata with low freedom mandates like calling `verify_signature(manifest)` explicitly, because one wrong byte risks privilege escalation, meeting the 14-15 band.",
-        "D7": "It masterfully follows the Tool pattern (~300 lines) with decision trees, code examples, and low freedom for precise operations on a specific format, matching the recommended pattern for this task, meeting the 9-10 band.",
-        "D8": "The skill offers comprehensive practical usability with decision trees for findings, fallback reasoning for validation gaps, and edge case handling like deeply nested blobs, enabling immediate and correct action, meeting the 14-15 band."
+        "D1": "The skill provides pure expert knowledge on security metadata handling in cross-platform skill porting, detailing non-obvious precedence rules and silent drops \u2014 a green flag for 'NEVER do X because [non-obvious reason]' \u2014 placing it in the 16-20 band",
+        "D2": "It integrates expert thinking patterns like 'Before designing, ask what makes this memorable' with domain-specific procedures such as exact validation command sequences and file-specific handling, meeting the 12-15 expert-level criteria",
+        "D3": "The extensive 'NEVER' list includes expert-grade anti-patterns with deep technical justifications like not trusting 'OK (signature=signed)' outputs, which only come from real-world breakage, fitting the 12-15 expert-grade band",
+        "D4": "The description precisely answers WHAT (detect AST10 risks), WHEN (during manifest validation or cross-runtime porting), and includes keywords like 'Universal Skill Format', 'deny_write precedence', and 'network allowlist', achieving the 14-15 perfect band",
+        "D5": "It implements excellent progressive disclosure with mandatory 'READ ENTIRE FILE' triggers embedded in workflow steps and explicit 'Do NOT load' instructions, placing it in the 14-15 excellent band",
+        "D6": "The skill perfectly calibrates freedom by mandating exact scripts and prohibiting modification for fragile operations like signature validation, aligning with the low-freedom requirement for file format operations, thus meeting the 14-15 band",
+        "D7": "The structure masterfully follows the 'Tool' pattern (~300 lines) with decision trees, code examples, and low freedom for precise format operations, matching its use case perfectly per the pattern guide's 9-10 band",
+        "D8": "It provides comprehensive usability through decision trees linking findings to rule numbers, fallback behaviors in scanner limits, and edge case handling like deeply nested blobs, meeting the 14-15 band for practical effectiveness"
       },
-      "total": 118.0,
-      "raw_response": "{\"D1\": {\"score\": 20, \"why\": \"The skill demonstrates pure knowledge delta with expert insights like 'deny_write always wins over write' and 'network.allow is evaluated default-deny', which are non-obvious precedence rules only an expert would know, meeting the 16-20 band.\"}, \"D2\": {\"score\": 15, \"why\": \"It provides expert-level thinking patterns such as evaluating `write_allowed(manifest, \\\\\\\"SOUL.md\\\\\\\")` over reading warnings, and domain-specific procedures like the exact evaluation order in `validators/usf.py`, meeting the 12-15 band.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER section contains expert-grade anti-patterns with deep reasoning like 'NEVER read `OK (signature=signed, ...)` as a verified signature' due to regex-only validation, reflecting hard-won experience, meeting the 12-15 band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description comprehensively answers WHAT (detect and triage OWASP AST10), WHEN (during manifest validation, porting, etc.), and includes trigger keywords like 'Universal Skill Format', meeting the 14-15 band.\"}, \"D5\": {\"score\": 14, \"why\": \"It implements excellent progressive disclosure with mandatory triggers like 'Read rules 1\u20135' based on finding type and explicit 'Do NOT open' guidance, demonstrating scenario detection and conditional loading, meeting the 14-15 band.\"}, \"D6\": {\"score\": 14, \"why\": \"Freedom is perfectly calibrated to the fragile domain of security metadata with low freedom mandates like calling `verify_signature(manifest)` explicitly, because one wrong byte risks privilege escalation, meeting the 14-15 band.\"}, \"D7\": {\"score\": 10, \"why\": \"It masterfully follows the Tool pattern (~300 lines) with decision trees, code examples, and low freedom for precise operations on a specific format, matching the recommended pattern for this task, meeting the 9-10 band.\"}, \"D8\": {\"score\": 15, \"why\": \"The skill offers comprehensive practical usability with decision trees for findings, fallback reasoning for validation gaps, and edge case handling like deeply nested blobs, enabling immediate and correct action, meeting the 14-15 band.\"}}"
+      "total": 116.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"The skill provides pure expert knowledge on security metadata handling in cross-platform skill porting, detailing non-obvious precedence rules and silent drops \u2014 a green flag for 'NEVER do X because [non-obvious reason]' \u2014 placing it in the 16-20 band\"}, \"D2\": {\"score\": 14, \"why\": \"It integrates expert thinking patterns like 'Before designing, ask what makes this memorable' with domain-specific procedures such as exact validation command sequences and file-specific handling, meeting the 12-15 expert-level criteria\"}, \"D3\": {\"score\": 15, \"why\": \"The extensive 'NEVER' list includes expert-grade anti-patterns with deep technical justifications like not trusting 'OK (signature=signed)' outputs, which only come from real-world breakage, fitting the 12-15 expert-grade band\"}, \"D4\": {\"score\": 15, \"why\": \"The description precisely answers WHAT (detect AST10 risks), WHEN (during manifest validation or cross-runtime porting), and includes keywords like 'Universal Skill Format', 'deny_write precedence', and 'network allowlist', achieving the 14-15 perfect band\"}, \"D5\": {\"score\": 14, \"why\": \"It implements excellent progressive disclosure with mandatory 'READ ENTIRE FILE' triggers embedded in workflow steps and explicit 'Do NOT load' instructions, placing it in the 14-15 excellent band\"}, \"D6\": {\"score\": 15, \"why\": \"The skill perfectly calibrates freedom by mandating exact scripts and prohibiting modification for fragile operations like signature validation, aligning with the low-freedom requirement for file format operations, thus meeting the 14-15 band\"}, \"D7\": {\"score\": 10, \"why\": \"The structure masterfully follows the 'Tool' pattern (~300 lines) with decision trees, code examples, and low freedom for precise format operations, matching its use case perfectly per the pattern guide's 9-10 band\"}, \"D8\": {\"score\": 14, \"why\": \"It provides comprehensive usability through decision trees linking findings to rule numbers, fallback behaviors in scanner limits, and edge case handling like deeply nested blobs, meeting the 14-15 band for practical effectiveness\"}}"
     },
     {
       "provider": "bedrock/deepseek-v3.2",
       "scores": {
-        "D1": 20.0,
-        "D2": 15.0,
+        "D1": 16.0,
+        "D2": 12.0,
         "D3": 15.0,
         "D4": 15.0,
         "D5": 15.0,
-        "D6": 15.0,
-        "D7": 10.0,
+        "D6": 14.0,
+        "D7": 9.0,
         "D8": 15.0
       },
       "justifications": {
-        "D1": "Every paragraph adds expert knowledge like 'deny_write always wins over write for any path it lists \u2014 most-specific-wins, not first-match' and precision on validator limitations, placing it in the 'Pure knowledge delta' band.",
-        "D2": "It provides expert thinking patterns ('Porting is a re-validation trigger, never an equivalence assumption') and necessary, non-obvious domain-specific procedures ('Run first, then read only what the finding needs' table), placing it in the 'Expert-level' band.",
-        "D3": "The extensive 'NEVER' list provides specific expert-grade anti-patterns with precise reasoning, like 'NEVER read OK (signature=signed, ...) as a verified signature', placing it in the 'Expert-grade anti-patterns with WHY' band.",
-        "D4": "The description perfectly lists WHAT, explicit WHEN triggers, and keywords, answering all three questions as required for a perfect score.",
-        "D5": "The 'Run first, then read only what the finding needs' table provides excellent embedded loading triggers and explicit 'Do NOT open' guidance, achieving perfect Progressive Disclosure.",
-        "D6": "The skill perfectly calibrates freedom as low for fragile security format operations by mandating specific tools ('validators/usf.py'), exact precedence rules, and clear 'NEVER' constraints, matching the required level.",
-        "D7": "It masterfully follows the official 'Tool' pattern (~300 lines) with decision trees, code examples, and low freedom for precise format operations as required.",
-        "D8": "It provides comprehensive, actionable decision trees, exact code/command examples, detailed edge cases, and error-handling guidance for effective Agent use."
+        "D1": "The skill provides pure expert knowledge delta on AST10 security-metadata porting pitfalls, like the detailed rule 'deny_write always wins over write, most-specific-wins' which Claude wouldn't inherently know.",
+        "D2": "It provides expert thinking patterns like the decision rule 'AST10 is not a protocol problem...it is that no shared vocabulary for *security metadata itself* exists' and domain-specific procedures like the exact ordering for evaluating manifest precedence rules.",
+        "D3": "It has an expert-grade NEVER list with specific reasoning, e.g., 'NEVER read OK (signature=signed, ...) as a verified signature' explaining the regex-only check and verification gap.",
+        "D4": "The description perfectly answers WHAT, WHEN, and includes keywords: 'Detect and triage OWASP AST10 Cross-Platform Reuse...Use when validating a manifest...when a skill is being ported...'.",
+        "D5": "It has perfect layering with explicit mandatory triggers like 'Run first, then read only what the finding needs' and clear 'Do NOT open' guidance in the decision table.",
+        "D6": "The freedom calibration for the fragile domain is excellent, using low-freedom exact scripts ('python3 validators/usf.py') and precise rules, not vague principles.",
+        "D7": "It demonstrates a masterful application of the Tool pattern (~300 lines, decision trees, code examples, low freedom) appropriate for precise security-format operations.",
+        "D8": "It offers comprehensive, tested usability including decision trees ('If the finding is\u2026 | Read'), error handling edge cases, and actionable fallback logic for different failure modes."
       },
-      "total": 120.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 20, \"why\": \"Every paragraph adds expert knowledge like 'deny_write always wins over write for any path it lists \u2014 most-specific-wins, not first-match' and precision on validator limitations, placing it in the 'Pure knowledge delta' band.\"},\n  \"D2\": {\"score\": 15, \"why\": \"It provides expert thinking patterns ('Porting is a re-validation trigger, never an equivalence assumption') and necessary, non-obvious domain-specific procedures ('Run first, then read only what the finding needs' table), placing it in the 'Expert-level' band.\"},\n  \"D3\": {\"score\": 15, \"why\": \"The extensive 'NEVER' list provides specific expert-grade anti-patterns with precise reasoning, like 'NEVER read OK (signature=signed, ...) as a verified signature', placing it in the 'Expert-grade anti-patterns with WHY' band.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description perfectly lists WHAT, explicit WHEN triggers, and keywords, answering all three questions as required for a perfect score.\"},\n  \"D5\": {\"score\": 15, \"why\": \"The 'Run first, then read only what the finding needs' table provides excellent embedded loading triggers and explicit 'Do NOT open' guidance, achieving perfect Progressive Disclosure.\"},\n  \"D6\": {\"score\": 15, \"why\": \"The skill perfectly calibrates freedom as low for fragile security format operations by mandating specific tools ('validators/usf.py'), exact precedence rules, and clear 'NEVER' constraints, matching the required level.\"},\n  \"D7\": {\"score\": 10, \"why\": \"It masterfully follows the official 'Tool' pattern (~300 lines) with decision trees, code examples, and low freedom for precise format operations as required.\"},\n  \"D8\": {\"score\": 15, \"why\": \"It provides comprehensive, actionable decision trees, exact code/command examples, detailed edge cases, and error-handling guidance for effective Agent use.\"}\n}"
+      "total": 111.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 16, \"why\": \"The skill provides pure expert knowledge delta on AST10 security-metadata porting pitfalls, like the detailed rule 'deny_write always wins over write, most-specific-wins' which Claude wouldn't inherently know.\"},\n  \"D2\": {\"score\": 12, \"why\": \"It provides expert thinking patterns like the decision rule 'AST10 is not a protocol problem...it is that no shared vocabulary for *security metadata itself* exists' and domain-specific procedures like the exact ordering for evaluating manifest precedence rules.\"},\n  \"D3\": {\"score\": 15, \"why\": \"It has an expert-grade NEVER list with specific reasoning, e.g., 'NEVER read OK (signature=signed, ...) as a verified signature' explaining the regex-only check and verification gap.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description perfectly answers WHAT, WHEN, and includes keywords: 'Detect and triage OWASP AST10 Cross-Platform Reuse...Use when validating a manifest...when a skill is being ported...'.\"},\n  \"D5\": {\"score\": 15, \"why\": \"It has perfect layering with explicit mandatory triggers like 'Run first, then read only what the finding needs' and clear 'Do NOT open' guidance in the decision table.\"},\n  \"D6\": {\"score\": 14, \"why\": \"The freedom calibration for the fragile domain is excellent, using low-freedom exact scripts ('python3 validators/usf.py') and precise rules, not vague principles.\"},\n  \"D7\": {\"score\": 9, \"why\": \"It demonstrates a masterful application of the Tool pattern (~300 lines, decision trees, code examples, low freedom) appropriate for precise security-format operations.\"},\n  \"D8\": {\"score\": 15, \"why\": \"It offers comprehensive, tested usability including decision trees ('If the finding is\u2026 | Read'), error handling edge cases, and actionable fallback logic for different failure modes.\"}\n}"
     },
     {
       "provider": "bedrock/nova-pro",
       "scores": {
-        "D1": 20.0,
-        "D2": 15.0,
+        "D1": 16.0,
+        "D2": 12.0,
         "D3": 15.0,
         "D4": 15.0,
-        "D5": 15.0,
-        "D6": 15.0,
-        "D7": 10.0,
-        "D8": 15.0
+        "D5": 14.0,
+        "D6": 14.0,
+        "D7": 9.0,
+        "D8": 14.0
       },
       "justifications": {
-        "D1": "Every paragraph earns its tokens with expert knowledge on security metadata and OWASP AST10.",
-        "D2": "Provides expert thinking patterns and domain-specific procedures for validating manifests and detecting porting issues.",
-        "D3": "Has an expert-grade NEVER list with specific reasoning for each anti-pattern.",
-        "D4": "The description is comprehensive, answering WHAT, WHEN, and including trigger keywords.",
-        "D5": "Implements proper content layering with decision trees and explicit triggers.",
-        "D6": "Perfect freedom calibration with specific scripts for fragile operations.",
-        "D7": "Masterful application of the 'Tool' pattern for precise operations on specific formats.",
-        "D8": "Comprehensive coverage including edge cases and error handling with actionable guidance."
+        "D1": "The skill provides pure knowledge delta with expert insights on security metadata and its implications.",
+        "D2": "The skill offers expert thinking patterns and domain-specific procedures for validating manifests and detecting issues.",
+        "D3": "The skill includes an expert-grade NEVER list with specific reasoning for avoiding common pitfalls.",
+        "D4": "The description is comprehensive, detailing WHAT, WHEN, and KEYWORDS for effective skill activation.",
+        "D5": "The skill implements good layering with explicit triggers and guidance on when to load additional resources.",
+        "D6": "The level of specificity is well-calibrated to the fragility of the tasks, providing exact steps where necessary.",
+        "D7": "The skill follows the 'Tool' design pattern effectively, with decision trees and code examples for precise operations.",
+        "D8": "The skill provides clear guidance, decision trees, and fallbacks, ensuring practical usability for agents."
       },
-      "total": 120.0,
-      "raw_response": "{\n  \"D1\": {\"score\": 20, \"why\": \"Every paragraph earns its tokens with expert knowledge on security metadata and OWASP AST10.\"},\n  \"D2\": {\"score\": 15, \"score\": 15, \"why\": \"Provides expert thinking patterns and domain-specific procedures for validating manifests and detecting porting issues.\"},\n  \"D3\": {\"score\": 15, \"why\": \"Has an expert-grade NEVER list with specific reasoning for each anti-pattern.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description is comprehensive, answering WHAT, WHEN, and including trigger keywords.\"},\n  \"D5\": {\"score\": 15, \"why\": \"Implements proper content layering with decision trees and explicit triggers.\"},\n  \"D6\": {\"score\": 15, \"why\": \"Perfect freedom calibration with specific scripts for fragile operations.\"},\n  \"D7\": {\"score\": 10, \"why\": \"Masterful application of the 'Tool' pattern for precise operations on specific formats.\"},\n  \"D8\": {\"score\": 15, \"why\": \"Comprehensive coverage including edge cases and error handling with actionable guidance.\"}\n}"
+      "total": 109.0,
+      "raw_response": "{\n  \"D1\": {\"score\": 16, \"why\": \"The skill provides pure knowledge delta with expert insights on security metadata and its implications.\"},\n  \"D2\": {\"score\": 12, \"why\": \"The skill offers expert thinking patterns and domain-specific procedures for validating manifests and detecting issues.\"},\n  \"D3\": {\"score\": 15, \"why\": \"The skill includes an expert-grade NEVER list with specific reasoning for avoiding common pitfalls.\"},\n  \"D4\": {\"score\": 15, \"why\": \"The description is comprehensive, detailing WHAT, WHEN, and KEYWORDS for effective skill activation.\"},\n  \"D5\": {\"score\": 14, \"why\": \"The skill implements good layering with explicit triggers and guidance on when to load additional resources.\"},\n  \"D6\": {\"score\": 14, \"why\": \"The level of specificity is well-calibrated to the fragility of the tasks, providing exact steps where necessary.\"},\n  \"D7\": {\"score\": 9, \"why\": \"The skill follows the 'Tool' design pattern effectively, with decision trees and code examples for precise operations.\"},\n  \"D8\": {\"score\": 14, \"why\": \"The skill provides clear guidance, decision trees, and fallbacks, ensuring practical usability for agents.\"}\n}"
     },
     {
       "provider": "claude-cli/sonnet",
@@ -367,24 +417,24 @@
         "D1": 19.0,
         "D2": 13.0,
         "D3": 15.0,
-        "D4": 14.0,
-        "D5": 14.0,
-        "D6": 13.0,
+        "D4": 15.0,
+        "D5": 15.0,
+        "D6": 14.0,
         "D7": 9.0,
         "D8": 14.0
       },
       "justifications": {
-        "D1": "The 'NEVER' section cites exact validator behavior (e.g. 'signature_state (validators/usf.py line 579) is a regex on the shape ed25519:<128 hex> and nothing more') rather than generic security advice, putting it solidly in the 16-20 'pure knowledge delta' band.",
-        "D2": "The triage table ('If the finding is\u2026 Read') pairs a thinking framework with domain-specific procedures like running 'python3 validators/usf.py' and 'node cli/bin/cli.js audit', matching the 12-15 'expert-level: shapes thinking AND provides procedures' band.",
-        "D3": "Each NEVER entry (e.g. the deny_write-by-basename vs write-by-path mismatch on 'SOUL.md') gives a specific landmine with code-level reasoning an expert would say 'I learned this the hard way' about, meeting the 12-15 expert-grade band.",
-        "D4": "The description states WHAT (manifest validation, cross-registry arbitrage) and WHEN ('Use when validating a manifest... when a skill is being ported... when a permission finding needs binding') with keywords like 'deny_write', 'signed content hash', and named platforms, landing in the 14-15 band though it stops short of an explicit numbered trigger list.",
-        "D5": "The explicit 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py for rules 1-5' lines are embedded conditional triggers with 'Do NOT Load' guidance, matching the 14-15 'excellent' band for reference loading.",
-        "D6": "The skill mandates exact precedence rules and literal commands (e.g. 'Call verify_signature(manifest) explicitly') appropriate to a low-freedom file-format/metadata-validation task, fitting the 11-13 'good calibration' band rather than the top tier since some sections (e.g. distinguishing-neighbors prose) are looser than the rest.",
-        "D7": "The mix of a routing decision table plus low-freedom rule/code citations at roughly Tool-pattern length places it in the 7-8 'clear pattern with minor deviations' to 9-10 range; I score 9 for the masterful blend of Navigation-style routing atop Tool-style precision.",
-        "D8": "Concrete commands, a YAML precedence example, and edge-case handling like 'The decode is bounded: depth 2, 256 KiB per blob, 400 candidates per file... needs a manual pass, not a re-run' cover error/edge cases well enough for the 14-15 'comprehensive' band."
+        "D1": "Rules like 'signature covers the canonical JCS (RFC 8785) serialization... excluding signature itself and including content_hash' and the risk_tier-as-untrusted-assertion rule are non-obvious expert claims with reasoning, placing this in the 16-20 'pure knowledge delta' band.",
+        "D2": "The 'Fires on / Decides / Does not decide' framing plus the routing table ('if the finding is... read...') combines a thinking pattern with a genuine domain-specific procedure (run validators/usf.py before reading rule text), landing in the 12-15 'expert-level' band.",
+        "D3": "The NEVER section gives seven entries with exact code citations (e.g. 'signature_state (validators/usf.py line 579) is a regex... and neither does the CLI') rather than generic warnings, matching the 12-15 'expert-grade anti-patterns with WHY' band.",
+        "D4": "The description states WHAT (manifest validation, cross-registry arbitrage, USF checks) and WHEN ('Use when validating a manifest...', 'when a skill is being ported...') with concrete keywords (deny_write, risk_tier, OpenClaw), fitting the 14-15 'comprehensive' band.",
+        "D5": "The explicit 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py for rules 1-5' instructions are exactly the conditional 'Do NOT Load' guidance the 14-15 band calls for.",
+        "D6": "Exact precedence rules ('deny_write always wins over write... most-specific-wins, not first-match') and pinned line-level tool behavior match the low-freedom calibration appropriate for fragile manifest/format validation, per the 14-15 band.",
+        "D7": "The decision table, low freedom, code/line references and validator-first workflow closely mirror the rubric's 'Tool' pattern (docx/pdf/xlsx-style), meeting the 9-10 'masterful application' band with only minor deviation from the ~300-line norm.",
+        "D8": "Concrete fallback guidance is baked in throughout, e.g. the C1/C2 detector-blind-spot analysis ('a payload expressed outside that vocabulary passes C1... caught only if it also satisfies C2') gives edge-case coverage matching the 14-15 band."
       },
-      "total": 111.0,
-      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"The 'NEVER' section cites exact validator behavior (e.g. 'signature_state (validators/usf.py line 579) is a regex on the shape ed25519:<128 hex> and nothing more') rather than generic security advice, putting it solidly in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"The triage table ('If the finding is\u2026 Read') pairs a thinking framework with domain-specific procedures like running 'python3 validators/usf.py' and 'node cli/bin/cli.js audit', matching the 12-15 'expert-level: shapes thinking AND provides procedures' band.\"}, \"D3\": {\"score\": 15, \"why\": \"Each NEVER entry (e.g. the deny_write-by-basename vs write-by-path mismatch on 'SOUL.md') gives a specific landmine with code-level reasoning an expert would say 'I learned this the hard way' about, meeting the 12-15 expert-grade band.\"}, \"D4\": {\"score\": 14, \"why\": \"The description states WHAT (manifest validation, cross-registry arbitrage) and WHEN ('Use when validating a manifest... when a skill is being ported... when a permission finding needs binding') with keywords like 'deny_write', 'signed content hash', and named platforms, landing in the 14-15 band though it stops short of an explicit numbered trigger list.\"}, \"D5\": {\"score\": 14, \"why\": \"The explicit 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py for rules 1-5' lines are embedded conditional triggers with 'Do NOT Load' guidance, matching the 14-15 'excellent' band for reference loading.\"}, \"D6\": {\"score\": 13, \"why\": \"The skill mandates exact precedence rules and literal commands (e.g. 'Call verify_signature(manifest) explicitly') appropriate to a low-freedom file-format/metadata-validation task, fitting the 11-13 'good calibration' band rather than the top tier since some sections (e.g. distinguishing-neighbors prose) are looser than the rest.\"}, \"D7\": {\"score\": 9, \"why\": \"The mix of a routing decision table plus low-freedom rule/code citations at roughly Tool-pattern length places it in the 7-8 'clear pattern with minor deviations' to 9-10 range; I score 9 for the masterful blend of Navigation-style routing atop Tool-style precision.\"}, \"D8\": {\"score\": 14, \"why\": \"Concrete commands, a YAML precedence example, and edge-case handling like 'The decode is bounded: depth 2, 256 KiB per blob, 400 candidates per file... needs a manual pass, not a re-run' cover error/edge cases well enough for the 14-15 'comprehensive' band.\"}}\n"
+      "total": 114.0,
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Rules like 'signature covers the canonical JCS (RFC 8785) serialization... excluding signature itself and including content_hash' and the risk_tier-as-untrusted-assertion rule are non-obvious expert claims with reasoning, placing this in the 16-20 'pure knowledge delta' band.\"}, \"D2\": {\"score\": 13, \"why\": \"The 'Fires on / Decides / Does not decide' framing plus the routing table ('if the finding is... read...') combines a thinking pattern with a genuine domain-specific procedure (run validators/usf.py before reading rule text), landing in the 12-15 'expert-level' band.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER section gives seven entries with exact code citations (e.g. 'signature_state (validators/usf.py line 579) is a regex... and neither does the CLI') rather than generic warnings, matching the 12-15 'expert-grade anti-patterns with WHY' band.\"}, \"D4\": {\"score\": 15, \"why\": \"The description states WHAT (manifest validation, cross-registry arbitrage, USF checks) and WHEN ('Use when validating a manifest...', 'when a skill is being ported...') with concrete keywords (deny_write, risk_tier, OpenClaw), fitting the 14-15 'comprehensive' band.\"}, \"D5\": {\"score\": 15, \"why\": \"The explicit 'Do NOT open coverage-matrix.md unless...' and 'Do NOT reach for skills/AST10/scripts/detector.py for rules 1-5' instructions are exactly the conditional 'Do NOT Load' guidance the 14-15 band calls for.\"}, \"D6\": {\"score\": 14, \"why\": \"Exact precedence rules ('deny_write always wins over write... most-specific-wins, not first-match') and pinned line-level tool behavior match the low-freedom calibration appropriate for fragile manifest/format validation, per the 14-15 band.\"}, \"D7\": {\"score\": 9, \"why\": \"The decision table, low freedom, code/line references and validator-first workflow closely mirror the rubric's 'Tool' pattern (docx/pdf/xlsx-style), meeting the 9-10 'masterful application' band with only minor deviation from the ~300-line norm.\"}, \"D8\": {\"score\": 14, \"why\": \"Concrete fallback guidance is baked in throughout, e.g. the C1/C2 detector-blind-spot analysis ('a payload expressed outside that vocabulary passes C1... caught only if it also satisfies C2') gives edge-case coverage matching the 14-15 band.\"}}\n"
     },
     {
       "provider": "anthropic-compatible/glm-5.2",
@@ -399,59 +449,63 @@
         "D8": 14.0
       },
       "justifications": {
-        "D1": "Pure knowledge delta throughout \u2014 e.g. rule 4's 'signature covers the canonical JCS (RFC 8785) serialization ... excluding signature itself' and the C1/C2 detector edge cases are expert-only content Claude would not know, putting nearly every paragraph in the 16-20 band.",
-        "D2": "Combines expert thinking patterns ('Encoding is not the finding ... Nor is an unreadable payload a clean one') with domain procedures Claude wouldn't know ('run validators/usf.py, read rules 1-5, then stop'), meeting the expert-level 12-15 band.",
-        "D3": "The NEVER section is expert-grade with hard-won WHYs, e.g. 'NEVER read OK (signature=signed...) as a verified signature' explained by validate_manifest never calling verify_signature \u2014 squarely the 12-15 band.",
-        "D4": "Description gives WHAT (manifest validation, deny_write precedence, signed content hash), WHEN ('when a skill is being ported across runtimes and needs a re-validation gate'), and keywords (OWASP AST10, Universal Skill Format, cross-registry arbitrage) \u2014 the perfect 14-15 band.",
-        "D5": "Excellent layering: the 'If the finding is\u2026 | Read' table embeds conditional triggers, plus explicit 'Do NOT open coverage-matrix.md' and 'Do NOT reach for scripts/detector.py' guidance, hitting the perfect 14-15 band.",
-        "D6": "Calibration matches the fragile validation task: exact scripts, file-line citations ('validators/usf.py line 579'), and mandated steps like 'Run --strict' with no creative-task overconstraint \u2014 the 14-15 band.",
-        "D7": "Masterful Tool-pattern application (~300-line equivalent): decision-tree routing table, code examples, low freedom, exact precedence rules \u2014 the 9-10 band.",
-        "D8": "Comprehensive edge-case and fallback coverage, e.g. verify_signature 'raises rather than returning False when there is no key' and the two-hop C2 break with the manual-pass remedy \u2014 the 14-15 band."
+        "D1": "Rules like 'deny_write most-specific-wins resolution, not first-match' and 'signature covers canonical JCS serialization excluding itself' plus the C1/C2 detector edge analysis (two-hop decode breaking the sink link, hex-line-keyed integrity exclusion) are pure knowledge delta in the 16-20 band with essentially no tutorial filler.",
+        "D2": "The 'Run first, then read only what the finding needs' routing table plus the framing 'AST10 is not a protocol problem... no shared vocabulary for security metadata' transfer both expert thinking patterns and the exact run-tools-then-read-rules procedure, hitting the 12-15 band.",
+        "D3": "The NEVER section is expert-grade with hard-won WHYs, e.g. 'signature_state is a regex on the shape ed25519:<128 hex> and validate_manifest never calls verify_signature' and 'UsfValidationResult.ok is not errors... run --strict' \u2014 the top band exactly.",
+        "D4": "The description names WHAT (manifest validation, deny_write precedence, default-deny network allowlist), WHEN ('Use when validating a manifest against the Universal Skill Format schema'), and keywords (risk_tier, signatures, cross-registry arbitrage) \u2014 perfect per the 14-15 band.",
+        "D5": "Loading is conditionally gated inside the workflow table ('a manifest field's meaning or precedence \u2192 rules 1-5, then stop') with explicit negative triggers 'Do NOT open coverage-matrix.md' and 'Do NOT reach for detector.py', the Excellent trigger tier.",
+        "D6": "Low-freedom precision where a wrong reading is dangerous (exact scripts to run, exact function calls like verify_signature(manifest)) while leaving judgment open where it belongs (tiering out-of-artifact scenarios 'this file does not assert a tier for them') \u2014 well calibrated throughout.",
+        "D7": "A masterful Tool-pattern application: decision-table routing, numbered rules, validator scripts, and a bounded ~150-line body, matching the pattern-selection guide for precise operations on a specific format.",
+        "D8": "Edge cases and failure modes are exhaustively covered \u2014 decode depth/size/candidate bounds, base32/base85 never becoming candidates, schema-failure suppressing semantic_errors, basename-vs-path deny_write disagreement \u2014 with concrete fallback actions, top band coverage."
       },
       "total": 114.0,
-      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Pure knowledge delta throughout \u2014 e.g. rule 4's 'signature covers the canonical JCS (RFC 8785) serialization ... excluding signature itself' and the C1/C2 detector edge cases are expert-only content Claude would not know, putting nearly every paragraph in the 16-20 band.\"}, \"D2\": {\"score\": 14, \"why\": \"Combines expert thinking patterns ('Encoding is not the finding ... Nor is an unreadable payload a clean one') with domain procedures Claude wouldn't know ('run validators/usf.py, read rules 1-5, then stop'), meeting the expert-level 12-15 band.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER section is expert-grade with hard-won WHYs, e.g. 'NEVER read OK (signature=signed...) as a verified signature' explained by validate_manifest never calling verify_signature \u2014 squarely the 12-15 band.\"}, \"D4\": {\"score\": 15, \"why\": \"Description gives WHAT (manifest validation, deny_write precedence, signed content hash), WHEN ('when a skill is being ported across runtimes and needs a re-validation gate'), and keywords (OWASP AST10, Universal Skill Format, cross-registry arbitrage) \u2014 the perfect 14-15 band.\"}, \"D5\": {\"score\": 14, \"why\": \"Excellent layering: the 'If the finding is\u2026 | Read' table embeds conditional triggers, plus explicit 'Do NOT open coverage-matrix.md' and 'Do NOT reach for scripts/detector.py' guidance, hitting the perfect 14-15 band.\"}, \"D6\": {\"score\": 14, \"why\": \"Calibration matches the fragile validation task: exact scripts, file-line citations ('validators/usf.py line 579'), and mandated steps like 'Run --strict' with no creative-task overconstraint \u2014 the 14-15 band.\"}, \"D7\": {\"score\": 9, \"why\": \"Masterful Tool-pattern application (~300-line equivalent): decision-tree routing table, code examples, low freedom, exact precedence rules \u2014 the 9-10 band.\"}, \"D8\": {\"score\": 14, \"why\": \"Comprehensive edge-case and fallback coverage, e.g. verify_signature 'raises rather than returning False when there is no key' and the two-hop C2 break with the manual-pass remedy \u2014 the 14-15 band.\"}}"
+      "raw_response": "{\"D1\": {\"score\": 19, \"why\": \"Rules like 'deny_write most-specific-wins resolution, not first-match' and 'signature covers canonical JCS serialization excluding itself' plus the C1/C2 detector edge analysis (two-hop decode breaking the sink link, hex-line-keyed integrity exclusion) are pure knowledge delta in the 16-20 band with essentially no tutorial filler.\"}, \"D2\": {\"score\": 14, \"why\": \"The 'Run first, then read only what the finding needs' routing table plus the framing 'AST10 is not a protocol problem... no shared vocabulary for security metadata' transfer both expert thinking patterns and the exact run-tools-then-read-rules procedure, hitting the 12-15 band.\"}, \"D3\": {\"score\": 15, \"why\": \"The NEVER section is expert-grade with hard-won WHYs, e.g. 'signature_state is a regex on the shape ed25519:<128 hex> and validate_manifest never calls verify_signature' and 'UsfValidationResult.ok is not errors... run --strict' \u2014 the top band exactly.\"}, \"D4\": {\"score\": 15, \"why\": \"The description names WHAT (manifest validation, deny_write precedence, default-deny network allowlist), WHEN ('Use when validating a manifest against the Universal Skill Format schema'), and keywords (risk_tier, signatures, cross-registry arbitrage) \u2014 perfect per the 14-15 band.\"}, \"D5\": {\"score\": 14, \"why\": \"Loading is conditionally gated inside the workflow table ('a manifest field's meaning or precedence \u2192 rules 1-5, then stop') with explicit negative triggers 'Do NOT open coverage-matrix.md' and 'Do NOT reach for detector.py', the Excellent trigger tier.\"}, \"D6\": {\"score\": 14, \"why\": \"Low-freedom precision where a wrong reading is dangerous (exact scripts to run, exact function calls like verify_signature(manifest)) while leaving judgment open where it belongs (tiering out-of-artifact scenarios 'this file does not assert a tier for them') \u2014 well calibrated throughout.\"}, \"D7\": {\"score\": 9, \"why\": \"A masterful Tool-pattern application: decision-table routing, numbered rules, validator scripts, and a bounded ~150-line body, matching the pattern-selection guide for precise operations on a specific format.\"}, \"D8\": {\"score\": 14, \"why\": \"Edge cases and failure modes are exhaustively covered \u2014 decode depth/size/candidate bounds, base32/base85 never becoming candidates, schema-failure suppressing semantic_errors, basename-vs-path deny_write disagreement \u2014 with concrete fallback actions, top band coverage.\"}}"
     }
   ],
   "aggregate": {
-    "n": 16,
-    "mean": 113.2,
-    "median": 113.0,
+    "n": 18,
+    "mean": 112.4,
+    "median": 114.0,
     "min": 101.0,
     "max": 120.0,
     "range": 19.0,
-    "stdev": 5.55,
-    "lower_bound": 107.7,
+    "stdev": 5.45,
+    "lower_bound": 107.0,
+    "sem": 1.28,
+    "ci_lower": 111.1,
     "judgments": [
-      107.0,
+      101.0,
+      117.0,
+      116.0,
+      109.0,
+      109.0,
+      114.0,
+      106.0,
+      120.0,
       119.0,
       120.0,
-      111.0,
-      111.0,
+      110.0,
       115.0,
-      106.0,
-      115.0,
-      112.0,
+      104.0,
+      116.0,
       111.0,
-      101.0,
-      118.0,
-      120.0,
-      120.0,
-      111.0,
+      109.0,
+      114.0,
       114.0
     ],
     "method": "multi-round-independent-pooled",
     "rubric_sha": "3027f20f3181758385a1bb8c022d4041dfb4de84",
     "rubric_content_sha256": "737ef3628f0e11353114c3bd05a1c9d0c448dbfec1ae85db839253cbe93198b6",
-    "dim_n": 16,
+    "dim_n": 18,
     "dim_means": {
-      "D1": 18.6,
-      "D2": 13.9,
+      "D1": 18.4,
+      "D2": 13.6,
       "D3": 14.8,
-      "D4": 14.7,
-      "D5": 13.8,
+      "D4": 14.9,
+      "D5": 13.6,
       "D6": 14.0,
       "D7": 9.1,
-      "D8": 14.3
+      "D8": 14.2
     }
   },
   "verdict": "SHIP",

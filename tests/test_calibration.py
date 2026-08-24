@@ -52,6 +52,9 @@ SCORECARDS = REPO_ROOT / "eval" / "scorecards"
 #: flagged judge on it: run 3 has none, and a check that only runs when someone
 #: is flagged is a check that stops running the moment the panel improves.
 SCORECARDS_RUN2 = REPO_ROOT / "eval" / "scorecards-run2"
+#: Every recorded corpus, live and archived. The worked example below is found
+#: in one of these rather than in whichever directory happens to be live.
+CORPORA = REPO_ROOT / "eval"
 
 
 def _load_calibration():
@@ -117,7 +120,11 @@ def test_calibration_emits_json():
     )
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
-    assert set(payload) == {"summary", "providers", "skills", "judge_quality"}
+    # Exact, not a subset: a block appearing or disappearing from the machine-readable
+    # report is a change to what the tool publishes and must be a deliberate edit here.
+    # `robustness` is eval/robustness.py's output, carried verbatim — see that module and
+    # tests/test_robustness.py for what is in it.
+    assert set(payload) == {"summary", "providers", "skills", "judge_quality", "robustness"}
 
 
 def test_the_headline_figures_still_describe_the_whole_panel(computed):
@@ -274,7 +281,34 @@ def test_adr_bias_figures_match_the_computed_biases(computed):
 # ---------------------------------------------------------------------------
 
 
-def _worked_example(computed) -> dict:
+def _last_corpus_judged_under_the_retired_clause() -> Path:
+    """The newest corpus scored before ADR-0006, found by reading the scorecards.
+
+    Which corpus that is is a *measurement*, not a name typed here: ADR-0006 added
+    `sem` and `ci_lower` to every aggregate it writes, so a corpus whose aggregates
+    carry neither was scored under the retired clause. The newest such corpus is
+    the one the lower-bound argument was last measured on. When run 6 archives run
+    5, run 5's directory will carry those keys and this will keep pointing at run 4
+    — which is the point: the evidence for a retired rule does not move.
+    """
+    dated: list[tuple[int, Path]] = []
+    for directory in sorted(CORPORA.glob("scorecards*")):
+        if not directory.is_dir():
+            continue
+        cards = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(directory.glob("*.json"))]
+        aggregates = [c["aggregate"] for c in cards if c.get("aggregate")]
+        if not aggregates or any("ci_lower" in agg for agg in aggregates):
+            continue
+        suffix = directory.name.rsplit("run", 1)[-1]
+        dated.append((int(suffix) if suffix.isdigit() else 0, directory))
+    assert dated, (
+        "no recorded corpus predates ADR-0006, so the retired clause's worked example has no "
+        "evidence left to stand on — ADR-0005's arithmetic is unverifiable and must be rewritten"
+    )
+    return max(dated)[1]
+
+
+def _worked_example() -> dict:
     """The skill the ADR's arithmetic must be worked on — found, never named.
 
     The ADR's case is "a skill with nothing against it but the lower bound", so
@@ -283,11 +317,22 @@ def _worked_example(computed) -> dict:
     `AST04`, which then shipped — and the pinned arithmetic became a sentence the
     ADR could only satisfy by stating something false (`108.9 < 105`). Deriving
     it means the assertion keeps testing the claim rather than the skill that
-    happened to illustrate it, and it fails loudly if no such skill exists, since
+    happened to illustrate it, and it fails loudly if no such corpus exists, since
     an ADR arguing from a case with no instances is the thing worth catching.
+
+    It is derived from the last corpus judged under the retired clause, not from
+    the live one, and that changed with run 5. The clause is retired: no skill
+    scored under the rule now in force can be "blocked by the lower bound", so a
+    search of the live corpus can only ever return zero and the assertion below
+    would fail on a document that is telling the truth. The evidence is historical
+    because the rule is, and the guard now says so by construction — it reads the
+    frozen corpus that produced the argument, and still fails if that corpus stops
+    containing exactly one clean instance or if the ADR stops quoting its
+    arithmetic.
     """
+    directory = _last_corpus_judged_under_the_retired_clause()
     blocked_by_the_bound = []
-    for path in sorted(SCORECARDS.glob("*.json")):
+    for path in sorted(directory.glob("*.json")):
         card = json.loads(path.read_text(encoding="utf-8"))
         agg = card.get("aggregate")
         if not agg or card["verdict"] == "SHIP":
@@ -297,17 +342,19 @@ def _worked_example(computed) -> dict:
             blocked_by_the_bound.append(card["skill"])
     assert len(blocked_by_the_bound) == 1, (
         "ADR-0005 argues from a skill blocked by the lower bound and nothing else; "
-        f"eval/scorecards/ holds {len(blocked_by_the_bound)} such skills ({blocked_by_the_bound}). "
+        f"eval/{directory.name}/ holds {len(blocked_by_the_bound)} such skills ({blocked_by_the_bound}). "
         "With none, the ADR has no worked example and its Negative consequences need rewriting; "
         "with several, this test cannot know which one the document should use."
     )
-    return next(r for r in computed["skills"] if r["skill"] == blocked_by_the_bound[0])
+    skill = blocked_by_the_bound[0]
+    row = next(r for r in cal.skill_dispersion(cal.load_judgments(directory)) if r["skill"] == skill)
+    return {**row, "corpus": f"eval/{directory.name}/"}
 
 
 @pytest.fixture(scope="module")
 def summary(computed):
     data = dict(computed["summary"])
-    data["worked_example"] = _worked_example(computed)
+    data["worked_example"] = _worked_example()
     return data
 
 
@@ -325,6 +372,10 @@ def _panel_phrases(summary: dict) -> list[str]:
         f"`{worked['skill']}`",
         f"{worked['mean']} - {worked['sigma']} = {worked['lower_bound']} < {POOLED_LOWER_BOUND}",
         f"{worked['mean']} - {worked['sigma']}/",
+        # The worked example is evidence from a corpus scored under a retired
+        # clause, so the document has to name that corpus. An unlabelled figure
+        # from an archive reads as a figure from the run being published.
+        worked["corpus"],
     ]
 
 

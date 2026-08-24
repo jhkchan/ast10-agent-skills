@@ -22,9 +22,9 @@ precisely so that a judge cannot opt out of explaining and still bind.
 
 **Which corpus is which.** ``eval/scorecards-run1/`` and
 ``eval/scorecards-run2/`` were both scored before either change and are frozen.
-``eval/scorecards-run3/`` and ``eval/scorecards/`` were both written under the
-rubric-grounded prompt and the justification contract; the second is the live
-corpus, currently run 4. Section 4 holds one test per side: the pre-contract
+``eval/scorecards-run3/``, ``eval/scorecards-run4/`` and ``eval/scorecards/``
+were all written under the rubric-grounded prompt and the justification
+contract; the last is the live corpus, currently run 5. Section 4 holds one test per side: the pre-contract
 archives must stay unexplainable by today's parser, and every post-contract
 corpus -- archived or live -- must satisfy it for every pooled judgment. Those
 two facts are what make the runs distinguishable by inspection rather than by
@@ -442,7 +442,7 @@ def test_run_judge_excludes_crashed_provider_with_audit_trail(tmp_path):
         _FakeAdapter("openai-compatible", error=TimeoutError("provider timed out after 60s")),
     ]
 
-    result = run_judge(skill_file, adapters, output_path=output_path)
+    result = run_judge(skill_file, adapters, output_path=output_path, audit_path=tmp_path / "audit.yml")
 
     assert result["status"] == "partial"
     assert len(result["judgments"]) == 1
@@ -479,7 +479,7 @@ def test_a_judge_that_will_not_explain_itself_is_excluded_not_pooled(tmp_path, r
         _FakeAdapter("unjustified", response=raw),
     ]
 
-    result = run_judge(skill_file, adapters, output_path=tmp_path / "scores.json")
+    result = run_judge(skill_file, adapters, output_path=tmp_path / "scores.json", audit_path=tmp_path / "audit.yml")
 
     assert result["status"] == "partial"
     assert [j["provider"] for j in result["judgments"]] == ["honest"]
@@ -498,7 +498,7 @@ def test_every_adapter_malformed_publishes_failed_not_a_zero_pool(tmp_path):
     skill_file.write_text("---\nname: sample-skill\n---\nBody.", encoding="utf-8")
 
     adapters = [_FakeAdapter("a", response="{}"), _FakeAdapter("b", response="nope")]
-    result = run_judge(skill_file, adapters, output_path=tmp_path / "scores.json")
+    result = run_judge(skill_file, adapters, output_path=tmp_path / "scores.json", audit_path=tmp_path / "audit.yml")
 
     assert result["status"] == "failed"
     assert result["pooled"] is None
@@ -523,7 +523,7 @@ ARCHIVED_CORPORA = ["scorecards-run1", "scorecards-run2"]
 #: being the same distinction the moment run 3 was archived, and this constant
 #: is the difference. Every corpus in it must satisfy the same contract the
 #: live one does.
-ARCHIVED_POST_CONTRACT_CORPORA = ["scorecards-run3"]
+ARCHIVED_POST_CONTRACT_CORPORA = ["scorecards-run3", "scorecards-run4"]
 
 #: The run the repository currently publishes, produced by the rubric-grounded
 #: prompt under the justification contract.
@@ -668,11 +668,13 @@ CORPUS_PROSE = (
     "docs/architecture.md",
     "docs/skill-judge-dashboard.md",
     "docs/adr/0005-judge-panel-calibration-and-the-lower-bound.md",
+    "docs/adr/0006-confidence-bound-on-the-pooled-mean.md",
     "eval/calibration.py",
     "eval/scorecards/README.md",
     "eval/scorecards-run1/README.md",
     "eval/scorecards-run2/README.md",
     "eval/scorecards-run3/README.md",
+    "eval/scorecards-run4/README.md",
     "scripts/judge_harness.py",
 )
 

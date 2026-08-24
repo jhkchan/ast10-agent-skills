@@ -23,6 +23,15 @@ It computes three things from `eval/scorecards/*.json` and nothing else:
    120), and self-consistency (its round-to-round spread on one skill). A judge
    that fails discrimination is printed as **NON-DISCRIMINATING**.
 
+It then prints a fourth block it does not compute: the **robustness** report from
+`eval/robustness.py` — leave-one-judge-out and missing-data sensitivity, both
+run through the live ship gate — and writes it to `eval/robustness.json`. That
+report answers the question these diagnostics raise and cannot settle: a judge
+flagged COARSE is still pooled into every published figure, so how much of the
+published ship count is resting on it? It lives in its own module because it must
+call `ship_floor.aggregate_verdict`, and this file must not — see "diagnostics
+only" below.
+
 A flagged judge is **not** dropped from any pooled figure here. The standing
 doctrine in this repository is declare-and-record: the report prints the pooled
 numbers with *and* without the flagged judges side by side so a reader sees the
@@ -42,7 +51,11 @@ disk could tell the reader which was true. Every figure the ADR quotes is
 printed by this script, and `tests/test_calibration.py` fails if the two drift.
 
 This script computes **diagnostics only**. It evaluates no candidate rule against
-the recorded data and it changes no gate constant. Three constants are imported
+the recorded data, it changes no gate constant, and it never computes a ship
+verdict: the robustness block it prints is produced by `eval/robustness.py`,
+which calls the live gate rather than re-deriving it, and this file only renders
+what that module returns. `tests/test_calibration.py` enforces the split on the
+code, not on the prose. Three constants are imported
 purely so the report can state what bar applies and what bar used to:
 `ship_floor.POOLED_TARGET` and `ship_floor.CONFIDENCE_K` are the rule in force
 after `docs/adr/0006-confidence-bound-on-the-pooled-mean.md`, and
@@ -57,7 +70,7 @@ Usage::
     python3 eval/calibration.py                  # print the tables
     python3 eval/calibration.py --json           # same figures, machine-readable
     python3 eval/calibration.py --scorecards DIR # point at another corpus
-    python3 eval/calibration.py --no-emit        # skip rewriting eval/judge-quality.json
+    python3 eval/calibration.py --no-emit        # skip rewriting the two emitted files
 """
 
 from __future__ import annotations
@@ -76,6 +89,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:  # allow `python3 eval/calibration.py`
     sys.path.insert(0, str(REPO_ROOT))
 
+import eval.robustness as robustness_module  # noqa: E402
 from scripts.ship_floor import CONFIDENCE_K, POOLED_LOWER_BOUND, POOLED_TARGET  # noqa: E402
 
 SCORECARD_DIR = REPO_ROOT / "eval" / "scorecards"
@@ -286,11 +300,13 @@ def skill_dispersion(judgments: list[Judgment]) -> list[dict[str, Any]]:
 # that did rank things adds a constant to every skill and widens every sigma,
 # and the sigma is what the ship rule subtracts.
 #
-# That judge is no longer flat. Run 3 (eval/scorecards/) sent the rubric's own
-# bands and it now varies and ranks, coming out COARSE rather than
-# NON-DISCRIMINATING. The rule below is unchanged and still fires on the run-2
-# corpus, which is what keeps "nobody is flagged" readable as a repair rather
-# than as a relaxed threshold. Every "Measured:" line in this section is that
+# That judge is no longer flat. Run 3 (eval/scorecards-run3/) sent the rubric's
+# own bands and it began to vary and to rank, coming out COARSE rather than
+# NON-DISCRIMINATING; it was flagged again on run 4 by compression against its
+# own ceiling and is COARSE again on run 5. The rule below is unchanged through
+# all four states and still fires on the run-2 corpus, which is what keeps
+# "nobody is flagged" readable as a measurement rather than as a relaxed
+# threshold. Every "Measured:" line in this section is that
 # run-2 panel — the evidence available when each threshold was written, kept as
 # a record of the margin rather than refreshed into a moving target.
 #
@@ -720,18 +736,25 @@ def panel_summary(judgments: list[Judgment]) -> dict[str, Any]:
     }
 
 
-def report(judgments: list[Judgment]) -> dict[str, Any]:
+def report(judgments: list[Judgment], panels: list[Any] | None = None) -> dict[str, Any]:
     """Everything the printed tables show, as plain data.
 
     ``summary``, ``providers`` and ``skills`` describe the panel exactly as
     recorded — flagged judges included. ``judge_quality`` is the only place a
     filtered figure appears, and it appears beside its unfiltered twin.
+
+    ``robustness`` is ``eval/robustness.py``'s output verbatim, or ``None`` for a
+    caller that passed no panels. It needs the scorecards themselves rather than
+    the flattened judgments — the attempted-vs-pooled gap and the rubric pin each
+    skill was judged against live in the file, not in a total — so it is passed
+    in rather than derived here.
     """
     return {
         "summary": panel_summary(judgments),
         "providers": provider_bias(judgments),
         "skills": skill_dispersion(judgments),
         "judge_quality": judge_quality(judgments),
+        "robustness": robustness_module.robustness(panels) if panels else None,
     }
 
 
@@ -912,9 +935,17 @@ def format_report(data: dict[str, Any]) -> str:
     lines.append("")
     lines.extend(_format_exclusion(quality["exclusion"]))
     lines.append("")
+    if data.get("robustness"):
+        # The margin around the board, printed here so a reader who came for the
+        # bias table cannot leave without it. Rendered by the module that
+        # computed it; nothing is re-derived on this side.
+        lines.append(robustness_module.format_report(data["robustness"]))
+        lines.append("")
     lines.append("  Diagnostics only. No gate constant is read from this file and none is changed by it;")
-    lines.append("  no judge is excluded by it. The gate has been changed exactly once, by a record")
-    lines.append("  written before the run it judges. See")
+    lines.append("  no judge is excluded from any published figure and no verdict is re-issued. The")
+    lines.append("  robustness block above drops judges and refills gaps HYPOTHETICALLY, to publish the")
+    lines.append("  margin around the board — the board itself stands exactly as recorded. The gate has")
+    lines.append("  been changed exactly once, by a record written before the run it judges. See")
     lines.append("  docs/adr/0005-judge-panel-calibration-and-the-lower-bound.md (the diagnosis) and")
     lines.append("  docs/adr/0006-confidence-bound-on-the-pooled-mean.md (the change).")
     return "\n".join(lines)
@@ -932,7 +963,15 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help=f"where to write the machine-readable judge-quality verdicts (default: {JUDGE_QUALITY_PATH.name})",
     )
-    parser.add_argument("--no-emit", action="store_true", help="print only; do not write the judge-quality file")
+    parser.add_argument("--no-emit", action="store_true", help="print only; do not write the emitted files")
+    parser.add_argument(
+        "--robustness-out",
+        default=None,
+        help=(
+            "where to write the machine-readable leave-one-judge-out and missing-data figures "
+            f"(default: {robustness_module.ROBUSTNESS_PATH.name})"
+        ),
+    )
     args = parser.parse_args(argv)
 
     source = Path(args.scorecards)
@@ -941,7 +980,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{args.scorecards}: no judgments recorded — nothing to calibrate")
         return 0
 
-    data = report(judgments)
+    panels = robustness_module.load_panels(source)
+    data = report(judgments, panels)
     print(json.dumps(data, indent=2) if args.json else format_report(data))
 
     # Written by default, but only for the corpus the committed file is *about*.
@@ -958,6 +998,17 @@ def main(argv: list[str] | None = None) -> int:
         )
         if not args.json:
             print(f"\n  Judge-quality verdicts written to {destination}")
+
+    # Same rule again for the robustness figures, and the same reason.
+    robustness_path = Path(args.robustness_out) if args.robustness_out else robustness_module.ROBUSTNESS_PATH
+    if data["robustness"] and not args.no_emit and (args.robustness_out or default_corpus):
+        robustness_path.parent.mkdir(parents=True, exist_ok=True)
+        robustness_path.write_text(
+            json.dumps(robustness_module.robustness_document(data["robustness"], source), indent=2) + "\n",
+            encoding="utf-8",
+        )
+        if not args.json:
+            print(f"  Robustness figures written to {robustness_path}")
     return 0
 
 

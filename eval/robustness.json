@@ -1,0 +1,1283 @@
+{
+  "generated_by": "eval/robustness.py",
+  "source": "eval/scorecards",
+  "doctrine": "Declare and record. These figures are the margin around the published board, not a revision of it. No judge is excluded from any published figure and no imputed judgment is written into any scorecard; both analyses re-run the live gate over a panel that was never recorded, and say so.",
+  "gate": {
+    "rule": "mean >= 108 AND mean - 1.0 * stdev/sqrt(n) >= 108 AND every dimension mean >= its floor",
+    "pooled_target": 108,
+    "confidence_k": 1.0,
+    "min_rounds": 4,
+    "applied_by": "scripts.ship_floor.aggregate_verdict"
+  },
+  "as_measured": {
+    "n_skills": 11,
+    "n_judgments": 188,
+    "n_attempted": 198,
+    "n_judges": 6,
+    "ships": 11,
+    "skills": [
+      {
+        "skill": "AST01",
+        "n": 16,
+        "verdict": "SHIP",
+        "reason": "",
+        "mean": 110.1,
+        "stdev": 6.65,
+        "sem": 1.66,
+        "ci_lower": 108.4
+      },
+      {
+        "skill": "AST02",
+        "n": 18,
+        "verdict": "SHIP",
+        "reason": "",
+        "mean": 111.8,
+        "stdev": 4.41,
+        "sem": 1.04,
+        "ci_lower": 110.8
+      },
+      {
+        "skill": "AST03",
+        "n": 16,
+        "verdict": "SHIP",
+        "reason": "",
+        "mean": 112.2,
+        "stdev": 4.58,
+        "sem": 1.15,
+        "ci_lower": 111.0
+      },
+      {
+        "skill": "AST04",
+        "n": 18,
+        "verdict": "SHIP",
+        "reason": "",
+        "mean": 111.6,
+        "stdev": 5.16,
+        "sem": 1.22,
+        "ci_lower": 110.4
+      },
+      {
+        "skill": "AST05",
+        "n": 16,
+        "verdict": "SHIP",
+        "reason": "",
+        "mean": 110.6,
+        "stdev": 4.79,
+        "sem": 1.2,
+        "ci_lower": 109.4
+      },
+      {
+        "skill": "AST06",
+        "n": 16,
+        "verdict": "SHIP",
+        "reason": "",
+        "mean": 112.1,
+        "stdev": 4.16,
+        "sem": 1.04,
+        "ci_lower": 111.1
+      },
+      {
+        "skill": "AST07",
+        "n": 17,
+        "verdict": "SHIP",
+        "reason": "",
+        "mean": 110.2,
+        "stdev": 4.75,
+        "sem": 1.15,
+        "ci_lower": 109.0
+      },
+      {
+        "skill": "AST08",
+        "n": 18,
+        "verdict": "SHIP",
+        "reason": "",
+        "mean": 109.7,
+        "stdev": 4.26,
+        "sem": 1.0,
+        "ci_lower": 108.7
+      },
+      {
+        "skill": "AST09",
+        "n": 18,
+        "verdict": "SHIP",
+        "reason": "",
+        "mean": 111.1,
+        "stdev": 4.78,
+        "sem": 1.13,
+        "ci_lower": 110.0
+      },
+      {
+        "skill": "AST10",
+        "n": 18,
+        "verdict": "SHIP",
+        "reason": "",
+        "mean": 112.4,
+        "stdev": 5.45,
+        "sem": 1.28,
+        "ci_lower": 111.1
+      },
+      {
+        "skill": "advisory",
+        "n": 17,
+        "verdict": "SHIP",
+        "reason": "",
+        "mean": 112.2,
+        "stdev": 4.35,
+        "sem": 1.06,
+        "ci_lower": 111.1
+      }
+    ]
+  },
+  "leave_one_judge_out": {
+    "note": "Each row drops one judge's judgments entirely and re-runs ship_floor.aggregate_verdict over what remains. Nothing is excluded from any published figure: the board stands as issued, and this is the margin around it.",
+    "baseline_ships": 11,
+    "of": 11,
+    "worst_ships": 8,
+    "worst_judges": [
+      "bedrock/qwen3-235b"
+    ],
+    "skills_broken_by_any_single_exclusion": [
+      "AST01",
+      "AST07",
+      "AST08"
+    ],
+    "judges": [
+      {
+        "provider": "bedrock/qwen3-235b",
+        "judgments_dropped": 32,
+        "ships": 8,
+        "of": 11,
+        "newly_blocked": [
+          {
+            "skill": "AST01",
+            "ci_lower": 106.7,
+            "mean": 108.4,
+            "n": 13
+          },
+          {
+            "skill": "AST07",
+            "ci_lower": 107.7,
+            "mean": 108.6,
+            "n": 14
+          },
+          {
+            "skill": "AST08",
+            "ci_lower": 107.5,
+            "mean": 108.2,
+            "n": 15
+          }
+        ],
+        "skills": [
+          {
+            "skill": "AST01",
+            "n": 13,
+            "verdict": "BLOCKED",
+            "reason": "confidence bound on the mean (mean - 1.0 * stdev/sqrt(n)) 106.7 < target 108 \u2014 mean 108.4 is Grade A but not confidently so (n 13, stdev 6.17, sem 1.71); see ADR-0006",
+            "mean": 108.4,
+            "stdev": 6.17,
+            "sem": 1.71,
+            "ci_lower": 106.7,
+            "verdict_as_measured": "SHIP",
+            "changed": true
+          },
+          {
+            "skill": "AST02",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.5,
+            "stdev": 3.68,
+            "sem": 0.95,
+            "ci_lower": 109.5,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST03",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.4,
+            "stdev": 2.72,
+            "sem": 0.75,
+            "ci_lower": 109.7,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST04",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 109.9,
+            "stdev": 3.74,
+            "sem": 0.97,
+            "ci_lower": 108.9,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST05",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 109.2,
+            "stdev": 3.93,
+            "sem": 1.09,
+            "ci_lower": 108.1,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST06",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.2,
+            "stdev": 3.93,
+            "sem": 1.09,
+            "ci_lower": 110.1,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST07",
+            "n": 14,
+            "verdict": "BLOCKED",
+            "reason": "confidence bound on the mean (mean - 1.0 * stdev/sqrt(n)) 107.7 < target 108 \u2014 mean 108.6 is Grade A but not confidently so (n 14, stdev 3.2, sem 0.86); see ADR-0006",
+            "mean": 108.6,
+            "stdev": 3.2,
+            "sem": 0.86,
+            "ci_lower": 107.7,
+            "verdict_as_measured": "SHIP",
+            "changed": true
+          },
+          {
+            "skill": "AST08",
+            "n": 15,
+            "verdict": "BLOCKED",
+            "reason": "confidence bound on the mean (mean - 1.0 * stdev/sqrt(n)) 107.5 < target 108 \u2014 mean 108.2 is Grade A but not confidently so (n 15, stdev 2.51, sem 0.65); see ADR-0006",
+            "mean": 108.2,
+            "stdev": 2.51,
+            "sem": 0.65,
+            "ci_lower": 107.5,
+            "verdict_as_measured": "SHIP",
+            "changed": true
+          },
+          {
+            "skill": "AST09",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 109.9,
+            "stdev": 4.3,
+            "sem": 1.11,
+            "ci_lower": 108.8,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST10",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.4,
+            "stdev": 5.33,
+            "sem": 1.38,
+            "ci_lower": 110.0,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "advisory",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.6,
+            "stdev": 4.27,
+            "sem": 1.1,
+            "ci_lower": 110.5,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          }
+        ]
+      },
+      {
+        "provider": "anthropic-compatible/glm-5.2",
+        "judgments_dropped": 30,
+        "ships": 10,
+        "of": 11,
+        "newly_blocked": [
+          {
+            "skill": "AST01",
+            "ci_lower": 107.2,
+            "mean": 109.2,
+            "n": 13
+          }
+        ],
+        "skills": [
+          {
+            "skill": "AST01",
+            "n": 13,
+            "verdict": "BLOCKED",
+            "reason": "confidence bound on the mean (mean - 1.0 * stdev/sqrt(n)) 107.2 < target 108 \u2014 mean 109.2 is Grade A but not confidently so (n 13, stdev 7.1, sem 1.97); see ADR-0006",
+            "mean": 109.2,
+            "stdev": 7.1,
+            "sem": 1.97,
+            "ci_lower": 107.2,
+            "verdict_as_measured": "SHIP",
+            "changed": true
+          },
+          {
+            "skill": "AST02",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.5,
+            "stdev": 4.66,
+            "sem": 1.2,
+            "ci_lower": 110.3,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST03",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.0,
+            "stdev": 4.88,
+            "sem": 1.3,
+            "ci_lower": 110.7,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST04",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.3,
+            "stdev": 5.6,
+            "sem": 1.45,
+            "ci_lower": 109.8,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST05",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.5,
+            "stdev": 4.91,
+            "sem": 1.27,
+            "ci_lower": 109.2,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST06",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.4,
+            "stdev": 4.27,
+            "sem": 1.18,
+            "ci_lower": 110.2,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST07",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.4,
+            "stdev": 4.99,
+            "sem": 1.33,
+            "ci_lower": 109.1,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST08",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 109.7,
+            "stdev": 4.65,
+            "sem": 1.2,
+            "ci_lower": 108.5,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST09",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.0,
+            "stdev": 5.26,
+            "sem": 1.36,
+            "ci_lower": 109.6,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST10",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.1,
+            "stdev": 5.92,
+            "sem": 1.53,
+            "ci_lower": 110.6,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "advisory",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.1,
+            "stdev": 4.67,
+            "sem": 1.25,
+            "ci_lower": 110.8,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          }
+        ]
+      },
+      {
+        "provider": "claude-cli/sonnet",
+        "judgments_dropped": 33,
+        "ships": 10,
+        "of": 11,
+        "newly_blocked": [
+          {
+            "skill": "AST01",
+            "ci_lower": 107.7,
+            "mean": 109.7,
+            "n": 13
+          }
+        ],
+        "skills": [
+          {
+            "skill": "AST01",
+            "n": 13,
+            "verdict": "BLOCKED",
+            "reason": "confidence bound on the mean (mean - 1.0 * stdev/sqrt(n)) 107.7 < target 108 \u2014 mean 109.7 is Grade A but not confidently so (n 13, stdev 7.32, sem 2.03); see ADR-0006",
+            "mean": 109.7,
+            "stdev": 7.32,
+            "sem": 2.03,
+            "ci_lower": 107.7,
+            "verdict_as_measured": "SHIP",
+            "changed": true
+          },
+          {
+            "skill": "AST02",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.8,
+            "stdev": 4.8,
+            "sem": 1.24,
+            "ci_lower": 110.6,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST03",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.9,
+            "stdev": 4.68,
+            "sem": 1.3,
+            "ci_lower": 111.6,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST04",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.5,
+            "stdev": 5.63,
+            "sem": 1.45,
+            "ci_lower": 110.0,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST05",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.5,
+            "stdev": 5.21,
+            "sem": 1.44,
+            "ci_lower": 109.1,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST06",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.5,
+            "stdev": 4.54,
+            "sem": 1.26,
+            "ci_lower": 111.2,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST07",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.4,
+            "stdev": 5.23,
+            "sem": 1.4,
+            "ci_lower": 109.0,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST08",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.1,
+            "stdev": 4.51,
+            "sem": 1.16,
+            "ci_lower": 108.9,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST09",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.4,
+            "stdev": 5.17,
+            "sem": 1.33,
+            "ci_lower": 110.1,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST10",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.7,
+            "stdev": 5.87,
+            "sem": 1.52,
+            "ci_lower": 111.2,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "advisory",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.4,
+            "stdev": 4.73,
+            "sem": 1.26,
+            "ci_lower": 111.1,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          }
+        ]
+      },
+      {
+        "provider": "bedrock/deepseek-v3.2",
+        "judgments_dropped": 30,
+        "ships": 11,
+        "of": 11,
+        "newly_blocked": [],
+        "skills": [
+          {
+            "skill": "AST01",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.4,
+            "stdev": 4.88,
+            "sem": 1.3,
+            "ci_lower": 110.1,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST02",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.5,
+            "stdev": 4.63,
+            "sem": 1.2,
+            "ci_lower": 110.3,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST03",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.1,
+            "stdev": 4.82,
+            "sem": 1.29,
+            "ci_lower": 110.8,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST04",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.6,
+            "stdev": 5.53,
+            "sem": 1.43,
+            "ci_lower": 110.2,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST05",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.4,
+            "stdev": 5.25,
+            "sem": 1.46,
+            "ci_lower": 108.9,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST06",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.7,
+            "stdev": 4.23,
+            "sem": 1.13,
+            "ci_lower": 110.6,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST07",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.3,
+            "stdev": 5.22,
+            "sem": 1.4,
+            "ci_lower": 108.9,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST08",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 109.9,
+            "stdev": 4.47,
+            "sem": 1.15,
+            "ci_lower": 108.8,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST09",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.9,
+            "stdev": 4.5,
+            "sem": 1.16,
+            "ci_lower": 109.7,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST10",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.9,
+            "stdev": 5.62,
+            "sem": 1.45,
+            "ci_lower": 110.5,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "advisory",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.1,
+            "stdev": 3.81,
+            "sem": 1.02,
+            "ci_lower": 110.1,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          }
+        ]
+      },
+      {
+        "provider": "bedrock/gpt-oss-120b",
+        "judgments_dropped": 33,
+        "ships": 11,
+        "of": 11,
+        "newly_blocked": [],
+        "skills": [
+          {
+            "skill": "AST01",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.7,
+            "stdev": 7.25,
+            "sem": 2.01,
+            "ci_lower": 108.7,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST02",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.7,
+            "stdev": 4.24,
+            "sem": 1.09,
+            "ci_lower": 111.6,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST03",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 113.2,
+            "stdev": 4.44,
+            "sem": 1.23,
+            "ci_lower": 112.0,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST04",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.7,
+            "stdev": 4.84,
+            "sem": 1.25,
+            "ci_lower": 111.5,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST05",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.8,
+            "stdev": 4.2,
+            "sem": 1.16,
+            "ci_lower": 110.6,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST06",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 113.1,
+            "stdev": 3.97,
+            "sem": 1.1,
+            "ci_lower": 112.0,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST07",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.5,
+            "stdev": 4.09,
+            "sem": 1.09,
+            "ci_lower": 110.4,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST08",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.3,
+            "stdev": 4.3,
+            "sem": 1.11,
+            "ci_lower": 109.2,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST09",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.1,
+            "stdev": 4.44,
+            "sem": 1.15,
+            "ci_lower": 110.9,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST10",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 114.2,
+            "stdev": 3.91,
+            "sem": 1.01,
+            "ci_lower": 113.2,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "advisory",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 113.1,
+            "stdev": 4.16,
+            "sem": 1.11,
+            "ci_lower": 112.0,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          }
+        ]
+      },
+      {
+        "provider": "bedrock/nova-pro",
+        "judgments_dropped": 30,
+        "ships": 11,
+        "of": 11,
+        "newly_blocked": [],
+        "skills": [
+          {
+            "skill": "AST01",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.9,
+            "stdev": 6.68,
+            "sem": 1.79,
+            "ci_lower": 109.1,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST02",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.7,
+            "stdev": 4.13,
+            "sem": 1.07,
+            "ci_lower": 111.6,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST03",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.5,
+            "stdev": 5.06,
+            "sem": 1.4,
+            "ci_lower": 111.1,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST04",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.4,
+            "stdev": 5.04,
+            "sem": 1.3,
+            "ci_lower": 111.1,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST05",
+            "n": 13,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 111.5,
+            "stdev": 4.74,
+            "sem": 1.31,
+            "ci_lower": 110.2,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST06",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.9,
+            "stdev": 3.74,
+            "sem": 1.0,
+            "ci_lower": 111.9,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST07",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.3,
+            "stdev": 5.06,
+            "sem": 1.31,
+            "ci_lower": 109.0,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST08",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 109.8,
+            "stdev": 4.49,
+            "sem": 1.16,
+            "ci_lower": 108.6,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST09",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 110.9,
+            "stdev": 4.83,
+            "sem": 1.25,
+            "ci_lower": 109.7,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "AST10",
+            "n": 15,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.4,
+            "stdev": 5.5,
+            "sem": 1.42,
+            "ci_lower": 111.0,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          },
+          {
+            "skill": "advisory",
+            "n": 14,
+            "verdict": "SHIP",
+            "reason": "",
+            "mean": 112.8,
+            "stdev": 4.19,
+            "sem": 1.12,
+            "ci_lower": 111.7,
+            "verdict_as_measured": "SHIP",
+            "changed": false
+          }
+        ]
+      }
+    ]
+  },
+  "missing_data": {
+    "note": "Every attempt that was made and never pooled, refilled at the SAME provider's observed mean on the SAME skill, then re-gated. Not a correction: no imputed value is written into any scorecard, dashboard or README figure, and the published verdicts stand as issued. The imputation is load-bearing and is stated so it can be argued with \u2014 imputing at the pooled mean instead would leave every mean untouched and shrink every sem, turning a gap in the record into free confidence.",
+    "imputation": "same provider, same skill, that provider's own observed mean",
+    "skills_with_a_gap": [
+      "AST01",
+      "AST03",
+      "AST05",
+      "AST06",
+      "AST07",
+      "advisory"
+    ],
+    "verdicts_changed": [
+      "AST01"
+    ],
+    "skills": [
+      {
+        "skill": "AST01",
+        "pooled": 16,
+        "attempted": 18,
+        "missing": 2,
+        "imputed": [
+          {
+            "provider": "bedrock/deepseek-v3.2",
+            "round": 3,
+            "imputed_total": 100.5,
+            "from_n": 2
+          },
+          {
+            "provider": "bedrock/nova-pro",
+            "round": 3,
+            "imputed_total": 104.5,
+            "from_n": 2
+          }
+        ],
+        "not_imputable": [],
+        "as_measured": {
+          "skill": "AST01",
+          "n": 16,
+          "verdict": "SHIP",
+          "reason": "",
+          "mean": 110.1,
+          "stdev": 6.65,
+          "sem": 1.66,
+          "ci_lower": 108.4
+        },
+        "imputed_verdict": {
+          "skill": "AST01",
+          "n": 18,
+          "verdict": "BLOCKED",
+          "reason": "confidence bound on the mean (mean - 1.0 * stdev/sqrt(n)) 107.6 < target 108 \u2014 mean 109.2 is Grade A but not confidently so (n 18, stdev 6.74, sem 1.59); see ADR-0006",
+          "mean": 109.2,
+          "stdev": 6.74,
+          "sem": 1.59,
+          "ci_lower": 107.6
+        },
+        "changed": true
+      },
+      {
+        "skill": "AST03",
+        "pooled": 16,
+        "attempted": 18,
+        "missing": 2,
+        "imputed": [
+          {
+            "provider": "anthropic-compatible/glm-5.2",
+            "round": 2,
+            "imputed_total": 113.5,
+            "from_n": 2
+          },
+          {
+            "provider": "bedrock/deepseek-v3.2",
+            "round": 2,
+            "imputed_total": 112.5,
+            "from_n": 2
+          }
+        ],
+        "not_imputable": [],
+        "as_measured": {
+          "skill": "AST03",
+          "n": 16,
+          "verdict": "SHIP",
+          "reason": "",
+          "mean": 112.2,
+          "stdev": 4.58,
+          "sem": 1.15,
+          "ci_lower": 111.0
+        },
+        "imputed_verdict": {
+          "skill": "AST03",
+          "n": 18,
+          "verdict": "SHIP",
+          "reason": "",
+          "mean": 112.3,
+          "stdev": 4.31,
+          "sem": 1.02,
+          "ci_lower": 111.3
+        },
+        "changed": false
+      },
+      {
+        "skill": "AST05",
+        "pooled": 16,
+        "attempted": 18,
+        "missing": 2,
+        "imputed": [
+          {
+            "provider": "anthropic-compatible/glm-5.2",
+            "round": 1,
+            "imputed_total": 113.0,
+            "from_n": 1
+          },
+          {
+            "provider": "anthropic-compatible/glm-5.2",
+            "round": 2,
+            "imputed_total": 113.0,
+            "from_n": 1
+          }
+        ],
+        "not_imputable": [],
+        "as_measured": {
+          "skill": "AST05",
+          "n": 16,
+          "verdict": "SHIP",
+          "reason": "",
+          "mean": 110.6,
+          "stdev": 4.79,
+          "sem": 1.2,
+          "ci_lower": 109.4
+        },
+        "imputed_verdict": {
+          "skill": "AST05",
+          "n": 18,
+          "verdict": "SHIP",
+          "reason": "",
+          "mean": 110.9,
+          "stdev": 4.56,
+          "sem": 1.07,
+          "ci_lower": 109.8
+        },
+        "changed": false
+      },
+      {
+        "skill": "AST06",
+        "pooled": 16,
+        "attempted": 18,
+        "missing": 2,
+        "imputed": [
+          {
+            "provider": "bedrock/deepseek-v3.2",
+            "round": 3,
+            "imputed_total": 115.0,
+            "from_n": 2
+          },
+          {
+            "provider": "bedrock/nova-pro",
+            "round": 3,
+            "imputed_total": 107.0,
+            "from_n": 2
+          }
+        ],
+        "not_imputable": [],
+        "as_measured": {
+          "skill": "AST06",
+          "n": 16,
+          "verdict": "SHIP",
+          "reason": "",
+          "mean": 112.1,
+          "stdev": 4.16,
+          "sem": 1.04,
+          "ci_lower": 111.1
+        },
+        "imputed_verdict": {
+          "skill": "AST06",
+          "n": 18,
+          "verdict": "SHIP",
+          "reason": "",
+          "mean": 112.0,
+          "stdev": 4.16,
+          "sem": 0.98,
+          "ci_lower": 111.0
+        },
+        "changed": false
+      },
+      {
+        "skill": "AST07",
+        "pooled": 17,
+        "attempted": 18,
+        "missing": 1,
+        "imputed": [
+          {
+            "provider": "bedrock/nova-pro",
+            "round": 1,
+            "imputed_total": 110.0,
+            "from_n": 2
+          }
+        ],
+        "not_imputable": [],
+        "as_measured": {
+          "skill": "AST07",
+          "n": 17,
+          "verdict": "SHIP",
+          "reason": "",
+          "mean": 110.2,
+          "stdev": 4.75,
+          "sem": 1.15,
+          "ci_lower": 109.0
+        },
+        "imputed_verdict": {
+          "skill": "AST07",
+          "n": 18,
+          "verdict": "SHIP",
+          "reason": "",
+          "mean": 110.2,
+          "stdev": 4.61,
+          "sem": 1.09,
+          "ci_lower": 109.1
+        },
+        "changed": false
+      },
+      {
+        "skill": "advisory",
+        "pooled": 17,
+        "attempted": 18,
+        "missing": 1,
+        "imputed": [
+          {
+            "provider": "bedrock/qwen3-235b",
+            "round": 2,
+            "imputed_total": 116.5,
+            "from_n": 2
+          }
+        ],
+        "not_imputable": [],
+        "as_measured": {
+          "skill": "advisory",
+          "n": 17,
+          "verdict": "SHIP",
+          "reason": "",
+          "mean": 112.2,
+          "stdev": 4.35,
+          "sem": 1.06,
+          "ci_lower": 111.1
+        },
+        "imputed_verdict": {
+          "skill": "advisory",
+          "n": 18,
+          "verdict": "SHIP",
+          "reason": "",
+          "mean": 112.4,
+          "stdev": 4.34,
+          "sem": 1.02,
+          "ci_lower": 111.4
+        },
+        "changed": false
+      }
+    ]
+  }
+}

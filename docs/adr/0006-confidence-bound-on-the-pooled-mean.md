@@ -1,6 +1,6 @@
 ---
 artifact: adr
-version: "1.0"
+version: "1.1"
 created: 2026-08-24
 updated: 2026-08-24
 status: accepted
@@ -16,12 +16,15 @@ Accepted
 **ACCEPTED and IMPLEMENTED in `scripts/ship_floor.py`.** The constant below was written down
 and this record accepted **before** any score was computed under it.
 
-**Run 5 must be a fresh judged run.** The corpus in `eval/scorecards/` is run 4, scored under
-the retired clause. Its verdicts stay exactly as issued and **no run-4 verdict may be re-issued,
-re-gated or re-described as though this rule had produced it** — not in the dashboard, not in
-the README, not in a changelog line. Adoption is complete only when run 5's scorecards are
-written under the rule named below; until then the published board is a historical measurement
-and every page showing it says so. `eval/scorecards-run{1,2,3}/` are likewise untouched.
+**Run 5 must be a fresh judged run.** That condition was written here before the run and **has
+since been met**: run 5 was scored on 2026-08-24 under the rule named below and is the live
+corpus in `eval/scorecards/`. Run 4 — the corpus this record was written against, and the source
+of every figure in its Context and Consequence-check sections — is archived unchanged at
+`eval/scorecards-run4/`. Its verdicts stay exactly as issued and **no run-4 verdict may be
+re-issued, re-gated or re-described as though this rule had produced it** — not in the dashboard,
+not in the README, not in a changelog line. `eval/scorecards-run{1,2,3}/` are likewise untouched.
+What run 5 produced, and what it does and does not license, is under
+[Outcome](#outcome--what-run-5-measured) at the end of this record. Adoption is complete.
 
 **Date:** 2026-08-24
 **Deciders:** Jacky Chan (Reviewer/Contributor, feature owner)
@@ -62,8 +65,8 @@ The accusation this change has to answer is that a bar was lowered to let someth
 has a numeric answer, and the numbers are stated here rather than buried in a consequence
 section:
 
-- **9 of 11 skills ALREADY SHIP under the locked rule** (run 4, `eval/scorecards/`). The board
-  was not stuck. Eight skills were repaired against the reasons the judges gave and the repairs
+- **9 of 11 skills ALREADY SHIP under the locked rule** (run 4, now `eval/scorecards-run4/`). The
+  board was not stuck. Eight skills were repaired against the reasons the judges gave and the repairs
   measured; the gate was doing its job.
 - **On run-4 data the new clause touches exactly one skill: `AST09`.** Every dimension floor
   clear, Grade-A mean 108.2, blocked under the locked rule solely by `mean − σ = 103.4 < 105`.
@@ -89,7 +92,8 @@ forces action now is the measured consequence, on a file nobody edited.
 
 `AST08`'s `SKILL.md` is byte-identical between run 3 and run 4 — last touched in commit
 `2cd49f1`, before run 3 was scored (`git diff --name-only 3e5919b bb593c8 -- skills/AST08/`
-returns nothing). Every one of its eight dimension means clears its floor in **both** runs:
+returns nothing), and unchanged through run 5 as well. Every one of its eight dimension means
+clears its floor in **both** runs:
 
 | Run | n | mean | sigma | `mean - sigma` | floors | locked verdict |
 | --- | ---: | ---: | ---: | ---: | --- | --- |
@@ -136,8 +140,10 @@ question is "is the true mean Grade A".
 
 ### The panel's sampling structure, measured
 
-Every figure below is computed from `eval/scorecards/*.json` (run 4: eleven skills, six judges,
-2.73 rounds per judge on average).
+Every figure below is computed from the run-4 corpus, now at `eval/scorecards-run4/*.json` (eleven
+skills, six judges, 2.73 rounds per judge on average). It was the live corpus when this record was
+written and the figures are left as measured, because they are the basis on which `k` was chosen
+before run 5 existed.
 
 | quantity | value |
 | --- | --- |
@@ -295,6 +301,33 @@ Note also that the new rule is **harsher** than the old one at small n — 110.3
 against a locked implied bar of 108.7-111.0 — so it removes rather than adds the pressure to
 raise `MIN_ROUNDS`. It is left at 4.
 
+**That "harsher" is a statement about small n at one sigma, and it must not be read as a general
+claim — at the n and sigma this panel actually produces, the new rule is the more permissive of
+the two.** The two clauses are the bars `mean ≥ 105 + σ` and `mean ≥ 108 + σ/√n`, so the adopted
+one demands more only where
+
+    σ < 3 / (1 − 1/√n)
+
+which is 4.00 at n = 16, 3.96 at n = 17 and 3.93 at n = 18. Run 5's per-skill sigma runs
+**4.16 to 6.65**, so at every one of its eleven `(n, σ)` pairs the adopted clause demands a
+**lower** mean than the retired one, by 0.12 points on `AST06` to 1.99 on `AST01` — and that 1.99
+is the whole of why run 5 is eleven of eleven where the retired clause gives ten. Over all five
+recorded runs — 55 skill-runs — the adopted clause has demanded a strictly higher mean on exactly
+**three**: `advisory` in run 3 (n 17, σ 3.44, by 0.39 points) and `AST04` and `AST05` in run 4
+(σ 3.74 and 4.06, by 0.17 and 0.03). One more is an exact tie at the precision the gate publishes
+— `AST06` in run 4 (n 15, σ 4.04), where both clauses demand a mean of 109.04 — and a tie is not
+an instance of the new rule being stricter, so it is counted separately rather than rolled in.
+The other 51 all go the other way. So it is not a rule that only ever relaxes — but it has never
+yet been the harder rule on a corpus it gated, and this record does not claim it is a stricter
+gate. **The case for the change is that the retired clause was not a function of the artifact**,
+which is a claim about validity, not about severity, and the two must not be allowed to borrow
+each other's credibility.
+
+Those counts are derived, not tallied by hand:
+`tests/test_docs.py::test_the_crossover_tally_every_page_publishes_is_the_one_the_corpora_yield`
+recomputes both bars over every scorecard in all five corpora and fails if this record, the
+README or the dashboard states a different number.
+
 ### Known gap, flagged and not fixed here
 
 `MIN_ROUNDS = 4` counts **judgments**, not **judges**. Four judgments from a single judge would
@@ -311,11 +344,11 @@ one authorised change.** In practice every run so far has used all six judges on
 **This is a consequence check, not an input to the choice, and not a re-gating.** The constant
 above was written down first (the pre-registration, the stability table, and the k-comparison
 table all precede this section in the order they were produced). Run 4's verdicts stand as issued
-under the locked rule. Run 5 is what will be judged under the new one. Nothing in this table is
-published as a verdict anywhere: it exists so that the cost of the change is on the record
-**before** the run that will pay it.
+under the locked rule. Run 5 is what was judged under the new one. Nothing in this table is
+published as a verdict anywhere: it exists so that the cost of the change was on the record
+**before** the run that would pay it.
 
-Applying the adopted rule to the run-4 corpus **as a hypothetical**:
+Applying the adopted rule to the run-4 corpus (`eval/scorecards-run4/`) **as a hypothetical**:
 
 | skill | n | mean | σ | `sem` | `ci_lower` | floors | locked | adopted |
 | --- | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |
@@ -356,6 +389,66 @@ shipped before and nine ship after; one skill moves from "blocked by a spread st
 stops being able to flip a verdict on a file nobody edited. A change that fixes a proven
 determinism defect and alters no result is the only kind of gate change that carries no suspicion
 whatsoever, and this is the moment to make it.
+
+## Outcome — what run 5 measured
+
+Written after run 5 was scored, and kept separate from everything above it so the order the
+document was produced in stays visible. Nothing above this heading was edited to match the result.
+
+**Run 5 ships 11 of 11 skills. No skill on the board is held by the second clause, or by any
+dimension floor.** The margins that clause leaves are: `AST01` `ci_lower` 108.4, `AST08` 108.7,
+`AST07` 109.0, and the remaining eight between 109.4 and 111.1, against a bar of 108.
+
+**The bound is not what produced that board, and the arithmetic says so rather than the prose.**
+When this rule was adopted it changed **zero verdicts** on the corpus in hand: nine of eleven
+skills shipped under the locked rule and the same nine under this one, with `AST09` moving from
+*blocked by a spread statistic* to *blocked by a confidence bound*. That claim is re-derived at
+test time — `tests/test_generate_dashboard.py::test_the_gate_change_moved_no_verdict_on_the_corpus_it_did_not_judge`
+runs today's gate over the frozen `eval/scorecards-run4/` bytes and fails if any of the eleven
+verdicts moves. So the two verdicts that changed between run 4 and run 5 changed because the
+measurements did, not because the rule did: `AST01` was edited (its `D3` rose 12.2 → 14.2 after it
+gained an anti-pattern section) and `AST09` was **not** edited at all (its pooled mean rose 108.2 →
+111.1 on a byte-identical file).
+
+**What this record's own worked example looks like now.** The example above is `AST09` under the
+retired clause, and it is **run-4 evidence, deliberately left pointed at run 4.** It has to be:
+the clause is retired, so no skill judged from run 5 onward can be blocked by it, and a search of
+the live corpus for "a skill held only by the lower bound" now returns nothing at all. That is not
+the argument dissolving, it is the argument's subject no longer running.
+`tests/test_calibration.py` derives the corpus the same way — the newest recorded run whose
+scorecards predate this record's two published statistics — so the example cannot silently drift
+onto a corpus the retired clause never judged.
+
+**And no part of this retires the diagnosis.** A green board under the corrected clause says
+nothing about whether the retired clause was sound. The demonstration that it was not remains
+`AST08`'s run-3 → run-4 flip on an unedited file, and it is untouched by anything run 5 measured.
+Two further observations point the same way. Had the retired clause still been in force, run 5's
+board would read ten of eleven — and the single skill it would have blocked is `AST01`, the *only*
+skill repaired between the two runs, at `110.1 − 6.65 = 103.4 < 105`. Not because the repair made
+it worse but because it is the skill this panel disagrees about most: sigma 6.65, the widest on the
+board, as it was in run 4 at 6.04. And the implied mean bar that clause produces went *up* on the
+better run, 108.7-111.0 → 109.2-111.7. A rule that blocks the improvement and floats upward as the
+artifacts get better is exactly what ADR-0005 described.
+
+**What the corrected clause still does not fix**, stated here so the 11-of-11 never travels
+without it:
+
+- **`k = 1.0` is one standard error of margin and is not a confidence level.** At the ICC of
+  0.666 measured on run 4 above, the naive `stdev/√n` understates the true standard error by
+  about 1.47×,
+  so the clause delivers roughly 0.68 design-corrected standard errors. No percentage may be
+  attached to it. This is the first item of future work and run 5 does not touch it.
+- **The pooled mean itself still moves between runs.** This record removed the gate's dependence
+  on *panel dispersion*; it could not remove sampling variation in the mean. Ten skills went into
+  run 5 unedited and their means moved between −1.1 and +2.9 points, and one of those movements
+  was large enough to change a verdict. A confidence bound narrows how much of that reaches a
+  verdict; it does not make a single run's board deterministic.
+- **The panel has not converged.** Between-judge spread went 11.6 → 11.4 and median per-skill
+  sigma 4.67 → 4.75, so the tightening of runs 3 and 4 did not continue. The bar this clause
+  computes moves with that sigma.
+- **The corpus is self-authored.** The skills, the fixtures and the rubric-grounded prompt come
+  from the same project. 11 of 11 is a statement of internal consistency and not of external
+  validation.
 
 ## Alternatives Considered
 
@@ -445,11 +538,42 @@ for another run.
 - Evidence now counts for something. Pooling seventeen judgments instead of four earns a
   measurably lower bar (109.13 against 110.34), bounded below by 108, which is the behaviour a
   reader expects of a rule that calls itself a lower bound.
-- The change buys nothing on the data in hand. Nine skills shipped under the locked rule and nine
-  ship under the adopted one, so the accusation of goalpost-moving has an arithmetic answer
-  rather than a rhetorical one.
+- The change bought nothing **on the corpus it was adopted against**, which is run 4: nine skills
+  shipped under the locked rule and nine ship under the adopted one, no verdict moved, and that
+  much of the goalpost-moving accusation has an arithmetic answer rather than a rhetorical one.
+  **It bought exactly one ship on the first corpus it actually gated, and that has to be recorded
+  in the same bullet.** See "What it bought on run 5" below — this Positive is a run-4 fact and
+  nothing more.
 - One constant retired, one added. The retired threshold's underlying statistic stays published
   and checkable, so ADR-0005's argument remains verifiable against future corpora.
+
+#### What it bought on run 5
+
+**Under the retired clause run 5 is 10 of 11, not 11 of 11.** `AST01` clears the mean
+(110.1 ≥ 108) and misses `mean − σ` at `110.1 − 6.65 = 103.4` against 105. Under the clause this
+record adopts it clears at `ci_lower` 108.4. Every other skill ships under either rule. So the
+change bought one ship, and it is not an incidental one: `AST01` is the single treated unit of the
+run-4 → run-5 controlled experiment that this repository's headline `D3` result rests on. The
+treatment effect on `D3` itself (12.2 → 14.2, against ten controls moving −0.4 to +0.4) is a floor
+comparison and is untouched by this clause; the **verdict** flip from BLOCKED to SHIP is not, and
+a reader who takes "`AST01` was repaired and then shipped" as one measurement is combining two.
+
+Nothing was moved to produce that. The constant was recorded before the run, no other constant
+changed, and the ordering is checkable in this file's history. But "the new rule costs nothing" is
+a claim about run 4, it is false about run 5, and this record must not be quoted as though the
+first sentence of the bullet above were the whole of it.
+
+**And the adopted clause is not the stricter rule on this panel.** At every one of run 5's eleven
+`(n, σ)` pairs it demands a mean between **0.12 and 1.99 points lower** than the retired one. The
+two bars are `mean ≥ 105 + σ` and `mean ≥ 108 + σ/√n`, so the adopted clause asks for more only
+where `σ < 3/(1 − 1/√n)` — about **4.0** at the n this panel produces — and the lowest per-skill σ
+this panel has ever recorded, over all five runs, is **3.44** — three of 55 skill-runs sit
+strictly below the crossover and one sits exactly on it. On the corpus it now gates it has never
+once been the harder rule. The full arithmetic is under "Consequence check" above. A reader told only that a
+*confidence bound* replaced a *spread statistic* will assume the gate got tighter; on this panel it
+did not, and the case for the change was never severity. It is that the retired clause was **not a
+function of the artifact** — `AST08`'s flip on a byte-identical file, which stands unaffected by
+any of this.
 
 ### Negative
 
@@ -530,9 +654,12 @@ for another run.
   divergence a recorded consequence rather than a surprise.
 - `eval/calibration.py` — regenerates the panel figures above; already prints both candidate
   bounds side by side as diagnostics.
-- `eval/scorecards/` (run 4) and `eval/scorecards-run3/` (run 3) — the two corpora scored under
-  the same prompt, and therefore the only pair from which the byte-identical-control comparison
-  can legitimately be made.
+- `eval/scorecards-run4/` (run 4) and `eval/scorecards-run3/` (run 3) — the two corpora this
+  record was written against, scored under the same prompt, and therefore the pair from which the
+  byte-identical-control comparison was made. Run 4 is also the last corpus judged under the
+  retired clause, which is what keeps the worked example above verifiable.
+- `eval/scorecards/` (run 5) — the first corpus judged under the rule this record adopts, and the
+  subject of the Outcome section.
 - `tests/test_calibration.py` — pins the gate constants and this repository's ADR figures; it is
   the test that must be updated to name this record rather than assert the constants never moved.
 - `docs/adr/0004-per-scenario-detectability-contract.md` — the companion decision on not letting a

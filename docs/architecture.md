@@ -295,14 +295,24 @@ to drift, and the prompt refuses to build if the vendored bytes do not hash to t
 `RUBRIC_CONTENT_SHA256`. The response contract is one object per dimension carrying a score
 and a one-sentence `why`; a judgement whose justification is missing, empty, or repeated
 across dimensions is recorded as **malformed** and excluded from the pool with an audit-trail
-entry, exactly as a crashed provider is. Both properties date from 2026-08-23 and both are
+entry, exactly as a crashed provider is — the entry names the skill, the provider, the 1-based
+round, the parse error and a redacted excerpt of the response, and is appended to
+`config/audit.yml` by `adapters.base.record_failure` before `run_judge` returns. That
+persistence dates from 2026-08-24 and run 5 predates it: its ten discards were recorded
+nowhere, and `eval/run5-refusals.md` reconstructs what the bytes still allow.
+`scripts/refusal_ledger.py` fails the build on any scorecard whose pooled `n` is below its
+attempted `n` without matching records, and `eval/robustness.py` — printed by
+`eval/calibration.py` and written to `eval/robustness.json` — re-runs the live gate with each
+single judge dropped and with those missing attempts refilled at the same judge's own mean on
+the same skill, so the published ship count travels with the margin around it rather than alone. Both properties date from 2026-08-23 and both are
 breaking: **scores measured under this prompt are not comparable to `eval/scorecards-run1/` or
 `eval/scorecards-run2/`**, which were produced by a prompt that sent only the dimension names
 and forbade prose. Those two directories are kept unmodified as the record of the earlier
-instrument. `eval/scorecards/` is **run 4**, the corpus every published figure comes from, and
-`eval/scorecards-run3/` is the archived run scored under this same prompt — the two differ only
-in eight `SKILL.md` files, which is what makes them a controlled pair rather than two
-snapshots. See the callout at the top of
+instrument. `eval/scorecards/` is **run 5**, the corpus every published figure comes from;
+`eval/scorecards-run3/` and `eval/scorecards-run4/` are the archived runs scored under this same
+prompt. Each consecutive pair differs by a known set of `SKILL.md` edits and nothing else — eight
+files between runs 3 and 4, one file (`AST01`) between runs 4 and 5 — which is what makes them
+controlled comparisons rather than three snapshots. See the callout at the top of
 [`skill-judge-dashboard.md`](skill-judge-dashboard.md).
 
 The ship rule itself — mean ≥ 108, mean − 1.0 × σ/√n ≥ 108, per-dimension floors, ≥ 4 pooled
@@ -315,11 +325,13 @@ rounds — and the full provider roster with the unavailable entries and their r
 replaced it with the confidence bound above, because `mean − σ` is a spread statistic and the
 question the clause asks is about a mean: the retired form made the verdict track the panel's
 dispersion rather than the artifact, and flipped `AST08` — byte-identical between runs 3 and 4 —
-from BLOCKED to SHIP. The record was written and the constant fixed before the run it judges, and
-the change alters no run-4 verdict. `eval/scorecards/` and the dashboard table it feeds are run 4
-under the retired clause and are **not** re-gated; run 5 is the first corpus judged by the rule
-above. `POOLED_LOWER_BOUND` survives in the source as a retired constant, read by nothing in the
-gate, so ADR-0005's arithmetic stays regenerable.
+from BLOCKED to SHIP. The record was written and the constant fixed before the run it judges.
+`eval/scorecards/` and the dashboard table it feeds are **run 5**, the first corpus judged by the
+rule above; `eval/scorecards-run4/` keeps run 4's verdicts as the retired clause issued them and is
+**not** re-gated. That the change altered no run-4 verdict is re-derived by
+`tests/test_generate_dashboard.py` rather than asserted, which is what lets run 5's board be read
+as a fact about the skills. `POOLED_LOWER_BOUND` survives in the source as a retired constant, read
+by nothing in the gate, so ADR-0005's arithmetic stays regenerable.
 
 ### `cli/ast10.py` and `.claude-plugin/marketplace.json` — distribution
 

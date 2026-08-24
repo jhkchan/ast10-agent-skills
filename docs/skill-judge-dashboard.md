@@ -10,137 +10,251 @@ OWASP project and carries no OWASP endorsement — see [`../README.md`](../READM
 
 > ## Which rule produced the table on this page
 >
-> **Every verdict published here is run 4's, issued under the rule in force when run 4 was
-> scored: `mean ≥ 108` AND `mean − stdev ≥ 105` AND the per-dimension floors.** That second
-> clause was retired on 2026-08-24 by
-> [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md), which replaced it with
-> `mean − 1.0 × stdev/√n ≥ 108` — a confidence bound on the mean rather than a spread statistic.
-> **The gate has been changed exactly once, and that is the change.**
+> **Every verdict published here is run 5's, issued under the rule in force:** `mean ≥ 108` AND
+> `mean − 1.0 × stdev/√n ≥ 108` AND the per-dimension floors. Run 5 is the **first corpus judged
+> under that second clause**, which [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md)
+> adopted on 2026-08-24 in place of the retired `mean − stdev` clause, measured against
+> `POOLED_LOWER_BOUND` (105) — a confidence bound on the mean instead of a spread statistic.
+> **The gate has been changed exactly once, and that is the change.** The constant was written down and the record accepted *before* this run was scored,
+> which is the whole of why this board is readable as a measurement.
 >
-> The board below is **not** re-gated under the new rule and must not be. A verdict re-issued
-> under a rule that did not produce it is a fabricated measurement, and ADR-0006 forbids it in
-> as many words. The table is frozen until **run 5**, the first run judged under the new clause,
-> replaces it. What ADR-0006 records about the difference, and what running the new gate over
-> this same corpus confirms: **nine of eleven ship under either rule, zero verdicts change**, and
-> the only row the change touches at all is `AST09`, which moves from *blocked by a spread
-> statistic* to *blocked by a confidence bound* without moving from BLOCKED.
+> **Run 4 is archived at `eval/scorecards-run4/` exactly as issued**, gated by the retired clause.
+> It is **not** re-gated and no run-4 verdict is restated here in the new clause's words. What is
+> checkable — and checked by
+> `tests/test_generate_dashboard.py::test_the_gate_change_moved_no_verdict_on_the_corpus_it_did_not_judge`
+> — is that running today's gate over those frozen bytes reproduces all eleven run-4 verdicts.
+> **The rule change moved no verdict when it was adopted.** That is what licenses reading the run-5
+> board as a statement about the skills rather than about the rule.
 >
 > The rule now in force is published under [The ship rule](#the-ship-rule) below.
 
-> ## Judged run recorded — run 4, 2026-08-24
+> ## Judged run recorded — run 5, 2026-08-24
 >
-> **Nine of eleven skills clear the ship rule, and no gate constant moved to get there.**
-> 11 skills x 3 rounds x 6 providers were attempted; **180 judgments bind** and 18 were
-> refused as malformed by the justification contract, so `n` varies by judge (26 to 32)
-> instead of sitting at a flat 33. Runs 1, 2 and 3 are retained under
-> `eval/scorecards-run1/`, `eval/scorecards-run2/` and `eval/scorecards-run3/`.
+> **Eleven of eleven skills clear the ship rule, and every dimension floor is clear on every
+> skill.** 11 skills × 3 rounds × 6 providers were attempted; **188 judgments bind** and 10 were
+> discarded, so `n` varies by judge (30 to 33) rather than sitting at a flat 33. **Those ten were
+> discarded without being recorded**, and which they were is reconstructed after the fact in
+> [`../eval/run5-refusals.md`](../eval/run5-refusals.md): AST01 lost the two judges that scored it
+> lowest, and its verdict does not survive the most natural assumption about what they would have
+> scored. Read the eleventh ship with that attached. Runs 1-4 are retained under `eval/scorecards-run1/`,
+> `eval/scorecards-run2/`, `eval/scorecards-run3/` and `eval/scorecards-run4/`.
 >
-> **Run 4 *is* comparable to run 3, and that is the point of it.** The judge prompt, the
-> rubric pin, the panel roster and every gate constant were held fixed across the two runs;
-> the only thing that changed was eight `SKILL.md` files. That makes this the first
-> skill-by-skill comparison the repository can legitimately make — see
-> [The controlled result](#the-controlled-result-what-changed-between-run-3-and-run-4)
-> below, which is worth more than the ship count above it. Runs 1 and 2 remain off-limits
-> for differencing: the prompt was rebuilt between run 2 and run 3 (callout below), so those
-> two are a different instrument reading the same files.
+> **The same board is also 8 of 11 without one judge, and 10 of 11 if AST01's two lost judgments
+> are refilled at the means of the judges that lost them.** Both figures are measured, not
+> rhetorical, and both are in [How fragile 11 of 11 is](#how-fragile-11-of-11-is) — the next section,
+> deliberately ahead of everything else on this page.
 >
-> **Two skills do not ship, for two different reasons.** `AST01` is BLOCKED on a dimension
-> floor — `D3` Anti-Pattern Quality 12.2 against a floor of 13 — and it is the only skill on
-> the board blocked by a floor. `AST09` is BLOCKED by the lower bound alone: a Grade-A mean
-> of 108.2, all eight dimension means above their floors, and `108.2 - 4.85 = 103.4 < 105`.
-> That clause is [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md)'s
-> subject, and `AST09` is now the single clean instance of the defect it describes: one
-> skill, one reason, and the reason is not about the skill. The defect was recorded and
-> deliberately **not** fixed on this run — a bar changed after seeing the run it is applied to
-> is not a bar. It was fixed afterwards, by
-> [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md), with the constant fixed before
-> the run it judges. Under that clause `AST09` is still BLOCKED (`108.2 − 1.18 = 107.0 < 108`):
-> the correction changed the reason, not the outcome.
->
-> **`bedrock/qwen3-235b` is flagged NON-DISCRIMINATING again, and it is still pooled.** It
-> ranked the roster in run 3 and was recorded as COARSE. In run 4 it still ranks, but the
-> skills moved up into its ceiling while its ceiling did not, so its across-skill sigma fell
-> from 1.38 to 0.94 and crossed the 1.0 floor. Full signals and the size of the effect are
-> in [Judge quality](#judge-quality-is-each-judge-measuring-or-ranking-nothing-diagnostics-only).
+> **Two verdicts moved since run 4, and only one of them followed an edit.** `AST01` — the only
+> `SKILL.md` touched between the two runs — gained the anti-pattern `NEVER` section the other eight
+> skills received a run earlier, and went BLOCKED (`D3` 12.2) → SHIP (`D3` 14.2). `AST09` was
+> **not edited** and moved BLOCKED → SHIP anyway, on a pooled mean that rose 108.2 → 111.1. Both are
+> in [The controlled results](#the-controlled-results) below, and the second is the more instructive
+> one.
 >
 > Regenerate after a run with:
 >
 > ```bash
 > python3 eval/run_judge_matrix.py --rounds 3   # writes eval/scorecards/*.json
 > python3 eval/generate_dashboard.py            # rewrites the table below
-> python3 eval/calibration.py                   # per-judge bias + judge-quality diagnostics;
->                                              # also writes eval/judge-quality.json
+> python3 eval/calibration.py                   # per-judge bias, judge-quality diagnostics and the
+>                                               # robustness block; also writes
+>                                               # eval/judge-quality.json and eval/robustness.json
 > ```
-
-> ## Instrument change — the judge prompt was rebuilt on 2026-08-23
->
-> **Runs 3 and 4 were scored under the rebuilt prompt. Runs 1 and 2 are not comparable to
-> either, and neither is anything measured before 2026-08-23.** The break is recorded here
-> rather than corrected in place, because the archived runs are the audit trail of what the
-> old instrument produced and deleting them would destroy the evidence that the two differ.
->
-> What changed, in `scripts/judge_harness.py`:
->
-> 1. **The judge now receives the rubric.** The old prompt sent the eight dimension *names* and
->    their maxima — "D1 Knowledge Delta 20, D2 Mindset + Appropriate Procedures 15, …" — and no
->    scoring bands at all. The band tables live in the pinned rubric and were never transmitted,
->    so six judges each scored against a private scale invented from a label. The prompt is now
->    built by reading the pinned rubric off disk and quoting every dimension's own band table,
->    red flags and worked examples verbatim; it refuses to build at all if those bytes do not
->    hash to the pinned `RUBRIC_CONTENT_SHA256`.
-> 2. **The judge must justify every score.** The old prompt ended "and nothing else", and
->    measurably **0% of run 2's 198 judgments contain any prose**. The response contract is
->    now `{"D1": {"score": <int>, "why": "<one sentence citing something specific in the skill>"},
->    …}`. A judgement whose `why` is missing, empty, or repeated across dimensions is recorded as
->    **malformed** and excluded from the pool with an audit-trail entry — the same treatment a
->    provider that crashed already gets. A judge that will not explain itself does not bind a score.
->    In run 4 that rejected 18 of 198 attempted judgments.
-> 3. **The artifact is fenced as data.** The skill was previously delimited by a bare `---`, which
->    is exactly what every scored skill's own YAML frontmatter opens with. It now sits between
->    markers Markdown cannot produce, declared in words to be the thing under evaluation rather
->    than a source of instructions.
->
-> **What the rebuild did to the panel, measured.** A pooled mean is a statement about *the rubric
-> as read by these judges* (ADR-0005, "Cross-repo implication"), and the read changed between
-> run 2 and run 3 — which is why run 3 was a new baseline rather than the third point on a trend.
-> The judges themselves are comparable across the break, and they moved: four of six came inside
-> 1.2 points of the pooled mean against two of six in run 2, the largest within-judge
-> round-to-round spread fell from 4.0 points to 2.3, median per-skill sigma fell from 6.43 to
-> 5.65, and `bedrock/qwen3-235b` — which returned exactly 120.0 on all eleven skills from three
-> distinct values under the old prompt — began to vary and to rank. See
-> [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md), "What the two instrument
-> changes did to the panel".
->
-> **No gate constant moved with the prompt rebuild, or with any of the four recorded runs.**
-> `FLOORS`, `POOLED_TARGET` (108), `POOLED_LOWER_BOUND` (105), `MIN_ROUNDS` and the rubric pin
-> were exactly as vendored throughout runs 1-4. Rebuilding the instrument is not permission to
-> move the bar, and neither is a run that would have shipped more skills without it.
->
-> **The gate has since been changed exactly once, and only once**: on 2026-08-24, after run 4
-> was published, [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md) retired the
-> `mean − stdev ≥ 105` clause in favour of `mean − 1.0 × stdev/√n ≥ 108`. It was changed because
-> the retired clause was shown not to be a function of the artifact — `AST08` is byte-identical
-> between runs 3 and 4 and that clause alone flipped its verdict — and it was recorded, with its
-> constant fixed, **before** the run it judges. Nothing else in the gate moved. Held by
-> `tests/scripts/test_judge_harness.py` and `tests/test_calibration.py`, which pin the live
-> constants and require ADR-0006 to document each of them.
 
 ---
 
-## The controlled result: what changed between run 3 and run 4
+## How fragile 11 of 11 is
 
-This is the most useful thing on the page, and it is not the ship count.
+**Three statements about this board are true at the same time, and a reader needs all three.**
 
-Between run 3 (`eval/scorecards-run3/`) and run 4 (`eval/scorecards/`) the judge prompt, the
-pinned rubric, the panel roster, the round count and every gate constant were held fixed.
-**Exactly one thing changed: eight skills — `AST02`-`AST07`, `AST09`, `AST10` — gained an
-explicit anti-pattern `NEVER` section**, seven or eight prohibitions apiece, each grounded in
-something a reader can open (a check id in that module's `CHECK_COVERAGE`, a scenario id and
-tier in `scenarios/registry.yaml`, a coverage-matrix debt item, or a cited file line).
+1. **As measured, it is 11 of 11.** Every verdict published on this page is that board, issued
+   under the rule in force over the judgments that were actually recorded. Nothing below revises it.
+2. **Without the panel's least discriminating judge, it is 8 of 11.** Drop `bedrock/qwen3-235b` —
+   flagged **COARSE** below, returning the full 120 on 34% of its judgments against 16% in the run
+   it was flagged NON-DISCRIMINATING on — and `AST01`, `AST07` and `AST08` all fall through the
+   confidence bound.
+3. **One of the eleven does not survive imputation of its own missing judgments.** `AST01` lost two
+   of its eighteen attempts, and both were from the two judges that scored `AST01` lowest. Refill
+   them at those judges' own observed means on `AST01` and it lands at `ci_lower` **107.6** —
+   `BLOCKED`.
 
-`AST01`, `AST08` and `advisory` were **deliberately left untouched**, because all three had
-already cleared the `D3` floor in run 3. They are the untreated controls, and they are what
-turns this from an anecdote into a result.
+Every figure in this section is recomputed from `eval/scorecards/*.json` by
+`python3 eval/calibration.py`, written to [`../eval/robustness.json`](../eval/robustness.json), and
+re-derived at test time by `tests/test_robustness.py`, so the numbers on this page cannot drift from
+the corpus. Both analyses re-run `ship_floor.aggregate_verdict` — the live gate, not a copy of it —
+over a panel that was never recorded. **No judge is excluded from any published figure, no imputed
+value is written into any scorecard, and no verdict is re-issued.** What is published here is the
+margin around the board, which the count alone cannot show.
+
+### Leave one judge out
+
+Each row drops one judge's judgments entirely and re-runs the gate over what remains.
+
+| Judge dropped | Judgments dropped | Board without it | Newly blocked (`ci_lower`) |
+| --- | ---: | ---: | --- |
+| `bedrock/qwen3-235b` | 32 | **8 of 11** | `AST01` 106.7 · `AST07` 107.7 · `AST08` 107.5 |
+| `anthropic-compatible/glm-5.2` | 30 | 10 of 11 | `AST01` 107.2 |
+| `claude-cli/sonnet` | 33 | 10 of 11 | `AST01` 107.7 |
+| `bedrock/deepseek-v3.2` | 30 | 11 of 11 | — |
+| `bedrock/gpt-oss-120b` | 33 | 11 of 11 | — |
+| `bedrock/nova-pro` | 30 | 11 of 11 | — |
+
+**`AST01` is blocked by three of the six single-judge exclusions.** It is not a skill that clears
+the bar and happens to lose one prop; it clears the bar only on the panel as constituted. `AST07`
+and `AST08` are blocked by one exclusion each, and both by the same one. Three of the eleven skills
+— `AST01`, `AST07`, `AST08` — can be blocked by dropping a single judge; the other eight cannot.
+
+**The judge the board leans on is the one this page flags.** `bedrock/qwen3-235b` is the most
+generous reader on the panel by five points, 79% of its dimension scores sit at a dimension's
+maximum, and on an unchanged rule it has come out NON-DISCRIMINATING in runs 2 and 4 and COARSE in
+runs 3 and 5 — a verdict that keeps crossing a line it sits on. It is pooled into every published
+figure, by the declare-and-record doctrine described under
+[Judge quality](#judge-quality-is-each-judge-measuring-or-ranking-nothing-diagnostics-only), and
+this table is the price of that decision stated in ships. Nothing here proposes dropping it:
+excluding a judge from the binding pool is a human decision that needs its own ADR, and this is
+the evidence such a record would have to weigh.
+
+### Missing-data sensitivity
+
+Six skills pooled fewer judgments than they attempted. Each row refills that skill's gap with the
+**same provider's own observed mean on the same skill** — the least-assuming number available,
+because it assumes only that a judge would have scored roughly what it scored on its other rounds
+of that same file — and re-runs the gate.
+
+| Skill | Pooled | Attempted | Mean → imputed | `ci_lower` → imputed | Verdict → imputed |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `AST01` | 16 | 18 | 110.1 → 109.2 | 108.4 → **107.6** | SHIP → **BLOCKED** |
+| `AST03` | 16 | 18 | 112.2 → 112.3 | 111.0 → 111.3 | SHIP → SHIP |
+| `AST05` | 16 | 18 | 110.6 → 110.9 | 109.4 → 109.8 | SHIP → SHIP |
+| `AST06` | 16 | 18 | 112.1 → 112.0 | 111.1 → 111.0 | SHIP → SHIP |
+| `AST07` | 17 | 18 | 110.2 → 110.2 | 109.0 → 109.1 | SHIP → SHIP |
+| `advisory` | 17 | 18 | 112.2 → 112.4 | 111.1 → 111.4 | SHIP → SHIP |
+
+**Five of the six are insensitive to their gap. `AST01` is not**, because its gap is not a random
+sample of its panel: `bedrock/deepseek-v3.2` averages 100.5 on `AST01` and `bedrock/nova-pro`
+averages 104.5, against a pooled 110.1, and it is precisely those two judges' round-3 judgments
+that never arrived. The eleventh ship therefore depends on two judgments nobody can produce — see
+[`../eval/run5-refusals.md`](../eval/run5-refusals.md) for what survived of them and what did not.
+
+**The imputation is load-bearing, and saying so is the point.** Refilling at the *pooled* mean
+instead would leave every mean untouched and shrink every `sem`, turning a hole in the record into
+free confidence; refilling at each judge's own mean assumes only within-judge consistency. Neither
+assumption is knowable from what survived, which is the argument for recording refusals rather than
+reasoning about them afterwards.
+
+### Reading the three numbers together
+
+`AST01` is the skill that the gate change bought (it does not clear the retired
+`mean − σ ≥ 105` clause on this run — see [The ship rule](#the-ship-rule)), the skill three of six
+single-judge exclusions block, and the skill whose own missing judgments flip it. Those are three
+independent ways of asking whether one row is real, and it fails all three. **Eleven of eleven is
+what was measured; it is not eleven results of equal strength**, and the eleventh is the weakest
+row on the board by every check this repository knows how to run.
+
+---
+
+## What 11 of 11 is, and what it is not
+
+A clean board is the easiest number on this page to over-read, so the five things it does not
+mean are stated beside it rather than at the bottom.
+
+1. **The corpus is self-authored.** The same project wrote the eleven skills, the fixtures, the
+   scenario registry and the rubric-grounded judge prompt. A high pooled score is evidence of
+   **internal consistency** — the artifacts say what this repository's own rubric asks for — and
+   it is not external validation by anybody. No third party has scored these files.
+2. **The panel still disagrees by most of a grade band.** Between the most generous judge and the
+   harshest there is an **11.4-point spread** on the same eleven files, and it is systematic: no
+   judge moves more than 2.3 points between its own rounds. A pooled mean is a statement about
+   *the rubric as read by these six judges*, never about a skill in the abstract
+   ([ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md), "Cross-repo implication").
+3. **`k = 1.0` is one standard error of margin and is deliberately not a confidence level.** The
+   judgments behind a pooled mean are not independent draws: they are six judges read about three
+   times each, and the judges carry large fixed offsets. Measured on run 4, the panel's
+   intraclass correlation is **0.666** and its design effect **2.15**, so `stdev/√n` understates
+   the true standard error of the mean by about **1.47×** and `k = 1.0` delivers roughly 0.68
+   design-corrected standard errors. The clause is quoted in points — it moves the effective bar
+   from 108.0 to about 109.2 at this panel — and never in percent. ADR-0006 records the shortfall
+   as its first item of future work; run 5 does not close it.
+4. **Two of the eleven clear the confidence bound by less than a point.** `AST01` ships at
+   `ci_lower` 108.4 and `AST08` at 108.7, against a bar of 108. By this repository's own margin
+   doctrine — *a threshold cleared by 0.38 is not a threshold cleared* — those two rows are inside
+   the run-to-run movement of the instrument that produced them, and neither should be read as
+   settled.
+5. **A verdict moved on a file nobody edited, under the new clause as well as the old one.**
+   `AST09` went BLOCKED → SHIP on a mean that rose 2.9 points while its `SKILL.md` stayed
+   byte-identical. ADR-0006 removed the gate's dependence on *panel dispersion*; it did not, and
+   could not, remove the run-to-run movement of the pooled mean itself. The board is a draw from a
+   distribution, and this run drew well.
+
+None of that makes 11 of 11 false. It makes it a measurement with units.
+
+---
+
+## The controlled results
+
+Two runs in a row changed exactly one thing and left the instrument alone, which is the only
+arrangement that supports a skill-by-skill reading. The pair is worth more than the ship count.
+
+### Run 4 → run 5: one treated skill, ten controls
+
+Between run 4 (`eval/scorecards-run4/`) and run 5 (`eval/scorecards/`) the judge prompt, the
+pinned rubric, the panel roster and the round count were held fixed; the gate's second clause
+changed by [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md). That change moves no
+verdict on the run-4 corpus — **and it moves exactly one on run 5, `AST01`, which is the treated
+row of this very table.** Read the `D3` column as the controlled measurement and the verdict
+column with the caveat below it. **Exactly one `SKILL.md` was edited: `AST01`**, which
+gained the anti-pattern `NEVER` section the eight treated skills received between runs 3 and 4.
+Every other skill is byte-identical across the two runs.
+
+| Skill | Edited | `D3` run 4 → run 5 | Mean run 4 → run 5 | Verdict run 4 → run 5 |
+| --- | --- | ---: | ---: | --- |
+| `AST01` | **yes** | 12.2 → 14.2 (+2.0) | 108.5 → 110.1 (+1.6) | BLOCKED (`D3`) → **SHIP** |
+| `AST02` | no — control | 14.2 → 14.1 (−0.1) | 112.3 → 111.8 (−0.5) | SHIP → SHIP |
+| `AST03` | no — control | 14.2 → 14.3 (+0.1) | 110.7 → 112.2 (+1.5) | SHIP → SHIP |
+| `AST04` | no — control | 14.3 → 13.9 (−0.4) | 112.6 → 111.6 (−1.0) | SHIP → SHIP |
+| `AST05` | no — control | 14.1 → 14.1 (0.0) | 111.2 → 110.6 (−0.6) | SHIP → SHIP |
+| `AST06` | no — control | 14.3 → 14.3 (0.0) | 111.3 → 112.1 (+0.8) | SHIP → SHIP |
+| `AST07` | no — control | 14.1 → 14.5 (+0.4) | 110.3 → 110.2 (−0.1) | SHIP → SHIP |
+| `AST08` | no — control | 13.2 → 13.4 (+0.2) | 110.8 → 109.7 (−1.1) | SHIP → SHIP |
+| `AST09` | no — control | 13.9 → 14.3 (+0.4) | 108.2 → 111.1 (**+2.9**) | BLOCKED (bound) → **SHIP** |
+| `AST10` | no — control | 14.8 → 14.8 (0.0) | 113.2 → 112.4 (−0.8) | SHIP → SHIP |
+| `advisory` | no — control | 14.0 → 13.9 (−0.1) | 112.2 → 112.2 (0.0) | SHIP → SHIP |
+
+**The treated row's verdict flip is not purely a treatment effect, and the `D3` column is where
+the controlled result lives.** `AST01`'s `SHIP` requires the clause ADR-0006 adopted: under the
+retired `mean − σ ≥ 105` it reads `110.1 − 6.65 = 103.4` and this row is `BLOCKED (D3)` →
+`BLOCKED (lower bound)` — a verdict that never changes. The `D3` movement is untouched by any of
+that: `D3` is compared against a fixed floor of 13, which neither clause has ever altered, so
+12.2 → 14.2 against ten controls holding still is the same measurement under either rule. Quote
+the dimension, not the verdict, when quoting this experiment; "`AST01` was repaired and then
+shipped" is two findings wearing one sentence, and only the first is controlled.
+
+**On `D3` the treatment replicates; on the pooled mean it does not separate from noise.** `AST01`
+rose +2.0 on `D3` and crossed the floor it had fallen through, while the ten controls moved between
+−0.4 and +0.4 with a mean of +0.05 — the same contrast the eight-skill pass produced a run earlier,
+now reproduced on a ninth skill with ten controls holding still. The pooled mean tells a weaker
+story: `AST01` gained +1.6, and the untouched `AST09` gained **+2.9**. A treatment effect smaller
+than the largest control movement is not a treatment effect you can read off the total, which is
+exactly why the dimension the edit targets is the place to look.
+
+**`AST09` is the row to be honest about.** It ships this run without a character changing, because
+its pooled mean rose 2.9 points. That is not the defect ADR-0006 fixed — its `ci_lower` went 107.0
+→ 110.0, and the movement is in the mean, not in the spread — but it is the same lesson one level
+up: pooled judge scores are a distribution, and eleven skills read three times by six judges will
+move a point or two in either direction for no reason attributable to the artifact. Ten unedited
+files moved between −1.1 and +2.9 this run. Any single skill's mean should be read with that band
+around it.
+
+### Run 3 → run 4: the eight-skill anti-pattern pass (historical)
+
+This is the earlier arm, recorded when run 4 was the live corpus and kept because it is the
+evidence the `D3` treatment works. Between run 3 (`eval/scorecards-run3/`) and run 4
+(`eval/scorecards-run4/`) the prompt, rubric, roster, round count and every gate constant were
+fixed, and **eight skills — `AST02`-`AST07`, `AST09`, `AST10` — gained an explicit anti-pattern
+`NEVER` section**, seven or eight prohibitions apiece, each grounded in something a reader can open
+(a check id in that module's `CHECK_COVERAGE`, a scenario id and tier in `scenarios/registry.yaml`,
+a coverage-matrix debt item, or a cited file line). `AST01`, `AST08` and `advisory` were
+deliberately left untouched as controls.
 
 | Skill | Anti-pattern section added | `D3` run 3 → run 4 | Mean run 3 → run 4 | Verdict run 3 → run 4 |
 | --- | --- | ---: | ---: | --- |
@@ -156,62 +270,71 @@ turns this from an anecdote into a result.
 | `AST08` | **no — control** | 13.5 → 13.2 (−0.3) | 110.3 → 110.8 (+0.5) | BLOCKED (bound) → **SHIP** |
 | `advisory` | **no — control** | 14.1 → 14.0 (−0.1) | 112.3 → 112.2 (−0.1) | SHIP → SHIP |
 
-**Every treated skill improved. No control did.** All eight treated skills rose on `D3`, by
-+1.2 to +2.8 points, and all eight crossed the floor of 13 they had been under. All eight rose
-on the pooled mean. Seven went BLOCKED → SHIP outright; the eighth, `AST09`, cleared every
-dimension floor and is held only by the lower bound. All three controls moved *down* on `D3` —
-−0.1, −0.3 and −0.9 — which is what a null treatment looks like against run-to-run movement.
+**Every treated skill improved. No control did.** All eight rose on `D3`, by +1.2 to +2.8, and all
+eight crossed the floor of 13 they had been under. All three controls moved *down* on `D3` — −0.1,
+−0.3 and −0.9 — which is what a null treatment looks like against run-to-run movement.
 
-**A `D3` margin of 0.1 was treated as clearance, and it should not have been.** `AST01` was
-excluded from the anti-pattern pass because it measured `D3` 13.1 against a floor of 13. It
-measures 12.2 now and is the only skill on the board blocked by a floor. `AST08` was excluded
-on a margin of 0.5 and has fallen to 13.2 — a margin of 0.2 — which is the same finding one
-run behind. Judge scores are a distribution, not a reading: a margin narrower than the
-distribution's own run-to-run movement is noise wearing a verdict's clothes, and treating it as
-clearance is how the untreated control became the only floor failure on the board.
+**A `D3` margin of 0.1 was treated as clearance, and it should not have been.** `AST01` was excluded
+from that pass because it measured `D3` 13.1 against a floor of 13; it measured 12.2 in run 4 and
+became the only skill on the board blocked by a floor. It was then treated, and run 5 is what that
+repair measured. `AST08` was excluded on a margin of 0.5, fell to 13.2, and sits at 13.4 today — the
+same finding, still open, one dimension away from a block.
 
-Two things this table does **not** say. `AST08`'s BLOCKED → SHIP is **not** an improvement: its
-`SKILL.md` is byte-identical across the two runs and its `D3` fell. It shipped because the
-panel's sigma narrowed and lifted its `mean − sigma` from 104.6 to 106.1 — the lower-bound
-defect [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) describes, visible in
-the flattering direction for once. **This row is the evidence that retired that clause.** A gate
-that is not a function of the artifact is not a gate, and
-[ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md) replaced it on the strength of
-exactly this comparison; under the confidence bound `AST08` is SHIP in both runs (`108.8`, then
-`109.7`). And a controlled result over eleven artifacts with one
-treatment arm is evidence, not proof: the pooled mean rose across the board, so some of every
-skill's movement is panel-level and only the treated-versus-control *contrast* is attributable.
-The contrast is the finding. `D3` anti-patterns are load-bearing rather than decorative, and
-this repository now has its own measurement saying so.
+Two things that pair of tables does **not** say. `AST08`'s run-3 → run-4 BLOCKED → SHIP was **not**
+an improvement: its `SKILL.md` was byte-identical and its `D3` fell. It shipped because the panel's
+sigma narrowed and lifted its `mean − sigma` from 104.6 to 106.1 — the lower-bound defect
+[ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) describes, visible in the
+flattering direction. **That row is the evidence that retired the clause**, and
+[ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md) replaced it on the strength of exactly
+this comparison; under the confidence bound `AST08` is SHIP in both runs (108.8, then 109.7). And a
+controlled result over eleven artifacts with one treatment arm is evidence, not proof: the pooled
+mean rose across the board between runs 3 and 4, so only the treated-versus-control *contrast* is
+attributable. The contrast is the finding. `D3` anti-patterns are load-bearing rather than
+decorative, and this repository now has two runs of its own measurement saying so.
+
+**The claim has to stop one step short of the one it is tempting to make, and `AST08` is why.**
+`AST08` is the only skill on the board with **no consolidated anti-pattern section of any kind** —
+the string `NEVER` does not appear in its `SKILL.md` — and it scores `D3` **13.4**, *above where
+every one of the eight treated skills started* (11.5 to 12.9) and above two of them after
+treatment. Its prohibitions are distributed through its decision rules and its per-check boundaries
+instead of gathered under a heading, and the judges scored that. So the measurement supports the
+narrow claim — **adding** a grounded anti-pattern section raised `D3` on nine skills that were at
+or under the floor, reproducibly, against controls that did not move — and it does **not** support
+"a consolidated `NEVER` section is what makes `D3` good", nor "a skill without one scores low".
+`AST08` is the counterexample this repository ships, and it is one dimension away from a block for
+reasons that have nothing to do with the section it does not have.
 
 ---
 
 ## Judge calibration (measured, diagnostics only)
 
-Regenerate with `python3 eval/calibration.py`. Panel: 6 providers x 11 skills = 180 binding judgments, pooled mean of **111.0**.
+Regenerate with `python3 eval/calibration.py`. Panel: 6 providers x 11 skills = 188 binding judgments, pooled mean of **111.3**.
 
 | Judge | n | mean | bias | round means |
 | --- | ---: | ---: | ---: | --- |
-| `bedrock/qwen3-235b` | 32 | 117.7 | +6.7 | 118.2 / 117.1 / 117.9 |
-| `anthropic-compatible/glm-5.2` | 29 | 112.1 | +1.2 | 112.3 / 112.4 / 111.6 |
-| `claude-cli/sonnet` | 32 | 110.4 | -0.5 | 110.6 / 110.7 / 109.9 |
-| `bedrock/nova-pro` | 29 | 110.0 | -1.0 | 110.3 / 110.4 / 108.9 |
-| `bedrock/deepseek-v3.2` | 26 | 109.2 | -1.8 | 109.3 / 109.6 / 108.5 |
-| `bedrock/gpt-oss-120b` | 32 | 106.1 | -4.9 | 106.1 / 106 / 106.3 |
+| `bedrock/qwen3-235b` | 32 | 117.7 | +6.5 | 117.7 / 117.3 / 118.2 |
+| `anthropic-compatible/glm-5.2` | 30 | 112.6 | +1.3 | 112.1 / 113.3 / 112.3 |
+| `bedrock/deepseek-v3.2` | 30 | 111.8 | +0.5 | 111 / 111.7 / 112.9 |
+| `claude-cli/sonnet` | 33 | 110.4 | -0.9 | 110 / 110.6 / 110.5 |
+| `bedrock/nova-pro` | 30 | 109.0 | -2.3 | 109.5 / 108.5 / 108.8 |
+| `bedrock/gpt-oss-120b` | 33 | 106.3 | -4.9 | 107.2 / 106.9 / 104.9 |
 
-An **11.6-point spread** separates the most generous judge from the harshest, while no judge's own
-round-to-round means differ by more than **1.5 points** — so this is systematic calibration bias,
-not measurement noise. The panel has kept closing up: the spread was 16.5 in run 2 and 15.4 in
-run 3, four of the six judges now sit within 1.8 points of the pooled mean, and what remains is
-carried by the two ends, `bedrock/qwen3-235b` at +6.7 and `bedrock/gpt-oss-120b` at -4.9.
-Per-skill sigma runs **3.74 to 6.04** (median 4.67) against the 3.3 `ship_floor.py` was calibrated on, which makes `mean - sigma >= 105` demand a mean of **108.7 to 111.0** (90.6% to 92.5% of 120) rather than the 108 (90.0%) it names.
-That implied-bar arithmetic describes the clause **as it stood for run 4** and is why it was
-retired; the rule now in force asks `mean − 1.0 × stdev/√n ≥ 108`, whose bar at this panel's
-median sigma and n is 109.1 and falls as evidence accumulates. These figures are diagnostics: no
-gate constant is read from them, and none was changed on the strength of them — the change is
-recorded in [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md), whose constant was fixed
-before the run it judges. See
-[ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) for the diagnosis.
+An **11.4-point spread** separates the most generous judge from the harshest, while no judge's own
+round-to-round means differ by more than **2.3 points** — so this is systematic calibration bias,
+not measurement noise. The panel closed up over three runs and has now stopped: the spread was
+16.5 in run 2, 15.4 in run 3, 11.6 in run 4 and 11.4 here. Four of the six judges sit within 2.3
+points of the pooled mean and three of those within 1.3; what remains is carried by the two ends,
+`bedrock/qwen3-235b` at +6.5 and `bedrock/gpt-oss-120b` at -4.9, neither of which moved
+meaningfully since run 4 (+6.7 and -4.9 there).
+Per-skill sigma runs **4.16 to 6.65** (median 4.75) against the 3.3 `ship_floor.py` was calibrated on, which would make the retired `mean - sigma >= 105` demand a mean of **109.2 to 111.7** (91.0% to 93.0% of 120) rather than the 108 (90.0%) it named.
+That implied-bar arithmetic describes the clause **as it stood through run 4** and is why it was
+retired; it is regenerated here rather than remembered, because it is the evidence
+[ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) rests on. The rule now in force
+asks `mean − 1.0 × stdev/√n ≥ 108`, whose bar at this panel's median sigma and n is **109.15** and
+falls toward 108 as evidence accumulates. These figures are diagnostics: no gate constant is read
+from them, and none was changed on the strength of them — the one change is recorded in
+[ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md), whose constant was fixed before the run
+it judges.
 
 ## Judge quality: is each judge measuring, or ranking nothing? (diagnostics only)
 
@@ -224,12 +347,12 @@ signals ask the prior question — whether the number is a **measurement** at al
 
 | Judge | n | distinct values | across-skill σ | across-skill variance | multiples of 5 | at dimension max | full 120 | own-round spread | Verdict |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| `bedrock/qwen3-235b` | 32 | 7 | 0.94 | 0.88 | 77% | 77% | 16% | 2.36 | NON-DISCRIMINATING |
-| `anthropic-compatible/glm-5.2` | 29 | 8 | 1.23 | 1.51 | 24% | 24% | 0% | 2.36 | DISCRIMINATING |
-| `bedrock/deepseek-v3.2` | 26 | 13 | 3.11 | 9.68 | 29% | 28% | 4% | 4.82 | DISCRIMINATING |
-| `bedrock/gpt-oss-120b` | 32 | 12 | 2.19 | 4.80 | 10% | 10% | 0% | 4.64 | DISCRIMINATING |
-| `bedrock/nova-pro` | 29 | 10 | 3.70 | 13.68 | 26% | 26% | 14% | 6.64 | DISCRIMINATING |
-| `claude-cli/sonnet` | 32 | 10 | 1.17 | 1.37 | 20% | 20% | 0% | 3.91 | DISCRIMINATING |
+| `bedrock/qwen3-235b` | 32 | 9 | 1.22 | 1.48 | 79% | 79% | 34% | 3.36 | COARSE |
+| `anthropic-compatible/glm-5.2` | 30 | 10 | 1.84 | 3.37 | 28% | 28% | 0% | 2.82 | DISCRIMINATING |
+| `bedrock/deepseek-v3.2` | 30 | 14 | 4.22 | 17.78 | 40% | 40% | 3% | 7.27 | DISCRIMINATING |
+| `bedrock/gpt-oss-120b` | 33 | 11 | 1.41 | 2.00 | 11% | 10% | 0% | 4.36 | DISCRIMINATING |
+| `bedrock/nova-pro` | 30 | 9 | 2.32 | 5.37 | 15% | 15% | 3% | 6.55 | DISCRIMINATING |
+| `claude-cli/sonnet` | 33 | 11 | 1.26 | 1.59 | 20% | 20% | 0% | 3.73 | DISCRIMINATING |
 
 *distinct values* — how many different numbers the judge used across all of its dimension scores
 (eight per judgment). *across-skill σ / variance* — the spread of its own per-skill mean totals;
@@ -238,26 +361,34 @@ dimension scores divisible by five. *at dimension max* / *full 120* — how ofte
 of a dimension, and the top of the rubric. *own-round spread* — the mean gap between its own rounds
 on one skill, which is what separates a judge that is *noisy* from one that is *constant*.
 
-**`bedrock/qwen3-235b` is flagged NON-DISCRIMINATING on this panel, and the reason is not a
-relapse.** Its history across the four runs is the clearest thing this table has ever shown:
+**`bedrock/qwen3-235b` is COARSE on this panel and is not flagged, and the way it got there is the
+clearest thing this table has ever shown.** Its verdict has now taken three different values across
+four runs, on a rule that has not changed:
 
 | Run | Prompt | distinct values | per-skill means | across-skill σ | Verdict |
 | --- | --- | ---: | --- | ---: | --- |
 | 2 | dimension names only | 3 | 120.0 on all eleven | 0.00 | NON-DISCRIMINATING |
 | 3 | rubric bands quoted | 9 | 114.7 – 119.7 | 1.38 | COARSE |
 | 4 | rubric bands quoted | 7 | 116.3 – 119.3 | 0.94 | NON-DISCRIMINATING |
+| 5 | rubric bands quoted | 9 | 116.3 – 120.0 | 1.22 | COARSE |
 
 Under the old prompt it returned the rubric total eleven times out of eleven, drawn from three
 distinct values — 10, 15 and 20, precisely the three dimension maxima — and ranked nothing at all.
-It has ranked ever since. What moved between run 3 and run 4 is not the judge: its floor rose from
-114.7 to 116.3 while its ceiling stayed put at roughly 119, because the *skills* improved into the
-top of the scale it is willing to use. 77% of its dimension scores sit at a dimension's maximum,
-so it has very little room above the roster and its per-skill means compressed into a 3.0-point
-band. The `< 1.0` across-skill floor then fires. That is a true statement about what this judge can
-resolve on this population — a judge that saturates cannot rank a roster once the roster reaches
-its ceiling — and it is why the flag is reported rather than explained away. It also repeats the
-lesson `AST01` teaches above: 1.38 against a floor of 1.0 was a margin of 0.38, and a margin that
-narrow is not clearance.
+It has ranked ever since. Run 4 flagged it again for a different reason: its floor rose while its
+ceiling did not, because the *skills* improved into the top of the scale it is willing to use, and
+its per-skill means compressed into a 3.0-point band that fell under the `< 1.0` across-skill floor.
+Run 5 puts it back over that floor at 1.22, on a slightly wider band of its own — 116.3 to 120.0
+against 116.3 to 119.3.
+
+**Read that as fragility, not as a repair.** Nothing in the judge's behaviour improved to earn it:
+79% of its dimension scores still sit at a dimension's maximum, and it now returns the full 120 on
+**34%** of its judgments against 16% in run 4 — more saturated than the run it was flagged on, not
+less. Its ceiling has not moved in three runs while the roster underneath it has, so its verdict
+will keep crossing a threshold it sits on, in both directions, for reasons that are about the
+population rather than about the judge. It is the most generous reader on the panel, five points
+clear of the next, and it is pooled into every figure on this page in every one of those states.
+The compression mechanism is pinned against the frozen run-4 corpus by
+`tests/test_judge_quality.py`, so it stays checked now that the live panel no longer reproduces it.
 
 The thresholds are anchored to the rubric or to chance, never to this panel — a bar chosen after
 seeing which judge it catches is a name for that judge, not a bar:
@@ -265,7 +396,7 @@ seeing which judge it catches is a name for that judge, not a bar:
 | Signal | Flag when | Why that number |
 | --- | --- | --- |
 | Distinct dimension values | < 4 | Every dimension in the pinned rubric defines exactly four score bands (D1: 0–5 / 6–10 / 11–15 / 16–20). A judge with fewer distinct values than one dimension has bands cannot express that dimension's scale even once. |
-| Across-skill σ | < 1.0 points | Deliberately extreme: not "agrees too much" but "returned one number". This panel places its skills 108.2 to 113.2 apart and the grade bands are twelve points wide, so a judge whose per-skill means fit in a one-point window has resolved that span to a single verdict. On run 2 the flat judge measured 0.00; on run 3 the lowest was 1.38; on run 4 it is 0.94. |
+| Across-skill σ | < 1.0 points | Deliberately extreme: not "agrees too much" but "returned one number". This panel places its skills 109.7 to 112.4 apart and the grade bands are twelve points wide, so a judge whose per-skill means fit in a one-point window has resolved that span to a single verdict. On run 2 the flat judge measured 0.00; on run 3 the lowest was 1.38; on run 4 it was 0.94; on run 5 it is 1.22. |
 | Multiples of 5 | ≥ 60% | A judge drawing uniformly at random would hit a multiple of five about **25%** of the time (5 of 21 values on D1, 4 of 16 on the six 15-point dimensions, 3 of 11 on D7). 60% is ~2.4× chance and unreachable by luck. Advisory only — it yields `COARSE`. |
 | At dimension max / full 120 | ≥ 50% | The rubric's top bands are reserved language ("pure knowledge delta — every paragraph earns its tokens"). A judge awarding them to the majority of what it sees has merged the top band with everything under it. Advisory only — it yields `COARSE`. |
 
@@ -273,45 +404,48 @@ Only the first two decide `NON-DISCRIMINATING`, because that is what the verdict
 returns one number ranks nothing, whatever its granularity. Granularity and saturation explain the
 *mechanism* and are reported beside it. A judge can be coarse without being flat — a much milder
 problem, and one the rule must not conflate with this one. `bedrock/qwen3-235b` is the worked
-example of the distinction in every direction available: flat on run 2, merely coarse on run 3, and
-flat-by-compression on run 4 without ever going back to returning one number.
+example of the distinction in every direction available: flat on run 2, coarse on run 3,
+flat-by-compression on run 4, and coarse again on run 5 without ever going back to returning one
+number.
 
 ### What excluding a flagged judge would do — shown, not applied
 
-`bedrock/qwen3-235b` was **not excluded** from anything. Every number everywhere else on this page,
-in `eval/scorecards/*.json`, and in
-[ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) is the *with* column below.
-Both columns are published so a reader sees the size of the effect instead of being handed a
-pre-filtered number.
+**No judge on this panel is flagged NON-DISCRIMINATING; there is nothing to exclude.** That is the
+sentence `eval/calibration.py` prints for run 5, and it is published here rather than left to
+inference: a page that simply stops showing an exclusion column looks identical to a page whose
+filter ran silently. There is no *without* column this run because there is nobody to drop.
 
-| Figure | With `bedrock/qwen3-235b` | Without | Δ |
-| --- | ---: | ---: | ---: |
-| Judgments pooled | 180 | 148 | −32 |
-| Pooled mean | 111.0 | 109.5 | −1.50 |
-| Between-judge spread | 11.6 | 6.0 | −5.60 |
-| Per-skill σ, median | 4.67 | 3.30 | −1.37 |
-| Per-skill σ, range | 3.74–6.04 | 3.19–5.70 | — |
+| Figure | Run 5, as published (every judge pooled) |
+| --- | ---: |
+| Judgments pooled | 188 |
+| Pooled mean | 111.3 |
+| Between-judge spread | 11.4 |
+| Per-skill σ, median | 4.75 |
+| Per-skill σ, range | 4.16–6.65 |
 
-`eval/calibration.py` prints this table and refuses to apply it. Deciding whether a flagged judge
-stops binding is a **human decision** and needs its own superseding record, written before the run
-it applies to. Run 3 is the standing case for having kept this judge: it is the judge the prompt
-fix repaired, and a panel that had dropped it in run 2 would never have measured that. The same
-verdicts, thresholds and deltas are in `eval/judge-quality.json` for anything that needs to read
-them mechanically.
+The one run where a column *was* printed is run 4, and it is the size of the effect a reader should
+keep in mind: dropping `bedrock/qwen3-235b` there moved the pooled mean 111.0 → 109.5 and the
+between-judge spread 11.6 → 6.0. Nothing was dropped then either. `eval/calibration.py` prints the
+comparison and refuses to apply it: deciding whether a flagged judge stops binding is a **human
+decision** and needs its own superseding record, written before the run it applies to. Run 3 is the
+standing case for having kept this judge — it is the judge the prompt fix repaired, and a panel that
+had dropped it in run 2 would never have measured that. The same verdicts, thresholds and deltas are
+in `eval/judge-quality.json` for anything that needs to read them mechanically.
 
 ### Runs 1 and 2 were scored without the rubric's bands
 
 Run 1 (`eval/scorecards-run1/`) and run 2 (`eval/scorecards-run2/`) were judged by the
 pre-2026-08-23 prompt, which sent the eight dimension names and their maxima and **none of the
-rubric bands**, and forbade prose. Their absolute values are **weaker evidence** than the figures
-on this page: every mean and every grade in those two archives rests on six private scales
-invented from eight labels, which is also the most likely explanation for a judge that could return
-the maximum eleven times without contradiction. What survives from them is the *relative* picture —
-the bias ordering, the between-judge spread, and their judge-quality verdicts, which turn on the
-shape of a judge's output rather than on where the rubric would have put it. They are kept unedited
-as the evidence for that defect. Run 3 (`eval/scorecards-run3/`) is frozen for a different reason:
-it was scored by the same prompt as run 4, so it is the *comparable* archive and the other half of
-the controlled result above. This page's tables are run 4 throughout.
+rubric bands**, and forbade prose. Their absolute values are **weaker evidence** than the figures on
+this page: every mean and every grade in those two archives rests on six private scales invented
+from eight labels, which is also the most likely explanation for a judge that could return the
+maximum eleven times without contradiction. What survives from them is the *relative* picture — the
+bias ordering, the between-judge spread, and their judge-quality verdicts, which turn on the shape
+of a judge's output rather than on where the rubric would have put it. They are kept unedited as the
+evidence for that defect. Run 3 (`eval/scorecards-run3/`) and run 4 (`eval/scorecards-run4/`) are
+frozen for a different reason: both were scored by the same prompt as run 5, so they are the
+*comparable* archives and the two halves of the controlled results above. This page's tables are
+run 5 throughout, except where a row says otherwise.
 
 ## The rubric — 8 dimensions, 120 points
 
@@ -358,8 +492,9 @@ measurement — so ship is defined on the pooled distribution, never on any one 
 
 A skill ships when **all** of the following hold (`ship_floor.aggregate_verdict`). This is the
 rule **in force now**, as changed by
-[ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md) on 2026-08-24 — it is **not** the
-rule that produced the Results table below, which is run 4's and predates it:
+[ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md) on 2026-08-24, and it is the rule that
+produced the Results table below — run 5 is the first corpus judged under it. The run-4 board in
+`eval/scorecards-run4/` was issued under the retired clause and is not re-gated:
 
 | Condition | Constant | Value |
 | --- | --- | --- |
@@ -371,12 +506,15 @@ rule that produced the Results table below, which is run 4's and predates it:
 | Rubric version | `RUBRIC_SHA` | `3027f20f3181758385a1bb8c022d4041dfb4de84` |
 
 The second clause is the one that does the work, and it asks a question the first cannot:
-*the point estimate is Grade A, but is the true mean confidently Grade A?* A mean of 108.2
-drawn from judgments with a sigma of 4.85 is weaker evidence than the same 108.2 with a sigma
-of 3.7, and the gate should be able to say so. At this panel's median sigma (4.67) and n (17)
-the clause moves the effective bar from 108.0 to about **109.1**; the bar falls as evidence
+*the point estimate is Grade A, but is the true mean confidently Grade A?* A mean of 110.1
+drawn from judgments with a sigma of 6.65 is weaker evidence than the same 110.1 with a sigma
+of 4.2, and the gate should be able to say so. At this panel's median sigma (4.75) and n (17)
+the clause moves the effective bar from 108.0 to about **109.2**; the bar falls as evidence
 accumulates but is bounded below by 108, so volume can never buy a pass for a skill whose true
-mean is not Grade A.
+mean is not Grade A. `k = 1.0` is **one standard error of margin and not a confidence level** —
+the judgments inside a pooled mean are clustered in six judges, so the naive standard error is
+understated by about 1.47× and no percentage may be attached to this clause. See
+[What 11 of 11 is, and what it is not](#what-11-of-11-is-and-what-it-is-not).
 
 **Until 2026-08-24 that clause read `mean − stdev ≥ POOLED_LOWER_BOUND (105)`, and that is the
 gate's one and only change.** `mean − stdev` is a *spread* statistic being used as a confidence
@@ -385,10 +523,29 @@ on how much the panel happened to agree.
 [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) diagnosed that and
 deliberately left it in force; ADR-0006 replaced it after the defect was demonstrated on an
 unedited file — `AST08`, byte-identical between runs 3 and 4, flipped BLOCKED → SHIP on that
-clause alone — and with the new constant fixed **before** the run it judges. Nine of eleven
-skills clear the gate under either rule; the change altered no verdict.
+clause alone — and with the new constant fixed **before** the run it judges. On the run-4 corpus
+nine of eleven skills clear the gate under either rule and the change altered no verdict, which is
+re-derived at test time rather than remembered.
 `POOLED_LOWER_BOUND` is retired: `mean − σ` is still computed and still published in the column
-below, and decides nothing.
+below, and decides nothing. Had it still been in force, run 5's board would read ten of eleven:
+`AST01` — the one skill that was actually repaired between the two runs, and whose `D3` rose 2.0
+points because of it — is the single row it would have blocked, at `110.1 − 6.65 = 103.4 < 105`,
+on the widest sigma in the panel. A clause that blocks the improvement and passes everything left
+alone is the diagnosis in one line.
+
+**And on this panel the confidence bound is the more permissive of the two clauses, not the
+stricter one.** `mean − σ ≥ 105` and `mean − σ/√n ≥ 108` are the bars `mean ≥ 105 + σ` and
+`mean ≥ 108 + σ/√n`, so the adopted clause demands more only where `σ < 3/(1 − 1/√n)` — about
+**4.0** at `n = 16`, 3.96 at `n = 17`, 3.93 at `n = 18`. **Run 5's per-skill σ runs 4.16 to 6.65, so
+at every one of its eleven `(n, σ)` pairs the adopted clause demands a lower mean than the retired
+one**, by 0.12 points on `AST06` to 1.99 on `AST01`. Across all five recorded runs — 55 skill-runs
+— the adopted clause has demanded a strictly higher mean on exactly **three**: `advisory` in run 3
+(σ 3.44) and `AST04` and `AST05` in run 4 (σ 3.74, 4.06). `AST06` in run 4 (σ 4.04) is an exact
+tie, both clauses demanding 109.04, and is counted apart from the three rather than with them. So
+it is not a rule that only ever relaxes, but it has never been the harder rule on a corpus it
+actually gated. ADR-0006's case is
+that the retired clause was **not a function of the artifact**; it was never that the replacement
+is stricter, and this page should not be read as claiming it is.
 
 ### Anti-re-roll
 
@@ -401,9 +558,18 @@ electricity.
 The single exception is an **invalidated** measurement — a defective instrument (a stale
 rubric path, a truncated response), flagged and auditable in the record. Never a score
 somebody merely dislikes. A judgment refused as **malformed** by the justification
-contract is the same exception applied at parse time, and it leaves an audit-trail entry
-naming the provider and the round: 18 of run 4's 198 attempted judgments were refused this
-way, which is why `n` differs by judge in the calibration table above.
+contract is the same exception applied at parse time, and it now leaves an audit-trail entry
+naming the skill, the provider, the round, the parse error and an excerpt of the response
+(`adapters.base.record_failure`, appended to `config/audit.yml`; the scorecard carries the
+same entries under `refusals`).
+
+**Run 5 predates that, and its ten discards left no entry at all.** The harness built its
+audit trail in memory and the caller kept only the judgments, so the reasons and the raw
+responses are gone; even the word "malformed" is an inference for those ten, because no
+status was written. Which skill, judge and round each was IS recoverable, and is recorded in
+[`../eval/run5-refusals.md`](../eval/run5-refusals.md) — 10 of 198, and `n` differs by judge
+in the calibration table above because of them. `python3 scripts/refusal_ledger.py` fails if
+any scorecard ever again shows a gap nothing accounts for.
 
 Only judgments produced in a context separate from the one that authored the skill may
 bind (`ship_floor.INDEPENDENT_METHODS`). Authoring-session self-scores measured **+12.2
@@ -456,47 +622,39 @@ during a round is excluded from that round's pool with a timestamped audit entry
 
 ## Results
 
-> **Produced by the locked rule, not the rule above.** Every row in this table is run 4's, gated
-> by `mean ≥ 108` AND `mean − stdev ≥ 105` AND the per-dimension floors — the rule in force when
-> run 4 was scored, and retired the same day this table was last published by
-> [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md). `AST09`'s reason cell names that
-> retired clause because that clause is what blocked it.
+> **Produced by the rule above, on the corpus below it.** Every row in this table is run 5's,
+> gated by `mean ≥ 108` AND `mean − 1.0 × stdev/√n ≥ 108` AND the per-dimension floors — the rule
+> [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md) put in force before this run was
+> scored. The `Mean − σ` column is the **retired** statistic, published because ADR-0005's argument
+> is arithmetic on it; it decides nothing, and `AST01` ships at 103.4 in that column.
 >
-> The table is **frozen** and `eval/generate_dashboard.py` must not be run against this corpus:
-> the generator calls the live gate, so regenerating would restate a run-4 verdict in the words
-> of a rule that never judged it. Run 5 is what replaces this table.
-> `tests/test_generate_dashboard.py::test_the_committed_results_table_is_run_4_under_the_rule_that_produced_it`
-> holds the freeze — it re-derives every verdict here through the *current* gate and fails if any
-> one of them has moved, so "frozen" stays a checkable claim rather than a promise. Under the new
-> clause the verdict column is identical: nine SHIP, `AST01` on its `D3` floor, `AST09` on the
-> confidence bound at `108.2 − 1.18 = 107.0 < 108`.
+> The table is regenerated, not typed: `python3 eval/generate_dashboard.py` rewrites it from
+> `eval/scorecards/*.json`, recomputing every verdict and grade through `ship_floor.aggregate_verdict`
+> rather than copying a stored one.
+> `tests/test_generate_dashboard.py::test_the_committed_results_table_is_the_live_corpus_under_the_rule_in_force`
+> fails if the committed table is not what the generator emits today, and re-derives every verdict
+> here through the gate. The table was **frozen** for exactly one run — between ADR-0006 and run 5,
+> while the published board was older than the rule in force — and
+> `test_the_gate_change_moved_no_verdict_on_the_corpus_it_did_not_judge` is what carries that period's
+> claim forward: today's gate over the frozen `eval/scorecards-run4/` bytes reproduces all eleven
+> run-4 verdicts.
 
 <!-- BEGIN:results -->
-**11 of 11 skills judged; 9 clear the ship rule.** Verdicts and grades below are recomputed from each scorecard's own `aggregate.judgments` by `ship_floor.aggregate_verdict`; stored verdicts are never copied. Unjudged skills keep their placeholder row rather than dropping out of the table.
+**11 of 11 skills judged; 11 clear the ship rule.** Verdicts and grades below are recomputed from each scorecard's own `aggregate.judgments` by `ship_floor.aggregate_verdict`; stored verdicts are never copied. Unjudged skills keep their placeholder row rather than dropping out of the table.
 
 | Skill | Rounds | Mean | Mean − σ | Lowest dim (floor) | Grade | Verdict |
 | --- | ---: | ---: | ---: | --- | --- | --- |
-| `AST01` | 17 | 108.5 | 102.5 | `D3` 12.2/13 ⚠ | A | BLOCKED — dimension means below floor: D3 |
-| `AST02` | 15 | 112.3 | 107.7 | `D2` 13.4/13 | A | SHIP |
-| `AST03` | 18 | 110.7 | 106.4 | `D2` 13.4/13 | A | SHIP |
-| `AST04` | 17 | 112.6 | 108.9 | `D6` 13.8/13 | A | SHIP |
-| `AST05` | 14 | 111.2 | 107.1 | `D2` 13.7/13 | A | SHIP |
-| `AST06` | 15 | 111.3 | 107.3 | `D2` 13.5/13 | A | SHIP |
-| `AST07` | 17 | 110.3 | 105.1 | `D5` 13.5/13 | A | SHIP |
-| `AST08` | 18 | 110.8 | 106.1 | `D3` 13.2/13 | A | SHIP |
-| `AST09` | 17 | 108.2 | 103.4 | `D2` 13.1/13 | A | BLOCKED — lower bound (mean - stdev) 103.4 < 105 — mean 108.2 is within noise (sigma 4.85) of failing badly |
-| `AST10` | 16 | 113.2 | 107.7 | `D5` 13.8/13 | A | SHIP |
-| `advisory` | 16 | 112.2 | 107.4 | `D2` 13.8/13 | A | SHIP |
-| `ast01-malicious-skills` | — | — | — | — | — | NOT YET JUDGED |
-| `ast02-supply-chain-compromise` | — | — | — | — | — | NOT YET JUDGED |
-| `ast03-over-privileged-skills` | — | — | — | — | — | NOT YET JUDGED |
-| `ast04-insecure-metadata` | — | — | — | — | — | NOT YET JUDGED |
-| `ast05-untrusted-external-instructions` | — | — | — | — | — | NOT YET JUDGED |
-| `ast06-weak-isolation` | — | — | — | — | — | NOT YET JUDGED |
-| `ast07-update-drift` | — | — | — | — | — | NOT YET JUDGED |
-| `ast08-poor-scanning` | — | — | — | — | — | NOT YET JUDGED |
-| `ast09-no-governance` | — | — | — | — | — | NOT YET JUDGED |
-| `ast10-cross-platform-reuse` | — | — | — | — | — | NOT YET JUDGED |
+| `AST01` | 16 | 110.1 | 103.4 | `D2` 13.4/13 | A | SHIP |
+| `AST02` | 18 | 111.8 | 107.4 | `D2` 13.5/13 | A | SHIP |
+| `AST03` | 16 | 112.2 | 107.6 | `D6` 13.8/13 | A | SHIP |
+| `AST04` | 18 | 111.6 | 106.4 | `D2` 13.6/13 | A | SHIP |
+| `AST05` | 16 | 110.6 | 105.8 | `D2` 13.3/13 | A | SHIP |
+| `AST06` | 16 | 112.1 | 107.9 | `D2` 13.5/13 | A | SHIP |
+| `AST07` | 17 | 110.2 | 105.5 | `D1` 17.4/17 | A | SHIP |
+| `AST08` | 18 | 109.7 | 105.4 | `D2` 13.4/13 | A | SHIP |
+| `AST09` | 18 | 111.1 | 106.3 | `D2` 13.4/13 | A | SHIP |
+| `AST10` | 18 | 112.4 | 107 | `D2` 13.6/13 | A | SHIP |
+| `advisory` | 17 | 112.2 | 107.9 | `D2` 13.7/13 | A | SHIP |
 <!-- END:results -->
 
 The `advisory` skill is judged on **guidance relevance and reasoning quality** — whether
@@ -535,16 +693,18 @@ the gate read the same bytes and cannot drift apart:
 `sem` and `ci_lower` are [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md)'s two
 additions and are what the second clause is read from: `sem = stdev/√n` rounded to two places,
 `ci_lower = mean − 1.0 × sem` rounded to one, both derived from the already-rounded `mean` and
-`stdev` so a reader holding those three numbers reproduces the verdict exactly. Run-4 scorecards
-predate them and do not carry them; the gate treats their absence as a date rather than a
-disagreement, and refuses any stored statistic — new key or old — whose value disagrees with the
-recompute.
+`stdev` so a reader holding those three numbers reproduces the verdict exactly. Run 5 is the first
+corpus written with them; the four archived runs predate them and do not carry them, so the gate
+treats their absence as a date rather than a disagreement, and refuses any stored statistic — new
+key or old — whose value disagrees with the recompute.
 
 Then:
 
 ```bash
 python3 eval/generate_dashboard.py    # rewrites the Results table above
-python3 scripts/ship_floor.py         # recomputes every stored verdict, fails on drift
+python3 scripts/ship_floor.py         # recomputes every scorecard verdict, fails on drift
+python3 eval/calibration.py           # bias, judge quality, and the robustness block
+python3 scripts/refusal_ledger.py     # every discarded judgment must be on the record
 ```
 
 The generator never copies a stored `verdict` or `grade`: it recomputes both from

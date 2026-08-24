@@ -30,8 +30,10 @@ because the retired clause was demonstrated to be NOT A FUNCTION OF THE ARTIFACT
 — AST08's SKILL.md is byte-identical between run 3 and run 4 and the clause
 flipped its verdict (run 3: 110.3 - 5.65 = 104.6, BLOCKED; run 4:
 110.8 - 4.67 = 106.1, SHIP) — and it was recorded and its constant fixed BEFORE
-the run it judges. Run 4 (eval/scorecards/) was scored under the retired clause
-and its published verdicts stay as issued; run 5 is the first run judged here.
+the run it judges. Run 4 (eval/scorecards-run4/) was scored under the retired
+clause and its published verdicts stay as issued; run 5 (eval/scorecards/) is the
+first run judged here, and running this gate over the frozen run-4 bytes
+reproduces all eleven of its verdicts.
 THIS REPO AND UPSTREAM NOW DIVERGE IN THIS ONE CLAUSE, by decision: see
 ADR-0006 "Consequences / Negative", THIRD_PARTY_LICENSES.md and NOTICE. Any
 score quoted across the two repositories must name which rule produced it.
@@ -222,9 +224,9 @@ def pooled_stats(totals: list[int]) -> dict:
 #: minus ADR-0006's two additions, and the split is a dating mechanism, not a
 #: softening: a scorecard written before 2026-08-24 cannot carry `sem`/`ci_lower`,
 #: so reading their absence as "stored stats disagree with the recompute" would
-#: turn every verdict in `eval/scorecards/` (run 4) into a stats-drift BLOCK —
-#: re-labelling a run this rule never judged, which ADR-0006's Status section
-#: forbids. Absence of these two is therefore tolerated; absence of anything in
+#: turn every verdict in the four archived runs (`eval/scorecards-run{1,2,3,4}/`)
+#: into a stats-drift BLOCK — re-labelling runs this rule never judged, which
+#: ADR-0006's Status section forbids. Absence of these two is therefore tolerated; absence of anything in
 #: this tuple is refused, and a stored value that DISAGREES with the recompute is
 #: refused whatever its key.
 PRE_ADR0006_STATS = ("n", "mean", "median", "min", "max", "range", "stdev", "lower_bound")
@@ -372,20 +374,98 @@ def binding_block(skill: str, iters: dict, skills_dir: pathlib.Path | None = Non
     return min(live, key=lambda t: (t[1].get("total", 0), t[0]))[1]
 
 
+#: Where this repo's judged runs actually live, relative to ROOT. `scores.json`
+#: is upstream's record shape and this repository has never written one; the
+#: scorecards are. `main()` reads BOTH so that the command documented in the
+#: README as "recompute every stored judge verdict" recomputes something.
+SCORECARD_SUBDIR = ("eval", "scorecards")
+
+
+def scorecard_dir() -> pathlib.Path:
+    """The live scorecard directory, resolved against ROOT at call time.
+
+    Resolved on each call rather than frozen at import, because ROOT is
+    environment-driven (`OWASP_AST10_ROOT`) and tests repoint it at a fixture
+    repo. A module-level constant would keep auditing the real corpus from
+    inside a fixture, which is the opposite of what pointing ROOT somewhere else
+    is for.
+    """
+    return ROOT.joinpath(*SCORECARD_SUBDIR)
+
+
+def audit_scorecards(directory: pathlib.Path | None = None) -> tuple[list[str], list[str], int]:
+    """Recompute every scorecard's stored aggregate verdict. Returns (failures, shipped, checked).
+
+    A scorecard is exactly the shape `aggregate_verdict` reads, so nothing is
+    translated on the way in: the stored `verdict` is a claim and the recompute
+    from `aggregate.judgments` is the evidence, same as for a `scores.json`
+    block. Files with no `aggregate` (a README, a hand-written note) are not
+    scorecards and are skipped rather than failed.
+    """
+    base = directory if directory is not None else scorecard_dir()
+    fail: list[str] = []
+    shipped: list[str] = []
+    checked = 0
+    if not base.is_dir():
+        return fail, shipped, checked
+    for path in sorted(base.glob("*.json")):
+        try:
+            card = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            fail.append(f"{path.name}: not valid JSON: {exc}")
+            continue
+        if not isinstance(card, dict) or not isinstance(card.get("aggregate"), dict):
+            continue
+        checked += 1
+        skill = str(card.get("skill") or path.stem)
+        verdict, why = aggregate_verdict(skill, card["aggregate"])
+        stored = card.get("verdict")
+        if stored is not None and stored != verdict:
+            fail.append(f"{path.name}: stored verdict '{stored}' != recomputed '{verdict}' ({why or 'ok'})")
+        if verdict == "SHIP":
+            shipped.append(skill)
+        else:
+            print(f"note: {skill} does not ship — {why}")
+    return fail, shipped, checked
+
+
 def main() -> int:
-    """Read scores.json, recompute every stored verdict, fail on disagreement.
+    """Recompute every stored verdict this repository publishes, and fail on disagreement.
+
+    Two records are read, and the command is only a no-op when neither exists:
+    `scores.json` (upstream's per-iteration shape, which this repo does not
+    write) and `eval/scorecards/*.json` (the judged runs it does). Reading only
+    the first is how this command came to print "nothing scored yet" and exit 0
+    beside a README line calling it a verification step — a check that checks
+    nothing reports success, which is worse than no check. **An invocation that
+    finds neither record now exits 1**, because "I could not verify anything" is
+    not a pass.
 
     Unlike upstream, this carries no per-repo delivery-floor or mandated-area
     check — this repo's spec/plan define no such concept. What ships is
     exactly what aggregate_verdict() says ships; nothing else gates here.
     """
     scores_path = ROOT / "scores.json"
-    if not scores_path.is_file():
-        print(f"note: {scores_path} does not exist — nothing scored yet")
-        return 0
-    scores = json.loads(scores_path.read_text())
     fail: list[str] = []
     shipped: list[str] = []
+
+    card_fail, card_shipped, card_checked = audit_scorecards()
+    fail.extend(card_fail)
+    shipped.extend(card_shipped)
+    if card_checked:
+        print(f"note: recomputed {card_checked} scorecard verdict(s) under {scorecard_dir()}")
+
+    if not scores_path.is_file():
+        if not card_checked:
+            print(f"FAIL: neither {scores_path} nor a scorecard under {scorecard_dir()} exists — nothing was checked")
+            return 1
+        if fail:
+            print("\n".join("FAIL: " + f for f in fail))
+            return 1
+        print(f"OK: {len(shipped)} skill(s) shipped.")
+        return 0
+
+    scores = json.loads(scores_path.read_text())
 
     for skill, iters in scores.items():
         # 1. Audit every stored per-block verdict against the per-block rule.

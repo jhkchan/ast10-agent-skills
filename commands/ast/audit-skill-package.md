@@ -49,8 +49,10 @@ category you care about.
    network, identity-file protection, derived `risk_tier` floor, `content_hash` agreement).
    A manifest that fails here makes every downstream permission finding provisional, so the
    sweep says so rather than reporting them as settled.
-3. **Sweep.** Runs each category's `DETECTORS` map via `run_all(pkg)`. Six of the ten
-   categories ship implemented checks (13 in total); four ship none by design.
+3. **Sweep.** Runs each category's `DETECTORS` map via `run_all(pkg)`. Eight of the ten
+   categories ship implemented checks — **36 in total** (`AST01` 10, `AST04` 6, `AST05` 5,
+   `AST06` 5, `AST03` 4, `AST08` 4, `AST02` 1, `AST10` 1) — and two, `AST07` and `AST09`,
+   ship none by design. `tests/test_docs.py` fails if that total drifts from the modules.
 4. **Ledger.** Closes with the coverage accounting: what was decided, what needs a judge,
    what is not decidable from an artifact. This section is mandatory, not optional trim.
 5. **Triage the remainder.** Anything the ten did not decide but a human flagged in prose
@@ -59,16 +61,22 @@ category you care about.
 
 ## Which categories can return a verdict
 
+Counts are each module's own `DETECTORS` registry, and
+`tests/test_docs.py::test_the_sweep_page_check_table_matches_the_detector_modules` fails if
+this table and the code part company — which is what happened before: it carried a
+scaffold-era roster (thirteen, spread over six categories) long after 36 shipped across
+eight.
+
 | Category | Implemented checks | Status |
 | --- | --- | --- |
-| AST01 Malicious Skills | 2 | covered |
-| AST02 Supply Chain Compromise | 0 | declared-and-uncovered |
-| AST03 Over-Privileged Skills | 2 | proxy-covered |
-| AST04 Insecure Metadata | 4 | covered |
-| AST05 Untrusted External Instructions | 2 | proxy-covered (artifact-signal-only) |
-| AST06 Weak Isolation | 2 | proxy-covered |
+| AST01 Malicious Skills | 10 | covered (scenario-level) |
+| AST02 Supply Chain Compromise | 1 | covered (scenario-level) |
+| AST03 Over-Privileged Skills | 4 | proxy-covered (mixed-proxy) |
+| AST04 Insecure Metadata | 6 | covered (scenario-level) |
+| AST05 Untrusted External Instructions | 5 | proxy-covered (artifact-signal-only) |
+| AST06 Weak Isolation | 5 | proxy-covered (mixed-proxy) |
 | AST07 Update Drift | 0 | declared-and-uncovered |
-| AST08 Poor Scanning | 1 | proxy-covered (category-precondition) |
+| AST08 Poor Scanning | 4 | covered (scenario-level) |
 | AST09 No Governance | 0 | declared-and-uncovered |
 | AST10 Cross-Platform Reuse | 1 | covered (scenario-level) — AST10-S06 only; the manifest half lives in `validators/usf.py` |
 
@@ -101,26 +109,31 @@ loader.
 
 ## Output
 
+**Abridged.** The shape below is the real report's; the per-category rows are cut down to
+the ones that carry the example. A real sweep prints a line for every one of the 36 shipped
+checks, so the `n/m` counts in the headers are the module's own roster and the ledger's
+totals are the roster totals — neither is a per-example figure.
+
 ```text
 PACKAGE: ./invoice-helper
 MANIFEST: skill.usf.yaml present - validated first (see /ast:validate-usf-manifest)
 
-AST01  Malicious Skills                  1/2 DETECTED
+AST01  Malicious Skills                  1/10 DETECTED
   DETECTED  AST01-content-hash-missing        manifest.content_hash.value is unset
   CLEAN     AST01-content-hash-mismatch       no declared hash to compare
-AST02  Supply Chain Compromise           DECLARED-AND-UNCOVERED  (0 checks by design)
-AST03  Over-Privileged Skills            2/2 DETECTED
+AST02  Supply Chain Compromise           0/1 DETECTED
+AST03  Over-Privileged Skills            2/4 DETECTED
   DETECTED  AST03-unbounded-write-scope        permissions.deny_write is unset or empty
   DETECTED  AST03-shell-network-privilege-combo  shell.allowed=True network.policy=allow-all
-AST04  Insecure Metadata                 1/4 DETECTED
+AST04  Insecure Metadata                 1/6 DETECTED
   DETECTED  AST04-yaml-injection               scripts/setup.py: Loader=yaml.UnsafeLoader
   CLEAN     AST04-json-injection               no prototype-pollution keys found
   CLEAN     AST04-toml-injection               no unexpected top-level TOML keys found
   CLEAN     AST04-invisible-unicode-smuggling  no invisible Unicode control code points found
-AST05  Untrusted External Instructions   1/2 DETECTED   [artifact-signal-only]
+AST05  Untrusted External Instructions   1/5 DETECTED   [artifact-signal-only]
   DETECTED  AST05-unrestricted-network-fetch   network.policy=allow-all
   CLEAN     AST05-wildcard-domain-allowlist    not in allow-list mode
-AST06  Weak Isolation                    1/2 DETECTED
+AST06  Weak Isolation                    1/5 DETECTED
   DETECTED  AST06-unrestricted-shell-exec      shell.allowed with no commands allow-list
   CLEAN     AST06-missing-sandbox-declaration  permissions block present
 AST07  Update Drift                      DECLARED-AND-UNCOVERED  (0 checks by design)
@@ -138,7 +151,7 @@ AST10  Cross-Platform Reuse              1/1 DETECTED   [scenario-level]
 
 -------------------------------------------------------------------------------
 COVERAGE LEDGER
-  Checks run:        13 static-detectable across 6 of 10 categories
+  Checks run:        36 static-detectable across 8 of 10 categories
   DETECTED:          6
   Registry total:    62 named scenarios - 20 static-detectable,
                      8 agent-judgable, 34 out-of-artifact
@@ -156,7 +169,7 @@ NEXT: /ast:check-coverage AST05   (why this category's number is proxy-scoped)
       /ast:validate-usf-manifest ./invoice-helper/skill.usf.yaml
 ```
 
-A sweep with zero DETECTED findings means "none of the 13 implemented checks fired against
+A sweep with zero DETECTED findings means "none of the 36 implemented checks fired against
 this package". It does not mean the package is safe, and the ledger is there so the report
 can never be read that way.
 

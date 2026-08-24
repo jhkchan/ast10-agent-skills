@@ -1,7 +1,7 @@
 {
   "generated_by": "eval/calibration.py",
   "source": "eval/scorecards",
-  "n_judgments": 180,
+  "n_judgments": 188,
   "n_skills": 11,
   "n_providers": 6,
   "doctrine": "Declare and record. A NON-DISCRIMINATING verdict flags a judge whose output carries no ranking information; it does NOT remove that judge from any pooled figure, and nothing in this repository reads this file as an exclusion list. Excluding a judge from the binding pool is a human decision and needs its own ADR.",
@@ -27,103 +27,107 @@
       "n_skills": 11,
       "n_dimension_scores": 256,
       "discrimination": {
-        "distinct_dimension_values": 7,
+        "distinct_dimension_values": 9,
         "dimension_values": [
           9.0,
           10.0,
+          13.0,
           14.0,
           15.0,
+          17.0,
           18.0,
           19.0,
           20.0
         ],
-        "across_skill_sd": 0.94,
-        "across_skill_variance": 0.88,
+        "across_skill_sd": 1.22,
+        "across_skill_variance": 1.48,
         "skill_mean_min": 116.3,
-        "skill_mean_max": 119.3,
-        "skill_mean_range": 3.0
+        "skill_mean_max": 120.0,
+        "skill_mean_range": 3.7
       },
       "granularity": {
-        "multiple_of_five_rate": 0.766,
+        "multiple_of_five_rate": 0.789,
         "chance_rate": 0.251
       },
       "saturation": {
-        "dimension_max_rate": 0.766,
-        "full_total_rate": 0.156,
+        "dimension_max_rate": 0.789,
+        "full_total_rate": 0.344,
         "rubric_total": 120
       },
       "self_consistency": {
         "round_means": [
-          118.2,
-          117.1,
-          117.9
+          117.7,
+          117.3,
+          118.2
         ],
-        "round_spread": 1.1,
-        "same_skill_spread_mean": 2.36,
-        "same_skill_spread_max": 6.0,
-        "within_skill_sd": 1.38
+        "round_spread": 0.9,
+        "same_skill_spread_mean": 3.36,
+        "same_skill_spread_max": 7.0,
+        "within_skill_sd": 1.83
       },
-      "verdict": "NON-DISCRIMINATING",
+      "verdict": "COARSE",
       "reasons": [
-        "across-skill sd 0.94 < 1.0: its 11 per-skill means span 3.0 points (116.3-119.3)",
-        "77% of its dimension scores are multiples of 5 (chance is 25%)",
-        "77% of its dimension scores are that dimension's maximum"
+        "79% of its dimension scores are multiples of 5 (chance is 25%)",
+        "79% of its dimension scores are that dimension's maximum"
       ]
     },
     {
       "provider": "anthropic-compatible/glm-5.2",
-      "n_judgments": 29,
+      "n_judgments": 30,
       "n_skills": 11,
-      "n_dimension_scores": 232,
+      "n_dimension_scores": 240,
       "discrimination": {
-        "distinct_dimension_values": 8,
+        "distinct_dimension_values": 10,
         "dimension_values": [
           8.0,
           9.0,
+          10.0,
           12.0,
           13.0,
           14.0,
           15.0,
+          17.0,
           18.0,
           19.0
         ],
-        "across_skill_sd": 1.23,
-        "across_skill_variance": 1.51,
-        "skill_mean_min": 109.7,
-        "skill_mean_max": 114.5,
-        "skill_mean_range": 4.8
+        "across_skill_sd": 1.84,
+        "across_skill_variance": 3.37,
+        "skill_mean_min": 109.3,
+        "skill_mean_max": 115.3,
+        "skill_mean_range": 6.0
       },
       "granularity": {
-        "multiple_of_five_rate": 0.241,
+        "multiple_of_five_rate": 0.279,
         "chance_rate": 0.251
       },
       "saturation": {
-        "dimension_max_rate": 0.241,
+        "dimension_max_rate": 0.279,
         "full_total_rate": 0.0,
         "rubric_total": 120
       },
       "self_consistency": {
         "round_means": [
-          112.3,
-          112.4,
-          111.6
+          112.1,
+          113.3,
+          112.3
         ],
-        "round_spread": 0.8,
-        "same_skill_spread_mean": 2.36,
-        "same_skill_spread_max": 4.0,
-        "within_skill_sd": 1.43
+        "round_spread": 1.2,
+        "same_skill_spread_mean": 2.82,
+        "same_skill_spread_max": 8.0,
+        "within_skill_sd": 1.65
       },
       "verdict": "DISCRIMINATING",
       "reasons": []
     },
     {
       "provider": "bedrock/deepseek-v3.2",
-      "n_judgments": 26,
+      "n_judgments": 30,
       "n_skills": 11,
-      "n_dimension_scores": 208,
+      "n_dimension_scores": 240,
       "discrimination": {
-        "distinct_dimension_values": 13,
+        "distinct_dimension_values": 14,
         "dimension_values": [
+          7.0,
           8.0,
           9.0,
           10.0,
@@ -138,44 +142,44 @@
           19.0,
           20.0
         ],
-        "across_skill_sd": 3.11,
-        "across_skill_variance": 9.68,
-        "skill_mean_min": 103.7,
-        "skill_mean_max": 113.0,
-        "skill_mean_range": 9.3
+        "across_skill_sd": 4.22,
+        "across_skill_variance": 17.78,
+        "skill_mean_min": 100.5,
+        "skill_mean_max": 117.3,
+        "skill_mean_range": 16.8
       },
       "granularity": {
-        "multiple_of_five_rate": 0.288,
+        "multiple_of_five_rate": 0.4,
         "chance_rate": 0.251
       },
       "saturation": {
-        "dimension_max_rate": 0.279,
-        "full_total_rate": 0.038,
+        "dimension_max_rate": 0.4,
+        "full_total_rate": 0.033,
         "rubric_total": 120
       },
       "self_consistency": {
         "round_means": [
-          109.3,
-          109.6,
-          108.5
+          111.0,
+          111.7,
+          112.9
         ],
-        "round_spread": 1.1,
-        "same_skill_spread_mean": 4.82,
-        "same_skill_spread_max": 14.0,
-        "within_skill_sd": 3.55
+        "round_spread": 1.9,
+        "same_skill_spread_mean": 7.27,
+        "same_skill_spread_max": 17.0,
+        "within_skill_sd": 4.27
       },
       "verdict": "DISCRIMINATING",
       "reasons": []
     },
     {
       "provider": "bedrock/gpt-oss-120b",
-      "n_judgments": 32,
+      "n_judgments": 33,
       "n_skills": 11,
-      "n_dimension_scores": 256,
+      "n_dimension_scores": 264,
       "discrimination": {
-        "distinct_dimension_values": 12,
+        "distinct_dimension_values": 11,
         "dimension_values": [
-          5.0,
+          7.0,
           8.0,
           9.0,
           11.0,
@@ -185,17 +189,16 @@
           15.0,
           16.0,
           17.0,
-          18.0,
-          19.0
+          18.0
         ],
-        "across_skill_sd": 2.19,
-        "across_skill_variance": 4.8,
-        "skill_mean_min": 101.7,
-        "skill_mean_max": 110.0,
-        "skill_mean_range": 8.3
+        "across_skill_sd": 1.41,
+        "across_skill_variance": 2.0,
+        "skill_mean_min": 103.7,
+        "skill_mean_max": 108.0,
+        "skill_mean_range": 4.3
       },
       "granularity": {
-        "multiple_of_five_rate": 0.105,
+        "multiple_of_five_rate": 0.106,
         "chance_rate": 0.251
       },
       "saturation": {
@@ -205,25 +208,25 @@
       },
       "self_consistency": {
         "round_means": [
-          106.1,
-          106.0,
-          106.3
+          107.2,
+          106.9,
+          104.9
         ],
-        "round_spread": 0.3,
-        "same_skill_spread_mean": 4.64,
-        "same_skill_spread_max": 9.0,
-        "within_skill_sd": 2.53
+        "round_spread": 2.3,
+        "same_skill_spread_mean": 4.36,
+        "same_skill_spread_max": 7.0,
+        "within_skill_sd": 2.31
       },
       "verdict": "DISCRIMINATING",
       "reasons": []
     },
     {
       "provider": "bedrock/nova-pro",
-      "n_judgments": 29,
+      "n_judgments": 30,
       "n_skills": 11,
-      "n_dimension_scores": 232,
+      "n_dimension_scores": 240,
       "discrimination": {
-        "distinct_dimension_values": 10,
+        "distinct_dimension_values": 9,
         "dimension_values": [
           9.0,
           10.0,
@@ -233,45 +236,44 @@
           15.0,
           16.0,
           18.0,
-          19.0,
           20.0
         ],
-        "across_skill_sd": 3.7,
-        "across_skill_variance": 13.68,
-        "skill_mean_min": 106.3,
-        "skill_mean_max": 118.3,
-        "skill_mean_range": 12.0
+        "across_skill_sd": 2.32,
+        "across_skill_variance": 5.37,
+        "skill_mean_min": 104.5,
+        "skill_mean_max": 112.7,
+        "skill_mean_range": 8.2
       },
       "granularity": {
-        "multiple_of_five_rate": 0.263,
+        "multiple_of_five_rate": 0.154,
         "chance_rate": 0.251
       },
       "saturation": {
-        "dimension_max_rate": 0.263,
-        "full_total_rate": 0.138,
+        "dimension_max_rate": 0.154,
+        "full_total_rate": 0.033,
         "rubric_total": 120
       },
       "self_consistency": {
         "round_means": [
-          110.3,
-          110.4,
-          108.9
+          109.5,
+          108.5,
+          108.8
         ],
-        "round_spread": 1.5,
-        "same_skill_spread_mean": 6.64,
-        "same_skill_spread_max": 14.0,
-        "within_skill_sd": 3.86
+        "round_spread": 1.0,
+        "same_skill_spread_mean": 6.55,
+        "same_skill_spread_max": 11.0,
+        "within_skill_sd": 3.74
       },
       "verdict": "DISCRIMINATING",
       "reasons": []
     },
     {
       "provider": "claude-cli/sonnet",
-      "n_judgments": 32,
+      "n_judgments": 33,
       "n_skills": 11,
-      "n_dimension_scores": 256,
+      "n_dimension_scores": 264,
       "discrimination": {
-        "distinct_dimension_values": 10,
+        "distinct_dimension_values": 11,
         "dimension_values": [
           6.0,
           7.0,
@@ -281,48 +283,45 @@
           13.0,
           14.0,
           15.0,
+          17.0,
           18.0,
           19.0
         ],
-        "across_skill_sd": 1.17,
-        "across_skill_variance": 1.37,
-        "skill_mean_min": 108.7,
-        "skill_mean_max": 112.7,
+        "across_skill_sd": 1.26,
+        "across_skill_variance": 1.59,
+        "skill_mean_min": 107.7,
+        "skill_mean_max": 111.7,
         "skill_mean_range": 4.0
       },
       "granularity": {
-        "multiple_of_five_rate": 0.199,
+        "multiple_of_five_rate": 0.205,
         "chance_rate": 0.251
       },
       "saturation": {
-        "dimension_max_rate": 0.199,
+        "dimension_max_rate": 0.205,
         "full_total_rate": 0.0,
         "rubric_total": 120
       },
       "self_consistency": {
         "round_means": [
+          110.0,
           110.6,
-          110.7,
-          109.9
+          110.5
         ],
-        "round_spread": 0.8,
-        "same_skill_spread_mean": 3.91,
-        "same_skill_spread_max": 8.0,
-        "within_skill_sd": 2.06
+        "round_spread": 0.6,
+        "same_skill_spread_mean": 3.73,
+        "same_skill_spread_max": 5.0,
+        "within_skill_sd": 2.01
       },
       "verdict": "DISCRIMINATING",
       "reasons": []
     }
   ],
-  "flagged": [
-    "bedrock/qwen3-235b"
-  ],
+  "flagged": [],
   "exclusion": {
-    "flagged": [
-      "bedrock/qwen3-235b"
-    ],
+    "flagged": [],
     "with_flagged": {
-      "n_judgments": 180,
+      "n_judgments": 188,
       "providers": [
         "anthropic-compatible/glm-5.2",
         "bedrock/deepseek-v3.2",
@@ -331,219 +330,106 @@
         "bedrock/qwen3-235b",
         "claude-cli/sonnet"
       ],
-      "pooled_mean": 111.0,
-      "bias_spread": 11.6,
-      "sigma_min": 3.74,
-      "sigma_max": 6.04,
-      "sigma_median": 4.67,
-      "implied_mean_bar_min": 108.7,
-      "implied_mean_bar_max": 111.0,
+      "pooled_mean": 111.3,
+      "bias_spread": 11.4,
+      "sigma_min": 4.16,
+      "sigma_max": 6.65,
+      "sigma_median": 4.75,
+      "implied_mean_bar_min": 109.2,
+      "implied_mean_bar_max": 111.7,
       "skills": [
         {
           "skill": "AST01",
-          "n": 17,
-          "mean": 108.5,
-          "sigma": 6.04,
-          "lower_bound": 102.5,
-          "sem_bound": 107.0
+          "n": 16,
+          "mean": 110.1,
+          "sigma": 6.65,
+          "lower_bound": 103.4,
+          "sem_bound": 108.4
         },
         {
           "skill": "AST02",
-          "n": 15,
-          "mean": 112.3,
-          "sigma": 4.62,
-          "lower_bound": 107.7,
+          "n": 18,
+          "mean": 111.8,
+          "sigma": 4.41,
+          "lower_bound": 107.4,
+          "sem_bound": 110.8
+        },
+        {
+          "skill": "AST03",
+          "n": 16,
+          "mean": 112.2,
+          "sigma": 4.58,
+          "lower_bound": 107.6,
+          "sem_bound": 111.0
+        },
+        {
+          "skill": "AST04",
+          "n": 18,
+          "mean": 111.6,
+          "sigma": 5.16,
+          "lower_bound": 106.4,
+          "sem_bound": 110.4
+        },
+        {
+          "skill": "AST05",
+          "n": 16,
+          "mean": 110.6,
+          "sigma": 4.79,
+          "lower_bound": 105.8,
+          "sem_bound": 109.4
+        },
+        {
+          "skill": "AST06",
+          "n": 16,
+          "mean": 112.1,
+          "sigma": 4.16,
+          "lower_bound": 107.9,
           "sem_bound": 111.1
         },
         {
-          "skill": "AST03",
-          "n": 18,
-          "mean": 110.7,
-          "sigma": 4.33,
-          "lower_bound": 106.4,
-          "sem_bound": 109.7
-        },
-        {
-          "skill": "AST04",
-          "n": 17,
-          "mean": 112.6,
-          "sigma": 3.74,
-          "lower_bound": 108.9,
-          "sem_bound": 111.7
-        },
-        {
-          "skill": "AST05",
-          "n": 14,
-          "mean": 111.2,
-          "sigma": 4.06,
-          "lower_bound": 107.1,
-          "sem_bound": 110.1
-        },
-        {
-          "skill": "AST06",
-          "n": 15,
-          "mean": 111.3,
-          "sigma": 4.04,
-          "lower_bound": 107.3,
-          "sem_bound": 110.3
-        },
-        {
           "skill": "AST07",
           "n": 17,
-          "mean": 110.3,
-          "sigma": 5.22,
-          "lower_bound": 105.1,
-          "sem_bound": 109.0
-        },
-        {
-          "skill": "AST08",
-          "n": 18,
-          "mean": 110.8,
-          "sigma": 4.67,
-          "lower_bound": 106.1,
-          "sem_bound": 109.7
-        },
-        {
-          "skill": "AST09",
-          "n": 17,
-          "mean": 108.2,
-          "sigma": 4.85,
-          "lower_bound": 103.4,
-          "sem_bound": 107.0
-        },
-        {
-          "skill": "AST10",
-          "n": 16,
-          "mean": 113.2,
-          "sigma": 5.55,
-          "lower_bound": 107.7,
-          "sem_bound": 111.8
-        },
-        {
-          "skill": "advisory",
-          "n": 16,
-          "mean": 112.2,
-          "sigma": 4.82,
-          "lower_bound": 107.4,
-          "sem_bound": 111.0
-        }
-      ]
-    },
-    "without_flagged": {
-      "n_judgments": 148,
-      "providers": [
-        "anthropic-compatible/glm-5.2",
-        "bedrock/deepseek-v3.2",
-        "bedrock/gpt-oss-120b",
-        "bedrock/nova-pro",
-        "claude-cli/sonnet"
-      ],
-      "pooled_mean": 109.5,
-      "bias_spread": 6.0,
-      "sigma_min": 3.19,
-      "sigma_max": 5.7,
-      "sigma_median": 3.3,
-      "implied_mean_bar_min": 108.2,
-      "implied_mean_bar_max": 110.7,
-      "skills": [
-        {
-          "skill": "AST01",
-          "n": 14,
-          "mean": 106.6,
-          "sigma": 4.78,
-          "lower_bound": 101.8,
-          "sem_bound": 105.3
-        },
-        {
-          "skill": "AST02",
-          "n": 12,
-          "mean": 110.6,
-          "sigma": 3.2,
-          "lower_bound": 107.4,
-          "sem_bound": 109.7
-        },
-        {
-          "skill": "AST03",
-          "n": 15,
-          "mean": 109.3,
-          "sigma": 3.33,
-          "lower_bound": 106.0,
-          "sem_bound": 108.4
-        },
-        {
-          "skill": "AST04",
-          "n": 14,
-          "mean": 111.6,
-          "sigma": 3.3,
-          "lower_bound": 108.3,
-          "sem_bound": 110.7
-        },
-        {
-          "skill": "AST05",
-          "n": 12,
           "mean": 110.2,
-          "sigma": 3.28,
-          "lower_bound": 106.9,
-          "sem_bound": 109.2
-        },
-        {
-          "skill": "AST06",
-          "n": 12,
-          "mean": 109.9,
-          "sigma": 3.29,
-          "lower_bound": 106.6,
+          "sigma": 4.75,
+          "lower_bound": 105.5,
           "sem_bound": 109.0
         },
         {
-          "skill": "AST07",
-          "n": 14,
-          "mean": 108.4,
-          "sigma": 3.5,
-          "lower_bound": 104.9,
-          "sem_bound": 107.5
-        },
-        {
           "skill": "AST08",
-          "n": 15,
-          "mean": 109.2,
-          "sigma": 3.19,
-          "lower_bound": 106.0,
-          "sem_bound": 108.4
+          "n": 18,
+          "mean": 109.7,
+          "sigma": 4.26,
+          "lower_bound": 105.4,
+          "sem_bound": 108.7
         },
         {
           "skill": "AST09",
-          "n": 14,
-          "mean": 106.5,
-          "sigma": 3.25,
-          "lower_bound": 103.2,
-          "sem_bound": 105.6
+          "n": 18,
+          "mean": 111.1,
+          "sigma": 4.78,
+          "lower_bound": 106.3,
+          "sem_bound": 110.0
         },
         {
           "skill": "AST10",
-          "n": 13,
-          "mean": 112.2,
-          "sigma": 5.7,
-          "lower_bound": 106.5,
-          "sem_bound": 110.6
+          "n": 18,
+          "mean": 112.4,
+          "sigma": 5.45,
+          "lower_bound": 107.0,
+          "sem_bound": 111.1
         },
         {
           "skill": "advisory",
-          "n": 13,
-          "mean": 110.8,
-          "sigma": 4.09,
-          "lower_bound": 106.7,
-          "sem_bound": 109.7
+          "n": 17,
+          "mean": 112.2,
+          "sigma": 4.35,
+          "lower_bound": 107.9,
+          "sem_bound": 111.1
         }
       ]
     },
-    "delta": {
-      "n_judgments": -32,
-      "pooled_mean": -1.5,
-      "bias_spread": -5.6,
-      "sigma_min": -0.55,
-      "sigma_max": -0.34,
-      "sigma_median": -1.37
-    },
-    "note": "Diagnostics. Every figure elsewhere in this report, in eval/scorecards/*.json, in the dashboard and in ADR-0005 is the with-flagged column: no judge has been excluded from anything. Excluding one is a human decision and needs its own ADR."
+    "without_flagged": null,
+    "delta": null,
+    "note": "No judge on this panel is flagged NON-DISCRIMINATING; there is nothing to exclude."
   }
 }

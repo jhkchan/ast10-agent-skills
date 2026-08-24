@@ -132,6 +132,24 @@ jobs:
         # and this step is what makes the invalidation loud instead of silent.
         run: python validators/tier_lock.py fixtures/manifest.yaml
 
+      # The verdict recompute over the committed scorecards is NOT a step here,
+      # and the omission is the maintainer-only split holding rather than an
+      # oversight: tests/test_packaging.py forbids naming the gate driver in an
+      # executable line of this workflow, so the recompute runs inside the
+      # pytest step above, through
+      # tests/scripts/test_ship_floor.py::test_main_over_this_repository_checks_the_recorded_corpus.
+      # That test is what stops the driver going back to what it was — a
+      # documented verification command that looked only for a `scores.json`
+      # this repo never writes, printed "nothing scored yet", and exited 0
+      # having checked nothing.
+
+      - name: Every discarded judgment is on the record
+        # Also deterministic. Fails if any scorecard pooled fewer judgments than
+        # it attempted without those attempts being named — in the scorecard's
+        # own `refusals` block, or in eval/run5-refusals.md for the frozen
+        # corpora that predate the recording path.
+        run: python scripts/refusal_ledger.py
+
   dogfood:
     name: Dogfood — own detectors over own skills
     runs-on: ubuntu-latest
