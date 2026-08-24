@@ -34,6 +34,14 @@ class ClaudeCliAdapter(ProviderAdapter):
         return AdapterStatus(self.name, available=True)
 
     def judge(self, prompt: str) -> str:
+        # `claude -p` print mode emits the answer on stdout and NOTHING about
+        # token cost, so `last_usage` stays None for this adapter and every
+        # artifact built on it records the absence rather than a guess
+        # (adapters/base.py, ProviderAdapter.last_usage). `--output-format
+        # json` would carry a usage block, but it also changes stdout from the
+        # answer text into an envelope — a transport change to the one route
+        # that reaches Claude at all, made for a metric. Not worth it.
+        self.last_usage = None
         try:
             result = subprocess.run(
                 ["claude", "-p", "--model", self.model, prompt],

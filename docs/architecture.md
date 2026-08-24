@@ -149,18 +149,25 @@ AST10 failure itself.
 `skill.usf.yaml` itself is outside that surface — that is what stops the hash from
 depending on the field that carries it.
 
-Two of those four patterns match **no file in this repository**: no skill ships a
-`references/` directory or an `evals/evals.json`, so every stamped `content_hash` here is
-a digest over `SKILL.md` plus `scripts/*.py` and nothing else. The patterns are kept
-anyway, and `scripts/content_hash.py` splits them out as `POPULATED_SURFACE_GLOBS` /
-`UNPOPULATED_SURFACE_GLOBS` so the split is a value a test can read rather than a comment
-a reader has to trust: the day a skill adds one of those files it must enter the hash
-without anyone remembering to widen the tuple, because a surface definition that silently
-stops covering a shipped file is the AST10 metadata-loss shape.
+Three of those four patterns match a file in every skill, so every stamped `content_hash`
+here is a digest over `SKILL.md` plus `scripts/*.py` plus `evals/evals.json`. Only
+`references/*.md` is left over, and its glob results match **no file in this repository**:
+no skill ships a `references/` directory. That leftover pattern is kept anyway, and `scripts/content_hash.py` splits the four out as
+`POPULATED_SURFACE_GLOBS` / `UNPOPULATED_SURFACE_GLOBS` so the split is a value a test can
+read rather than a comment a reader has to trust: the day a skill adds a
+`references/notes.md` it must enter the hash without anyone remembering to widen the
+tuple, because a surface definition that silently stops covering a shipped file is the
+AST10 metadata-loss shape.
 `tests/scripts/test_content_hash.py::test_unpopulated_surface_globs_are_still_unpopulated`
 fails if that stops being true, and
 `test_shipped_content_hash_is_reproducible_from_the_populated_globs_alone` re-derives
-every skill's digest from `SKILL.md` + `scripts/*.py` alone to prove the claim.
+every skill's digest from the populated patterns alone to prove the claim.
+
+`evals/evals.json` was in the unmatched half until the with/without eval cases were
+authored. Every skill now ships one, the pattern moved to `POPULATED_SURFACE_GLOBS`, and
+every skill's `content_hash` was re-stamped in the same change — which is the behaviour
+the two tuples exist to force. Nothing about the hashing algorithm or the surface
+definition moved; only which patterns match a file did.
 
 ### `skills/<AST>/scripts/detector.py` — the mechanism
 
@@ -223,6 +230,30 @@ number in the repository can never be older than the corpus it describes:
   repository's own eleven packages, waived or not, with each waiver's written reason, plus
   a re-run through the bridge's wider scan view so the claim that scanning
   `skill.usf.yaml` as text finds nothing extra is measured rather than assumed.
+
+### `eval/skill_evals.py` — the third kind of evidence
+
+Judge scores grade the *text* of a `SKILL.md`; detector F1 grades the *scripts*. Neither
+grades what an agent holding the skill actually produces. `eval/skill_evals.py` runs every
+case in `skills/<AST>/evals/evals.json` **twice** — once with the skill's `SKILL.md`
+installed as the agent's operating instructions, once with that one block removed and
+nothing else changed — and the **delta between the two pass rates is the deliverable**.
+Both prompts are built by one function from one list of sections, so "the arms differ in
+exactly one respect" is a property of the construction rather than a claim about it, and
+each arm's `prompt.txt` is committed so the claim stays auditable after the run.
+
+The agent under test and the grader are always different models: the runner exits rather
+than let one model grade its own output, and both names are written into every
+`timing.json`, `grading.json` and `benchmark.json`. `eval/skill_eval_grade.py` is a
+stricter second pass over the same workspace — it blinds each run behind an opaque token,
+scrubs arm markers out of the text, rejects a PASS whose evidence does not quote the
+graded output, and classifies every assertion across the two arms into
+`assertion-review.json`. [`skill-eval-report.md`](skill-eval-report.md), written by
+`eval/generate_skill_eval_report.py`, is that surface's published page.
+
+It is a **third, separate** surface. A `pass_rate` there is not an F1 and not a judge
+total, the three are never averaged, and nothing on that surface reaches
+`scripts/ship_floor.py`.
 
 ### `fixtures/` — the evidence
 

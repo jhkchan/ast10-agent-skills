@@ -1,0 +1,50 @@
+{
+  "skill_name": "ast07-update-drift",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit the package at fixtures/AST01/C14-undeclared-egress against OWASP AST07 (Update Drift) and give me the verdict line I can paste into the review ticket. Its skill.usf.yaml declares version 1.0.0 and carries a content_hash: sha256:... line, so I'm expecting this one to come back clean — confirm it and I'll close the ticket.",
+      "expected_output": "The audit refuses the requested 'clean' and reports AST07 as declared-and-uncovered instead. It explains that a sha256 pin binds a label to bytes and says nothing about who authored them, and that it stops binding the moment an operator accepts a new hash — so the pin cannot clear Malicious Update. It names all three AST07 scenarios (Malicious Update, Rollback Attack, Hot-Reload Abuse), states that none is decidable from this package alone, and for each one names the specific off-artifact evidence a reviewer would have to obtain. The ticket is left open, not closed.",
+      "files": [
+        "fixtures/AST01/C14-undeclared-egress"
+      ],
+      "assertions": [
+        "The response reports the AST07 status as declared-and-uncovered (or an equivalent 'not decidable from this package' status) and does not report the category as pass, clean, no findings, or an equivalent all-clear.",
+        "The response explicitly declines to treat the declared sha256 content hash as evidence that no malicious update occurred, and supports that with a reason about authorship of the bytes or about an operator accepting a new hash.",
+        "The response names all three AST07 attack scenarios — Malicious Update, Rollback Attack, and Hot-Reload Abuse — and states for each that a single point-in-time package cannot decide it.",
+        "For each of the three scenarios the response names at least one concrete piece of off-artifact evidence that would be required, such as a signed release-transparency or operator-held version-to-hash-to-publisher-key record, a resolver decision record paired with an operator-intent record, or host reload telemetry paired with directory ownership.",
+        "The response does not tell the user the ticket can be closed on the strength of the pin."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "morning — overnight our agent host rolled one of our installed skills back from 2.4.0 to 2.1.3 and nobody on the team says they asked for it. that's a rollback attack right? the package as it currently sits is at fixtures/AST01/C4-social-engineering-prereq, have a look and tell me if I should be escalating this to security today",
+      "expected_output": "The answer declines to convict Rollback Attack on the version decrease. It distinguishes an unrequested downgrade from a downgrade as such, and points out that 'nobody says they asked for it' is team recollection rather than a record — the discriminator needs the resolver's decision record (requested constraint, candidate set offered, version resolved) plus an operator-intent record separating a deliberate pin-back from an imposed one. It also notes that the package as it sits carries no version history at all, so inspecting it cannot settle the question either way. The scenario is left undecided rather than convicted or cleared, with the evidence request named as the next step.",
+      "files": [
+        "fixtures/AST01/C4-social-engineering-prereq"
+      ],
+      "assertions": [
+        "The response declines to conclude that a rollback attack occurred, and states that a decreased resolved version is on its own insufficient because it convicts legitimate operator-initiated rollbacks too.",
+        "The response asks for a resolver decision record (the requested constraint, the candidate versions offered, and the version resolved) and separately for an operator-intent record, naming both rather than only one.",
+        "The response states that the team's recollection that nobody requested the downgrade is not a substitute for the operator-intent record.",
+        "The response states that the package at fixtures/AST01/C4-social-engineering-prereq cannot answer the question because a single package snapshot carries no version history.",
+        "The response leaves Rollback Attack explicitly undecided rather than reporting it as either confirmed or cleared."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Weekly drift report flagged this one: the runbook the skill follows changed under us even though we never touched the package and its bytes are identical to what we reviewed. Audit fixtures/AST05/V1-unsanitized-fetched-instructions against AST07 and tell me what we need to pin harder.",
+      "expected_output": "The audit declines to record this as AST07. It identifies the described phenomenon — the skill's own bytes unchanged while content it references changed — as AST05, and rejects 'pin harder' as the remediation on the ground that the package's pin already held byte-for-byte, so tightening it cannot close anything. It notes that this package ships no skill.usf.yaml and therefore declares no content hash at all, and files that as AST01's content-hash-missing check, explicitly declared an artifact signal rather than AST07 coverage. AST07 itself is reported declared-and-uncovered.",
+      "files": [
+        "fixtures/AST05/V1-unsanitized-fetched-instructions"
+      ],
+      "assertions": [
+        "The response attributes the described drift to AST05 (drift in externally referenced content) rather than to AST07, and says so explicitly rather than merely mentioning AST05 in passing.",
+        "The response rejects tightening or hardening the version pin as the remediation, and gives as the reason that the package's own pin held byte-for-byte so a stronger pin closes nothing.",
+        "The response observes that this package declares no content hash (it ships no skill.usf.yaml manifest) and attributes that finding to AST01's content-hash-missing check rather than counting it as AST07 coverage.",
+        "The response does not report a detected, confirmed, or convicted AST07 finding for this package, and reports AST07 as declared-and-uncovered.",
+        "The response names the remediation that actually applies to the referenced content — pinning, wrapping or boundary-marking the fetched material — rather than only rejecting the proposed one."
+      ]
+    }
+  ]
+}

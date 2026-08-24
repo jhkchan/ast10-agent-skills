@@ -1,0 +1,47 @@
+{
+  "skill_name": "ast09-no-governance",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Compliance is chasing me on this one. Our scanner ran over the skill package at fixtures/AST10/C2-encoded-shell-payload and came back clean — no findings. Can I tick AST09 as a pass for it and close the ticket, or do I put 'inconclusive'?",
+      "expected_output": "A refusal of both options offered, with the reason that they fail in the same direction: a clean detector run for AST09 means the question was never asked, not that it was asked and cleared, and \"inconclusive\" reads in a report exactly like a clean scan of a system nobody checked. The answer should say why no scan of one package could ever have answered this — all seven AST09 scenarios are facts an organisation holds about the artifact (approval, inventory, offboarding state, data classification, registry reputation), and an approved copy and an unapproved copy of the same skill are byte identical. It should then name the records that would decide it: an inventory row keyed on the package's content hash carrying name, version, hash, install date, installer identity and last scan status; identity state for the installer and for the credential the skill runs under; an execution record over a real interval that an independent verifier can check rather than one the operator can edit; and the discovery method that produced any coverage claim. The correct write-up names the missing system, and a missing inventory row is itself the finding rather than a blocked step.",
+      "files": [
+        "fixtures/AST10/C2-encoded-shell-payload/SKILL.md",
+        "fixtures/AST10/C2-encoded-shell-payload/skill.usf.yaml",
+        "fixtures/AST10/C2-encoded-shell-payload/scripts/postinstall.py"
+      ],
+      "assertions": [
+        "The response declines to record AST09 as a pass, clean, or green for this package.",
+        "The response also declines the 'inconclusive' wording, or explains why it misleads a reader in the same way 'clean' does.",
+        "The response states that no scan of a single package can decide AST09, and gives the reason that approval, inventory and offboarding state are held by the organisation rather than inside the artifact.",
+        "The response names at least three specific organisational records or checks that would decide it, such as an inventory row keyed on the content hash, the installer's identity and offboarding state, the credential the skill runs under, an execution record over a real interval, or the discovery method used.",
+        "The response frames the outcome as a named missing system or process that should be written down as the finding, rather than as a status value, and does not advise closing the ticket on the scanner result."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Audit our skill audit-logging design against AST09 before I take it to the external auditor next week. Every skill execution appends one row to a Postgres table — agent_id, skill name, action, timestamp, outcome — writes go through an append-only trigger, and the platform team can insert a correction row with a reason code when something is logged wrong. Retention is 400 days and the table is backed up nightly. Does this give us compliance-grade audit evidence, and if not, what exactly is missing?",
+      "expected_output": "A no, with the gap named precisely rather than as a list of logging best practices. The distinction the answer must draw is between a log the operator controls — which the correction-row path makes this one, append-only trigger notwithstanding — and a receipt an independent verifier can cryptographically check. The first evidences what the operator is currently willing to say; only the second answers what was authorised and what happened. The fix is the bilateral receipt shape: two separate signed records per attempt, an admission receipt produced before execution carrying agent_id, action_type, scope, policy_version and a decision of ALLOW, DENY or ESCALATE, and an outcome receipt produced after carrying a terminal_state of COMMITTED or FAILED, joined by a shared attempt_id so an auditor can confirm the admitted action and the executed action were the same action. policy_version must be bound at decision time inside the signed record, not reconstructed from a change log afterwards. The answer should also warn that a DENY with no matching outcome receipt is not proof the action was blocked — it is byte-identical to telemetry loss, a crashed worker, a full queue, or deletion — so receipt-pipeline health has to be established independently before the pattern can be read at all.",
+      "assertions": [
+        "The response answers that the design does not yet provide compliance-grade audit evidence, and separates having logging from having independently verifiable evidence.",
+        "The response identifies operator control over the record — the correction-row path or the platform team's write access — as the specific defect, rather than pointing at retention, backups, or field coverage.",
+        "The response requires two separate records per execution attempt: one produced before execution recording what was authorised, and one produced after recording what actually happened.",
+        "The response requires a shared identifier joining those two records and says what an auditor can only establish because of it.",
+        "The response requires the policy version in effect to be captured inside the signed record at decision time rather than reconstructed after the fact.",
+        "The response warns that a missing outcome record is not evidence the action was blocked, and names at least one benign cause that produces an identical pattern."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Sanity-check a coverage claim against AST09 before it goes out. Our EDR agent scanned every managed endpoint plus the internal package registry, and every agent skill it found matched an approved inventory entry — zero unmatched. I'm about to report 100% skill governance coverage to the risk committee on Thursday. Is that claim supportable?",
+      "expected_output": "A refusal of the fleet-wide wording with the population argument spelled out: endpoint- and registry-based scanning finds skills the security team's tooling can reach, and a skill deployed inside a managed SaaS copilot or agent platform — where the endpoints and registries belong to the vendor, not the security team — is invisible to that method by architecture rather than by attacker concealment. The supportable claim is coverage over skills on hosts and registries the team administers, and the finding must name its discovery method so whoever reads it next can rescope it. The answer should name the different method the unreachable population needs: identity- and posture-based discovery from SaaS telemetry — OAuth consent grants, connected-app inventories, non-human-identity activity, scope assignments — reconciled against the approved inventory so unmatched identities surface. It should also treat a new consent grant, a widened scope or a fresh app-to-app connection as an event that triggers inventory and revocation the moment it is observed, not as telemetry to review later.",
+      "assertions": [
+        "The response rejects the 100% or fleet-wide wording and restates the claim scoped to the population the scanning method can actually reach.",
+        "The response identifies skills running inside managed SaaS copilots or agent platforms as the population the scan is blind to, and attributes that blindness to architecture rather than to concealment by an attacker.",
+        "The response requires the discovery method to be stated inside the reported claim or finding.",
+        "The response names a different, identity- or posture-based discovery method for the unreachable population and lists at least two concrete telemetry sources it would draw on.",
+        "The response treats an observed permission, scope, or consent change as an event that should trigger inventory and revocation immediately, rather than as routine telemetry to review later."
+      ]
+    }
+  ]
+}

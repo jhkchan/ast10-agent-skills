@@ -117,6 +117,43 @@ class AdapterStatus:
             raise ValueError(f"{self.name}: unavailable AdapterStatus requires a non-empty reason")
 
 
+@dataclasses.dataclass(frozen=True)
+class TokenUsage:
+    """What one provider reported about the cost of one `judge()` call.
+
+    Added for `eval/skill_evals.py`, whose contract requires a real
+    `total_tokens` per run and forbids inventing one: "If a provider does not
+    return a token count, record what it does return and say so rather than
+    inventing a number." Bedrock's `converse` and the Anthropic-Messages
+    endpoint both return a usage block that the adapters were discarding; the
+    local `claude -p` print mode returns none at all. This type is how the
+    three answers stay distinguishable downstream — a count, a partial count,
+    or the absence of one with the reason attached.
+
+    Every field is Optional because a partial report is a real outcome: an
+    endpoint that returns input and output tokens but no total is recorded as
+    exactly that, and `total_tokens` is summed from the halves only when both
+    are present (see `from_pair`). `source` always names where the numbers came
+    from, so a reader of a timing.json never has to guess which API said what.
+    """
+
+    input_tokens: int | None
+    output_tokens: int | None
+    total_tokens: int | None
+    source: str
+
+    @classmethod
+    def from_pair(cls, input_tokens: int | None, output_tokens: int | None, source: str) -> TokenUsage:
+        """Usage for an endpoint that reports the two halves but no total."""
+        total = None
+        if input_tokens is not None and output_tokens is not None:
+            total = input_tokens + output_tokens
+        return cls(input_tokens=input_tokens, output_tokens=output_tokens, total_tokens=total, source=source)
+
+    def as_dict(self) -> dict:
+        return dataclasses.asdict(self)
+
+
 class ProviderAdapter(abc.ABC):
     """One judge-matrix provider seam. Concrete adapters own exactly one
     provider's transport and never see the rubric or scoring pipeline —
@@ -124,6 +161,14 @@ class ProviderAdapter(abc.ABC):
     T-2.3, `call_model`/`run_judge`)."""
 
     name: str
+
+    #: Token accounting from the MOST RECENT `judge()` call, or None when this
+    #: provider reported none. Every concrete adapter must reset it to None on
+    #: entry to `judge()` before doing anything else: a stale count carried
+    #: over from a previous call and attributed to this one would be a
+    #: fabricated measurement, which is the exact failure the field exists to
+    #: avoid. Nothing in the judge matrix reads it; `eval/skill_evals.py` does.
+    last_usage: TokenUsage | None = None
 
     @abc.abstractmethod
     def check_availability(self) -> AdapterStatus:

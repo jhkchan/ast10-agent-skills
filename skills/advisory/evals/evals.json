@@ -1,0 +1,47 @@
+{
+  "skill_name": "advisory",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Quick one before standup. Pentest report has this line: \"the skill was granted write access to production secrets and our scanner never flagged it\". Which OWASP AST bucket do I file it under? My instinct is AST08 because the scanner missed it.",
+      "expected_output": "AST03 as the single origin, with AST08 recorded as a contributing control failure that carries an owner and an action. The reasoning should be the preventer-versus-catcher test: the over-broad grant is what had to already be true for the finding to be possible and is what a fix would have prevented, while the missed detection is only a catcher, owned by whoever operates the scanner. The answer should correct the user's instinct explicitly and explain that \"our scanner missed it\" is the phrasing that most reliably captures a primary it does not own — AST08 is the origin only when the scanner or the scan result is itself the artifact under review. Exactly one primary is recorded, and the answer should note that routing decides ownership, not truth: it has not inspected the package and cannot confirm the finding.",
+      "assertions": [
+        "The response names exactly one primary or origin category and it is AST03.",
+        "The response records AST08 as a contributing control failure rather than as a second primary or a co-equal category.",
+        "The response attaches both an owner and an action to the contributing entry.",
+        "The response justifies the origin with a prevent-versus-catch distinction rather than by matching keywords in the finding's wording.",
+        "The response states the condition under which AST08 would instead be the origin: when the scanner, its coverage claim, or a scan result is itself the thing under review.",
+        "The response does not claim to have verified the finding or to have inspected any package."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Triage this for our tracker. I need one origin AST id, any contributing entries with an owner and an action against each, and an honest statement of what the receiving category can actually confirm. Finding as written by the auditor: \"A skill installed in 2024 by an engineer who left the company in March is still running under a service principal with tenant-wide admin consent. Nobody could tell us who approved the install, and it does not appear in any inventory we were shown.\" ",
+      "expected_output": "AST09 as the origin: nobody was in a position to know the artifact existed and no approval was ever recorded, which is missing installation control rather than missing version control — there is no approved baseline for this install to have drifted from, so AST07 does not apply. The tenant-wide admin consent reads like AST03 and the answer should say why that reading loses: the missing deprovisioning step is what had to be true, and if the grant was correctly sized for the skill's function while the installer was employed then AST03 does not apply at all and the contributing line should be dropped rather than listed as decoration. Any contributing entry that survives carries an owner and an action. The hand-off statement must be honest about what the receiving category can confirm: AST09 ships no detector, no fixture case and no published F1 — zero of seven scenarios are decidable from the package — so this goes to a person and a process, specifically revocation wired into the offboarding workflow, and the ticket must not be parked pending a scan that will never run.",
+      "assertions": [
+        "The response names exactly one origin category and it is AST09.",
+        "The response justifies AST09 as missing installation control rather than missing version control, for example by noting there is no approved baseline for the install to have drifted from.",
+        "The response states that AST09 ships no detector and that no scan of the package can confirm this finding.",
+        "The response warns against closing or parking the ticket pending a scan, and routes the hand-off to a named human process such as revocation wired into offboarding.",
+        "Every contributing entry the response lists carries both an owner and an action, or the response explains why a plausible contributing category such as the over-scoped credential was dropped instead of listed."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "A vendor sent us this package: fixtures/AST10/C2-encoded-shell-payload. Run it through the triage router and tell me which AST category it belongs to, so I can open the ticket in the right queue.",
+      "expected_output": "A redirect rather than a routing verdict. Triage routes a finding expressed in prose — a ticket, a pentest line item, a disclosure — and never opens the package under discussion; a package is the wrong input, and the correct next step is the relevant category skill's own entry point or the repository's audit path, because routing a package would mean scanning it and nothing here scans. Critically the answer must not manufacture a category for a package it has not examined, and must not report the package as a finding: this fixture is labelled clean, its two encoded blobs decode to a JSON settings object and a 1x1 PNG, and nothing is executed. If AST10 is named at all it should be named as where to audit, explicitly not as a decided classification, and the answer should separate the question routing answers (which category owns a finding) from the question it does not (whether the finding is true).",
+      "files": [
+        "fixtures/AST10/C2-encoded-shell-payload/SKILL.md",
+        "fixtures/AST10/C2-encoded-shell-payload/skill.usf.yaml",
+        "fixtures/AST10/C2-encoded-shell-payload/scripts/postinstall.py"
+      ],
+      "assertions": [
+        "The response declines to produce a routing verdict for a package and gives the reason: triage routes findings expressed in prose and does not scan or open packages.",
+        "The response redirects the user to a concrete alternative, such as the relevant category skill's own entry point or the repository's audit path.",
+        "The response does not assert that the package is malicious, vulnerable, or a confirmed finding in any AST category.",
+        "If the response names an AST category at all, it labels it as where to look or what to audit against rather than as a decided classification for this package.",
+        "The response distinguishes what routing decides (which category owns a finding) from what it does not decide (whether the finding is true), and states that it has not decided the latter."
+      ]
+    }
+  ]
+}

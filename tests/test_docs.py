@@ -55,6 +55,7 @@ DASHBOARD = REPO_ROOT / "docs" / "skill-judge-dashboard.md"
 ARCHITECTURE = REPO_ROOT / "docs" / "architecture.md"
 F1_REPORT = REPO_ROOT / "docs" / "f1-report.md"
 DOGFOOD_REPORT = REPO_ROOT / "docs" / "dogfood-report.md"
+SKILL_EVAL_REPORT = REPO_ROOT / "docs" / "skill-eval-report.md"
 AUDIT = REPO_ROOT / "config" / "audit.yml"
 FIXTURE_MANIFEST = REPO_ROOT / "fixtures" / "manifest.yaml"
 
@@ -435,10 +436,46 @@ def test_the_advisory_row_publishes_no_f1_because_it_has_no_corpus():
         "scenarios/registry.yaml",
         "scripts/ship_floor.py",
         "judge matrix",
+        # The third kind of evidence. Judge scores grade the text and detector F1
+        # grades the scripts; this is the only surface that grades an agent's output,
+        # and an architecture page that omitted it would describe a repository that
+        # measures two things when it measures three.
+        "eval/skill_evals.py",
+        "eval/skill_eval_grade.py",
+        "skill-eval-report.md",
     ],
 )
 def test_architecture_explains_every_moving_part(component):
     assert component in _flat(ARCHITECTURE), f"docs/architecture.md must explain how {component} fits in"
+
+
+@pytest.mark.parametrize(
+    "claim",
+    [
+        "delta between the two pass rates is the deliverable",
+        "always different models",
+        "never averaged",
+    ],
+)
+def test_architecture_states_the_three_rules_the_third_surface_lives_by(claim):
+    """Run it twice, never let one model grade itself, never mix the units."""
+    assert claim in _flat(ARCHITECTURE)
+
+
+def test_readme_distinguishes_all_three_kinds_of_evidence():
+    """A reader must be able to tell a pass_rate from an F1 from a judge total, and
+    the README is where most of them will meet all three for the first time."""
+    flat = _flat(README)
+    assert "Three kinds of evidence" in flat
+    for link in ("docs/skill-judge-dashboard.md", "docs/f1-report.md", "docs/skill-eval-report.md"):
+        assert link in flat, f"the README's evidence table must link {link}"
+    for question in (
+        "Is the **text** of a `SKILL.md` well written",
+        "Do the shipped Python check scripts separate",
+        "Does an agent **holding** a skill behave better",
+    ):
+        assert question in flat, "each surface needs a sentence saying what it answers, not only a name"
+    assert "never averaged with one another" in flat
 
 
 def test_architecture_carries_the_non_endorsement_note():
@@ -553,6 +590,7 @@ DOC_PATHS = {
     # still a document a reader checks and finds wrong.
     "docs/f1-report.md": F1_REPORT,
     "docs/dogfood-report.md": DOGFOOD_REPORT,
+    "docs/skill-eval-report.md": SKILL_EVAL_REPORT,
 }
 
 #: A backticked token is treated as a repository path only when its first

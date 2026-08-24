@@ -232,3 +232,95 @@ def test_anthropic_compatible_available_with_api_key(monkeypatch):
     monkeypatch.setenv(ZAI_API_KEY_ENV, "test-key")
     status = AnthropicCompatibleAdapter.from_env().check_availability()
     assert status.available is True
+
+
+# --- token accounting: what a provider reported, or the absence of it -------
+#
+# Added with `eval/skill_evals.py`, whose contract requires a real per-run
+# `total_tokens` and forbids inventing one. Three facts are pinned:
+# the count is read from the response rather than estimated; a provider that
+# reports nothing yields None rather than a plausible integer; and a previous
+# call's count can never be attributed to a later one.
+
+
+class _FakeBedrockClient:
+    """Stands in for boto3's bedrock-runtime client, `converse` only."""
+
+    def __init__(self, response):
+        self.response = response
+
+    def converse(self, **_kwargs):
+        if isinstance(self.response, Exception):
+            raise self.response
+        return self.response
+
+
+def _bedrock_with(monkeypatch, response):
+    import boto3
+
+    adapter = BedrockAdapter("nova-pro")
+    monkeypatch.setattr(boto3, "client", lambda *a, **k: _FakeBedrockClient(response))
+    return adapter
+
+
+_TEXT_ONLY = {"output": {"message": {"content": [{"text": "hello"}]}}}
+
+
+def test_bedrock_records_the_usage_block_converse_returns(monkeypatch):
+    response = dict(_TEXT_ONLY, usage={"inputTokens": 900, "outputTokens": 100, "totalTokens": 1000})
+    adapter = _bedrock_with(monkeypatch, response)
+    assert adapter.judge("p") == "hello"
+    assert adapter.last_usage.total_tokens == 1000
+    assert adapter.last_usage.input_tokens == 900
+    assert adapter.last_usage.output_tokens == 100
+    assert MODELS["nova-pro"] in adapter.last_usage.source
+
+
+def test_bedrock_records_no_usage_when_the_response_carries_none(monkeypatch):
+    adapter = _bedrock_with(monkeypatch, dict(_TEXT_ONLY))
+    adapter.judge("p")
+    assert adapter.last_usage is None
+
+
+def test_bedrock_never_carries_a_previous_calls_token_count_forward(monkeypatch):
+    """A stale count attributed to a later call is a fabricated measurement."""
+    import boto3
+
+    adapter = BedrockAdapter("nova-pro")
+    monkeypatch.setattr(boto3, "client", lambda *a, **k: _FakeBedrockClient(dict(_TEXT_ONLY, usage={"totalTokens": 7})))
+    adapter.judge("first")
+    assert adapter.last_usage.total_tokens == 7
+
+    monkeypatch.setattr(boto3, "client", lambda *a, **k: _FakeBedrockClient(RuntimeError("throttled")))
+    with pytest.raises(AdapterError):
+        adapter.judge("second")
+    assert adapter.last_usage is None
+
+
+def test_bedrock_ignores_a_usage_field_that_is_not_a_number(monkeypatch):
+    adapter = _bedrock_with(monkeypatch, dict(_TEXT_ONLY, usage={"totalTokens": "lots"}))
+    adapter.judge("p")
+    assert adapter.last_usage.total_tokens is None
+
+
+def test_token_usage_sums_a_pair_only_when_both_halves_are_present():
+    from adapters.base import TokenUsage
+
+    assert TokenUsage.from_pair(10, 5, "src").total_tokens == 15
+    assert TokenUsage.from_pair(10, None, "src").total_tokens is None
+    assert TokenUsage.from_pair(None, None, "src").total_tokens is None
+
+
+def test_claude_cli_reports_no_token_usage_and_says_so_by_being_none(monkeypatch):
+    """`claude -p` print mode returns the answer and nothing about cost."""
+    import subprocess
+
+    class _Completed:
+        returncode = 0
+        stdout = "an answer"
+        stderr = ""
+
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: _Completed())
+    adapter = ClaudeCliAdapter()
+    assert adapter.judge("p") == "an answer"
+    assert adapter.last_usage is None

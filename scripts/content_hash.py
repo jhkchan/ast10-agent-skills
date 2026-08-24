@@ -28,21 +28,29 @@ SURFACE_GLOBS = ("SKILL.md", "references/*.md", "scripts/*.py", "evals/evals.jso
 # Which of those patterns actually match a file in THIS repository, stated
 # rather than implied. An independent review found the docs describing the
 # hashed surface as if it contained `references/*.md` and `evals/evals.json`
-# when no skill here ships either, so every skill's content_hash is in fact a
-# digest over `SKILL.md` plus `scripts/*.py` and nothing else.
+# when no skill here shipped either, so the partition below was added to make
+# the claim a value a test can read rather than a comment a reader has to trust.
 #
-# The two unpopulated patterns are kept rather than deleted, for one reason:
-# the day a skill adds a `references/notes.md` or an `evals/evals.json`, that
-# file must enter the hash without anybody remembering to edit this tuple. A
-# surface definition that silently stops covering a shipped file is the AST10
-# metadata-loss shape. Removing the patterns would be hash-neutral today and a
-# trap tomorrow.
+# THE DAY ANTICIPATED IN THAT COMMENT HAS ARRIVED, and this is the record of it.
+# Every one of the eleven skills now ships an `evals/evals.json` — the
+# hand-authored with/without eval cases described at
+# https://agentskills.io/skill-creation/evaluating-skills — so that pattern moved
+# from UNPOPULATED to POPULATED and every skill's content_hash was re-stamped in
+# the same change. Nothing about the hashing algorithm moved; the surface
+# definition did not move either. What moved is which patterns match a file, and
+# that is exactly the event the two tuples exist to make loud: a surface
+# definition that silently stops covering a shipped file is the AST10
+# metadata-loss shape, and so is one that silently starts.
+#
+# `references/*.md` is still matched by no skill and is still kept rather than
+# deleted, for the same reason it was kept before: removing it would be
+# hash-neutral today and a trap the day a skill adds `references/notes.md`.
 #
 # `tests/scripts/test_content_hash.py::test_unpopulated_surface_globs_are_still_unpopulated`
 # fails the moment that changes, so the prose above cannot go stale quietly,
 # and `tests/test_docs.py` asserts the published docs say the same thing.
-POPULATED_SURFACE_GLOBS = ("SKILL.md", "scripts/*.py")
-UNPOPULATED_SURFACE_GLOBS = ("references/*.md", "evals/evals.json")
+POPULATED_SURFACE_GLOBS = ("SKILL.md", "scripts/*.py", "evals/evals.json")
+UNPOPULATED_SURFACE_GLOBS = ("references/*.md",)
 
 
 def _surface_files(skill_dir: Path) -> list[Path]:

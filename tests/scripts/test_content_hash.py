@@ -5,12 +5,19 @@ uses to bind a judged block to "the current content" of a skill's shipped
 surface, defined by SURFACE_GLOBS as
 (SKILL.md, references/*.md, scripts/*.py, evals/evals.json).
 
-Two of those four patterns match nothing in this repository today, so every
-shipped skill's content_hash is a digest over SKILL.md plus scripts/*.py.
-The tmp_path tests below exercise the full glob set on purpose — the hasher
-must keep working for a surface this repo does not currently populate — and
+One of those four patterns matches nothing in this repository today
+(references/*.md), so every shipped skill's content_hash is a digest over
+SKILL.md plus scripts/*.py plus evals/evals.json. The tmp_path tests below
+exercise the full glob set on purpose — the hasher must keep working for a
+surface this repo does not currently populate — and
 test_unpopulated_surface_globs_are_still_unpopulated pins the claim about the
 real skills/ tree so the published docs cannot go stale unnoticed.
+
+evals/evals.json crossed from the unpopulated half to the populated one when
+the with/without eval cases were authored, and every skill's content_hash was
+re-stamped in that same change. That crossing is the event these partition
+tests exist to make loud, and it is the reason the tuples are values rather
+than prose.
 """
 
 from __future__ import annotations
@@ -113,10 +120,11 @@ def test_unpopulated_surface_globs_are_still_unpopulated():
     """Guards a documented claim, not an implementation detail.
 
     README.md, docs/architecture.md and every skill.usf.yaml state that
-    `references/*.md` and `evals/evals.json` contribute nothing to any shipped
-    content_hash because no skill ships them. The day one does, that prose is
-    wrong — and a reader who believed it would mis-recompute the hash. Fail
-    here rather than let the docs drift.
+    `references/*.md` contributes nothing to any shipped content_hash because
+    no skill ships one. The day one does, that prose is wrong — and a reader
+    who believed it would mis-recompute the hash. Fail here rather than let the
+    docs drift. `evals/evals.json` was in this half until every skill authored
+    one; that is what moving a pattern to POPULATED_SURFACE_GLOBS looks like.
     """
     matched: list[str] = []
     for skill in sorted(d for d in SKILLS_DIR.iterdir() if (d / "SKILL.md").is_file()):

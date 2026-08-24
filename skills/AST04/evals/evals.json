@@ -1,0 +1,51 @@
+{
+  "skill_name": "ast04-insecure-metadata",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Got a skill package off a teammate and it feels off. It's at fixtures/AST04/V1-yaml-frontmatter-injection/ — a SKILL.md, a metadata.yaml sidecar, and scripts/loader.py that reads the sidecar at load time. Is it dodgy? If it is, tell me what to change and how many separate changes I'm actually making.",
+      "expected_output": "A verdict of vulnerable that separates the two halves of the finding instead of merging them. The payload half is the `!!python/object/apply:os.system ['id']` tag sitting in metadata.yaml; the call-site half is `yaml.load(fh.read())` in scripts/loader.py with no `Loader=` argument, so PyYAML's legacy default constructs that tag rather than rejecting it. The remediation is two changes, not one: pin the loader to `yaml.safe_load` / `SafeLoader`, and delete the tag from the sidecar — fixing either alone leaves a live defect, because a package can ship a payload for a loader it does not bundle and can bundle a loader for a payload that arrives later. `FullLoader` must not be offered as the fix. The response should also note that this package's own SKILL.md frontmatter is benign, so the finding is in the sidecar plus the bundled loader.",
+      "files": [
+        "fixtures/AST04/V1-yaml-frontmatter-injection/SKILL.md",
+        "fixtures/AST04/V1-yaml-frontmatter-injection/metadata.yaml",
+        "fixtures/AST04/V1-yaml-frontmatter-injection/scripts/loader.py"
+      ],
+      "assertions": [
+        "The output names metadata.yaml and scripts/loader.py as two distinct pieces of evidence, not as one finding with one location.",
+        "The output identifies the `!!python/object/apply` tag in metadata.yaml as the code-executing payload AND identifies the `yaml.load(...)` call with no `Loader=` argument in scripts/loader.py as the unsafe call site.",
+        "The output prescribes `yaml.safe_load` or `SafeLoader` as the acceptable loader and does not present `FullLoader`, `UnsafeLoader`, or a bare `yaml.load()` as an acceptable remediation.",
+        "The output states that remediating only one of the two halves leaves the other defect in place, i.e. it counts at least two required changes.",
+        "The output attributes the finding to metadata.yaml and scripts/loader.py rather than to the SKILL.md frontmatter of this package."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Audit the package at fixtures/AST04/V9-risk-tier-spoofing against AST04 and report any metadata contradictions. I only need the contradiction and the fix — the permission block itself was signed off by the platform team last quarter and is not up for renegotiation.",
+      "expected_output": "A single AST04 finding: the manifest self-classifies as `risk_tier: L0` while declaring `shell: true` together with an effective write (`reports/summary.md`), a permission set whose derived floor is L3. The contradiction is between the declared tier and the floor derived from the permissions — not between the permissions and anything else. The response should state that the comparison is one-directional: only a tier declared strictly below its derived floor is a finding, and declaring above the floor is conservative and must not be flagged. Because the permission set is out of scope by the user's own framing, the correct remediation is to raise the declared tier to match the floor, not to narrow the permissions.",
+      "files": [
+        "fixtures/AST04/V9-risk-tier-spoofing/SKILL.md"
+      ],
+      "assertions": [
+        "The output reports a risk-tier contradiction and names the declared value `L0` as the under-declaration.",
+        "The output derives the floor from the declared permissions and names both contributing grants — shell execution and a non-shadowed write entry — rather than asserting a tier from the prose.",
+        "The output states that a tier declared ABOVE its derived floor is not a finding, i.e. the check is one-directional.",
+        "The output's remediation corrects the declared `risk_tier` rather than reducing or rewriting the permission block."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Sign-off request. We want to publish fixtures/AST04/C8-permission-understating to the internal marketplace this afternoon. It ships scripts/fetch.sh which shells out to curl twice, and the manifest declares shell: true with network.allow: [api.weather.example]. Does AST04 block the approval? Give me the sign-off line I can paste into the ticket.",
+      "expected_output": "AST04 does not block: every destination reached by scripts/fetch.sh is api.weather.example, which the manifest declares, so there is no declared-versus-code contradiction and no permission-understating finding. The response must not convict on the mere presence of an egress primitive (curl) or on `shell: true` — that is the false positive this fixture exists to catch. The declared `shell: true` should be routed to AST03 if it is raised at all: an honest declaration that may be broader than the function needs is over-privilege, not misdeclaration. The sign-off line must be qualified rather than a blanket clean: two AST04 questions are not decidable from package bytes — brand impersonation needs an external trademark/vendor-namespace corpus the package does not carry, and the staged loader resolves its payload off-artifact at install time.",
+      "files": [
+        "fixtures/AST04/C8-permission-understating/SKILL.md",
+        "fixtures/AST04/C8-permission-understating/scripts/fetch.sh"
+      ],
+      "assertions": [
+        "The output reports no AST04 permission-understating finding and states that every host reached in scripts/fetch.sh appears on the manifest's declared allowlist.",
+        "The output does not treat the presence of curl, an egress call, or `shell: true` as itself an AST04 finding.",
+        "The output qualifies the pass by naming at least one AST04 question that package bytes cannot settle — brand impersonation (needs an external trademark or vendor-namespace corpus) and/or the staged loader (payload resolves off-artifact at install).",
+        "If the output raises the breadth of the declared `shell: true` at all, it attributes that to AST03 over-privilege rather than to AST04 misdeclaration."
+      ]
+    }
+  ]
+}

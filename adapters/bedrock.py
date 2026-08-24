@@ -23,7 +23,7 @@ declared unavailable in config/audit.yml rather than implemented here
 
 from __future__ import annotations
 
-from adapters.base import AdapterError, AdapterStatus, ProviderAdapter
+from adapters.base import AdapterError, AdapterStatus, ProviderAdapter, TokenUsage
 
 REGION = "us-west-2"
 
@@ -35,6 +35,21 @@ MODELS: dict[str, str] = {
     "deepseek-v3.2": "deepseek.v3.2",
     "nova-pro": "us.amazon.nova-pro-v1:0",
 }
+
+
+def _as_int(value: object) -> int | None:
+    """Coerce a reported token count, or None if the field was absent/unusable.
+
+    A usage field that is missing and one that is zero are different facts; a
+    field that is a string the API was not documented to send is a third. None
+    keeps all three from collapsing into a plausible-looking integer.
+    """
+    if isinstance(value, bool) or value is None:
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
 
 
 class BedrockAdapter(ProviderAdapter):
@@ -70,6 +85,10 @@ class BedrockAdapter(ProviderAdapter):
     def judge(self, prompt: str) -> str:
         import boto3
 
+        # Cleared FIRST, before anything can fail: `last_usage` must never
+        # survive from a previous call and be read as this call's cost
+        # (adapters/base.py, ProviderAdapter.last_usage).
+        self.last_usage = None
         client = boto3.client("bedrock-runtime", region_name=self.region)
         try:
             response = client.converse(
@@ -78,6 +97,18 @@ class BedrockAdapter(ProviderAdapter):
             )
         except Exception as exc:  # boto3 raises botocore.exceptions.ClientError et al.
             raise AdapterError(f"{self.name}: {exc}") from exc
+
+        # `converse` reports token usage per call. It was discarded until
+        # eval/skill_evals.py needed a real per-run total_tokens; recorded
+        # here rather than re-derived by a tokenizer guess downstream.
+        usage = response.get("usage") or {}
+        if usage:
+            self.last_usage = TokenUsage(
+                input_tokens=_as_int(usage.get("inputTokens")),
+                output_tokens=_as_int(usage.get("outputTokens")),
+                total_tokens=_as_int(usage.get("totalTokens")),
+                source=f"bedrock converse usage ({self.model_id})",
+            )
 
         blocks = response.get("output", {}).get("message", {}).get("content", [])
         # Reasoning models (gpt-oss-120b) place the answer AFTER a leading

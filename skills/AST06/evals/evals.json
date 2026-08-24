@@ -1,0 +1,47 @@
+{
+  "skill_name": "ast06-weak-isolation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Found fixtures/AST06/V3-unrestricted-sudo sitting in a shared workspace folder on a dev box. scripts/install.py runs `sudo cp` of a plist into /Library/LaunchDaemons and then launchctl loads it. Our manifest linter passed the package because the declared write scope is just ./sandbox/install.log. What do I file, and what do I tell the linter owner?",
+      "expected_output": "File AST06-S01 Host Escape, decided by the script disjunct: a bundled-script call site shells out to a host persistence location outside the skill's own tree. Say explicitly which disjunct fired and which stayed silent — the declared write scope really is narrow (./sandbox/install.log), so the root-write-scope disjunct returns negative and the linter behaved correctly within its remit; the two disjuncts are independent and a negative on one is not a pass on the other. The consequence worth stating: uninstalling the skill removes install.py but does not remove the registered launch agent, so the persistence outlives the package. The remediation must not be 'tighten the manifest' — an isolation finding says no boundary enforces the manifest, so narrowing a write list the runtime never reads closes a ticket and leaves the host unchanged, and it files an AST03-shaped fix against an AST06 cause.",
+      "files": [
+        "fixtures/AST06/V3-unrestricted-sudo/SKILL.md",
+        "fixtures/AST06/V3-unrestricted-sudo/scripts/install.py"
+      ],
+      "assertions": [
+        "The output reports a Host Escape finding and names the bundled-script persistence call site (the sudo/launchd write into /Library/LaunchDaemons) as the evidence.",
+        "The output states that the declared write scope is narrow and therefore that the manifest/write-scope disjunct is silent for this package, explaining why the manifest linter passed it.",
+        "The output states that the planted persistence survives removal of the skill.",
+        "The output does not offer narrowing or tightening the declared write scope as the remediation for the host-escape finding."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Audit fixtures/AST06/C4-unrestricted-sudo against AST06 Host Escape and give me a verdict with the evidence. Note that scripts/install.py does call sudo — `subprocess.run(['sudo','apt-get','--version'])` — and writes ./sandbox/install.log. I need to know whether the sudo call alone is disqualifying and how much of AST06 this audit actually covered.",
+      "expected_output": "No Host Escape finding. The sudo call is a privilege requirement, not an act: no call site in the package targets a persistence location (no cron table, systemd unit, shell rc, or launch agent), and the runtime state it writes stays inside the skill's own sandbox directory. An unbounded shell grant is a capability and a category precondition; AST06-S01's defining condition is an act, and promoting the capability into a detection flags a superset of packages that never write outside their own tree. The coverage statement is the other half of the answer: a package scan decides one of AST06's five scenarios. Bind address, workspace-over-bundled precedence and skill shadowing, hot-reload behaviour, and cross-agent shared state are properties of a deployment, not of a package, and this audit says nothing about them — a one-of-five result reported without that ratio reads as containment.",
+      "files": [
+        "fixtures/AST06/C4-unrestricted-sudo/SKILL.md",
+        "fixtures/AST06/C4-unrestricted-sudo/scripts/install.py"
+      ],
+      "assertions": [
+        "The output reports no Host Escape finding for this package.",
+        "The output states that the sudo call is not itself the finding, giving as the reason that no call site targets a host persistence location and that a shell or privilege grant is a capability rather than the act the scenario requires.",
+        "The output names at least three AST06 concerns the package scan could not decide, drawn from bind address, workspace-over-bundled precedence or skill shadowing, hot-reload behaviour, and cross-agent shared state, and attributes them to the deployment rather than to the package.",
+        "The output does not present the negative package scan as evidence that the deployment is isolated or that AST06 is closed."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Security opened an AST06 finding against our agent runtime and I'd like to close it today. Two facts: we do ship a container sandbox — operators enable it with one line in config — and the control WebSocket only listens on 127.0.0.1, never 0.0.0.0. I can attach the vendor security page and the config reference. Is that enough to close it?",
+      "expected_output": "No, and for two independent reasons. A sandbox that is available if configured is evidence for the finding rather than against it: the population that gets compromised is the population running the default, and the default here is host mode. And loopback binding is not isolation without authentication — a browser-origin WebSocket client bypassed origin checks and authentication throttling on a loopback-bound agent gateway in ClawJacked (CVE-2026-32025), so 'localhost-only' has already failed as a containment argument in public. The response must also change the subject to the right object: a vendor security page and a config reference are evidence about the product, and the finding is about this deployment. What closes it is evidence that this instance runs sandboxed by default and that host mode requires a documented, explicit opt-in, plus authentication on the control interface.",
+      "assertions": [
+        "The output declines to close the finding on the evidence offered.",
+        "The output states that a sandbox which is optional or available-if-configured is evidence for the finding, because the exposed population is the one running the default execution mode.",
+        "The output states that a loopback-bound control interface is not sufficient isolation without authentication, and cites the named precedent (ClawJacked / CVE-2026-32025) or an equivalent documented loopback WebSocket bypass.",
+        "The output distinguishes evidence about the product (vendor page, config reference, capability statement) from evidence about the deployment, and states that only the latter can close the finding.",
+        "The output names the specific evidence that would close it: this deployment runs sandboxed by default with host mode behind a documented explicit opt-in."
+      ]
+    }
+  ]
+}

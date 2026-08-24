@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import os
 
-from adapters.base import AdapterError, AdapterStatus, ProviderAdapter
+from adapters.base import AdapterError, AdapterStatus, ProviderAdapter, TokenUsage
 
 ZAI_BASE_URL = "https://api.z.ai/api/anthropic"
 ZAI_API_KEY_ENV = "ZAI_API_KEY"
@@ -54,6 +54,10 @@ class AnthropicCompatibleAdapter(ProviderAdapter):
     def judge(self, prompt: str) -> str:
         import requests
 
+        # See adapters/base.py, ProviderAdapter.last_usage: cleared before the
+        # call so a previous call's count can never be read as this one's.
+        self.last_usage = None
+
         try:
             response = requests.post(
                 f"{self.base_url}/v1/messages",
@@ -72,6 +76,16 @@ class AnthropicCompatibleAdapter(ProviderAdapter):
             raise AdapterError(f"{self.name}: HTTP {response.status_code}: {response.text[:500]}")
 
         payload = response.json()
+        # The Anthropic Messages shape reports input/output tokens but no
+        # total; TokenUsage.from_pair sums them only when both are present,
+        # so a half-reported call stays half-reported.
+        usage = payload.get("usage") or {}
+        if usage:
+            self.last_usage = TokenUsage.from_pair(
+                input_tokens=usage.get("input_tokens"),
+                output_tokens=usage.get("output_tokens"),
+                source=f"anthropic-messages usage ({self.model})",
+            )
         for block in payload.get("content", []):
             if block.get("type") == "text":
                 return block["text"]

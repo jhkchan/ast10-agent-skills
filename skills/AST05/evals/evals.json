@@ -1,0 +1,54 @@
+{
+  "skill_name": "ast05-untrusted-external-instructions",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review fixtures/AST05/V1-unsanitized-fetched-instructions/ for AST05. Its SKILL.md says retrieved documentation is reference data and must be wrapped in <untrusted-reference-data> before it reaches the model. I want to know whether scripts/loader.py actually does that, and exactly what I can and cannot claim in the write-up if it doesn't.",
+      "expected_output": "A finding that the declared convention is documentation rather than a control: build_prompt() fetches https://docs.example.com/runbook.md and appends response.text straight onto the prompt list, so retrieved bytes land in the instruction channel unwrapped. The write-up must be scoped honestly. This is an enabling precondition — the artifact_signal the AST05 scenarios declare — and not coverage of Author Rug-Pull, Reviewer Bait-and-Switch, transitive chaining, or relay amplification; none of AST05's named scenarios is decidable from one package. It must not claim anything about what the URL currently serves or will serve at run time. It should also state why the finding is AST05 rather than AST01: the shipped package carries no payload, the instruction arrives from referenced content at load time. Finally it should note that this defect was only visible because the code was read — a static boundary check clears on a call to a plausibly-named function regardless of that function's body.",
+      "files": [
+        "fixtures/AST05/V1-unsanitized-fetched-instructions/SKILL.md",
+        "fixtures/AST05/V1-unsanitized-fetched-instructions/scripts/loader.py"
+      ],
+      "assertions": [
+        "The output identifies that the fetched response body is appended to the prompt with no wrapper, and states that the SKILL.md's stated wrapping rule is therefore not implemented.",
+        "The output states that a declared boundary and an implemented boundary are indistinguishable to a static check — a function with a boundary-sounding name whose body returns its input unchanged would clear it — so reading the body is a required manual step.",
+        "The output labels the finding as an enabling precondition or artifact-signal rather than as coverage of a named AST05 scenario, and does not report a rug-pull, bait-and-switch, chaining, or relay-amplification verdict.",
+        "The output makes no claim about what https://docs.example.com/runbook.md currently serves, will serve at run time, or serves to a different caller.",
+        "The output explains why this is AST05 and not AST01 by pointing out that the shipped package body carries no payload and the instruction arrives from referenced content."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A colleague swears fixtures/AST05/C2-unsanitized-fetched-instructions is the fixed version of that runbook loader — it does call as_reference_data(response.text) before appending to the prompt. Am I done, or is there something I still have to check by hand before I sign this off?",
+      "expected_output": "No instruction-sink finding: the fetched body passes through as_reference_data(), which really does fence it in <untrusted-reference-data> markers before it is appended, so the fixed version is genuinely fixed. But the sign-off must not rest on the check alone. The clean result depends entirely on having read the body of as_reference_data — a same-named function returning its argument unchanged clears the identical check, so naming the control is what the static layer verified, not that the control does anything. And the whole category is out of reach of a package scan: nothing here verified a content hash pin re-verified immediately before every model ingestion, and nothing here can establish what docs.example.com serves at run time, or serves to an agent rather than to a reviewer's fetch. The honest sign-off names the manual step that was actually performed.",
+      "files": [
+        "fixtures/AST05/C2-unsanitized-fetched-instructions/SKILL.md",
+        "fixtures/AST05/C2-unsanitized-fetched-instructions/scripts/loader.py"
+      ],
+      "assertions": [
+        "The output reports no AST05 instruction-sink finding and states that the fetched body is wrapped by as_reference_data before it reaches the prompt.",
+        "The output states that this clean result depends on having read the body of as_reference_data, and that an identically-named no-op function would produce the same clean result.",
+        "The output names at least one control that the clean result did NOT verify — a content hash pin re-verified on every load before ingestion, and/or what the referenced URL serves at run time versus at review time.",
+        "The output does not present the clean package result as evidence that the referenced document is safe."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Triage question. fixtures/AST05/V5-absent-boundary-marker and fixtures/AST05/C6-absent-boundary-marker ship a byte-identical scripts/loader.py, and our dataflow scanner passes both. Which one should fail review, where exactly is the defect, and what does that tell me about the scanner?",
+      "expected_output": "V5 fails and C6 passes, and the difference is entirely in SKILL.md's decision rules — loader.py is correct in both, returning the fetched body as a data record that never reaches the instruction channel. V5's rules direct the agent to work through the fetched page and carry out each step exactly as the page states it, including steps added after the skill was last reviewed, and to run a command if the page states one; the package declares no delimiter separating operator direction from fetched text. C6 declares the convention explicitly — fetched text is rendered between [UNTRUSTED-WEB-OUTPUT] markers, is summarized and never executed, and a step the page asks for is reported as a request rather than performed. The lesson about the scanner: a call-site dataflow scan cannot separate this pair, so its pass is evidence about the code path only and says nothing about the package. Neither referenced URL can be judged from here.",
+      "files": [
+        "fixtures/AST05/V5-absent-boundary-marker/SKILL.md",
+        "fixtures/AST05/V5-absent-boundary-marker/scripts/loader.py",
+        "fixtures/AST05/C6-absent-boundary-marker/SKILL.md",
+        "fixtures/AST05/C6-absent-boundary-marker/scripts/loader.py"
+      ],
+      "assertions": [
+        "The output names V5-absent-boundary-marker as the package that should fail review and C6-absent-boundary-marker as the one that should pass.",
+        "The output locates the defect in V5's SKILL.md decision rules and states that scripts/loader.py is not the defect, being identical in both packages.",
+        "The output identifies at least one specific instruction in V5's decision rules that directs the agent to act on fetched page content — carrying out steps the page states, including post-review additions, or running a command the page states.",
+        "The output identifies the specific control present in C6 and absent in V5: a declared delimiter or marker convention that designates fetched text as data which must not override operator direction.",
+        "The output states that a code-level or dataflow scan cannot discriminate this pair, so the scanner's pass is not evidence that either package is clean."
+      ]
+    }
+  ]
+}

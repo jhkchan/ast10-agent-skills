@@ -742,7 +742,7 @@ python3 scripts/refusal_ledger.py               # every discarded judgment must 
 ruff check . && ruff format --check .           # exactly what CI runs; see ruff.toml
 ```
 
-Two of those write documents that are committed alongside the code, and both are
+Some of those write documents that are committed alongside the code, and each is
 regenerated-and-compared by the test suite rather than trusted:
 
 - [`docs/f1-report.md`](docs/f1-report.md) — every category's measured precision,
@@ -753,6 +753,32 @@ regenerated-and-compared by the test suite rather than trusted:
   detector over this repository's own eleven skill packages, waived or not, with
   the reason for each waiver. Written by
   `python3 scripts/dogfood.py --markdown --out docs/dogfood-report.md`.
+- [`docs/skill-eval-report.md`](docs/skill-eval-report.md) — the **with/without**
+  eval delta. Written by `python3 eval/generate_skill_eval_report.py` from the
+  committed runs under `eval/skill-eval-workspace/`.
+
+### Three kinds of evidence, and what each one answers
+
+They use three different units and are never averaged with one another:
+
+| Surface | The question it answers |
+| --- | --- |
+| [Judge scores](docs/skill-judge-dashboard.md) | Is the **text** of a `SKILL.md` well written against the pinned eight-dimension rubric? No prompt is ever executed. Unit: a total out of 120. |
+| [Detector F1](docs/f1-report.md) | Do the shipped Python check scripts separate this repository's own labelled vulnerable and clean fixtures? Real output measurement — of the scripts, not of an agent. Unit: precision/recall/F1 per category. |
+| [With/without evals](docs/skill-eval-report.md) | Does an agent **holding** a skill behave better than the same agent holding nothing? Unit: the fraction of a case's hand-authored assertions a graded response satisfied, and the **delta** between the two arms. |
+
+Only the third one has ever measured an agent's output. Every case in
+`skills/*/evals/evals.json` runs twice — once with the skill installed, once
+without it and nothing else changed — and the delta is the deliverable. The agent
+under test and the grader are always different models, and both are recorded in
+every artifact. Nothing on that surface feeds the ship gate.
+
+```bash
+python3 eval/skill_evals.py --dry-run            # the plan; writes nothing, calls nothing
+python3 eval/skill_evals.py                      # run every case in both arms, grade, aggregate
+python3 eval/skill_eval_grade.py review          # which assertions the skill actually moved
+python3 eval/generate_skill_eval_report.py       # publish docs/skill-eval-report.md
+```
 
 Reformatting a skill's `scripts/*.py` changes the bytes its `content_hash` covers, so the
 manifests have to be re-stamped afterwards or `validators/usf.py` will (correctly) report
