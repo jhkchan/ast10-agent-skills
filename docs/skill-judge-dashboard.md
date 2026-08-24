@@ -8,6 +8,25 @@ This repository is an independent community implementation. It is **not** an off
 OWASP project and carries no OWASP endorsement — see [`../README.md`](../README.md) and
 [`../NOTICE`](../NOTICE).
 
+> ## Which rule produced the table on this page
+>
+> **Every verdict published here is run 4's, issued under the rule in force when run 4 was
+> scored: `mean ≥ 108` AND `mean − stdev ≥ 105` AND the per-dimension floors.** That second
+> clause was retired on 2026-08-24 by
+> [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md), which replaced it with
+> `mean − 1.0 × stdev/√n ≥ 108` — a confidence bound on the mean rather than a spread statistic.
+> **The gate has been changed exactly once, and that is the change.**
+>
+> The board below is **not** re-gated under the new rule and must not be. A verdict re-issued
+> under a rule that did not produce it is a fabricated measurement, and ADR-0006 forbids it in
+> as many words. The table is frozen until **run 5**, the first run judged under the new clause,
+> replaces it. What ADR-0006 records about the difference, and what running the new gate over
+> this same corpus confirms: **nine of eleven ship under either rule, zero verdicts change**, and
+> the only row the change touches at all is `AST09`, which moves from *blocked by a spread
+> statistic* to *blocked by a confidence bound* without moving from BLOCKED.
+>
+> The rule now in force is published under [The ship rule](#the-ship-rule) below.
+
 > ## Judged run recorded — run 4, 2026-08-24
 >
 > **Nine of eleven skills clear the ship rule, and no gate constant moved to get there.**
@@ -31,9 +50,12 @@ OWASP project and carries no OWASP endorsement — see [`../README.md`](../READM
 > of 108.2, all eight dimension means above their floors, and `108.2 - 4.85 = 103.4 < 105`.
 > That clause is [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md)'s
 > subject, and `AST09` is now the single clean instance of the defect it describes: one
-> skill, one reason, and the reason is not about the skill. The defect is recorded and
-> deliberately **not** fixed here — a bar changed after seeing the run it is applied to is
-> not a bar.
+> skill, one reason, and the reason is not about the skill. The defect was recorded and
+> deliberately **not** fixed on this run — a bar changed after seeing the run it is applied to
+> is not a bar. It was fixed afterwards, by
+> [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md), with the constant fixed before
+> the run it judges. Under that clause `AST09` is still BLOCKED (`108.2 − 1.18 = 107.0 < 108`):
+> the correction changed the reason, not the outcome.
 >
 > **`bedrock/qwen3-235b` is flagged NON-DISCRIMINATING again, and it is still pooled.** It
 > ranked the roster in run 3 and was recorded as COARSE. In run 4 it still ranks, but the
@@ -89,11 +111,19 @@ OWASP project and carries no OWASP endorsement — see [`../README.md`](../READM
 > [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md), "What the two instrument
 > changes did to the panel".
 >
-> **No gate constant moved.** `FLOORS`, `POOLED_TARGET` (108), `POOLED_LOWER_BOUND` (105),
-> `MIN_ROUNDS` and the rubric pin are exactly as vendored. Rebuilding the instrument is not
-> permission to move the bar, and neither is a run that would have shipped more skills without
-> it. ADR-0005's claim that the bar was never retuned still holds across all four runs.
-> Held by `tests/scripts/test_judge_harness.py` and `tests/test_calibration.py`.
+> **No gate constant moved with the prompt rebuild, or with any of the four recorded runs.**
+> `FLOORS`, `POOLED_TARGET` (108), `POOLED_LOWER_BOUND` (105), `MIN_ROUNDS` and the rubric pin
+> were exactly as vendored throughout runs 1-4. Rebuilding the instrument is not permission to
+> move the bar, and neither is a run that would have shipped more skills without it.
+>
+> **The gate has since been changed exactly once, and only once**: on 2026-08-24, after run 4
+> was published, [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md) retired the
+> `mean − stdev ≥ 105` clause in favour of `mean − 1.0 × stdev/√n ≥ 108`. It was changed because
+> the retired clause was shown not to be a function of the artifact — `AST08` is byte-identical
+> between runs 3 and 4 and that clause alone flipped its verdict — and it was recorded, with its
+> constant fixed, **before** the run it judges. Nothing else in the gate moved. Held by
+> `tests/scripts/test_judge_harness.py` and `tests/test_calibration.py`, which pin the live
+> constants and require ADR-0006 to document each of them.
 
 ---
 
@@ -144,7 +174,11 @@ Two things this table does **not** say. `AST08`'s BLOCKED → SHIP is **not** an
 `SKILL.md` is byte-identical across the two runs and its `D3` fell. It shipped because the
 panel's sigma narrowed and lifted its `mean − sigma` from 104.6 to 106.1 — the lower-bound
 defect [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) describes, visible in
-the flattering direction for once. And a controlled result over eleven artifacts with one
+the flattering direction for once. **This row is the evidence that retired that clause.** A gate
+that is not a function of the artifact is not a gate, and
+[ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md) replaced it on the strength of
+exactly this comparison; under the confidence bound `AST08` is SHIP in both runs (`108.8`, then
+`109.7`). And a controlled result over eleven artifacts with one
 treatment arm is evidence, not proof: the pooled mean rose across the board, so some of every
 skill's movement is panel-level and only the treated-versus-control *contrast* is attributable.
 The contrast is the finding. `D3` anti-patterns are load-bearing rather than decorative, and
@@ -171,8 +205,13 @@ not measurement noise. The panel has kept closing up: the spread was 16.5 in run
 run 3, four of the six judges now sit within 1.8 points of the pooled mean, and what remains is
 carried by the two ends, `bedrock/qwen3-235b` at +6.7 and `bedrock/gpt-oss-120b` at -4.9.
 Per-skill sigma runs **3.74 to 6.04** (median 4.67) against the 3.3 `ship_floor.py` was calibrated on, which makes `mean - sigma >= 105` demand a mean of **108.7 to 111.0** (90.6% to 92.5% of 120) rather than the 108 (90.0%) it names.
-These figures are diagnostics: no gate constant is read from them and none was changed. See
-[ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md).
+That implied-bar arithmetic describes the clause **as it stood for run 4** and is why it was
+retired; the rule now in force asks `mean − 1.0 × stdev/√n ≥ 108`, whose bar at this panel's
+median sigma and n is 109.1 and falls as evidence accumulates. These figures are diagnostics: no
+gate constant is read from them, and none was changed on the strength of them — the change is
+recorded in [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md), whose constant was fixed
+before the run it judges. See
+[ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) for the diagnosis.
 
 ## Judge quality: is each judge measuring, or ranking nothing? (diagnostics only)
 
@@ -317,23 +356,39 @@ have produced binding means roughly two grade-boundaries apart, with a per-judgm
 around 3.3 points. A single judgment is therefore one draw from a distribution, not a
 measurement — so ship is defined on the pooled distribution, never on any one round.
 
-A skill ships when **all** of the following hold (`ship_floor.aggregate_verdict`):
+A skill ships when **all** of the following hold (`ship_floor.aggregate_verdict`). This is the
+rule **in force now**, as changed by
+[ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md) on 2026-08-24 — it is **not** the
+rule that produced the Results table below, which is run 4's and predates it:
 
 | Condition | Constant | Value |
 | --- | --- | --- |
 | Pooled mean over all recorded judgments | `POOLED_TARGET` | ≥ **108** |
-| Pooled mean minus one sample standard deviation | `POOLED_LOWER_BOUND` | ≥ **105** |
+| Confidence bound on that mean, `mean − k × stdev/√n` | `CONFIDENCE_K` = **1.0**, against `POOLED_TARGET` | ≥ **108** |
 | Every dimension mean at or above its floor | `FLOORS` | D1 ≥ 17, D2 ≥ 13, D3 ≥ 13, D4 ≥ 13, D5 ≥ 13, D6 ≥ 13, D7 ≥ 8, D8 ≥ 13 |
 | Pooled judgment count | `MIN_ROUNDS` | ≥ **4** |
 | Aggregation method | `AGG_METHOD` | `multi-round-independent-pooled` |
 | Rubric version | `RUBRIC_SHA` | `3027f20f3181758385a1bb8c022d4041dfb4de84` |
 
-The mean-minus-sigma clause is the one that does the work: a mean of 108 sitting on a
-sigma of 4 is *within noise of failing badly*, and this rule refuses it. It is also the
-clause [ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) shows to be
-measuring judge disagreement rather than skill quality — recorded, and left in force. Nine
-of eleven skills clear this rule as written, on constants nobody has touched since they
-were vendored.
+The second clause is the one that does the work, and it asks a question the first cannot:
+*the point estimate is Grade A, but is the true mean confidently Grade A?* A mean of 108.2
+drawn from judgments with a sigma of 4.85 is weaker evidence than the same 108.2 with a sigma
+of 3.7, and the gate should be able to say so. At this panel's median sigma (4.67) and n (17)
+the clause moves the effective bar from 108.0 to about **109.1**; the bar falls as evidence
+accumulates but is bounded below by 108, so volume can never buy a pass for a skill whose true
+mean is not Grade A.
+
+**Until 2026-08-24 that clause read `mean − stdev ≥ POOLED_LOWER_BOUND (105)`, and that is the
+gate's one and only change.** `mean − stdev` is a *spread* statistic being used as a confidence
+bound on a *mean*: it does not shrink with sample size, and the mean it actually demanded floated
+on how much the panel happened to agree.
+[ADR-0005](adr/0005-judge-panel-calibration-and-the-lower-bound.md) diagnosed that and
+deliberately left it in force; ADR-0006 replaced it after the defect was demonstrated on an
+unedited file — `AST08`, byte-identical between runs 3 and 4, flipped BLOCKED → SHIP on that
+clause alone — and with the new constant fixed **before** the run it judges. Nine of eleven
+skills clear the gate under either rule; the change altered no verdict.
+`POOLED_LOWER_BOUND` is retired: `mean − σ` is still computed and still published in the column
+below, and decides nothing.
 
 ### Anti-re-roll
 
@@ -401,6 +456,21 @@ during a round is excluded from that round's pool with a timestamped audit entry
 
 ## Results
 
+> **Produced by the locked rule, not the rule above.** Every row in this table is run 4's, gated
+> by `mean ≥ 108` AND `mean − stdev ≥ 105` AND the per-dimension floors — the rule in force when
+> run 4 was scored, and retired the same day this table was last published by
+> [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md). `AST09`'s reason cell names that
+> retired clause because that clause is what blocked it.
+>
+> The table is **frozen** and `eval/generate_dashboard.py` must not be run against this corpus:
+> the generator calls the live gate, so regenerating would restate a run-4 verdict in the words
+> of a rule that never judged it. Run 5 is what replaces this table.
+> `tests/test_generate_dashboard.py::test_the_committed_results_table_is_run_4_under_the_rule_that_produced_it`
+> holds the freeze — it re-derives every verdict here through the *current* gate and fails if any
+> one of them has moved, so "frozen" stays a checkable claim rather than a promise. Under the new
+> clause the verdict column is identical: nine SHIP, `AST01` on its `D3` floor, `AST09` on the
+> confidence bound at `108.2 − 1.18 = 107.0 < 108`.
+
 <!-- BEGIN:results -->
 **11 of 11 skills judged; 9 clear the ship rule.** Verdicts and grades below are recomputed from each scorecard's own `aggregate.judgments` by `ship_floor.aggregate_verdict`; stored verdicts are never copied. Unjudged skills keep their placeholder row rather than dropping out of the table.
 
@@ -454,12 +524,21 @@ the gate read the same bytes and cannot drift apart:
     "n": 4, "mean": 110.0, "median": 110.0,
     "min": 108, "max": 112, "range": 4,
     "stdev": 1.83, "lower_bound": 108.2,
+    "sem": 0.92, "ci_lower": 109.1,
     "dim_means": {"D1": 18.0, "D2": 14.0, "D3": 14.0, "D4": 14.0,
                   "D5": 14.0, "D6": 14.0, "D7": 9.0, "D8": 13.0},
     "dim_n": 4
   }
 }
 ```
+
+`sem` and `ci_lower` are [ADR-0006](adr/0006-confidence-bound-on-the-pooled-mean.md)'s two
+additions and are what the second clause is read from: `sem = stdev/√n` rounded to two places,
+`ci_lower = mean − 1.0 × sem` rounded to one, both derived from the already-rounded `mean` and
+`stdev` so a reader holding those three numbers reproduces the verdict exactly. Run-4 scorecards
+predate them and do not carry them; the gate treats their absence as a date rather than a
+disagreement, and refuses any stored statistic — new key or old — whose value disagrees with the
+recompute.
 
 Then:
 

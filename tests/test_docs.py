@@ -37,7 +37,15 @@ from pathlib import Path
 import pytest
 import yaml
 
-from scripts.ship_floor import AGG_METHOD, FLOORS, MIN_ROUNDS, POOLED_LOWER_BOUND, POOLED_TARGET, RUBRIC_SHA
+from scripts.ship_floor import (
+    AGG_METHOD,
+    CONFIDENCE_K,
+    FLOORS,
+    MIN_ROUNDS,
+    POOLED_LOWER_BOUND,
+    POOLED_TARGET,
+    RUBRIC_SHA,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 README = REPO_ROOT / "README.md"
@@ -189,13 +197,42 @@ def test_dashboard_floors_match_the_shipped_gate():
     "fragment",
     [
         f"≥ **{POOLED_TARGET}**",
-        f"≥ **{POOLED_LOWER_BOUND}**",
+        f"`CONFIDENCE_K` = **{CONFIDENCE_K}**",
         f"≥ **{MIN_ROUNDS}**",
         "multi-round-independent-pooled",
     ],
 )
 def test_dashboard_publishes_the_ship_rule_constants(fragment):
     assert fragment in _flat(DASHBOARD), f"the ship rule table must publish {fragment!r} from scripts/ship_floor.py"
+
+
+def test_dashboard_says_which_rule_produced_the_table_it_shows():
+    """The gate changed once; a board that does not say under which rule it was
+    gated is a number without units.
+
+    The published Results table is run 4's, issued under the clause ADR-0006
+    retired. The dashboard has to name that clause, name the one in force, and
+    say the table is not re-gated — otherwise a reader cannot tell whether they
+    are looking at a measurement or a restatement.
+    """
+    flat = _flat(DASHBOARD)
+    assert "0006-confidence-bound-on-the-pooled-mean" in flat, (
+        "the dashboard must link the record that changed the gate"
+    )
+    assert "Which rule produced the table on this page" in flat
+    assert f"`POOLED_LOWER_BOUND` ({POOLED_LOWER_BOUND})" in flat, (
+        "the retired constant must stay published, or the archived verdicts lose their units"
+    )
+    assert "re-gated" in flat and "run 5" in flat.lower()
+
+
+def test_dashboard_does_not_present_the_retired_clause_as_the_rule_in_force():
+    """The ship-rule table is the rule a contributor will act on, so it publishes
+    the clause in force. The retired one may only appear as history."""
+    flat = _flat(DASHBOARD)
+    assert f"| `POOLED_LOWER_BOUND` | ≥ **{POOLED_LOWER_BOUND}** |" not in flat, (
+        "the ship rule table still lists the retired lower bound as a live condition"
+    )
 
 
 @pytest.mark.parametrize("grade,band", [("A", "108"), ("B", "96"), ("C", "84"), ("D", "72")])

@@ -19,6 +19,17 @@ Two invariants make the generated table trustworthy:
    result. Publishing zeros, or omitting the table, would both read as a
    measurement that did not happen.
 
+**Do not run this against a corpus scored under a superseded rule.** It calls the
+live gate, so pointing it at `eval/scorecards/` (run 4, judged under the clause
+`docs/adr/0006-confidence-bound-on-the-pooled-mean.md` retired on 2026-08-24)
+would restate a published verdict in the words of a rule that never issued it —
+which that record forbids in as many words. The committed Results table is
+therefore frozen until run 5 replaces it; `--check` will report it out of date
+and that report is expected, not a defect.
+``tests/test_generate_dashboard.py::test_the_committed_results_table_is_run_4_under_the_rule_that_produced_it``
+is what guards the table instead, by re-deriving every published verdict through
+the current gate and failing if one has moved.
+
 Usage::
 
     python3 eval/generate_dashboard.py            # rewrite in place

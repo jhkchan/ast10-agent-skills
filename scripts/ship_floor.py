@@ -9,11 +9,32 @@ policy: "If this formula is updated upstream, the two repos diverge and Step
 05 measures an agreed-to metric in only one of them" (plan.md "Risky code
 touchpoints").
 
-The formula below — FLOORS, POOLED_TARGET, POOLED_LOWER_BOUND, MIN_ROUNDS,
-AGG_METHOD, RUBRIC_SHA, pooled_stats(), dim_means_of(), aggregate_verdict(),
-verdict_of(), _is_invalidated(), binding_block() — is copied UNCHANGED from
-upstream: it is "the exact formula locked at Gate B half 1" (spec.md gate-2)
-and must not drift by so much as a comparison operator without a re-vendor.
+The formula below — FLOORS, POOLED_TARGET, MIN_ROUNDS, AGG_METHOD, RUBRIC_SHA,
+pooled_stats(), dim_means_of(), aggregate_verdict(), verdict_of(),
+_is_invalidated(), binding_block() — was copied UNCHANGED from upstream: it is
+"the exact formula locked at Gate B half 1" (spec.md gate-2) and must not drift
+by so much as a comparison operator without a recorded decision. It has taken
+exactly one such decision, described next; everything not named there is still
+byte-identical to upstream.
+
+THE GATE HAS BEEN CHANGED EXACTLY ONCE, and this is that change. On 2026-08-24
+docs/adr/0006-confidence-bound-on-the-pooled-mean.md replaced the second clause
+`mean - stdev >= POOLED_LOWER_BOUND (105)` with
+`mean - CONFIDENCE_K * stdev/sqrt(n) >= POOLED_TARGET (108)`, adding CONFIDENCE_K
+and the two published statistics `sem` and `ci_lower`. Nothing else moved: FLOORS,
+POOLED_TARGET, MIN_ROUNDS, AGG_METHOD, RUBRIC_SHA, INDEPENDENT_METHODS, the
+anti-re-roll pooling rule, dim_means_of(), verdict_of(), _is_invalidated(),
+binding_block(), and the whole of pooled_stats()/aggregate_verdict() apart from
+that clause, are as vendored. The change was made
+because the retired clause was demonstrated to be NOT A FUNCTION OF THE ARTIFACT
+— AST08's SKILL.md is byte-identical between run 3 and run 4 and the clause
+flipped its verdict (run 3: 110.3 - 5.65 = 104.6, BLOCKED; run 4:
+110.8 - 4.67 = 106.1, SHIP) — and it was recorded and its constant fixed BEFORE
+the run it judges. Run 4 (eval/scorecards/) was scored under the retired clause
+and its published verdicts stay as issued; run 5 is the first run judged here.
+THIS REPO AND UPSTREAM NOW DIVERGE IN THIS ONE CLAUSE, by decision: see
+ADR-0006 "Consequences / Negative", THIRD_PARTY_LICENSES.md and NOTICE. Any
+score quoted across the two repositories must name which rule produced it.
 
 Dropped from upstream: the `A_MINUS`/`MANDATED` skill-name sets and the
 delivery-floor check in `main()` are the upstream eval-harness repository's own roll-up
@@ -29,6 +50,7 @@ a fixture repo.
 from __future__ import annotations
 
 import json
+import math
 import os
 import pathlib
 import re
@@ -51,9 +73,23 @@ TARGETS = {"A": 108}
 #
 # SHIP is consequently defined on the POOLED DISTRIBUTION, not on any one
 # judgment:
-#     mean >= 108                       clears the grade-A target on average
-#     mean - stdev >= 105               and is not within one sigma of failing badly
+#     mean >= 108                            the POINT ESTIMATE is grade A
+#     mean - 1.0 * stdev/sqrt(n) >= 108      and the TRUE MEAN is confidently grade A
 # plus the per-dimension floors, applied to the DIMENSION MEANS.
+#
+# THE SECOND CLAUSE READ `mean - stdev >= 105` UNTIL 2026-08-24, and changing it
+# is the only edit this file has taken since it was vendored. `mean - stdev` is a
+# SPREAD statistic; the question the clause asks — "is this skill's true quality
+# above the bar?" — is a question about a MEAN, whose uncertainty shrinks as
+# `stdev/sqrt(n)`. Using the spread made the verdict a function of how much the
+# panel happened to agree that day rather than of the artifact: AST08's SKILL.md
+# is byte-identical between run 3 and run 4 and went BLOCKED (110.3 - 5.65 =
+# 104.6) -> SHIP (110.8 - 4.67 = 106.1) on that clause alone. A gate that is not
+# a function of the artifact is not a gate. ADR-0005 diagnosed it; ADR-0006
+# named the replacement rule and its constant BEFORE the run they judge, which
+# is the whole reason the change is not a retune. Full derivation, the k
+# comparison, the verdict-stability controls and the alternatives considered are
+# in docs/adr/0006-confidence-bound-on-the-pooled-mean.md.
 #
 # ANTI-RE-ROLL, preserved but by a different mechanism. The old rule took
 # min(total) so that re-running the judge could never raise a score. Pooling
@@ -66,8 +102,44 @@ TARGETS = {"A": 108}
 # is no longer worth the electricity. The one exception is an INVALIDATED
 # measurement (see _is_invalidated): a defective instrument, flagged and
 # auditable, never a score somebody merely dislikes.
-POOLED_TARGET = 108  # required pooled mean
-POOLED_LOWER_BOUND = 105  # required mean - 1 sample stdev
+# As vendored, and unchanged by ADR-0006: the grade-A boundary on the 120-point
+# rubric (108/120 = 90.0%). It is now the reference level for BOTH clauses --
+# clause 1 asks whether the point estimate reaches it, clause 2 whether the
+# lower end of a confidence interval on the mean still does. ADR-0006 "What the
+# second clause is FOR".
+POOLED_TARGET = 108  # required pooled mean, and the bar clause 2 measures against
+# NEW in ADR-0006: standard errors of margin the pooled mean must hold above
+# POOLED_TARGET. Derived, not chosen (ADR-0006 "Why k = 1.0, derived rather than
+# chosen"), on four grounds: (1) it is deliberately NOT sold as a confidence
+# level -- this panel's ICC is 0.666 and its design effect 2.15, so a nominal
+# 95% k would deliver ~87% and the label would be false; k = 1.0 is quoted in
+# points instead, moving the effective bar from 108.0 to about 109.1 at this
+# panel's median sigma 4.67 and n 17. (2) It keeps the clause LIVE: the naive
+# swap `mean - stdev/sqrt(n) >= 105` reads `mean >= 106.2` here, strictly
+# implied by clause 1, i.e. decoration. (3) It passes the pre-registered
+# verdict-stability test with room to spare -- AST08's byte-identical run-3
+# score clears by 0.84 and its run-4 score by 1.70, where k >= 1.577 would
+# reintroduce the very flip this change removes. (4) It needs no estimate of the
+# panel's ICC to justify, so the bar cannot float invisibly on panel
+# composition, which is the disease ADR-0005 diagnosed.
+CONFIDENCE_K = 1.0  # standard errors of margin required above POOLED_TARGET
+# RETIRED as a gate constant by ADR-0006 and read by NOTHING in this module. It
+# is kept, and kept at 105, because ADR-0005's diagnosis is arithmetic against
+# this exact number and `eval/calibration.py` regenerates those figures from it;
+# deleting it would make the record that justified the change unverifiable. The
+# descriptive statistic it used to gate on, `lower_bound = mean - stdev`, is
+# still computed and still published in every scorecard for the same reason. It
+# simply stops deciding anything. ADR-0006 "The rule".
+POOLED_LOWER_BOUND = 105  # historical: the retired mean - 1 sample stdev bar
+# Unchanged by ADR-0006, and the reason is a property of the new rule rather
+# than an absence of thought: the bar FALLS with n (110.34 at n=4, 109.13 at
+# n=17, 108.47 at n=100) but is monotone and strictly bounded below by
+# POOLED_TARGET, so volume can buy at most the ~1.1 points between today's bar
+# and 108 and can never buy a pass for a skill whose true mean is below grade A.
+# The new rule is also HARSHER than the retired one at small n, so it removes
+# rather than adds the pressure to raise this. ADR-0006 "MIN_ROUNDS stays 4".
+# Known gap, flagged there and deliberately not fixed here: this counts
+# JUDGMENTS, not JUDGES.
 MIN_ROUNDS = 4  # below this a sample stdev is not worth computing
 AGG_METHOD = "multi-round-independent-pooled"
 # Pins the skill-judge rubric version scores must be judged against (spec.md
@@ -117,13 +189,23 @@ def pooled_stats(totals: list[int]) -> dict:
     README and the gate are literally the same numbers — a reader recomputing
     from `aggregate.judgments` must land on the stored values exactly, which is
     what makes the stored values checkable rather than merely asserted.
+
+    `sem` and `ci_lower` are ADR-0006's two additions, and they follow the same
+    convention for the same reason: `sem` is derived from the ROUNDED `stdev`
+    and `ci_lower` from the ROUNDED `mean` and `sem`, so a reader holding only
+    `n`, `mean` and `stdev` reproduces the gate's verdict exactly rather than
+    approximately. `lower_bound` (`mean - stdev`) stays published although
+    nothing gates on it any more: it is the statistic ADR-0005's argument rests
+    on, and dropping it would destroy the evidence for the change.
     """
     if len(totals) < MIN_ROUNDS:
         raise ValueError(f"pooled stats need >= {MIN_ROUNDS} judgments, got {len(totals)}")
+    n = len(totals)
     mean = round(statistics.fmean(totals), 1)
     stdev = round(statistics.stdev(totals), 2)
+    sem = round(stdev / math.sqrt(n), 2)
     return {
-        "n": len(totals),
+        "n": n,
         "mean": mean,
         "median": round(statistics.median(totals), 1),
         "min": min(totals),
@@ -131,7 +213,21 @@ def pooled_stats(totals: list[int]) -> dict:
         "range": max(totals) - min(totals),
         "stdev": stdev,
         "lower_bound": round(mean - stdev, 1),
+        "sem": sem,
+        "ci_lower": round(mean - CONFIDENCE_K * sem, 1),
     }
+
+
+#: The statistics every recorded aggregate MUST carry. This is `pooled_stats()`
+#: minus ADR-0006's two additions, and the split is a dating mechanism, not a
+#: softening: a scorecard written before 2026-08-24 cannot carry `sem`/`ci_lower`,
+#: so reading their absence as "stored stats disagree with the recompute" would
+#: turn every verdict in `eval/scorecards/` (run 4) into a stats-drift BLOCK —
+#: re-labelling a run this rule never judged, which ADR-0006's Status section
+#: forbids. Absence of these two is therefore tolerated; absence of anything in
+#: this tuple is refused, and a stored value that DISAGREES with the recompute is
+#: refused whatever its key.
+PRE_ADR0006_STATS = ("n", "mean", "median", "min", "max", "range", "stdev", "lower_bound")
 
 
 def dim_means_of(dimsets: list[dict]) -> dict:
@@ -148,7 +244,20 @@ def aggregate_verdict(skill: str, agg: dict | None) -> tuple[str, str]:
 
     Recomputes every published number from `aggregate.judgments` first: a stored
     mean is a claim, not evidence, exactly as a stored `per_dim_floors_met` flag
-    is not evidence.
+    is not evidence. A stored statistic that disagrees with that recompute is
+    BLOCKED, not a rounding note.
+
+    Two clauses on the pooled totals, asking two different questions against the
+    same boundary (ADR-0006):
+
+        mean     >= POOLED_TARGET   is the point estimate Grade A?
+        ci_lower >= POOLED_TARGET   is the TRUE mean confidently Grade A?
+
+    where `ci_lower = mean - CONFIDENCE_K * stdev/sqrt(n)`. The second clause
+    read `mean - stdev >= POOLED_LOWER_BOUND (105)` until 2026-08-24; that form
+    could flip the verdict of a byte-identical file when the panel's dispersion
+    moved, which is why it was replaced. Run 4's published verdicts were issued
+    under the retired clause and are not re-issued here.
     """
     if not agg:
         return "BLOCKED", "no aggregate block — pool the independent rounds first"
@@ -164,7 +273,13 @@ def aggregate_verdict(skill: str, agg: dict | None) -> tuple[str, str]:
     if len(totals) < MIN_ROUNDS:
         return "BLOCKED", f"only {len(totals)} pooled judgments, need >= {MIN_ROUNDS}"
     stats = pooled_stats(totals)
-    drift = [k for k, v in stats.items() if agg.get(k) != v]
+    missing = [k for k in PRE_ADR0006_STATS if k not in agg]
+    if missing:
+        return (
+            "BLOCKED",
+            f"aggregate is missing required statistics: {missing}",
+        )
+    drift = [k for k, v in stats.items() if k in agg and agg[k] != v]
     if drift:
         return (
             "BLOCKED",
@@ -177,10 +292,12 @@ def aggregate_verdict(skill: str, agg: dict | None) -> tuple[str, str]:
         return "BLOCKED", f"dimension means below floor: {', '.join(bad)}"
     if stats["mean"] < POOLED_TARGET:
         return "BLOCKED", f"pooled mean {stats['mean']} < target {POOLED_TARGET}"
-    if stats["lower_bound"] < POOLED_LOWER_BOUND:
+    if stats["ci_lower"] < POOLED_TARGET:
         return "BLOCKED", (
-            f"lower bound (mean - stdev) {stats['lower_bound']} < {POOLED_LOWER_BOUND} "
-            f"— mean {stats['mean']} is within noise (sigma {stats['stdev']}) of failing badly"
+            f"confidence bound on the mean (mean - {CONFIDENCE_K} * stdev/sqrt(n)) "
+            f"{stats['ci_lower']} < target {POOLED_TARGET} "
+            f"— mean {stats['mean']} is Grade A but not confidently so "
+            f"(n {stats['n']}, stdev {stats['stdev']}, sem {stats['sem']}); see ADR-0006"
         )
     return "SHIP", ""
 

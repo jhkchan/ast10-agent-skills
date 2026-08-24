@@ -41,11 +41,16 @@ a 20.1-point spread against scorecards that say −5.4 and 17.9, and nothing on
 disk could tell the reader which was true. Every figure the ADR quotes is
 printed by this script, and `tests/test_calibration.py` fails if the two drift.
 
-This script computes **diagnostics only**. It deliberately does not evaluate any
-candidate replacement rule against the recorded data, and it changes no gate
-constant: `ship_floor.POOLED_TARGET` and `ship_floor.POOLED_LOWER_BOUND` are
-imported here purely so the report can state what is currently in force. A bar
-retuned against the data it is about to judge is not a bar — see the ADR.
+This script computes **diagnostics only**. It evaluates no candidate rule against
+the recorded data and it changes no gate constant. Three constants are imported
+purely so the report can state what bar applies and what bar used to:
+`ship_floor.POOLED_TARGET` and `ship_floor.CONFIDENCE_K` are the rule in force
+after `docs/adr/0006-confidence-bound-on-the-pooled-mean.md`, and
+`ship_floor.POOLED_LOWER_BOUND` is the constant that rule retired — kept here
+because ADR-0005's implied-mean-bar figures are arithmetic on it, and a record
+whose arithmetic can no longer be re-derived is folklore. A bar retuned against
+the data it is about to judge is not a bar; ADR-0006 is the one change the gate
+has taken and its constant was fixed before the run it judges — see both ADRs.
 
 Usage::
 
@@ -71,7 +76,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:  # allow `python3 eval/calibration.py`
     sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.ship_floor import POOLED_LOWER_BOUND, POOLED_TARGET  # noqa: E402
+from scripts.ship_floor import CONFIDENCE_K, POOLED_LOWER_BOUND, POOLED_TARGET  # noqa: E402
 
 SCORECARD_DIR = REPO_ROOT / "eval" / "scorecards"
 
@@ -223,10 +228,15 @@ def provider_bias(judgments: list[Judgment]) -> list[dict[str, Any]]:
 def skill_dispersion(judgments: list[Judgment]) -> list[dict[str, Any]]:
     """Per-skill mean, sigma, and the two candidate lower bounds side by side.
 
-    ``lower_bound`` is what `ship_floor.aggregate_verdict` gates on today
-    (``mean − σ``). ``sem_bound`` is ``mean − σ/√n``, the uncertainty of the
-    mean itself. Both are printed; neither is applied. Deciding between them on
-    the strength of this table is precisely the move the ADR forbids.
+    ``sem_bound`` is ``mean − σ/√n``, the uncertainty of the mean itself, and
+    since ADR-0006 it is the shape `ship_floor.aggregate_verdict` gates on — as
+    ``ci_lower``, measured against ``POOLED_TARGET`` rather than against the
+    retired 105. ``lower_bound`` (``mean − σ``) is what the gate used through run
+    4 and is kept because ADR-0005's whole argument is arithmetic on it. Both are
+    printed; neither is applied here. This table gates nothing, and choosing
+    between the two columns on the strength of it — rather than in a record
+    written before the run it judges — is precisely the move ADR-0005 forbids and
+    ADR-0006 avoided.
     """
     by_skill: dict[str, list[float]] = defaultdict(list)
     for j in judgments:
@@ -251,7 +261,12 @@ def skill_dispersion(judgments: list[Judgment]) -> list[dict[str, Any]]:
                 "mean": mean,
                 "sigma": sigma,
                 "lower_bound": round(mean - sigma, 1),
-                "sem_bound": round(mean - sigma / math.sqrt(len(totals)), 1),
+                # Rounded exactly as `ship_floor.pooled_stats` rounds `ci_lower`:
+                # sem to two places first, then the subtraction. Deriving from
+                # the unrounded sem instead puts this column 0.1 away from the
+                # gate on AST10's run-3 figures, and a diagnostic that disagrees
+                # with the rule it is diagnosing is worse than no diagnostic.
+                "sem_bound": round(mean - CONFIDENCE_K * round(sigma / math.sqrt(len(totals)), 2), 1),
             }
         )
     return rows
@@ -657,11 +672,19 @@ def judge_quality(judgments: list[Judgment], maxima: Mapping[str, int] | None = 
 def panel_summary(judgments: list[Judgment]) -> dict[str, Any]:
     """Panel-level figures: the spread, the sigma range, and the bar it implies.
 
-    ``implied_mean_bar_*`` is arithmetic on the locked rule, not a proposal:
+    ``implied_mean_bar_*`` is arithmetic on the RETIRED clause, not a proposal:
     ``mean − σ ≥ POOLED_LOWER_BOUND`` is the same constraint as
-    ``mean ≥ POOLED_LOWER_BOUND + σ``, so the sigma a panel produces sets the
-    mean the rule actually demands. Printing it makes visible that the effective
-    bar moved when the panel widened, without anyone editing a constant.
+    ``mean ≥ POOLED_LOWER_BOUND + σ``, so the sigma a panel produces set the
+    mean that clause actually demanded. It is still computed because ADR-0005's
+    figures are that arithmetic and must stay regenerable; it is what ADR-0006
+    retired, and printing it makes visible that the effective bar moved when the
+    panel widened, without anyone editing a constant.
+
+    ``sem_bar_median`` is the same statement about the clause now in force:
+    ``mean − CONFIDENCE_K × σ/√n ≥ POOLED_TARGET`` is ``mean ≥ POOLED_TARGET +
+    k·σ/√n``, so at this panel's median σ and n the rule demands that mean. It
+    falls as n rises and is bounded below by ``POOLED_TARGET``, which is the
+    difference between a confidence bound and a spread.
     """
     biases = provider_bias(judgments)
     dispersion = skill_dispersion(judgments)
@@ -678,6 +701,16 @@ def panel_summary(judgments: list[Judgment]) -> dict[str, Any]:
         "sigma_median": round(statistics.median(sigmas), 2),
         "calibration_sigma": CALIBRATION_SIGMA,
         "pooled_target": POOLED_TARGET,
+        "confidence_k": CONFIDENCE_K,
+        # Median sigma over median n, which is the figure ADR-0006 quotes
+        # (109.13 at sigma 4.67, n 17) — not the median of the per-skill sems,
+        # which is a different statistic and would put the tool 0.05 away from
+        # the record it is meant to make checkable.
+        "sem_bar_median": round(
+            POOLED_TARGET
+            + CONFIDENCE_K * statistics.median(sigmas) / math.sqrt(statistics.median([row["n"] for row in dispersion])),
+            2,
+        ),
         "pooled_lower_bound": POOLED_LOWER_BOUND,
         "implied_mean_bar_min": round(POOLED_LOWER_BOUND + min(sigmas), 1),
         "implied_mean_bar_max": round(POOLED_LOWER_BOUND + max(sigmas), 1),
@@ -867,14 +900,23 @@ def format_report(data: dict[str, Any]) -> str:
         f"({s['implied_pct_min']}%-{s['implied_pct_max']}% of {RUBRIC_MAX}), "
         f"not the {s['pooled_target']} ({s['target_pct']}%) it names as the target."
     )
+    lines.append(
+        f"  That clause was RETIRED on 2026-08-24 (ADR-0006). The rule in force is "
+        f"mean - {s['confidence_k']} * sigma/sqrt(n) >= {s['pooled_target']}, which at this "
+        f"panel's median sigma and n demands a mean of {s['sem_bar_median']} and falls toward "
+        f"{s['pooled_target']} as judgments accumulate. Run 4 was judged under the retired "
+        f"clause and is not re-gated."
+    )
     lines.append("")
     lines.extend(_format_judge_quality(quality))
     lines.append("")
     lines.extend(_format_exclusion(quality["exclusion"]))
     lines.append("")
     lines.append("  Diagnostics only. No gate constant is read from this file and none is changed by it;")
-    lines.append("  no judge is excluded by it. See")
-    lines.append("  docs/adr/0005-judge-panel-calibration-and-the-lower-bound.md.")
+    lines.append("  no judge is excluded by it. The gate has been changed exactly once, by a record")
+    lines.append("  written before the run it judges. See")
+    lines.append("  docs/adr/0005-judge-panel-calibration-and-the-lower-bound.md (the diagnosis) and")
+    lines.append("  docs/adr/0006-confidence-bound-on-the-pooled-mean.md (the change).")
     return "\n".join(lines)
 
 

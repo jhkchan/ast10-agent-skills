@@ -246,11 +246,24 @@ no cloud credentials are configured for the workflow and none should be. The
 maintainer runs it locally and commits the scorecard artifacts so reviewers diff
 recorded scores instead of trusting an unreproducible CI run.
 
-The ship gate is pooled across judges: mean ≥ 108 **and** mean − stdev ≥ 105
-**and** every per-dimension floor met, over at least `MIN_ROUNDS` pooled
-judgments. A provider that could not be reached is declared in
-`config/audit.yml` with a recorded reason — never silently averaged as zero and
-never dropped without a record.
+The ship gate is pooled across judges: mean ≥ 108 **and**
+mean − 1.0 × stdev/√n ≥ 108 **and** every per-dimension floor met, over at least
+`MIN_ROUNDS` pooled judgments. A provider that could not be reached is declared
+in `config/audit.yml` with a recorded reason — never silently averaged as zero
+and never dropped without a record.
+
+**The second clause changed once, and only once.** It read `mean − stdev ≥ 105`
+through runs 1-4; on 2026-08-24
+[`docs/adr/0006-confidence-bound-on-the-pooled-mean.md`](docs/adr/0006-confidence-bound-on-the-pooled-mean.md)
+retired it, because a spread statistic used as a confidence bound on a mean made
+the verdict depend on how much the panel agreed that day rather than on the file
+— `AST08` is byte-identical between runs 3 and 4 and flipped on that clause
+alone. The replacement was recorded, with its constant, **before** the run it
+judges, and it changes no run-4 verdict. Every published run-4 score stays as
+issued under the old rule; do not re-gate an archived corpus under the new one.
+Changing a gate constant again needs the same two steps ADR-0005 laid down and
+ADR-0006 followed: a superseding record naming the rule and its constants first,
+then a fresh judged run.
 
 **Before you run it: the prompt was rebuilt on 2026-08-23, and two of the four
 recorded runs predate it.** The judge is now sent the pinned rubric's
@@ -264,8 +277,10 @@ recorded. `eval/scorecards/` is run 4, the corpus the dashboard publishes, and
 `eval/scorecards-run3/` is its archived predecessor under the same prompt; a
 fresh run is comparable to both and is what replaces the live one. No gate
 constant moved with the prompt, and none moved with the run that took the board
-from one shippable skill to nine; see the callout at the top of
-`docs/skill-judge-dashboard.md`.
+from one shippable skill to nine; the one change the gate has ever taken came
+afterwards, by ADR-0006, and is described above. See the callouts at the top of
+`docs/skill-judge-dashboard.md`, which name the rule that produced the published
+table.
 
 **Archive the live corpus before you overwrite it.** `cp -r eval/scorecards
 eval/scorecards-run<N>` first, then record. Runs 3 and 4 were scored by the same

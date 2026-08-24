@@ -59,11 +59,13 @@ retained unmodified as the audit trail of what the unanchored instrument
 produced; they must not be pooled with, differenced against, or trended
 into anything measured from here on.
 
-``eval/scorecards/`` is no longer one of them. It holds **run 3**, the
-first run recorded under this prompt -- 177 binding judgments of 198
-attempted, the other 21 refused as malformed for want of a justification --
-and it is the new baseline those archives are not comparable to, rather
-than the third point on a trend through them. Which corpus is which is
+``eval/scorecards/`` is no longer one of them. It holds the live corpus,
+**run 4** -- 180 binding judgments of 198 attempted, the other 18 refused
+as malformed for want of a justification -- while **run 3**, the first run
+recorded under this prompt (177 of 198), was archived to
+``eval/scorecards-run3/`` when run 4 was written. Those two are the new
+baseline the pre-rebuild archives are not comparable to, rather than
+further points on a trend through them. Which corpus is which is
 checkable rather than remembered: ``tests/scripts/test_judge_harness.py``
 asserts that the archived responses are still *rejected* by
 ``parse_judgment`` for the stated reason, and that every judgment banked in
@@ -71,9 +73,18 @@ asserts that the archived responses are still *rejected* by
 
 No gate constant moved for this change. ``ship_floor.FLOORS``,
 ``POOLED_TARGET``, ``POOLED_LOWER_BOUND``, ``MIN_ROUNDS`` and
-``RUBRIC_SHA`` are exactly as vendored -- ADR-0005's central claim is that
-the bar was not retuned, and rebuilding the instrument is not permission
-to move the bar.
+``RUBRIC_SHA`` were exactly as vendored across every run scored here --
+ADR-0005's central claim is that the bar was not retuned to meet the
+results, and rebuilding the instrument is not permission to move the bar.
+
+The gate has since been changed **exactly once**, and not by this module and
+not for this reason. On 2026-08-24, after run 4 was published,
+``docs/adr/0006-confidence-bound-on-the-pooled-mean.md`` retired the second
+ship clause ``mean - stdev >= POOLED_LOWER_BOUND (105)`` in favour of
+``mean - 1.0 * stdev/sqrt(n) >= POOLED_TARGET (108)``, because the retired
+clause was measured flipping the verdict of a byte-identical file. The
+constant was fixed before the run it judges, and no scorecard written by this
+harness before that date may be re-gated or re-described under it.
 """
 
 from __future__ import annotations

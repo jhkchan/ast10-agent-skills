@@ -315,11 +315,22 @@ overclaim the labels exist to block:
 recorded judgments rather than copied from a stored field. **Nine of the eleven skills clear
 the ship rule**: pooled mean ≥ 108, pooled `mean − σ` ≥ 105, and all eight dimension means
 above their floors, over 14 to 18 pooled judgments from six independent judges. No gate
-constant has been changed across any of the four recorded runs. The two that do not clear it
+constant changed across any of the four recorded runs. The two that do not clear it
 are `AST01`, blocked on the `D3` Anti-Pattern Quality floor, and `AST09`, which clears every
 floor and is held only by the `mean − σ` clause — a defect recorded in
 [ADR-0005](docs/adr/0005-judge-panel-calibration-and-the-lower-bound.md) and deliberately not
-fixed by moving the bar. This column is a judgement about the knowledge package and says
+fixed on the run it would have benefited.
+
+**The gate has since been changed exactly once.** After run 4 was published,
+[ADR-0006](docs/adr/0006-confidence-bound-on-the-pooled-mean.md) retired the `mean − σ ≥ 105`
+clause and replaced it with `mean − 1.0 × σ/√n ≥ 108` — a confidence bound on the mean instead
+of a spread statistic — because the retired clause was shown not to be a function of the
+artifact: `AST08`'s `SKILL.md` is byte-identical between runs 3 and 4 and that clause alone
+flipped its verdict. The replacement constant was recorded **before** the run that will be judged
+by it, and it buys nothing on the data in hand: nine of eleven ship under either rule and no
+verdict changes. Everything above is run 4 under the rule that produced it and is not re-gated;
+run 5 is the first run judged under the new clause. This column is a judgement about the
+knowledge package and says
 nothing about the detector; the two are separate gates and
 [`docs/skill-judge-dashboard.md`](docs/skill-judge-dashboard.md) is the full board.
 

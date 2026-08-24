@@ -8,12 +8,23 @@ The generator's two load-bearing promises:
    not support.
 2. An empty scorecard directory renders as an explicit "no judged run recorded
    yet" state, never as a table of zeros and never by omitting the table.
+
+A third promise starts here, and it belongs to the published page rather than to
+the generator. ADR-0006 changed the gate's second clause after run 4 was
+published, so the committed Results table can no longer be regenerated without
+restating a run-4 verdict in the words of a rule that never judged it. The table
+is frozen until run 5 replaces it, and
+``test_the_committed_results_table_is_run_4_under_the_rule_that_produced_it``
+holds the freeze honest: it re-derives every published verdict through the
+CURRENT gate and fails if any has moved, so "frozen" never quietly becomes
+"stale".
 """
 
 from __future__ import annotations
 
 import importlib.util
 import json
+import math
 import statistics
 import sys
 from pathlib import Path
@@ -49,9 +60,16 @@ PASSING_DIMS = {
 
 
 def _aggregate(totals: list[int], dim_means: dict | None = None) -> dict:
-    """A self-consistent aggregate block, exactly as ship_floor recomputes it."""
+    """A self-consistent aggregate block, exactly as ship_floor recomputes it.
+
+    Written the shape a post-ADR-0006 run writes, `sem` and `ci_lower` included,
+    so these fixtures exercise the STRICT half of the drift check: the gate
+    tolerates those two keys being absent (that dates a scorecard to run 4 or
+    earlier) but never tolerates them being wrong.
+    """
     mean = round(statistics.fmean(totals), 1)
     stdev = round(statistics.stdev(totals), 2)
+    sem = round(stdev / math.sqrt(len(totals)), 2)
     return {
         "method": "multi-round-independent-pooled",
         "rubric_sha": RUBRIC_SHA,
@@ -64,6 +82,8 @@ def _aggregate(totals: list[int], dim_means: dict | None = None) -> dict:
         "range": max(totals) - min(totals),
         "stdev": stdev,
         "lower_bound": round(mean - stdev, 1),
+        "sem": sem,
+        "ci_lower": round(mean - 1.0 * sem, 1),
         "dim_means": dict(dim_means or PASSING_DIMS),
         "dim_n": len(totals),
     }
@@ -111,9 +131,72 @@ def test_placeholder_roster_matches_the_shipped_skills():
     assert set(gen.PLACEHOLDER_SKILLS) == names
 
 
-def test_committed_dashboard_is_up_to_date():
-    """`--check` must be clean on the committed tree, so CI can enforce it."""
-    assert gen.main(["--check"]) == 0
+def test_the_committed_results_table_is_run_4_under_the_rule_that_produced_it():
+    """The published board is frozen, and the freeze has to be checkable.
+
+    `--check` was the right assertion while one rule had produced every published
+    verdict. It is not any more. ADR-0006 changed the gate's second clause on
+    2026-08-24, after run 4 was published, so `render_block` now evaluates the
+    run-4 corpus under a rule run 4 was never scored against — and regenerating
+    would restate `AST09`'s BLOCKED reason in the words of a clause that never
+    saw it. ADR-0006 forbids exactly that, so the table stays as issued until
+    run 5 replaces it.
+
+    What replaces `--check` is the stronger claim, and the one a sceptical reader
+    actually wants: **the freeze hides nothing.** Every verdict in the committed
+    table is re-derived here through the CURRENT gate and must match. If the new
+    clause would move any row, this fails and the table is not merely stale — it
+    is wrong, and the freeze is no longer defensible. If someone regenerates the
+    table anyway, the reason cell stops naming the retired clause and this fails
+    too.
+    """
+    import re
+
+    from scripts.ship_floor import POOLED_LOWER_BOUND, aggregate_verdict
+
+    text = (REPO_ROOT / "docs" / "skill-judge-dashboard.md").read_text(encoding="utf-8")
+    block = text.split(gen.BEGIN, 1)[1].split(gen.END, 1)[0]
+
+    published: dict[str, str] = {}
+    for line in block.splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) == 7 and cells[0].startswith("`") and cells[-1] not in ("Verdict", "NOT YET JUDGED"):
+            published[cells[0].strip("`")] = cells[-1]
+    assert published, "no judged rows found in the committed Results block"
+
+    cards = {str(c.get("skill")): c for c in gen.load_scorecards()}
+    assert set(published) == set(cards), (
+        "the frozen table and eval/scorecards/ describe different skills; the freeze cannot be checked"
+    )
+
+    for skill, cell in published.items():
+        recomputed, _why = aggregate_verdict(skill, cards[skill].get("aggregate"))
+        assert cell.split(" — ")[0] == recomputed, (
+            f"{skill}: the frozen run-4 table publishes {cell.split(' — ')[0]!r} but the rule now in "
+            f"force computes {recomputed!r}. A frozen board is only honest while the freeze changes "
+            "no verdict — see docs/adr/0006-confidence-bound-on-the-pooled-mean.md."
+        )
+
+    # The one row whose REASON belongs to the retired clause is still stated in
+    # that clause's terms. Derived, not named: whichever skill run 4 blocked on
+    # the lower bound is the one that must still say so.
+    blocked_by_the_retired_clause = [
+        skill
+        for skill, card in cards.items()
+        if (agg := card.get("aggregate"))
+        and agg["mean"] >= 108
+        and agg["lower_bound"] < POOLED_LOWER_BOUND
+        and all(agg["dim_means"][d] >= f for d, f in gen.FLOORS.items())
+    ]
+    assert len(blocked_by_the_retired_clause) == 1, (
+        f"expected exactly one run-4 skill blocked by the retired clause alone, found {blocked_by_the_retired_clause}"
+    )
+    cell = published[blocked_by_the_retired_clause[0]]
+    assert re.search(r"lower bound \(mean - stdev\) [\d.]+ < 105", cell), (
+        f"{blocked_by_the_retired_clause[0]}'s published reason no longer names the clause that "
+        f"produced it — the table has been regenerated under the new rule, which re-labels a "
+        f"run-4 verdict: {cell!r}"
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -305,9 +305,21 @@ in eight `SKILL.md` files, which is what makes them a controlled pair rather tha
 snapshots. See the callout at the top of
 [`skill-judge-dashboard.md`](skill-judge-dashboard.md).
 
-The ship rule itself — mean ≥ 108, mean − σ ≥ 105, per-dimension floors, ≥ 4 pooled rounds
-— and the full provider roster with the unavailable entries and their reasons are in
+The ship rule itself — mean ≥ 108, mean − 1.0 × σ/√n ≥ 108, per-dimension floors, ≥ 4 pooled
+rounds — and the full provider roster with the unavailable entries and their reasons are in
 [`skill-judge-dashboard.md`](skill-judge-dashboard.md).
+
+**The gate was changed exactly once.** Its second clause read `mean − σ ≥ 105` from the moment
+`ship_floor.py` was vendored through run 4. On 2026-08-24
+[`adr/0006-confidence-bound-on-the-pooled-mean.md`](adr/0006-confidence-bound-on-the-pooled-mean.md)
+replaced it with the confidence bound above, because `mean − σ` is a spread statistic and the
+question the clause asks is about a mean: the retired form made the verdict track the panel's
+dispersion rather than the artifact, and flipped `AST08` — byte-identical between runs 3 and 4 —
+from BLOCKED to SHIP. The record was written and the constant fixed before the run it judges, and
+the change alters no run-4 verdict. `eval/scorecards/` and the dashboard table it feeds are run 4
+under the retired clause and are **not** re-gated; run 5 is the first corpus judged by the rule
+above. `POOLED_LOWER_BOUND` survives in the source as a retired constant, read by nothing in the
+gate, so ADR-0005's arithmetic stays regenerable.
 
 ### `cli/ast10.py` and `.claude-plugin/marketplace.json` — distribution
 

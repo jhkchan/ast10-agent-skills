@@ -1,12 +1,41 @@
 ---
 artifact: adr
-version: "1.2"
+version: "1.3"
 created: 2026-08-23
 updated: 2026-08-24
 status: accepted
+superseded_in_part_by: "0006 — the lower-bound clause only; the diagnosis below stands"
 ---
 
 # ADR-0005: The Ship Rule's Lower Bound Measures Judge Disagreement, Not Skill Quality
+
+> ## Superseded in part by [ADR-0006](0006-confidence-bound-on-the-pooled-mean.md)
+>
+> **What is superseded: the lower-bound clause, and nothing else.** On 2026-08-24
+> [ADR-0006](0006-confidence-bound-on-the-pooled-mean.md) replaced
+> `mean − stdev ≥ POOLED_LOWER_BOUND (105)` with
+> `mean − 1.0 × stdev/√n ≥ POOLED_TARGET (108)` in `scripts/ship_floor.py`. That is the gate's
+> first and only change. `POOLED_TARGET`, `FLOORS` and `MIN_ROUNDS` did not move; the anti-re-roll
+> pooling rule did not move.
+>
+> **The diagnosis below is not superseded and is not wrong.** It is the record of how the defect
+> was found, and ADR-0006 rests on it entirely. Decision item 4 — a superseding record naming the
+> rule and its constants *before* any score is computed under it, then a fresh judged run — was
+> not overruled either; it was **followed**, and it still binds the next change. What ADR-0006
+> supersedes is item 1's "`POOLED_LOWER_BOUND` stays 105" and item 2's "stated, not applied".
+>
+> **Nothing below has been rewritten**, including two sentences that no longer hold against the
+> boundary the new clause uses. Both were measured against the retired 105 threshold and are true
+> of it: that `AST09` "clears comfortably at 107.0" under the standard error of the mean, and that
+> fixing the bound "would take the board from nine skills to ten". Against the Grade-A boundary
+> ADR-0006's clause actually asks about, `AST09`'s 107.0 is **below** 108 and still BLOCKED — the
+> board stays at nine, and the change buys nothing. The correction is recorded in ADR-0006
+> ("Consequence check") rather than applied here, because editing the argument after the fact
+> would destroy the thing this file is for.
+>
+> **Every figure below still regenerates.** `eval/calibration.py` keeps the retired constant so
+> the implied-mean-bar arithmetic can be re-derived, and `tests/test_calibration.py` still fails
+> if this document and that script disagree.
 
 ## Status
 

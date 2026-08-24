@@ -18,10 +18,14 @@ hold the two together:
    It is where the drift actually happened: an earlier draft published a
    `nova-pro` bias of −7.9 and a 20.1-point spread against scorecards that say
    −5.4 and 17.9.
-5. The gate constants the ADR promises it did not touch are still the values it
-   names. This is the ADR's central claim — that the bar was not retuned after
-   seeing the results — and the only way to keep it true a year from now is to
-   make changing a constant fail a test that names the record.
+5. The gate constants are the values a record explains. Through run 4 that
+   record was ADR-0005 and the claim was that nothing had moved. It has moved
+   once since: ADR-0006 retired `POOLED_LOWER_BOUND` in favour of
+   `mean − CONFIDENCE_K × stdev/√n ≥ POOLED_TARGET`. So the assertion changes
+   shape rather than disappearing — the *live* constants are pinned against
+   ADR-0006 and must be documented in it, the *retired* one is pinned at the
+   value ADR-0005's arithmetic needs, and either drifting without a record still
+   fails a test that names the record.
 """
 
 from __future__ import annotations
@@ -36,11 +40,12 @@ from pathlib import Path
 
 import pytest
 
-from scripts.ship_floor import FLOORS, MIN_ROUNDS, POOLED_LOWER_BOUND, POOLED_TARGET
+from scripts.ship_floor import CONFIDENCE_K, FLOORS, MIN_ROUNDS, POOLED_LOWER_BOUND, POOLED_TARGET
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CALIBRATION_PY = REPO_ROOT / "eval" / "calibration.py"
 ADR = REPO_ROOT / "docs" / "adr" / "0005-judge-panel-calibration-and-the-lower-bound.md"
+ADR_0006 = REPO_ROOT / "docs" / "adr" / "0006-confidence-bound-on-the-pooled-mean.md"
 DASHBOARD = REPO_ROOT / "docs" / "skill-judge-dashboard.md"
 SCORECARDS = REPO_ROOT / "eval" / "scorecards"
 #: Run 2, archived and frozen. Used where a claim needs a panel that has a
@@ -402,25 +407,58 @@ def test_dashboard_points_at_the_record_and_the_regenerator():
 
 
 # ---------------------------------------------------------------------------
-# 5. The constants the ADR promises it did not touch
+# 5. The constants, and the record that has to explain each one
 # ---------------------------------------------------------------------------
 
-#: The gate as ADR-0005 found it and left it. Changing any of these is a
-#: decision, and a decision needs a record that supersedes 0005.
-LOCKED_CONSTANTS = {
+#: The gate as it stands, and the record that explains it. ADR-0005 left all of
+#: these untouched; ADR-0006 is the gate's one and only change and it moved the
+#: second clause only. Changing any of these again is a decision, and a decision
+#: needs a record that supersedes 0006 and is written BEFORE the run it judges.
+LIVE_CONSTANTS = {
     "POOLED_TARGET": (POOLED_TARGET, 108),
-    "POOLED_LOWER_BOUND": (POOLED_LOWER_BOUND, 105),
+    "CONFIDENCE_K": (CONFIDENCE_K, 1.0),
     "MIN_ROUNDS": (MIN_ROUNDS, 4),
 }
 
 
-@pytest.mark.parametrize("name", sorted(LOCKED_CONSTANTS))
-def test_ship_floor_constants_are_unchanged_since_the_record(name):
-    actual, recorded = LOCKED_CONSTANTS[name]
+@pytest.mark.parametrize("name", sorted(LIVE_CONSTANTS))
+def test_live_ship_floor_constants_match_the_record_in_force(name):
+    actual, recorded = LIVE_CONSTANTS[name]
     assert actual == recorded, (
-        f"scripts/ship_floor.{name} is {actual}, but ADR-0005 records it as {recorded} and states "
-        "that no gate constant changed. Retuning the gate requires a superseding ADR written "
-        "BEFORE the run it judges — see docs/adr/0005-judge-panel-calibration-and-the-lower-bound.md."
+        f"scripts/ship_floor.{name} is {actual}, but ADR-0006 records it as {recorded}. The gate has "
+        "been changed exactly once, by that record, with its constant fixed before the run it "
+        "judges. Changing it again requires a superseding ADR written BEFORE the next run — see "
+        "docs/adr/0006-confidence-bound-on-the-pooled-mean.md."
+    )
+
+
+@pytest.mark.parametrize("name", sorted(LIVE_CONSTANTS))
+def test_adr_0006_documents_every_live_constant(name):
+    """A pinned number with no surviving justification is an undocumented gate.
+
+    Pinning the value alone lets the record rot while the test stays green, so
+    the constant and the ADR that explains it are asserted together.
+    """
+    actual, _ = LIVE_CONSTANTS[name]
+    flat = _text(ADR_0006)
+    assert f"{name} = {actual}" in flat, (
+        f"docs/adr/0006-confidence-bound-on-the-pooled-mean.md does not state {name} = {actual}; "
+        "the constant in scripts/ship_floor.py is now unexplained"
+    )
+
+
+def test_the_retired_bound_keeps_the_value_adr_0005_argues_from():
+    """`POOLED_LOWER_BOUND` is retired, not deleted, and 105 is why.
+
+    ADR-0005's whole argument is arithmetic against 105 — the implied mean bar,
+    the worked example, the perverse-incentive figure — and `eval/calibration.py`
+    regenerates all of it from this constant. Moving or removing it would make
+    the record that justified ADR-0006 unverifiable.
+    """
+    assert POOLED_LOWER_BOUND == 105
+    flat_0006 = _text(ADR_0006)
+    assert "POOLED_LOWER_BOUND = 105" in flat_0006 and "retired as a gate constant" in flat_0006, (
+        "ADR-0006 must record that it retired POOLED_LOWER_BOUND and at what value"
     )
 
 
@@ -428,10 +466,44 @@ def test_dimension_floors_are_unchanged_since_the_record():
     assert FLOORS == {"D1": 17, "D2": 13, "D3": 13, "D4": 13, "D5": 13, "D6": 13, "D7": 8, "D8": 13}
 
 
-def test_adr_quotes_the_constants_it_leaves_in_force():
+def test_adr_0005_quotes_the_constants_it_left_in_force():
+    """ADR-0005 is history now, and it still has to quote what it left standing."""
     flat = _text(ADR)
     assert f"`POOLED_TARGET` ({POOLED_TARGET})" in flat
     assert f"`POOLED_LOWER_BOUND` ({POOLED_LOWER_BOUND})" in flat
+
+
+def test_adr_0005_is_marked_superseded_in_part_without_being_rewritten():
+    """The weaker claim has to be published where the stronger one was made.
+
+    ADR-0005 says in as many words that no gate constant changed. That is true
+    of every run it describes and false of the repository today, so the file
+    carries a superseded-in-part note pointing at ADR-0006 — and keeps its
+    argument, its figures and its Accepted status intact, because it is the
+    record of how the defect was found.
+    """
+    flat = _text(ADR)
+    assert "Superseded in part by" in flat
+    assert "0006-confidence-bound-on-the-pooled-mean" in flat
+    assert "The diagnosis below is not superseded and is not wrong." in flat
+    # Still intact: the argument, the worked arithmetic, and the status.
+    assert "**`ship_floor.py` is untouched.**" in flat
+    assert re.search(r"^Accepted$", ADR.read_text(encoding="utf-8"), re.M)
+
+
+def test_adr_0006_records_that_the_gate_changed_exactly_once_and_bought_nothing():
+    """The three claims a reader is entitled to check before trusting a gate change."""
+    flat = _text(ADR_0006)
+    assert "the gate was changed exactly once" in flat
+    # The determinism evidence, with its arithmetic shown.
+    assert "110.3" in flat and "5.65" in flat and "104.6" in flat
+    assert "110.8" in flat and "4.67" in flat and "106.1" in flat
+    # No pass manufactured, stated in arithmetic rather than in rhetoric.
+    assert "9 of 11 skills ALREADY SHIP under the locked rule" in flat
+    assert "Zero verdicts change" in flat
+    # Run 5 is a fresh run, and run 4 is not re-labelled under the new rule.
+    assert "Run 5 must be a fresh judged run" in flat
+    assert "no run-4 verdict may be re-issued" in flat
 
 
 def test_calibration_imports_only_the_constants_it_reports():
@@ -439,8 +511,11 @@ def test_calibration_imports_only_the_constants_it_reports():
 
     The script may *discuss* `aggregate_verdict` in a docstring — explaining
     which bound is in force is half its job — but it must not call it, and it
-    must not pull anything from `ship_floor` beyond the two constants it prints
-    for context. A calibration tool that reaches into the gate is a second gate.
+    must not pull anything from `ship_floor` beyond the constants it prints for
+    context: the two the rule in force is built from, and the one it retired,
+    which ADR-0005's implied-mean-bar arithmetic is derived from and which would
+    otherwise have to be transcribed here. A calibration tool that reaches into
+    the gate is a second gate.
     """
     tree = ast.parse(CALIBRATION_PY.read_text(encoding="utf-8"))
     imported: set[str] = set()
@@ -451,9 +526,10 @@ def test_calibration_imports_only_the_constants_it_reports():
             assert all(alias.name != "scripts.ship_floor" for alias in node.names), (
                 "eval/calibration.py must import named constants from ship_floor, not the module"
             )
-    assert imported == {"POOLED_LOWER_BOUND", "POOLED_TARGET"}, (
+    assert imported == {"CONFIDENCE_K", "POOLED_LOWER_BOUND", "POOLED_TARGET"}, (
         f"eval/calibration.py imports {sorted(imported)} from ship_floor; it may only read the "
-        "two constants it prints for context, never the verdict machinery"
+        "three constants it prints for context — the two in force and the one ADR-0006 retired — "
+        "never the verdict machinery"
     )
     called = {
         node.func.id if isinstance(node.func, ast.Name) else getattr(node.func, "attr", "")

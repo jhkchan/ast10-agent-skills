@@ -50,6 +50,11 @@ bit for bit, so a copy — not a live import across repos — is the only way to
 guarantee this repo and its upstream can never silently diverge without a
 visible re-vendor.
 
+That guarantee has now done its job once. The two repositories **do** diverge, in
+one clause of `ship_floor.py`, and the divergence is visible: it is recorded in
+[`docs/adr/0006-confidence-bound-on-the-pooled-mean.md`](docs/adr/0006-confidence-bound-on-the-pooled-mean.md),
+in `NOTICE`, in the file's own docstring, and per file below.
+
 ## License-compatibility policy
 
 This repo is a provider-agnostic GitHub publication (spec.md contract) and
@@ -97,12 +102,24 @@ Upstream publishes no semver tags as of the vendored commit (`git describe
   which do not exist in this repo. It starts as an empty dict here, to be
   populated by T-3.x once this repo's own `AST01`.."AST10"` + advisory skills
   are authored — same contract (keyed by skill directory name), no data.
-- `ship_floor.py` — the aggregate formula itself is copied unmodified and
-  MUST stay that way without a deliberate re-vendor: `FLOORS`, `POOLED_TARGET`
-  (108), `POOLED_LOWER_BOUND` (105), `MIN_ROUNDS` (4), `AGG_METHOD`,
-  `RUBRIC_SHA`, `INDEPENDENT_METHODS`, `pooled_stats()`, `dim_means_of()`,
-  `aggregate_verdict()`, `verdict_of()`, `_is_invalidated()`, `binding_block()`
-  are all byte-identical to upstream. Upstream's `A_MINUS`/`MANDATED` skill-name
+- `ship_floor.py` — the aggregate formula was copied unmodified and has since
+  been changed **exactly once**, by a recorded decision rather than by drift:
+  [`docs/adr/0006-confidence-bound-on-the-pooled-mean.md`](docs/adr/0006-confidence-bound-on-the-pooled-mean.md)
+  (2026-08-24) retired the second ship clause `mean − stdev ≥ POOLED_LOWER_BOUND
+  (105)` and replaced it with `mean − CONFIDENCE_K (1.0) × stdev/√n ≥
+  POOLED_TARGET (108)`, adding `CONFIDENCE_K` and the two published statistics
+  `sem` and `ci_lower`. The reason is on the record: the retired clause used a
+  spread statistic as a confidence bound on a mean, and was measured changing a
+  verdict on a byte-identical file. **This repository and upstream now diverge
+  in that one clause**; a score quoted across the two must name which rule
+  produced it, and `POOLED_LOWER_BOUND` remains in the file at 105 as a retired
+  constant that the gate no longer reads. Everything else stays byte-identical
+  to upstream and MUST stay that way without a deliberate re-vendor or an ADR of
+  the same standing: `FLOORS`, `POOLED_TARGET` (108), `MIN_ROUNDS` (4),
+  `AGG_METHOD`, `RUBRIC_SHA`, `INDEPENDENT_METHODS`, `dim_means_of()`,
+  `verdict_of()`, `_is_invalidated()`, `binding_block()`, and the whole of
+  `pooled_stats()`/`aggregate_verdict()` apart from the clause named above.
+  Upstream's `A_MINUS`/`MANDATED` skill-name
   sets and the delivery-floor check in `main()` were **dropped**: those name
   that repository's own skill roster and are not part of the
   formula — this repo's spec/plan define no equivalent "mandated area"

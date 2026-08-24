@@ -3,8 +3,15 @@
 
 Judges each skills/<NAME>/SKILL.md across every AVAILABLE provider adapter, pools
 the per-round totals with the vendored ship_floor rule (mean >= 108 AND
-mean - stdev >= 105 AND per-dimension floors), and writes one scorecard per skill
-to eval/scorecards/<name>.json.
+mean - 1.0 * stdev/sqrt(n) >= 108 AND per-dimension floors), and writes one
+scorecard per skill to eval/scorecards/<name>.json.
+
+The second clause read `mean - stdev >= 105` through run 4 and was retired on
+2026-08-24 by docs/adr/0006-confidence-bound-on-the-pooled-mean.md -- the gate's
+first and only change, recorded before the run it judges. Scorecards written from
+here on therefore carry two statistics run 4's do not, `sem` and `ci_lower`.
+ARCHIVE eval/scorecards/ before overwriting it (CONTRIBUTING.md): run 4 was judged
+under the retired clause and must not be re-gated under this one.
 
 Providers that are unavailable are recorded in config/audit.yml with a reason by
 adapters.base.build_roster -- never silently dropped (spec.md S-004).

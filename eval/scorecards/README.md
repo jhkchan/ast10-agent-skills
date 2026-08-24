@@ -18,6 +18,20 @@ recorded in the audit trail. That is why `n` varies by judge (26 to 32) instead 
 a flat 33; an uneven `n` is the honest shape of a run that rejects bad rows rather than
 averaging them in.
 
+**These files were gated by the rule in force on 2026-08-24, and that rule has since changed.**
+Every verdict recorded here was issued under `mean ≥ 108` AND `mean − stdev ≥ 105` AND the
+per-dimension floors. That second clause was retired the same day by
+[`../../docs/adr/0006-confidence-bound-on-the-pooled-mean.md`](../../docs/adr/0006-confidence-bound-on-the-pooled-mean.md),
+which replaced it with `mean − 1.0 × stdev/√n ≥ 108` — the gate's first and only change, made
+because the retired clause was measured flipping the verdict of a byte-identical file. **These
+scorecards are not re-gated and must not be**: run 5 is the first corpus judged under the new
+clause. They were also written before that clause's two published statistics (`sem`, `ci_lower`)
+existed and so do not carry them, which is why `scripts/ship_floor.py` treats the absence of
+those two keys as a date rather than as a disagreement — a stored statistic that *disagrees* with
+the recompute is still refused. Running the new gate over this corpus produces the same nine
+SHIPs and the same two
+BLOCKs; only `AST09`'s stated reason would differ, and it is deliberately not written back here.
+
 **Run 3 is the one archive these files may be compared against, skill by skill.**
 `eval/scorecards-run3/` was scored by this same prompt, with the same panel, the same round
 count and the same gate constants. The only thing that changed between the two runs is eight

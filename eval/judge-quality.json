@@ -484,7 +484,7 @@
           "mean": 110.2,
           "sigma": 3.28,
           "lower_bound": 106.9,
-          "sem_bound": 109.3
+          "sem_bound": 109.2
         },
         {
           "skill": "AST06",
