@@ -52,7 +52,14 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.ship_floor import aggregate_verdict  # noqa: E402
-from validators.usf import validate_manifest_file  # noqa: E402
+from scripts.sign_usf import assertion_keys, parse_did_web  # noqa: E402
+from validators.usf import (  # noqa: E402
+    SIGNATURE_STATE_SIGNED,
+    load_manifest,
+    signature_state,
+    validate_manifest_file,
+    verify_signature,
+)
 
 README = REPO_ROOT / "README.md"
 GENERATOR = REPO_ROOT / "scripts" / "generate_badges.py"
@@ -240,6 +247,35 @@ def _usf_conformant() -> tuple[int, int]:
     return conformant, len(roster)
 
 
+def _usf_signed() -> tuple[int, int, str]:
+    """``(signed, roster, identity)`` — the signing claim, recomputed from the files.
+
+    A second implementation of ``generate_badges.usf_signing`` rather than a call to
+    it, for the same reason every other figure in this file is recomputed: a test that
+    asks the generator what the generator produced would pass on a generator that
+    invented the number. Offline by construction — the anchor is the committed copy,
+    never a fetch — so this can never fail because a domain was briefly unreachable.
+    """
+    roster = _skill_roster()
+    document = json.loads((REPO_ROOT / "config" / "did-web-anchor.json").read_text(encoding="utf-8"))
+    identity = document["id"]
+    published = {key.public_key for key in assertion_keys(document, parse_did_web(identity))}
+
+    signed = 0
+    for name in roster:
+        path = REPO_ROOT / "skills" / name / "skill.usf.yaml"
+        if not path.is_file():
+            continue
+        manifest = load_manifest(path)
+        author = manifest.get("author") or {}
+        key = author.get("signing_key")
+        if signature_state(manifest) != SIGNATURE_STATE_SIGNED or author.get("identity") != identity:
+            continue
+        if key in published and verify_signature(manifest, public_key_hex=key) is True:
+            signed += 1
+    return signed, len(roster), identity
+
+
 def _rubric_upstream() -> str:
     provenance = (REPO_ROOT / "vendor" / "skill-judge" / "PROVENANCE.md").read_text(encoding="utf-8")
     match = re.search(r"Upstream\s*\|\s*`([\w.-]+/[\w.-]+)`", provenance)
@@ -271,6 +307,10 @@ MUTATIONS = [
     ("F1 boundary clause", "3 publish none by rule", "0 publish none by rule"),
     ("control delta", "+0.52", "+0.90"),
     ("USF conformance", "11%2F11%20skills", "9%2F11%20skills"),
+    # The signing claim is a derived figure like any other: it is on the pill, it is
+    # hand-editable, and a "signed" that outran the manifests would be this repository
+    # committing the AST10 failure it exists to find.
+    ("USF signing claim", "schema--validated%20%C2%B7%20signed", "schema--validated"),
     ("scenario count", "62%20%C2%B7%20tiered", "58%20%C2%B7%20tiered"),
     ("licence id", "Apache--2.0", "MIT"),
     ("rubric upstream", _rubric_upstream().replace("-", "--").replace("/", "%2F"), "an--unrelated%2Frepository"),
@@ -392,10 +432,54 @@ def test_the_output_eval_badge_is_the_control_arm_and_not_the_whole_corpus():
 
 def test_the_usf_badge_matches_the_validator_over_every_shipped_manifest():
     conformant, roster = _usf_conformant()
+    signed, _roster, _identity = _usf_signed()
     committed = badge("USF v1.0")
-    assert committed.message == f"{conformant}/{roster} skills {DOT} schema-validated"
+    expected = f"{conformant}/{roster} skills {DOT} schema-validated"
+    if signed == roster:
+        expected += f" {DOT} signed"
+    assert committed.message == expected
     assert committed.link == "schemas/usf-v1.schema.json"
     assert (REPO_ROOT / "schemas" / "usf-v1.schema.json").is_file()
+
+
+def test_the_usf_badge_claims_a_signature_only_while_every_manifest_carries_one():
+    """The badge's signing claim, checked against the manifests it is a claim about.
+
+    The word on the pill is the assertion; the direction that matters is that it cannot
+    appear while a manifest says otherwise. Both directions are pinned, so the claim can
+    neither outrun the artifacts nor be dropped while they still substantiate it.
+    """
+    signed, roster, identity = _usf_signed()
+    message = badge("USF v1.0").message
+    assert (f"{DOT} signed" in message) == (signed == roster), (
+        f"the row says {message!r} while {signed} of {roster} manifests carry a signature this "
+        "repository can check against the published key"
+    )
+    if signed != roster:
+        return
+    # Every manifest, individually, substantiates the one word on the pill.
+    for name in _skill_roster():
+        manifest = load_manifest(REPO_ROOT / "skills" / name / "skill.usf.yaml")
+        assert signature_state(manifest) == SIGNATURE_STATE_SIGNED
+        assert manifest["author"]["identity"] == identity
+
+
+def test_the_usf_badge_does_not_read_a_signature_as_a_safety_claim():
+    """A signature answers "who published this", never "is this safe" — this repository's
+    own AST01 rule, aimed at its own README.
+
+    The pill has room for one word, so the boundary lives in the alt text, which is also
+    what a screen reader and an image-blocked reader get. The colour matters as much as
+    the wording: painted green, "signed" reads as a pass whatever the alt text says.
+    """
+    committed = badge("USF v1.0")
+    if f"{DOT} signed" not in committed.message:
+        pytest.skip("the row makes no signing claim to bound")
+    alt = committed.alt.lower()
+    assert "never that they are safe" in alt or "never that it is safe" in alt, committed.alt
+    assert "who published" in alt, committed.alt
+    for overstatement in ("trusted", "safe to install", "audited", "certified", "verified safe"):
+        assert overstatement not in alt, f"the USF alt text overstates a signature: {overstatement!r}"
 
 
 def test_the_usf_badge_names_the_version_the_manifests_declare():

@@ -1,11 +1,25 @@
 # Signing the USF manifests
 
-All eleven manifests ship `signature: "unsigned"` today, and `author.identity` and
-`author.signing_key` are **absent rather than empty**. That is a decision, not a to-do:
-publishing a DID or a public key that anchors to nothing manufactures exactly the false
-trust signal AST10 warns about. This page is the runbook for the day that changes — and
-for the day, months later, when you have to re-sign, rotate, or explain what the signature
-is worth.
+**All eleven manifests are signed.** Each carries an `ed25519:<128 hex>` signature over its
+own RFC 8785 payload, `author.identity: did:web:jhkchan.github.io`, and the
+`author.signing_key` that identity publishes at
+<https://jhkchan.github.io/.well-known/did.json>. Anyone can check the whole set, from any
+machine, with no key and no account:
+
+```bash
+python3 scripts/sign_usf.py verify --identity did:web:jhkchan.github.io
+```
+
+They shipped unsigned before that — `signature: "unsigned"`, both anchor fields **absent
+rather than empty** — and that was a decision rather than a to-do: publishing a DID or a
+public key that anchors to nothing manufactures exactly the false trust signal AST10 warns
+about, so the tool has no code path that produces a signature without an anchor. The state
+changed when there was a domain to anchor to, which is the only thing that was missing.
+
+This page is the runbook: how that was done, and — read months later — how to re-sign after
+an edit, how to rotate, and what a signature here is and is not worth. `YOUR.DOMAIN` below
+is a placeholder throughout; nothing in this repository hardcodes a domain, and the identity
+is always a runtime argument.
 
 Everything below is done by `scripts/sign_usf.py`. Two properties of that tool shape the
 whole procedure:
@@ -21,7 +35,7 @@ whole procedure:
 Contents: [Before you start](#before-you-start) · [The four commands](#the-four-commands) ·
 [When you must re-sign](#when-you-must-re-sign) · [What a signature proves](#what-a-verified-signature-proves-and-what-it-does-not) ·
 [Key loss and rotation](#key-loss-and-key-rotation) · [The key is never in CI](#the-key-is-never-in-ci) ·
-[After the first signing run](#after-the-first-signing-run)
+[What the first signing run moved](#what-the-first-signing-run-moved)
 
 ---
 
@@ -33,7 +47,7 @@ You need three things, and the first one is the one that actually matters:
    The trust anchor is `did:web`, the USF specification's own example form, and a
    `did:web` anchor is worth exactly as much as your control of the domain and its TLS.
 2. **A place to keep the private key that is neither this repository nor CI.** The default
-   is `~/.config/ast10-signing/ed25519.pem` (directory `0700`, key `0600`).
+   is `~/.config/did-web/jhkchan.github.io/ed25519.pem` (directory `0700`, key `0600`).
 3. **`cryptography` installed** (`pip install cryptography`). `validators/usf.py` imports it
    lazily; the signer needs it outright.
 
@@ -58,7 +72,7 @@ nothing should.
 ### 1. `keygen` — make the key, outside the tree
 
 ```bash
-python3 scripts/sign_usf.py keygen                 # ~/.config/ast10-signing/ed25519.pem
+python3 scripts/sign_usf.py keygen                 # ~/.config/did-web/jhkchan.github.io/ed25519.pem
 python3 scripts/sign_usf.py keygen --encrypt       # passphrase-protected at rest
 ```
 
@@ -230,9 +244,9 @@ reasons the anchor is worth having.
 ### Rotating
 
 ```bash
-python3 scripts/sign_usf.py keygen --out ~/.config/ast10-signing/ed25519-2.pem
+python3 scripts/sign_usf.py keygen --out ~/.config/did-web/jhkchan.github.io/ed25519-2.pem
 python3 scripts/sign_usf.py did-doc --identity did:web:YOUR.DOMAIN \
-    --key ~/.config/ast10-signing/ed25519-2.pem --output did-new.json
+    --key ~/.config/did-web/jhkchan.github.io/ed25519-2.pem --output did-new.json
 ```
 
 `keygen` refuses to overwrite an existing key, so rotation is always a deliberate act: move
@@ -264,9 +278,13 @@ CI can check every signature and never needs, never sees, and never gets the pri
 
 - `.github/workflows/eval.yml` runs `python scripts/sign_usf.py verify` with no
   `--identity`, so it needs no network and no secret. A signed manifest whose bytes moved
-  since signing fails the build; an explicitly `unsigned` manifest passes, because unsigned
-  is this repository's declared state and a step that failed on it would be pressure to
-  manufacture an anchor.
+  since signing fails the build. An explicitly `unsigned` manifest still passes that step —
+  it is a declared state, not a defect, and a step that failed on it would be pressure to
+  manufacture an anchor — so the step alone is not what pins the *current* state. That is
+  `tests/test_usf.py::test_shipped_manifest_is_signed_and_anchored`, which fails if any
+  manifest reverts, and `tests/test_signing_anchor.py`, which checks every manifest against
+  a committed copy of the published DID document rather than against the network, so a
+  pull request never goes red because GitHub Pages had a bad minute.
 - `keygen` and `sign` refuse to run when `CI`, `GITHUB_ACTIONS`, `GITLAB_CI`, `BUILDKITE`,
   `JENKINS_URL` or `TF_BUILD` is set. A signing key CI can reach is a signing key a workflow
   can exfiltrate. `tests/scripts/test_sign_usf.py::test_keygen_and_sign_refuse_to_run_in_ci`
@@ -295,21 +313,33 @@ CI can check every signature and never needs, never sees, and never gets the pri
 
 ---
 
-## After the first signing run
+## What the first signing run moved
 
-The unsigned state is pinned by tests on purpose — *"signing this repo is a deliberate
-change that has to update this expectation."* Expect these to fail on the first signing run,
-and update each one to describe the new state rather than deleting it:
+The unsigned state was pinned by tests on purpose — *"signing this repo is a deliberate
+change that has to update this expectation"* — and roughly fifteen of them went red on the
+first signing run. Every one was a guard whose premise had become false, and none was
+deleted or relaxed. This is the record of where each one went, and it is the map for the
+next time the signing state changes: a rotation, or a fork signing under its own identity.
 
-| What fails | What to do |
-| --- | --- |
-| `tests/test_usf.py::test_shipped_manifest_is_explicitly_unsigned` | Assert the signed state instead: a real `ed25519:<128 hex>` signature and a declared `author.identity`. |
-| `tests/scripts/test_sign_usf.py::test_verify_treats_an_explicitly_unsigned_manifest_as_the_honest_current_state` | Keep the property (unsigned is not a failure) on a fixture copy; stop asserting it about the shipped eleven. |
-| `README.md` — the **Unsigned packages** bullet, the `validators/usf.py` sample output, and the note that `--strict` fails on this repo's own roster | Rewrite all three together. They describe one state and they must move as one. |
-| `docs/architecture.md` — the manifest section | Same. |
+| Guard | Then | Now |
+| --- | --- | --- |
+| `tests/test_usf.py::test_shipped_manifest_is_signed_and_anchored` | asserted the placeholder `"unsigned"` | asserts the state, an `ed25519:<128 hex>` signature that VERIFIES over its own JCS payload, `author.identity`, and `author.signing_key` — a superset of what the old pin guaranteed |
+| `tests/test_usf.py::test_shipped_signature_does_not_survive_a_change_to_the_package_it_covers` | did not exist | tampering with a permission, the `content_hash` or the identity breaks verification |
+| `tests/test_signing_anchor.py` | did not exist | every manifest agrees with `config/did-web-anchor.json`, checked OFFLINE so CI never depends on a domain being up |
+| `tests/scripts/test_sign_usf.py` — the seven that signed the shipped roster | started from files that happened to be unsigned | start from `_unsigned_skill_copy`, a copy reverted to the pre-signing form, so each tests the TRANSITION it was always about rather than the state of the tree |
+| `tests/scripts/test_sign_usf.py::test_verify_reports_the_shipped_roster_as_signed_and_verifying` | did not exist | the eleven verify, with the unanchored caveat still printed |
+| `README.md`, `docs/architecture.md`, `CONTRIBUTING.md`, `.github/workflows/eval.yml` | described an unsigned roster and warnings that no longer fire | describe the signed one, and what a signature does not prove |
 
-Only after all of that: the USF badge. It currently claims `schema-validated`, which stays
-true either way and says nothing about signing. Do not add a "signed" claim while any
-manifest carries the placeholder — a badge that overstates the state of the artifact is the
-AST10 failure this repository exists to find. The badge row is generated by
-`scripts/generate_badges.py`; change it there, never by hand.
+**The badge.** It said `11/11 skills · schema-validated` and deliberately made no signing
+claim, because claiming one while a manifest carried the placeholder would have been the
+AST10 failure this repository exists to find. It now reads `11/11 skills · schema-validated
+· signed`, under two rules that are the reason it is allowed to:
+
+- **Derived, never typed.** `generate_badges.usf_signing` counts a manifest only when its
+  signature verifies over its own payload against a key `config/did-web-anchor.json`
+  publishes under `assertionMethod`. One manifest reverting to the placeholder drops the
+  word from the row in the same commit. The badge row is generated by
+  `scripts/generate_badges.py` — change it there, never by hand.
+- **It does not overstate.** The pill is not green, does not say "verified" and does not say
+  "trusted"; the alt text names the publisher and says outright that this answers who
+  published these packages, never that they are safe to run.

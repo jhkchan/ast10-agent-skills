@@ -80,11 +80,19 @@ Regenerate the content hash whenever the shipped surface changes:
 python3 validators/usf.py --update-content-hash skills/<ID>/skill.usf.yaml
 ```
 
-Note that the unsigned / no-DID **warnings are expected** and are the repo's
-honest declared posture, which is why CI does not run the validator with
-`--strict`. Do not silence them by inventing an identity anchor that anchors to
-nothing — publishing a DID or public key that nobody can verify manufactures
-exactly the false trust signal AST10 warns about.
+The shipped roster is clean under `--strict` today: every manifest is signed and
+anchored to `did:web:jhkchan.github.io` (see [`docs/signing.md`](docs/signing.md)).
+CI still runs the validator without `--strict`, because that step's job is to fail
+on a manifest that is wrong, not on a warning a future schema revision adds.
+
+A new skill you contribute will warn about a missing identity anchor and an
+unsigned manifest, and **that is the correct state for it**. Leave both warnings
+alone: `signature: "unsigned"` with `author.identity` and `author.signing_key`
+absent rather than empty is what an unsigned package honestly looks like. Do not
+silence them by inventing an anchor — publishing a DID or public key that nobody
+can verify manufactures exactly the false trust signal AST10 warns about, and the
+maintainer signs the roster at release with a key that never enters this
+repository or CI.
 
 **3. List the skill in the marketplace manifest.** Add a `{name, description}`
 entry to `.claude-plugin/marketplace.json` and bump `skill_count`.

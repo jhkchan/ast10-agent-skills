@@ -22,10 +22,16 @@ description: >-
 
 author:
   name: "owasp-ast10-agent-skills contributors"
-  # `identity` and `signing_key` are deliberately absent. This package ships
-  # unsigned (see `signature` below), and publishing a DID or a public key that
-  # anchors to nothing would manufacture exactly the false trust signal AST10
-  # warns about. The validator reports the gap as a warning; it is not hidden.
+  # `identity` and `signing_key` are written by scripts/sign_usf.py in the same
+  # operation as `signature` below, and both are INSIDE the signed payload. A
+  # signature whose key anchors to nothing is the false trust signal AST10 warns
+  # about, so the signer cannot produce one without the anchor, and neither field
+  # can be swapped for another publisher's without breaking the signature.
+  # The key is published at https://jhkchan.github.io/.well-known/did.json; this
+  # anchor is worth exactly as much as control of that domain and its TLS. A
+  # verified signature answers "who published this", never "is this safe".
+  identity: "did:web:jhkchan.github.io"
+  signing_key: "ed25519:77fb87cd4a46dd524190f72cee510d0ad934b0df4acc40366f9b8a8dc87593a6"
 
 permissions:
   # Paths are relative to the skill package under review, which the host supplies
@@ -71,11 +77,12 @@ scan_status:
   # from one stripped during a port, which is the AST10 failure itself.
   result: "unscanned"
 
-# Explicit unsigned placeholder. The validator reports signature_state="unsigned"
-# -- a policy decision for the consumer, not a malformed manifest. Once a key
-# exists, this becomes ed25519 over the RFC 8785 (JCS) canonical JSON
-# serialization of this manifest with `signature` removed and `content_hash` kept.
-signature: "unsigned"
+# ed25519 over the RFC 8785 (JCS) canonical JSON serialization of this manifest
+# with `signature` removed and `content_hash` kept, so this one value covers both
+# the package bytes and the identity anchor above. Written and re-checked by
+# scripts/sign_usf.py; anyone can check it against the published key with:
+#   python3 scripts/sign_usf.py verify --identity did:web:jhkchan.github.io
+signature: "ed25519:11c8062b103da8980d41ef0f5bfff63886fa16a78401d2671b4961004defe4595bc250ec5ba977479d204074c68d8407c584938c75075cf219c587db83fa1700"
 
 # sha256 over this skill's shipped surface as defined by scripts/content_hash.py
 # (SKILL.md, references/*.md, scripts/*.py, evals/evals.json). This file is

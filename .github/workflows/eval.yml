@@ -128,18 +128,26 @@ jobs:
 
       - name: USF manifest validation
         # Every shipped skill must carry a schema-valid Universal Skill Format
-        # manifest. Not --strict: the unsigned / no-DID warnings are the
-        # honest, declared posture of this repo (see any skill.usf.yaml), not
-        # defects to be suppressed.
+        # manifest. Not --strict on purpose: this step's job is to fail on a
+        # manifest that is WRONG. The roster happens to be warning-free today
+        # (it is signed and anchored), but a contributor's new skill warns
+        # about its missing anchor and its unsigned signature, and those are
+        # the honest declared state of an unsigned package -- not defects to be
+        # suppressed by inventing an anchor that anchors to nothing.
         run: python validators/usf.py skills/*/skill.usf.yaml
 
       - name: USF signature verification (public-key only)
         # The half of signing that CI can run, and the only half it ever gets.
         # `verify` with no --identity checks each signature against the public key
-        # the manifest itself carries: a signed manifest whose bytes have been
-        # altered since signing FAILS here, and an explicitly `unsigned` one PASSES,
-        # because "unsigned" is this repo's declared state and a step that failed on
-        # it would be pressure to manufacture an anchor that anchors to nothing.
+        # the manifest itself carries: the eleven shipped manifests are signed, so
+        # one whose bytes have been altered since signing FAILS here. An explicitly
+        # `unsigned` manifest still PASSES -- it is a declared state, not a defect,
+        # and a step that failed on it would be pressure to manufacture an anchor
+        # that anchors to nothing. What pins the roster's CURRENT signed state is
+        # tests/test_usf.py::test_shipped_manifest_is_signed_and_anchored, and
+        # tests/test_signing_anchor.py checks the manifests against a committed copy
+        # of the published DID document -- offline, so a PR never fails here because
+        # a domain was briefly unreachable.
         #
         # Verification is a public-key operation, so no private key is needed here
         # and none is present: `keygen` and `sign` refuse to run at all when CI is

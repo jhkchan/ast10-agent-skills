@@ -31,7 +31,14 @@ if str(REPO_ROOT) not in sys.path:
 
 from scripts import generate_badges as gen  # noqa: E402
 from scripts.ship_floor import aggregate_verdict  # noqa: E402
-from validators.usf import validate_manifest_file  # noqa: E402
+from scripts.sign_usf import assertion_keys, parse_did_web  # noqa: E402
+from validators.usf import (  # noqa: E402
+    SIGNATURE_STATE_SIGNED,
+    load_manifest,
+    signature_state,
+    validate_manifest_file,
+    verify_signature,
+)
 
 README = REPO_ROOT / "README.md"
 
@@ -106,6 +113,8 @@ def test_the_committed_badge_row_is_the_one_its_sources_produce():
         ("7 of 10", "10 of 10"),  # an F1 coverage claim that hides the boundary
         ("+0.52", "+0.90"),  # an inflated control delta
         ("62%20%C2%B7%20tiered", "58%20%C2%B7%20tiered"),  # the pre-registry scenario estimate
+        # A signing claim typed onto the pill, or typed off it.
+        ("schema--validated%20%C2%B7%20signed", "schema--validated"),
     ],
 )
 def test_check_fails_when_a_badge_outruns_its_source(tmp_path, stale, replacement):
@@ -247,7 +256,55 @@ def test_the_usf_badge_matches_the_validator_over_every_shipped_manifest():
     conformant = sum(
         1 for s in skills if (s / "skill.usf.yaml").is_file() and validate_manifest_file(s / "skill.usf.yaml").ok
     )
-    assert _message("USF v1.0") == f"{conformant}/{len(skills)} skills {gen.DOT} schema-validated"
+    expected = f"{conformant}/{len(skills)} skills {gen.DOT} schema-validated"
+    signed, roster, _identity = gen.usf_signing()
+    if signed == roster:
+        expected += f" {gen.DOT} signed"
+    assert _message("USF v1.0") == expected
+
+
+def test_the_usf_signing_count_is_every_manifest_that_verifies_against_the_anchor():
+    """The derivation, checked one manifest at a time rather than as a total.
+
+    A count is easy to satisfy accidentally; the point is WHICH manifests it counts.
+    Every skill on the roster is re-checked here against the published key, and the
+    total has to agree with the sum of those individual answers.
+    """
+    document = json.loads((REPO_ROOT / "config" / "did-web-anchor.json").read_text(encoding="utf-8"))
+    published = {k.public_key for k in assertion_keys(document, parse_did_web(document["id"]))}
+
+    expected = 0
+    for path in sorted((REPO_ROOT / "skills").glob("*/skill.usf.yaml")):
+        manifest = load_manifest(path)
+        author = manifest.get("author") or {}
+        key = author.get("signing_key")
+        ok = (
+            signature_state(manifest) == SIGNATURE_STATE_SIGNED
+            and author.get("identity") == document["id"]
+            and key in published
+            and verify_signature(manifest, public_key_hex=key) is True
+        )
+        expected += ok
+
+    signed, roster, identity = gen.usf_signing()
+    assert signed == expected
+    assert roster == len(list((REPO_ROOT / "skills").glob("*/SKILL.md")))
+    assert identity == document["id"]
+
+
+def test_the_usf_signing_derivation_reads_the_committed_anchor_and_not_the_network():
+    """Generating a README must never depend on a domain being reachable."""
+
+    def refuse(*args, **kwargs):
+        raise AssertionError("usf_signing reached for the network")
+
+    monkeypatch = pytest.MonkeyPatch()
+    try:
+        monkeypatch.setattr("scripts.sign_usf._http_get", refuse)
+        monkeypatch.setattr("urllib.request.urlopen", refuse)
+        assert gen.usf_signing()[0] > 0
+    finally:
+        monkeypatch.undo()
 
 
 def test_the_usf_badge_says_something_a_reader_can_act_on():
@@ -395,6 +452,40 @@ def test_a_manifest_that_fails_validation_flips_the_usf_badge_to_caution(monkeyp
     assert badge.colour == gen.CAUTION
 
 
+def test_an_unsigned_manifest_drops_the_signing_claim_from_the_badge(monkeypatch):
+    """The clean state is not hard-coded. One manifest reverting to the placeholder
+    takes the word off the pill in the same commit, which is the whole reason the
+    claim is derived instead of typed."""
+    monkeypatch.setattr(gen, "usf_signing", lambda: (10, 11, "did:web:example.com"))
+    badge = next(b for b in gen.build_badges() if b.label == "USF v1.0")
+    assert badge.message == f"11/11 skills {gen.DOT} schema-validated"
+    assert "signed" not in badge.message
+    assert "carry no signature" in badge.alt
+    assert badge.colour == gen.STANDARD, "an unsigned roster is this repo's declared posture, not a caution"
+
+
+def test_a_non_conformant_manifest_outranks_the_signing_claim(monkeypatch):
+    """A signature over a manifest that does not validate is not a reason to look
+    calmer. Conformance is decided first and its caution wins the pill."""
+    monkeypatch.setattr(gen, "usf_conformance", lambda: (9, 11))
+    monkeypatch.setattr(gen, "usf_signing", lambda: (11, 11, "did:web:example.com"))
+    badge = next(b for b in gen.build_badges() if b.label == "USF v1.0")
+    assert badge.message == f"9/11 skills {gen.DOT} 2 not conformant"
+    assert "signed" not in badge.message
+    assert badge.colour == gen.CAUTION
+
+
+def test_the_signing_claim_names_the_publisher_and_refuses_to_imply_safety(monkeypatch):
+    """The alt text is the only place the boundary fits, so it is asserted where the
+    wording is chosen rather than only where it is committed."""
+    monkeypatch.setattr(gen, "usf_signing", lambda: (11, 11, "did:web:example.com"))
+    badge = next(b for b in gen.build_badges() if b.label == "USF v1.0")
+    assert f"{gen.DOT} signed" in badge.message
+    assert "did:web:example.com" in badge.alt
+    assert "never that they are safe to run" in badge.alt
+    assert badge.colour == gen.STANDARD
+
+
 def test_a_skill_with_no_manifest_counts_against_the_usf_numerator(tmp_path, monkeypatch):
     monkeypatch.setattr(gen, "SKILLS_DIR", tmp_path)
     for name in ("alpha", "beta"):
@@ -451,6 +542,7 @@ def test_the_latest_iteration_is_the_one_that_is_badged():
         ("+0.52 vs blind control", "%2B0.52%20vs%20blind%20control"),
         ("a_b", "a__b"),
         ("7 of 10 · 3 publish none by rule", "7%20of%2010%20%C2%B7%203%20publish%20none%20by%20rule"),
+        ("11/11 skills · schema-validated · signed", "11%2F11%20skills%20%C2%B7%20schema--validated%20%C2%B7%20signed"),
     ],
 )
 def test_shield_escaping_survives_the_round_trip(raw, encoded):

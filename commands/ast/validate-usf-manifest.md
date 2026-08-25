@@ -98,16 +98,22 @@ Exit code is 1 when any manifest fails, 0 otherwise. A passing manifest prints o
 verdict line and any warnings:
 
 ```text
-skills/AST01/skill.usf.yaml: warn: author.identity: no decentralized identity anchor declared; a registry cannot bind this package to a publisher, so installation counts and author names remain unverifiable trust signals
-skills/AST01/skill.usf.yaml: OK (signature=unsigned, risk_tier floor=L0, 0 error(s), 1 warning(s))
+skills/AST01/skill.usf.yaml: OK (signature=signed, risk_tier floor=L0, 0 error(s), 0 warning(s))
 ```
 
 ### Reading the verdict line
 
-- `signature=unsigned` is a **state**, not a defect. It is an explicit, auditable
-  declaration that the package ships without a signature — far better than a signature
-  field that anchors to nothing, which manufactures the false trust signal AST10 warns
-  about. Whether unsigned is acceptable is the consumer's policy call.
+- `signature=` reports one of three **states**, and only one of them is a defect.
+  `signed` means the field holds a well-formed `ed25519:<128 hex>` value — the validator
+  reports the shape, and checking it against a published key is
+  `python3 scripts/sign_usf.py verify --identity did:web:<domain>`. `unsigned` is the
+  explicit, auditable declaration that the package ships without one — far better than a
+  signature field that anchors to nothing, which manufactures the false trust signal AST10
+  warns about — and whether that is acceptable is the consumer's policy call. `malformed`
+  is the defect: neither a real signature nor an honest placeholder.
+- **A signature answers "who published this", never "is this safe."** A `signed` verdict
+  line, and even a `verify` that passes against a live anchor, says nothing about
+  `scan_status`, about review, or about what the package does when it runs.
 - `risk_tier floor=` is the tier **derived from the permissions**, not the tier the author
   wrote. When the two disagree downward, that is an error above; when they agree, the
   author's claim has been independently confirmed rather than believed.

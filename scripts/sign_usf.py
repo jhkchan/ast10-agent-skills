@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """scripts/sign_usf.py — sign the USF manifests, and anchor the key that signed them.
 
-Every shipped `skill.usf.yaml` carries `signature: "unsigned"`, and `author.identity`
-and `author.signing_key` are absent rather than empty. That is not an oversight to be
-tidied away by generating a key: publishing a DID or a public key that anchors to
-nothing manufactures exactly the false trust signal AST10 warns about, and this repo's
-own AST01 skill states the rule it would break — *"A verified signature answers 'who
-published this', never 'is this safe'."* A key with no anchor answers neither.
+Every shipped `skill.usf.yaml` is signed by this tool and anchored to
+`did:web:jhkchan.github.io`. Before that they carried `signature: "unsigned"` with
+`author.identity` and `author.signing_key` absent rather than empty, which was never an
+oversight to be tidied away by generating a key: publishing a DID or a public key that
+anchors to nothing manufactures exactly the false trust signal AST10 warns about, and this
+repo's own AST01 skill states the rule it would break — *"A verified signature answers 'who
+published this', never 'is this safe'."* A key with no anchor answers neither. An unsigned
+manifest is therefore still a first-class state here, reported as such rather than as a
+failure — a contributor's new skill ships in it, and `verify` says so without complaining.
 
 So this tool treats signing and anchoring as ONE operation. `sign` writes
 `author.identity`, `author.signing_key` and `signature` in a single rewrite, and both
@@ -26,7 +29,7 @@ modified manifest with its own key passes that check trivially.
 
 KEY CUSTODY
 -----------
-The private key lives outside this repository (default `~/.config/ast10-signing/`,
+The private key lives outside this repository (default `~/.config/did-web/jhkchan.github.io/`,
 directory 0700, key 0600) and is used at release only.
 
 * `keygen` REFUSES to write a key inside the working tree, checked against the git
@@ -101,7 +104,13 @@ MANIFEST_NAME = "skill.usf.yaml"
 
 #: Default private-key location. Outside the repository by construction, and the
 #: `keygen` refusal below is what keeps it that way when someone passes `--out`.
-DEFAULT_KEY_PATH = Path("~/.config/ast10-signing/ed25519.pem")
+# Keyed by the IDENTITY, not by this project. The key is anchored to a did:web
+# that names a person, so the same key signs whatever else that person publishes
+# and a second project must reuse it rather than mint a rival. A project-scoped
+# path (`~/.config/<project>-signing/`) invites exactly that split, and an
+# identity whose key set fragments per repository is not an identity. Keeping the
+# DID in the path also leaves room for a second one without either moving.
+DEFAULT_KEY_PATH = Path("~/.config/did-web/jhkchan.github.io/ed25519.pem")
 
 #: Environment variables that mean "this is not a maintainer's laptop".
 CI_ENV_VARS = ("CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "JENKINS_URL", "TF_BUILD")

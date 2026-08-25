@@ -306,7 +306,14 @@ def test_a_signed_manifest_does_not_trip_the_scan(tmp_path):
 
 
 def test_the_shipped_manifests_are_clean_today():
-    """The eleven are unsigned, and nothing about them is key-shaped either way."""
+    """The eleven are signed, and the PUBLIC half they carry is not key-shaped.
+
+    This is the case the docstring above calls the rule's one real limit: an ed25519
+    private seed and an ed25519 public key are the same 64-hex string shape, so the
+    `signing_key:` field the signer writes is allowed only because the field NAMES it as
+    public. Now that the roster is signed, this assertion runs against eleven real
+    published keys rather than against eleven manifests that carried none.
+    """
     assert not offenders(sorted((REPO_ROOT / "skills").glob("*/skill.usf.yaml")))
 
 

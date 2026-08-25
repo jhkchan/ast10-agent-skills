@@ -170,11 +170,24 @@ the two tuples exist to force. Nothing about the hashing algorithm or the surfac
 definition moved; only which patterns match a file did.
 
 **`signature` is the field the rest of this section exists to keep honest.** All eleven
-manifests carry the literal placeholder `"unsigned"`, and `author.identity` /
-`author.signing_key` are absent rather than empty — a DID or a public key that anchors to
-nothing is the false trust signal AST10 is about, and `validators/usf.py` distinguishes the
-explicit placeholder from a real `ed25519:<128 hex>` value rather than treating either as
-"valid".
+manifests are signed: each carries a real `ed25519:<128 hex>` value over its own RFC 8785
+payload, plus `author.identity: did:web:jhkchan.github.io` and the `author.signing_key`
+that identity publishes at `https://jhkchan.github.io/.well-known/did.json`. Anyone can
+check the set with `python3 scripts/sign_usf.py verify --identity did:web:jhkchan.github.io`,
+which needs no key and no secret.
+
+They shipped unsigned before that, with the literal placeholder `"unsigned"` and both
+anchor fields absent rather than empty, and the reason is worth keeping: a DID or a public
+key that anchors to nothing is the false trust signal AST10 is about. `validators/usf.py`
+still distinguishes the explicit placeholder from a real value rather than treating either
+as "valid", which is what makes both states legible rather than one of them a gap.
+
+What a verified signature answers is *who published this*, never *is this safe* — and a
+`did:web` anchor is worth exactly as much as control of that domain and its TLS.
+`config/did-web-anchor.json` is a committed copy of the published document so CI can check
+the manifests against it without a network call
+(`tests/test_signing_anchor.py`); the live resolution stays in `verify --identity`, where
+an unreachable anchor exits 3 and is never confused with a pass.
 
 Signing them is implemented, not aspirational. `scripts/sign_usf.py` writes
 `author.identity`, `author.signing_key` and `signature` in a single rewrite, with all three

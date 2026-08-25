@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -49,6 +50,13 @@ from validators.usf import (
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = REPO_ROOT / "skills"
+
+#: The did:web identity every shipped manifest anchors to. Pinned here rather than read
+#: back out of the manifests, because a test that derives the expected value from the file
+#: under test cannot notice the file changing. The key that identity publishes, and the
+#: agreement between the two, are checked offline in
+#: ``tests/test_signing_anchor.py``.
+SHIPPED_IDENTITY = "did:web:jhkchan.github.io"
 
 SHIPPED_SKILLS = [
     "AST01",
@@ -934,11 +942,63 @@ def test_shipped_manifest_content_hash_matches_the_package_on_disk(skill):
 
 
 @pytest.mark.parametrize("skill", SHIPPED_SKILLS)
-def test_shipped_manifest_is_explicitly_unsigned(skill):
-    """Not a placeholder to be forgotten: the tests pin it, so signing this repo
-    is a deliberate change that has to update this expectation."""
-    result = validate_manifest_file(SKILLS_DIR / skill / "skill.usf.yaml")
-    assert result.signature_state == SIGNATURE_STATE_UNSIGNED
+def test_shipped_manifest_is_signed_and_anchored(skill):
+    """The eleven are signed, and this is the assertion that keeps saying so.
+
+    It replaces ``test_shipped_manifest_is_explicitly_unsigned``, which pinned the
+    unsigned placeholder so that signing this repository could not happen by accident.
+    That test's premise is now false, and the successor is a SUPERSET of what it
+    guaranteed: it still fixes the exact signature state, and it additionally requires a
+    real ``ed25519:<128 hex>`` value, both anchor fields, and a signature that actually
+    verifies over this manifest's own RFC 8785 payload. "Signed" as a bare string would
+    be weaker than the unsigned pin it replaces -- `signature: "ed25519:" + "00" * 64`
+    would satisfy it -- so nothing here settles for the shape alone.
+
+    What it still does not claim: that any of this makes the skill safe. That is
+    ``author.identity``'s own comment in every manifest, and this repository's AST01
+    rule -- a verified signature answers "who published this", never "is this safe".
+    """
+    path = SKILLS_DIR / skill / "skill.usf.yaml"
+    result = validate_manifest_file(path)
+    assert result.signature_state == SIGNATURE_STATE_SIGNED
+    assert result.ok, result.errors
+
+    manifest = load_manifest(path)
+    assert re.fullmatch(r"ed25519:[0-9a-f]{128}", manifest["signature"]), manifest["signature"]
+
+    author = manifest["author"]
+    assert author.get("identity") == SHIPPED_IDENTITY
+    assert re.fullmatch(r"ed25519:[0-9a-f]{64}", author.get("signing_key") or ""), author.get("signing_key")
+
+    # Over its own JCS payload, against the key the manifest carries -- and again against
+    # that key passed in explicitly, so a verifier that ignored its argument is caught.
+    assert verify_signature(manifest) is True
+    assert verify_signature(manifest, public_key_hex=author["signing_key"]) is True
+
+
+@pytest.mark.parametrize("skill", SHIPPED_SKILLS)
+def test_shipped_signature_does_not_survive_a_change_to_the_package_it_covers(skill):
+    """The other half of the claim above: the signature is bound to THESE bytes.
+
+    A signature that verified over a manifest it no longer describes would be the false
+    trust signal AST10 is about, so the binding is asserted rather than assumed. The
+    manifest on disk is never touched; the tampering happens on the loaded dict.
+    """
+    manifest = load_manifest(SKILLS_DIR / skill / "skill.usf.yaml")
+
+    tampered = copy.deepcopy(manifest)
+    tampered["permissions"]["shell"] = True
+    assert verify_signature(tampered) is False
+
+    # The content_hash is inside the signed payload, so a swapped package fails too.
+    restamped = copy.deepcopy(manifest)
+    restamped["content_hash"] = "sha256:" + "00" * 32
+    assert verify_signature(restamped) is False
+
+    # And the anchor is inside it: the signature cannot be moved to another publisher.
+    moved = copy.deepcopy(manifest)
+    moved["author"]["identity"] = "did:web:evil.example"
+    assert verify_signature(moved) is False
 
 
 @pytest.mark.parametrize("skill", SHIPPED_SKILLS)

@@ -274,19 +274,27 @@ def test_ci_workflow_is_read_only(workflow):
 
 
 def test_usf_validation_step_is_not_strict(workflow_text):
-    """--strict turns the unsigned / no-DID warnings into failures. Those
-    warnings are this repo's declared posture, not defects; a CI step that
-    forced them green would be pressure to manufacture an identity anchor that
-    anchors to nothing."""
+    """--strict turns every warning into a failure, and the step's job is to fail
+    on a manifest that is WRONG.
+
+    The shipped roster is warning-free today because it is signed and anchored,
+    so this is not about the current state: a contributor's new skill warns about
+    its missing anchor and its unsigned signature, and those are the honest
+    declared state of an unsigned package. A CI step that forced them green would
+    be pressure to manufacture an identity anchor that anchors to nothing."""
     assert "validators/usf.py --strict" not in workflow_text
 
 
 def test_ci_verifies_usf_signatures_without_an_identity(workflow_text):
     """Verification is a public-key operation, so it is the half of signing that
     belongs in CI. Without --identity it checks each signature against the key the
-    manifest itself carries: a signed manifest whose bytes moved fails, and an
-    explicitly `unsigned` one passes, which is what keeps the step from becoming
-    pressure to manufacture an anchor. See docs/signing.md."""
+    manifest itself carries: the eleven shipped manifests are signed, so one whose
+    bytes moved fails here, and an explicitly `unsigned` one still passes, which is
+    what keeps the step from becoming pressure to manufacture an anchor. The
+    roster's current signed state is pinned by
+    tests/test_usf.py::test_shipped_manifest_is_signed_and_anchored and checked
+    against the published key, offline, by tests/test_signing_anchor.py. See
+    docs/signing.md."""
     executable = [line for line in workflow_text.splitlines() if not line.lstrip().startswith("#")]
     verify = [line for line in executable if "sign_usf.py verify" in line]
     assert verify, "CI does not run `sign_usf.py verify`"

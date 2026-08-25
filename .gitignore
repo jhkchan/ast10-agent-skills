@@ -84,4 +84,11 @@ id_rsa*
 id_ed25519*
 id_ecdsa*
 id_dsa*
-ast10-signing/
+# The signing key's own directory, both segments of sign_usf.py's DEFAULT_KEY_PATH
+# (~/.config/did-web/<did>/ed25519.pem). The key lives outside the repository by
+# design and keygen refuses to write inside it, so these lines are the belt to
+# that braces: they catch a copied key directory, a backup, or a restored tarball.
+# tests/test_signing_key_never_enters_the_repo.py derives what must be here from
+# DEFAULT_KEY_PATH, so moving the default without updating this fails the suite.
+did-web/
+jhkchan.github.io/

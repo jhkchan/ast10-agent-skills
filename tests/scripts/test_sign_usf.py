@@ -27,15 +27,22 @@ Four properties carry the weight here, and each is a test rather than a review h
    ed25519 seed, whose public key is published as
    `did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp`.
 
-Nothing here touches the eleven shipped manifests. They are still explicitly unsigned
-(`tests/test_usf.py::test_shipped_manifest_is_explicitly_unsigned` pins that), and every
-test that signs works on a copy under `tmp_path`.
+Nothing here writes to the eleven shipped manifests; every test that signs works on a copy
+under `tmp_path`. Those eleven are now SIGNED and anchored to `did:web:jhkchan.github.io`
+(`tests/test_usf.py::test_shipped_manifest_is_signed_and_anchored` pins that, and
+`tests/test_signing_anchor.py` pins their agreement with the published key), which is why
+the tests below that are ABOUT the unsigned state build their own: `_unsigned_skill_copy`
+reverts a copy to the pre-signing form so that signing it exercises the TRANSITION --
+unsigned -> signed -- which is the property those tests were always about. Reading the
+transition off the shipped roster only worked while the roster happened to be unsigned; a
+fixture makes it work in either state, and keeps working after the next rotation.
 """
 
 from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import stat
 from pathlib import Path
@@ -45,6 +52,7 @@ import pytest
 from scripts.sign_usf import (
     BASE58BTC_ALPHABET,
     DEFAULT_KEY_PATH,
+    MANIFEST_NAME,
     MULTICODEC_ED25519_PUB,
     DidResolutionError,
     DidWeb,
@@ -67,6 +75,7 @@ from scripts.sign_usf import (
     sign_manifest,
 )
 from validators.usf import (
+    SIGNATURE_STATE_MALFORMED,
     SIGNATURE_STATE_SIGNED,
     SIGNATURE_STATE_UNSIGNED,
     load_manifest,
@@ -116,6 +125,93 @@ def _skill_copy(tmp_path: Path, name: str = "AST01") -> Path:
     destination = tmp_path / "skills" / name
     shutil.copytree(SKILLS_DIR / name, destination)
     return destination
+
+
+#: The author-block comment a manifest carries while it is unsigned, and the signature
+#: block that goes with it. These are the two comment runs `sign_usf.py` replaces, named
+#: by `_STALE_AUTHOR_COMMENT` / `_STALE_SIGNATURE_COMMENT` in the tool: both become FALSE
+#: the moment a signature exists, and a manifest whose comments contradict its fields is
+#: worse than one with no comments at all. Restoring them here is what makes
+#: `_unsigned_skill_copy` a real pre-signing manifest rather than a signed one with the
+#: values blanked out.
+_UNSIGNED_AUTHOR_COMMENT = [
+    "  # `identity` and `signing_key` are deliberately absent. This package ships",
+    "  # unsigned (see `signature` below), and publishing a DID or a public key that",
+    "  # anchors to nothing would manufacture exactly the false trust signal AST10",
+    "  # warns about. The validator reports the gap as a warning; it is not hidden.",
+]
+_UNSIGNED_SIGNATURE_COMMENT = [
+    '# Explicit unsigned placeholder. The validator reports signature_state="unsigned"',
+    "# -- a policy decision for the consumer, not a malformed manifest. Once a key",
+    "# exists, this becomes ed25519 over the RFC 8785 (JCS) canonical JSON",
+    "# serialization of this manifest with `signature` removed and `content_hash` kept.",
+]
+
+_ANCHOR_COMMENT_OPENER = "written by scripts/sign_usf.py in the same"
+_SIGNATURE_COMMENT_OPENER = "# ed25519 over the RFC 8785 (JCS) canonical JSON serialization"
+_ANCHOR_FIELD_RE = re.compile(r"^\s+(identity|signing_key):")
+
+
+def _unsign_text(text: str) -> str:
+    """The inverse of ``sign_usf.rewrite_manifest_text``: back to the pre-signing manifest.
+
+    A line rewrite for the same reason the signer is one -- PyYAML discards every comment,
+    and the comments are the half of these manifests that explains their own decisions.
+    """
+    lines = text.split("\n")
+    out: list[str] = []
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        if _ANCHOR_COMMENT_OPENER in line:
+            while index < len(lines) and lines[index].strip().startswith("#"):
+                index += 1
+            out.extend(_UNSIGNED_AUTHOR_COMMENT)
+            continue
+        if _ANCHOR_FIELD_RE.match(line):
+            index += 1
+            continue
+        if line.startswith(_SIGNATURE_COMMENT_OPENER):
+            while index < len(lines) and lines[index].startswith("#"):
+                index += 1
+            out.extend(_UNSIGNED_SIGNATURE_COMMENT)
+            continue
+        if line.startswith("signature:"):
+            out.append('signature: "unsigned"')
+            index += 1
+            continue
+        out.append(line)
+        index += 1
+    return "\n".join(out)
+
+
+def _unsigned_skill_copy(tmp_path: Path, name: str = "AST01") -> Path:
+    """A copy of a shipped skill reverted to the state it shipped in before signing.
+
+    The package bytes are untouched, so `content_hash` still matches and the copy is
+    signable; only `skill.usf.yaml`'s anchor fields, signature and the two comments that
+    explain them move. Every property is asserted rather than assumed: if the shipped
+    manifest's shape drifts far enough that this stops producing a valid unsigned
+    manifest, it fails HERE, naming the fixture, instead of surfacing as a confusing
+    failure inside whichever test happened to use it.
+    """
+    skill = _skill_copy(tmp_path, name)
+    manifest_path = skill / MANIFEST_NAME
+    manifest_path.write_text(_unsign_text(manifest_path.read_text(encoding="utf-8")), encoding="utf-8")
+
+    text = manifest_path.read_text(encoding="utf-8")
+    assert 'signature: "unsigned"' in text
+    assert "deliberately absent" in text and "unsigned placeholder" in text
+    assert _ANCHOR_COMMENT_OPENER not in text
+
+    manifest = load_manifest(manifest_path)
+    assert signature_state(manifest) == SIGNATURE_STATE_UNSIGNED
+    assert "identity" not in manifest["author"] and "signing_key" not in manifest["author"]
+    result = validate_manifest_file(manifest_path)
+    assert result.ok, result.errors
+    # Signable: the content_hash still describes the package beside it.
+    assert preflight([Target(manifest_path)]) == []
+    return skill
 
 
 @pytest.fixture(autouse=True)
@@ -525,9 +621,20 @@ def test_preflight_refuses_a_manifest_the_validator_rejects(tmp_path):
 
 
 def test_sign_writes_signature_and_anchor_in_one_operation(tmp_path):
-    skill = _skill_copy(tmp_path)
+    """The transition, on a manifest that is unsigned at the start of the test.
+
+    It used to start from the shipped roster, which was unsigned at the time. The roster is
+    signed now, so the starting state is built rather than borrowed -- and the assertion
+    that the manifest arrives unsigned is written out here instead of being inherited from
+    a fact about the tree, which makes the test say more than it did, not less.
+    """
+    skill = _unsigned_skill_copy(tmp_path)
     target = Target(skill / "skill.usf.yaml")
     did = parse_did_web("did:web:example.com")
+
+    before = load_manifest(target.path)
+    assert signature_state(before) == SIGNATURE_STATE_UNSIGNED
+    assert "identity" not in before["author"] and "signing_key" not in before["author"]
 
     result = sign_manifest(target, private_key=_zero_key(), did=did)
     assert result.previous_state == SIGNATURE_STATE_UNSIGNED
@@ -538,6 +645,9 @@ def test_sign_writes_signature_and_anchor_in_one_operation(tmp_path):
     assert manifest["author"]["signing_key"] == f"ed25519:{ZERO_SEED_PUBLIC_HEX}"
     assert verify_signature(manifest) is True
     assert validate_manifest_file(target.path).ok
+    # One operation, not three: no state exists in which the file has a signature and no
+    # anchor, or an anchor and no signature.
+    assert result.signature == manifest["signature"]
 
 
 def test_the_anchor_is_inside_the_signed_payload(tmp_path):
@@ -566,24 +676,49 @@ def test_tampering_with_any_signed_field_breaks_the_signature(tmp_path):
     assert verify_signature(load_manifest(target.path)) is False
 
 
+#: The comments a manifest carries that describe its PERMISSIONS, which signing has no
+#: business touching. Signing rewrites the two comments that explain the unsigned state and
+#: nothing else.
+STILL_TRUE_COMMENTS = (
+    "# Paths are relative to the skill package under review",
+    "# No egress. Default-deny with an empty allowlist means no host is reachable.",
+    "# sha256 over this skill's shipped surface as defined by scripts/content_hash.py",
+)
+
+
 def test_signing_preserves_the_manifest_comments_that_are_still_true(tmp_path):
-    skill = _skill_copy(tmp_path)
+    """Run on a manifest reverted to the unsigned state, so both halves are observable:
+    the permission comments survive, and the two that would become false are replaced."""
+    skill = _unsigned_skill_copy(tmp_path)
     target = Target(skill / "skill.usf.yaml")
     before = target.path.read_text(encoding="utf-8")
     sign_manifest(target, private_key=_zero_key(), did=parse_did_web("did:web:example.com"))
     after = target.path.read_text(encoding="utf-8")
 
-    for comment in (
-        "# Paths are relative to the skill package under review",
-        "# No egress. Default-deny with an empty allowlist means no host is reachable.",
-        "# sha256 over this skill's shipped surface as defined by scripts/content_hash.py",
-    ):
+    for comment in STILL_TRUE_COMMENTS:
         assert comment in before and comment in after
 
     # The two comments that would become FALSE are the two that are replaced.
     assert "deliberately absent" in before and "deliberately absent" not in after
     assert "unsigned placeholder" in before and "unsigned placeholder" not in after
     assert "https://example.com/.well-known/did.json" in after
+
+
+@pytest.mark.parametrize("skill", sorted(p.name for p in SKILLS_DIR.iterdir() if p.is_dir()))
+def test_the_shipped_manifests_carry_no_comment_that_signing_made_false(skill):
+    """The same property, asserted about the real artifact rather than about a copy.
+
+    The test above proves the tool replaces those comments. This proves the eleven files a
+    reader actually opens came out the other side of that: the permission comments are
+    still there, and neither sentence explaining an unsigned state survives beside a
+    signature. It is the half a fixture-only test cannot cover.
+    """
+    text = (SKILLS_DIR / skill / MANIFEST_NAME).read_text(encoding="utf-8")
+    assert "deliberately absent" not in text
+    assert "unsigned placeholder" not in text
+    assert "https://jhkchan.github.io/.well-known/did.json" in text
+    for comment in STILL_TRUE_COMMENTS:
+        assert comment in text, f"{skill}: signing dropped a comment it does not own: {comment}"
 
 
 def test_signing_is_idempotent(tmp_path):
@@ -647,8 +782,9 @@ def test_sign_requires_an_identity():
 
 
 def test_sign_refuses_the_whole_set_when_one_manifest_is_stale(tmp_path, capsys):
-    first = _skill_copy(tmp_path, "AST01")
-    second = _skill_copy(tmp_path, "AST02")
+    first = _unsigned_skill_copy(tmp_path, "AST01")
+    second = _unsigned_skill_copy(tmp_path, "AST02")
+    untouched = (first / "skill.usf.yaml").read_text(encoding="utf-8")
     (second / "SKILL.md").write_text((second / "SKILL.md").read_text() + "\ndrift\n", encoding="utf-8")
     key = _write_key(tmp_path / "keys" / "ed25519.pem", _zero_key())
 
@@ -670,8 +806,10 @@ def test_sign_refuses_the_whole_set_when_one_manifest_is_stale(tmp_path, capsys)
     assert "Nothing was written" in error
     assert "content_hash is STALE" in error
     assert "AST02" in error
-    # The clean manifest is untouched: no half-signed set.
+    # The clean manifest is untouched: no half-signed set. Asserted on the BYTES as well
+    # as the state, so a write that left the state alone would still be caught.
     assert signature_state(load_manifest(first / "skill.usf.yaml")) == SIGNATURE_STATE_UNSIGNED
+    assert (first / "skill.usf.yaml").read_text(encoding="utf-8") == untouched
 
 
 def test_sign_confirms_the_anchor_publishes_the_key_before_writing(tmp_path, monkeypatch, capsys):
@@ -686,7 +824,8 @@ def test_sign_confirms_the_anchor_publishes_the_key_before_writing(tmp_path, mon
 
 
 def test_sign_refuses_when_the_anchor_publishes_a_different_key(tmp_path, monkeypatch, capsys):
-    skill = _skill_copy(tmp_path)
+    skill = _unsigned_skill_copy(tmp_path)
+    untouched = (skill / "skill.usf.yaml").read_text(encoding="utf-8")
     key = _write_key(tmp_path / "keys" / "ed25519.pem", _zero_key())
     did = parse_did_web("did:web:example.com")
     other = os.urandom(32).hex()
@@ -695,16 +834,19 @@ def test_sign_refuses_when_the_anchor_publishes_a_different_key(tmp_path, monkey
     assert main(["sign", "--identity", did.did, "--key", str(key), str(skill)]) == 1
     assert "does not publish the key" in capsys.readouterr().err
     assert signature_state(load_manifest(skill / "skill.usf.yaml")) == SIGNATURE_STATE_UNSIGNED
+    assert (skill / "skill.usf.yaml").read_text(encoding="utf-8") == untouched
 
 
 def test_sign_reports_an_unreachable_anchor_as_unresolved_not_as_a_failure(tmp_path, monkeypatch, capsys):
-    skill = _skill_copy(tmp_path)
+    skill = _unsigned_skill_copy(tmp_path)
+    untouched = (skill / "skill.usf.yaml").read_text(encoding="utf-8")
     key = _write_key(tmp_path / "keys" / "ed25519.pem", _zero_key())
     _stub_offline(monkeypatch)
 
     assert main(["sign", "--identity", "did:web:example.com", "--key", str(key), str(skill)]) == 3
     assert "could not resolve" in capsys.readouterr().err
     assert signature_state(load_manifest(skill / "skill.usf.yaml")) == SIGNATURE_STATE_UNSIGNED
+    assert (skill / "skill.usf.yaml").read_text(encoding="utf-8") == untouched
 
 
 def test_skip_anchor_check_says_out_loud_what_it_is_skipping(tmp_path, capsys):
@@ -800,23 +942,69 @@ def test_verify_treats_a_tampered_manifest_as_a_failure(tmp_path, capsys):
     assert "does not verify" in capsys.readouterr().out
 
 
-def test_verify_treats_a_malformed_signature_as_a_failure(tmp_path, capsys):
-    skill = _skill_copy(tmp_path)
+@pytest.mark.parametrize("start", ["unsigned", "signed"], ids=["from-unsigned", "from-signed"])
+def test_verify_treats_a_malformed_signature_as_a_failure(tmp_path, capsys, start):
+    """Neither `ed25519:<128 hex>` nor the explicit placeholder: not a state, a defect.
+
+    Run from BOTH starting points. The unsigned case is the one this test always had --
+    a placeholder corrupted into something that merely looks cryptographic. The signed
+    case is the one the shipped roster can now reach: a real signature truncated, retyped
+    or half-copied. A verifier that read "starts with ed25519:" as a pass would let the
+    second through, so both are asserted rather than one standing in for the other.
+    """
+    skill = _unsigned_skill_copy(tmp_path) if start == "unsigned" else _skill_copy(tmp_path)
     manifest_path = skill / "skill.usf.yaml"
-    manifest_path.write_text(
-        manifest_path.read_text().replace('signature: "unsigned"', 'signature: "ed25519:not-hex"'), encoding="utf-8"
-    )
+    text = manifest_path.read_text(encoding="utf-8")
+    mutated = re.sub(r'^signature: ".*"$', 'signature: "ed25519:not-hex"', text, count=1, flags=re.MULTILINE)
+    assert mutated != text
+    manifest_path.write_text(mutated, encoding="utf-8")
+
+    assert signature_state(load_manifest(manifest_path)) == SIGNATURE_STATE_MALFORMED
     assert main(["verify", str(skill)]) == 1
-    assert "FAIL" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "FAIL" in out
+    # Never reported as the honest unsigned state -- that is what would hide it.
+    assert "unsigned (explicit placeholder" not in out
 
 
-def test_verify_treats_an_explicitly_unsigned_manifest_as_the_honest_current_state(capsys):
-    """The eleven shipped manifests are unsigned. That must not read as a failure, or the
-    tool pushes a maintainer toward exactly the unanchored key this repo refuses to ship."""
+def test_verify_treats_an_explicitly_unsigned_manifest_as_the_honest_current_state(tmp_path, capsys):
+    """An unsigned manifest must not read as a failure, or the tool pushes a maintainer
+    toward exactly the unanchored key this repo refuses to ship.
+
+    This used to be asserted about the shipped eleven, which were unsigned. It is now
+    asserted about unsigned copies -- the property belongs to the STATE, not to whichever
+    files happen to be in it, and stating it that way keeps it true for anyone who runs
+    this tool on their own unsigned roster. The shipped eleven get the stronger assertion
+    directly below: they verify.
+    """
+    skills = [_unsigned_skill_copy(tmp_path, name) for name in ("AST01", "AST02", "AST03")]
+
+    assert main(["verify", *[str(skill) for skill in skills]]) == 0
+    out = capsys.readouterr().out
+    assert out.count("unsigned (explicit placeholder") == len(skills)
+    assert f"0 verified, {len(skills)} unsigned, 0 failed" in out
+    assert "FAIL" not in out
+
+
+def test_verify_reports_the_shipped_roster_as_signed_and_verifying(capsys):
+    """The honest current state of the eleven, which is the state this file's fixtures
+    are built to be independent of.
+
+    No `--identity`, exactly as CI runs it: each signature is checked against the key its
+    own manifest carries, so the check needs no network and no secret. That proves the
+    files have not moved since they were signed -- and the tool says so itself, in the
+    caveat asserted here, because it does NOT prove who signed them. The check that does
+    is `verify --identity`, run by a human against the live anchor, and offline against
+    the committed copy in `tests/test_signing_anchor.py`.
+    """
+    manifests = list(SKILLS_DIR.glob("*/skill.usf.yaml"))
+
     assert main(["verify"]) == 0
     out = capsys.readouterr().out
-    assert out.count("unsigned (explicit placeholder") == len(list(SKILLS_DIR.glob("*/skill.usf.yaml")))
+    assert f"{len(manifests)} verified, 0 unsigned, 0 failed" in out
     assert "FAIL" not in out
+    assert out.count("signature is internally consistent") == len(manifests)
+    assert "ONLY internal consistency" in out
 
 
 def test_verify_needs_no_key_material(monkeypatch, tmp_path):
