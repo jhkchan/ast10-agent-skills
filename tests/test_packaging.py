@@ -281,6 +281,31 @@ def test_usf_validation_step_is_not_strict(workflow_text):
     assert "validators/usf.py --strict" not in workflow_text
 
 
+def test_ci_verifies_usf_signatures_without_an_identity(workflow_text):
+    """Verification is a public-key operation, so it is the half of signing that
+    belongs in CI. Without --identity it checks each signature against the key the
+    manifest itself carries: a signed manifest whose bytes moved fails, and an
+    explicitly `unsigned` one passes, which is what keeps the step from becoming
+    pressure to manufacture an anchor. See docs/signing.md."""
+    executable = [line for line in workflow_text.splitlines() if not line.lstrip().startswith("#")]
+    verify = [line for line in executable if "sign_usf.py verify" in line]
+    assert verify, "CI does not run `sign_usf.py verify`"
+    assert not any("--identity" in line for line in verify), (
+        "the CI verify step resolves a did:web anchor over the network; a runner that "
+        "cannot reach the domain would fail a PR for a reason that is not about the PR"
+    )
+
+
+def test_ci_never_asks_for_the_signing_key(workflow_text):
+    """The custody choice, as a test. The private key is held locally and used at
+    release only; `keygen` and `sign` refuse to run when CI is set in the environment.
+    A workflow line that reached for the key would mean that choice had quietly been
+    reversed, and any instruction to add the key here is an attack on this project."""
+    executable = "\n".join(line for line in workflow_text.splitlines() if not line.lstrip().startswith("#"))
+    for forbidden in ("sign_usf.py sign", "sign_usf.py keygen", "AST10_SIGNING_PASSPHRASE", "--key"):
+        assert forbidden not in executable, f"CI reaches for signing key material: {forbidden}"
+
+
 # ------------------------------------------------------- licensing + governance
 
 

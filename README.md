@@ -239,6 +239,21 @@ no identity anchor and no signature, on purpose (see
 [What this does not do](#what-this-does-not-do)). That is the flag behaving correctly:
 a warning nobody has to act on is a warning that gets ignored.
 
+**Signing them is a separate, deliberate act**, and `scripts/sign_usf.py` is the tool for
+it: it writes the signature and the `did:web` identity that anchors it in one operation,
+because a key that anchors to nothing is the false trust signal AST10 warns about. The
+private key is held locally and used at release only — never in CI, which needs only the
+public half:
+
+```bash
+python3 scripts/sign_usf.py verify   # what CI runs: no key, no network, no identity claimed
+```
+
+[`docs/signing.md`](docs/signing.md) is the runbook — the four commands in order, where the
+DID document is published and how to check it resolves, why any edit to a skill invalidates
+that skill's signature, key loss and rotation, and what a verified signature does and does
+not prove.
+
 ### Or just use the slash commands
 
 The checkout also carries `commands/ast/` — fourteen slash commands that wrap the four
@@ -702,8 +717,12 @@ pretend otherwise rather than shipping a proxy that scores well.
   a platform is a re-validation event, not an edit — AST10's whole premise is that security
   properties are lost in translation between runtimes.
 - **Unsigned packages.** Every manifest ships `signature: "unsigned"` with an explicit
-  placeholder. Publishing a key that anchors to nothing would manufacture exactly the false
-  trust signal AST10 warns about.
+  placeholder, and `author.identity` is absent rather than empty. Publishing a key that
+  anchors to nothing would manufacture exactly the false trust signal AST10 warns about.
+  Signing is implemented and documented — `scripts/sign_usf.py` and
+  [`docs/signing.md`](docs/signing.md) — and signing and anchoring are one operation there,
+  so this state cannot be half-left. It has not been done because it needs a domain, and
+  the signature it would produce would still answer only *who published this*.
 
 ---
 
@@ -721,14 +740,15 @@ fixtures/                  class-balanced vulnerable/clean corpora + manifest.ya
 detectors/                 shared F1 engine, reporter, and per-skill scaffold
 validators/                USF manifest validator + the registry tier-lock hash
 adapters/                  judge-matrix provider adapters (bedrock, claude-cli, ...)
-scripts/                   pooled scoring rule, content hashing, judge harness, dogfood
+scripts/                   pooled scoring rule, content hashing, judge harness, dogfood,
+                           manifest signing (sign_usf.py — see docs/signing.md)
 eval/                      scorecards + the dashboard generator
 cli/ast10.py               list / status / route / install  (Python)
 cli/bin/cli.js             list / route / audit / coverage / status  (Node, no deps)
 cli/lib/bridge.py          the one implementation `route` and `audit` both call
 commands/ast/              14 slash commands wrapping the workflows above
 .claude-plugin/            marketplace.json — the eleven-skill index
-docs/                      architecture, the judge dashboard, ADRs, glossary
+docs/                      architecture, the judge dashboard, ADRs, glossary, signing.md
 ruff.toml                  the lint + format contract CI runs unflagged
 ```
 
@@ -741,6 +761,8 @@ for the tiering contract every coverage matrix is written against.
 ```bash
 python3 -m pytest -q                            # the full suite
 python3 validators/usf.py skills/*/skill.usf.yaml   # every shipped manifest
+python3 scripts/sign_usf.py verify              # every signature; needs no key, and is
+                                                # exactly what CI runs (docs/signing.md)
 python3 validators/tier_lock.py fixtures/manifest.yaml   # tier-drift check
 python3 scripts/dogfood.py                      # our detectors over our own skills
 python3 scripts/ship_floor.py                   # recompute every stored judge verdict in

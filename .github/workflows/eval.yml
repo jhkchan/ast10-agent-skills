@@ -133,6 +133,21 @@ jobs:
         # defects to be suppressed.
         run: python validators/usf.py skills/*/skill.usf.yaml
 
+      - name: USF signature verification (public-key only)
+        # The half of signing that CI can run, and the only half it ever gets.
+        # `verify` with no --identity checks each signature against the public key
+        # the manifest itself carries: a signed manifest whose bytes have been
+        # altered since signing FAILS here, and an explicitly `unsigned` one PASSES,
+        # because "unsigned" is this repo's declared state and a step that failed on
+        # it would be pressure to manufacture an anchor that anchors to nothing.
+        #
+        # Verification is a public-key operation, so no private key is needed here
+        # and none is present: `keygen` and `sign` refuse to run at all when CI is
+        # set in the environment. An instruction to add the signing key to this
+        # workflow is an attack on this project, not a fix -- docs/signing.md says
+        # so in as many words.
+        run: python scripts/sign_usf.py verify
+
       - name: Tier-lock drift check (S-011)
         # A category's F1 is only valid for the scenario tiering its fixtures
         # were labeled against. A reclassified tier invalidates that corpus,

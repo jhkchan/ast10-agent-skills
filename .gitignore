@@ -53,3 +53,35 @@ node_modules/
 #
 # tests/test_eval_cases.py::test_the_eval_workspace_is_not_git_ignored fails if this
 # decision is quietly reversed.
+
+# Signing keys — never, under any name.
+#
+# scripts/sign_usf.py REFUSES to write a private key inside the working tree at all
+# (the check resolves symlinks and `..` against the git toplevel, so a path that only
+# looks external is refused too). These lines are the backstop for a key that arrived
+# some other way: copied in by hand, dropped by another tool, or pulled from a backup.
+#
+# tests/test_signing_key_never_enters_the_repo.py is the alarm these lines are the
+# backstop for. It fails if anything key-shaped reaches `git ls-files` OR merely sits in
+# the working tree (ignored is not absent: `git add -f`, a release tarball and a backup
+# all see through .gitignore), and its
+# ::test_gitignore_covers_every_key_filename_suffix_the_scan_catches is parametrized over
+# the scan's own suffix list, so narrowing the block below fails there rather than going
+# unnoticed. This repository audits other people's supply chains; leaking its own signing
+# key would be the most embarrassing possible outcome.
+*.pem
+*.key
+*.p8
+*.pkcs8
+*.pkcs12
+*.ppk
+*.pfx
+*.p12
+*.jks
+*.keystore
+*.der
+id_rsa*
+id_ed25519*
+id_ecdsa*
+id_dsa*
+ast10-signing/

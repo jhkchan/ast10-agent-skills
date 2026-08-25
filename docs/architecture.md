@@ -169,6 +169,29 @@ every skill's `content_hash` was re-stamped in the same change — which is the 
 the two tuples exist to force. Nothing about the hashing algorithm or the surface
 definition moved; only which patterns match a file did.
 
+**`signature` is the field the rest of this section exists to keep honest.** All eleven
+manifests carry the literal placeholder `"unsigned"`, and `author.identity` /
+`author.signing_key` are absent rather than empty — a DID or a public key that anchors to
+nothing is the false trust signal AST10 is about, and `validators/usf.py` distinguishes the
+explicit placeholder from a real `ed25519:<128 hex>` value rather than treating either as
+"valid".
+
+Signing them is implemented, not aspirational. `scripts/sign_usf.py` writes
+`author.identity`, `author.signing_key` and `signature` in a single rewrite, with all three
+*inside* the signed payload (the payload is the whole manifest minus `signature`,
+canonicalised per RFC 8785), so a signature cannot be moved to another publisher's identity
+and an identity cannot be swapped under an existing signature. There is no code path that
+yields one without the other. Because each manifest signs its own `content_hash`, the
+signer recomputes every target's hash first and refuses the whole run if one has drifted:
+signing a stale manifest would attest to bytes that are not there.
+
+The custody split is the same shape as the judge split above. `keygen` and `sign` are
+maintainer-local and refuse to run when the environment says CI; `verify` is a public-key
+operation, so `.github/workflows/eval.yml` runs it on every PR and the private key is never
+present. [`signing.md`](signing.md) is the runbook, and
+`tests/test_signing_key_never_enters_the_repo.py` is what fails if a key ever reaches this
+tree.
+
 ### `skills/<AST>/scripts/detector.py` — the mechanism
 
 Pure functions over a plain package dict:

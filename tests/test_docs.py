@@ -53,6 +53,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 README = REPO_ROOT / "README.md"
 DASHBOARD = REPO_ROOT / "docs" / "skill-judge-dashboard.md"
 ARCHITECTURE = REPO_ROOT / "docs" / "architecture.md"
+SIGNING = REPO_ROOT / "docs" / "signing.md"
 F1_REPORT = REPO_ROOT / "docs" / "f1-report.md"
 DOGFOOD_REPORT = REPO_ROOT / "docs" / "dogfood-report.md"
 SKILL_EVAL_REPORT = REPO_ROOT / "docs" / "skill-eval-report.md"
@@ -584,6 +585,10 @@ SKILLS_DIR = REPO_ROOT / "skills"
 DOC_PATHS = {
     "README.md": README,
     "docs/architecture.md": ARCHITECTURE,
+    # The signing runbook names commands, key paths, tests and a re-signing
+    # trigger. It is read months after it is written, by which time an orphan
+    # reference in it is indistinguishable from an instruction.
+    "docs/signing.md": SIGNING,
     "docs/skill-judge-dashboard.md": DASHBOARD,
     # Generated, but subject to exactly the same orphan-reference contract: a
     # generated document that names a path or a test that does not exist is
