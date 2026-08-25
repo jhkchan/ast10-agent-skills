@@ -18,6 +18,8 @@ and document the gap" (steps/04-build-tdd.md).
 from __future__ import annotations
 
 import pathlib
+import sys
+import types
 
 import pytest
 import yaml
@@ -255,12 +257,29 @@ class _FakeBedrockClient:
         return self.response
 
 
-def _bedrock_with(monkeypatch, response):
-    import boto3
+def _fake_boto3(response=None, *, client=True, session=None):
+    """A stand-in `boto3` module.
 
-    adapter = BedrockAdapter("nova-pro")
-    monkeypatch.setattr(boto3, "client", lambda *a, **k: _FakeBedrockClient(response))
-    return adapter
+    `adapters/bedrock.py` imports boto3 lazily inside the methods that use it,
+    on purpose, so that a missing install degrades one adapter rather than the
+    whole package. These tests exercise OUR parsing of what `converse` returns
+    and never touch boto3's own behaviour, so binding the real package here
+    would add a dependency that buys no coverage -- and CI does not install it,
+    which is exactly how these tests failed there while passing on a machine
+    that happens to have the AWS CLI. Injecting the module keeps them running
+    everywhere and, unlike `pytest.importorskip`, they can never skip silently.
+    """
+    mod = types.ModuleType("boto3")
+    if client:
+        mod.client = lambda *a, **k: _FakeBedrockClient(response)
+    if session is not None:
+        mod.Session = session
+    return mod
+
+
+def _bedrock_with(monkeypatch, response):
+    monkeypatch.setitem(sys.modules, "boto3", _fake_boto3(response))
+    return BedrockAdapter("nova-pro")
 
 
 _TEXT_ONLY = {"output": {"message": {"content": [{"text": "hello"}]}}}
@@ -284,14 +303,13 @@ def test_bedrock_records_no_usage_when_the_response_carries_none(monkeypatch):
 
 def test_bedrock_never_carries_a_previous_calls_token_count_forward(monkeypatch):
     """A stale count attributed to a later call is a fabricated measurement."""
-    import boto3
-
+    fake = _fake_boto3(dict(_TEXT_ONLY, usage={"totalTokens": 7}))
+    monkeypatch.setitem(sys.modules, "boto3", fake)
     adapter = BedrockAdapter("nova-pro")
-    monkeypatch.setattr(boto3, "client", lambda *a, **k: _FakeBedrockClient(dict(_TEXT_ONLY, usage={"totalTokens": 7})))
     adapter.judge("first")
     assert adapter.last_usage.total_tokens == 7
 
-    monkeypatch.setattr(boto3, "client", lambda *a, **k: _FakeBedrockClient(RuntimeError("throttled")))
+    fake.client = lambda *a, **k: _FakeBedrockClient(RuntimeError("throttled"))
     with pytest.raises(AdapterError):
         adapter.judge("second")
     assert adapter.last_usage is None
@@ -324,3 +342,33 @@ def test_claude_cli_reports_no_token_usage_and_says_so_by_being_none(monkeypatch
     adapter = ClaudeCliAdapter()
     assert adapter.judge("p") == "an answer"
     assert adapter.last_usage is None
+
+
+# --- the documented degradation path, which nothing exercised ---------------
+#
+# adapters/bedrock.py imports boto3 lazily and check_availability() promises
+# `available=False, reason="boto3 is not installed"` when it is absent. That
+# promise was never tested: every bedrock test ran on a machine that had boto3,
+# which is also why CI's ModuleNotFoundError went unnoticed until it fired.
+
+
+def test_bedrock_reports_itself_unavailable_when_boto3_is_absent(monkeypatch):
+    """The lazy import exists so one missing package degrades one adapter."""
+    monkeypatch.setitem(sys.modules, "boto3", None)  # import boto3 -> ImportError
+    status = BedrockAdapter("nova-pro").check_availability()
+    assert status.available is False
+    assert status.reason == "boto3 is not installed"
+
+
+def test_bedrock_reports_itself_unavailable_when_credentials_are_absent(monkeypatch):
+    """A resolvable boto3 with no credentials is a different refusal, and the
+    reason a roster records must say which one it hit."""
+
+    class _NoCredsSession:
+        def get_credentials(self):
+            return None
+
+    monkeypatch.setitem(sys.modules, "boto3", _fake_boto3(client=False, session=_NoCredsSession))
+    status = BedrockAdapter("nova-pro").check_availability()
+    assert status.available is False
+    assert status.reason == "no AWS credentials configured"
