@@ -397,11 +397,7 @@ def build_badges() -> list[Badge]:
         # the qualifier carry the scope. The count is still in the alt text and
         # in docs/f1-report.md, so nothing is hidden -- only reframed.
         report = json.loads(F1_REPORT.read_text(encoding="utf-8"))
-        scores = {
-            row["scenario_level"]["f1"]
-            for row in report["categories"]
-            if row.get("category") in set(published)
-        }
+        scores = {row["scenario_level"]["f1"] for row in report["categories"] if row.get("category") in set(published)}
         if len(scores) == 1:
             f1_message = f"{scores.pop():.3f} {DOT} where a package can decide it"
         else:
