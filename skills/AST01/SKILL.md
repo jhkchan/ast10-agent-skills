@@ -84,6 +84,16 @@ manifest that declares everything cannot be contradicted, so it silences the che
 that depend on it — see the quiet list below before reading any negative result as
 "no payload".
 
+Two more follow from the operands themselves, and both are things to write down rather
+than to notice. **Whichever half is absent is the verdict** — the construct is here, the
+declaration covers it, the check clears — stated in the package's own strings, the host
+and the path as the author spelled them, because a negative written in this file's
+vocabulary is checkable against this file and against nothing the reader is holding. And
+**which operand is the wrong one is not a fact the artifact carries**: the finding is the
+distance between two halves one author shipped together, so narrowing the grant and
+widening the declaration close it identically from here. Which was intended is a question
+for the author; answering it yourself ships a remediation the evidence does not support.
+
 ## Decision rules
 
 Split by the freedom table above, so that the voice is not mistaken for uniform. Rules 1,
@@ -285,7 +295,11 @@ predicate, and each half reads like a finding when it is alone. Each entry names
   time. A retry-loop grep filed under S07 converts "no in-package signal exists" into
   "checked, clean" and retires the one scenario in this category whose honest state is a
   published gap; the empty cell is the measurement, and this is the never-pad rule it
-  exists to enforce.
+  exists to enforce. The prohibition is on *scoring* the scenario, never on *naming* it:
+  a complaint that corresponds to S07 is answered by naming it, giving its tier, and
+  putting nothing in its column. Read as a ban on saying the id, this entry hands back a
+  domain gap with no name on it — which nobody downstream can look up, route, or collect
+  the out-of-artifact evidence for.
 - **NEVER let the payload's legibility decide the category.** AST01 is the only one of
   these five that names what the attacker actually did, so a compromised registry, a
   load-time parser execution, a poisoned referenced runbook and the scanner that missed all

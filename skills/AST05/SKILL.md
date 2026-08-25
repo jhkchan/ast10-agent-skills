@@ -50,6 +50,15 @@ the code in front of you: a single named step leaves the remaining blind spots r
 as surfaces the checks covered, which is the same over-claim as reporting the clean run
 bare.
 
+Read *incomplete review* as a qualifier on the verdict, never as leave to withhold one.
+The answer still ends in the verdict the question asked for; a reply that names the manual
+steps and stops has reported this page's machinery and kept the finding, which is the bare
+clean run's failure arriving from the other side and reads downstream as a pass either
+way. Name the steps against the code, too — the boundary function by its own name and the
+file it is defined in, the manifest's own `network` block — because a limit stated in this
+file's vocabulary describes the check, and only the package's own strings let a reader
+check the check.
+
 **Route first.** Reasoning for each cross-category call is in *Distinguishing AST05 from
 its neighbors*; this table is only the jump.
 

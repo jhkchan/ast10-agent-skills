@@ -1,6 +1,6 @@
 {
   "skill_name": "ast01-malicious-skills",
-  "held_out": "HELD OUT — do not tune against this file. These cases are the control on whether a skill edit generalised or merely fitted the cases it was written against. They were authored from this skill's SKILL.md, its coverage-matrix.md and the whitepaper, never from a measured result, and they must not be read while a SKILL.md is being edited or cited to justify a change to one. An iteration that tunes this skill against these cases has destroyed their value as a control and owes the next iteration a replacement set authored the same way.",
+  "regression": "SPENT AS A CONTROL — this is a REGRESSION corpus, and it is not a control. These eleven cases were authored as the held-out set that said whether a skill edit generalised, and iteration 3 spent them: advisory's case and its four failed assertions were quoted into the iteration-3 brief as the specification for an advisory fix, and per-skill deltas from this corpus were published for all eleven skills. A case that steers an edit can no longer say whether that edit generalised, so nothing in this file is a control any more and no document, test or report may call it one. Keep running it anyway: a case a skill used to pass and now fails is a regression, and catching that is what a spent corpus is still good for. Never read a number from this file as evidence that an improvement generalised — skills/*/evals/control.json is the blind control that answers that question, and it is the only file that does.",
   "evals": [
     {
       "id": 1,

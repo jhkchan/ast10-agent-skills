@@ -56,14 +56,17 @@ the route sends you. Mechanism (manifest-vs-behavior diffing) lives in
 | Why this is not "apply least privilege, harder" | you expected the detector to close the category, or you are about to file a purpose-versus-scope judgement as a static finding |
 | Decision rules | always: six rules, and the reason this file exists |
 | Distinguishing AST03 from its neighbors | the route above was contested, or one incident spans two categories |
-| What the shipped checks decide, and where they go quiet | **MANDATORY before you report a negative, and before you extend any check by hand.** The last silence is why a previous version of the identity check false-positived against every conformant USF manifest |
+| What the shipped checks decide, and where they go quiet | **MANDATORY before you report a negative, before you extend any check by hand, and again whenever the question is *which id do I file*** — that one is decided by which check saw the condition and what its `CHECK_COVERAGE` claims, and both live here rather than in the rules. The last silence is why a previous version of the identity check false-positived against every conformant USF manifest |
 | NEVER | **always, and again before a finding is written down or a number published.** What the three non-covering checks and the three out-of-artifact scenarios invite you to conclude; each entry names the check, tier or test that refutes it |
 | Scope and out-of-artifact boundary | you are being asked whether an LPCI trigger will actually fire |
 
 **A negative is a two-part deliverable**: the result, and the limit that produced it — which
 check ran, over what, and what it did not look at. The result on its own leaves a reader
 unable to tell a clean package from an unexamined one, which is why the quiet list is the
-one row in the table above marked mandatory rather than conditional.
+one row in the table above marked mandatory rather than conditional. It fails just as
+completely the other way: an answer that recites which check ran and what it could not see,
+and never says what this manifest actually declares, has reported the instrument and kept
+the finding. Both halves, or the deliverable is not one.
 
 **Do NOT load `coverage-matrix.md`** to decide whether something is a finding. It is the
 tier contract and the F1 denominator; open it only to cite the authoritative tier of a
@@ -172,7 +175,11 @@ exists to prevent.
   signal and the registry names it as an `artifact_signal`, but it decides neither
   `AST03-S01` (which needs the purpose-versus-scope judgement) nor `AST06-S02` (which
   needs the host's sandbox and co-located services). Escalate it; do not file it as a
-  scenario finding.
+  scenario finding. Being a conjunction, it is also refuted by either conjunct alone: a
+  declared `shell: false`, or an egress list that is already a bounded allowlist, settles
+  it from the field itself. Read those two fields and quote them rather than reporting
+  that the check did not fire — a silent check and a manifest that denies the conjunct
+  produce the same output, and only one of them is evidence.
 - **Permission vocabularies differ and a check that reads only one is silently dead.**
   One package reaches these checks in three spellings — USF `permissions.files.deny_write`,
   the flattened detector shape, and bare-boolean SKILL.md frontmatter. A previous version

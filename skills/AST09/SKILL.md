@@ -87,7 +87,11 @@ different population — see decision rule 4.
    posture-based discovery from SaaS telemetry (OAuth grants, connected-app
    inventories, NHI activity, scope assignments), reconciled against the approved
    inventory so unmatched identities surface. Applying only endpoint scanning and
-   reporting a clean result over-claims coverage for this scenario specifically.
+   reporting a clean result over-claims coverage for this scenario specifically. Naming
+   the method is half the answer and reads like all of it: every method leaves a residual
+   population, and the trace that population reliably leaves is the grant and scope drift
+   rule 5 turns on — so an answer that stops at *which method we used* has scoped the
+   claim without reaching the skills the scoping just excluded. Rule 4 ends inside rule 5.
 5. **Scope/permission drift is itself a discovery signal, not just a change to log
    after the fact — and it is the signal that reaches the population rule 4's chosen
    method cannot.** A new OAuth consent grant, a widened scope, or a fresh

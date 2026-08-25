@@ -156,27 +156,38 @@ Usage::
     python3 eval/skill_evals.py --iteration 3          # resume iteration-3
     python3 eval/skill_evals.py --iteration 3 --benchmark-only   # recompute from disk
     python3 eval/skill_evals.py --no-grade             # runs only; grade with skill_eval_grade.py
-    python3 eval/skill_evals.py --case-file heldout.json          # the held-out control set
+    python3 eval/skill_evals.py --case-file control.json         # the blind control set
+    python3 eval/skill_evals.py --case-file regression.json      # the spent corpus, kept for regressions
 
-THE TUNED SET AND THE HELD-OUT SET
-==================================
+THREE CORPORA, AND WHY THEY MAY NEVER BE POOLED
+===============================================
 
-`--case-file` chooses which authored corpus runs. The default, `evals.json`, is
-the **tuned** set: the cases an iteration reads, argues with, and edits a
-`SKILL.md` against. `heldout.json` is the **held-out** control — one case per
-skill, eleven in total, authored from the skills and the whitepaper and never from
-a measured result.
+`--case-file` chooses which authored corpus runs, and there are now three.
+
+* `evals.json` — the **tuned** set: the cases an iteration reads, argues with, and
+  edits a `SKILL.md` against. The default.
+* `control.json` — the **blind control**: one case per skill, eleven in total,
+  authored from each skill's own files and the whitepaper and never from a
+  measured result. It is the only corpus that can say whether an edit generalised.
+* `regression.json` — the control that used to hold that role under the name
+  `heldout.json`, **spent** when iteration 3 tuned an advisory fix against one of
+  its cases and published per-skill deltas from it. Kept and still run, because a
+  case a skill used to pass and now fails is a regression worth catching; it is no
+  longer evidence that anything generalised, and nothing may report it as such.
 
 They answer different questions and must not be pooled. A delta on the tuned set
 says the skill improved on cases somebody looked at while improving it; a delta on
-the held-out set says the improvement generalised. Running both and averaging them
-would destroy exactly the distinction the second set exists to draw, so this runner
-never merges them: one invocation runs one corpus, and a held-out run writes its
-runs under `<skill>-heldout-case-<n>` so a workspace directory names the corpus
-that produced it.
+the control says the improvement generalised; a delta on the regression corpus says
+only that behaviour on eleven spent cases did or did not move. Running two and
+averaging them would destroy exactly the distinction the extra corpora exist to
+draw, so this runner never merges them: one invocation runs one corpus, and every
+non-default run writes under `<skill>-<corpus>-case-<n>` — `AST01-control-case-1`,
+`AST01-regression-case-1` — so a workspace directory names the corpus that produced
+it and no two corpora can share a directory or a `feedback.json` key.
 
-The held-out set's own value is spent the moment it is used to steer an edit. That
-rule travels inside each file, in a top-level `held_out` string, and
+The control's own value is spent the moment it is used to steer an edit, and that
+has now happened once, to its predecessor. The rule travels inside each file, in a
+top-level `control` string that also says what a replacement costs, and
 `tests/test_eval_cases.py` requires it to be there.
 """
 
@@ -223,7 +234,7 @@ WORKSPACE_ROOT = REPO / "eval" / "skill-eval-workspace"
 #: iteration edits a SKILL.md against.
 DEFAULT_CASE_FILE = "evals.json"
 
-#: The HELD-OUT control set, selected with `--case-file heldout.json`. One case per
+#: The BLIND CONTROL set, selected with `--case-file control.json`. One case per
 #: skill, authored from the skills and the whitepaper rather than from any measured
 #: result. It answers a question the tuned set structurally cannot: did an
 #: iteration's edits generalise, or did they only fit the cases they were made
@@ -231,10 +242,16 @@ DEFAULT_CASE_FILE = "evals.json"
 #: never merged into the default run — a reader of a workspace has to be able to
 #: tell which corpus produced the delta they are looking at, and the run slugs
 #: carry that distinction (`EvalCase.slug`).
-HELDOUT_CASE_FILE = "heldout.json"
+CONTROL_CASE_FILE = "control.json"
 
-#: Both, for the small number of places that need to name the pair.
-CASE_FILES: tuple[str, ...] = (DEFAULT_CASE_FILE, HELDOUT_CASE_FILE)
+#: The corpus that held that role until iteration 3 spent it. Still runnable and
+#: still worth running as a REGRESSION suite — the cases catch a skill going
+#: backwards — but a delta measured on it is no longer evidence that anything
+#: generalised, and the file's own notice says so.
+REGRESSION_CASE_FILE = "regression.json"
+
+#: All three, for the small number of places that need to name the set.
+CASE_FILES: tuple[str, ...] = (DEFAULT_CASE_FILE, CONTROL_CASE_FILE, REGRESSION_CASE_FILE)
 
 #: The two arms. Order matters only for printing.
 CONFIGURATIONS: tuple[str, ...] = ("with_skill", "without_skill")
@@ -336,10 +353,11 @@ class EvalCase:
         """The workspace directory name for this case, and its key in feedback.json.
 
         The tuned file keeps the bare `AST01-case-1` spelling it has always had.
-        Any other case file inserts its own stem — `AST01-heldout-case-1` — so a
-        control run and a tuned run can never land in the same directory, share a
-        `feedback.json` key, or be averaged into one another's benchmark by a
-        reader who assumed one workspace held one corpus.
+        Any other case file inserts its own stem — `AST01-control-case-1`,
+        `AST01-regression-case-1` — so a control run, a regression run and a tuned
+        run can never land in the same directory, share a `feedback.json` key, or
+        be averaged into one another's benchmark by a reader who assumed one
+        workspace held one corpus.
         """
         stem = Path(self.case_file).stem
         infix = "" if self.case_file == DEFAULT_CASE_FILE else f"{stem}-"
@@ -363,10 +381,11 @@ def discover_cases(
     directory raises rather than quietly running fewer cases than asked for.
 
     `case_file` selects WHICH authored set to run. It defaults to the tuned
-    `evals.json`; `HELDOUT_CASE_FILE` is the held-out control set, one case per
-    skill, and the whole reason it can be trusted is that nothing consults it
-    while a `SKILL.md` is being edited. Running it is a separate, deliberate act,
-    which is why it is a flag and not a merge.
+    `evals.json`; `CONTROL_CASE_FILE` is the blind control, one case per skill,
+    and the whole reason it can be trusted is that nothing consults it while a
+    `SKILL.md` is being edited. `REGRESSION_CASE_FILE` is the corpus that used to
+    be that control and is now a regression suite. Running either is a separate,
+    deliberate act, which is why it is a flag and not a merge.
     """
     available = sorted(d.name for d in skills_dir.iterdir() if (d / "evals" / case_file).is_file())
     wanted = list(available)
@@ -1055,9 +1074,10 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_CASE_FILE,
         choices=CASE_FILES,
         help=(
-            "which authored set to run: the tuned %(default)s, or heldout.json — the "
-            "held-out control that says whether a skill edit generalised. Held-out runs "
-            "get their own slugs, so the two never share a workspace directory."
+            "which authored corpus to run: the tuned %(default)s, control.json — the "
+            "blind control that says whether a skill edit generalised — or regression.json, "
+            "the spent control kept as a regression suite. Every non-default corpus gets its "
+            "own run slugs, so no two ever share a workspace directory."
         ),
     )
     return parser

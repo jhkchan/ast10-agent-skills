@@ -43,7 +43,7 @@ its neighbors*; this table is only the jump.
 
 | What you are holding | Go to |
 | --- | --- |
-| A bundled script writing a cron table, systemd unit, shell rc or launch agent | *What the two shipped checks decide* — script disjunct, then rule 5 for what the finding means |
+| A bundled script writing a cron table, systemd unit, shell rc or launch agent | Rule 5 first — it fixes what the finding is and what a complete remediation has to contain — then *What the two shipped checks decide* for what the check's own answer is worth |
 | A declared write scope of `/`, `~`, `$HOME` or `*` | Same section — manifest disjunct |
 | "We ship a sandbox, it's available if you configure it" | *Why "available if configured" does not close this finding* |
 | A `0.0.0.0` or loopback-bound control interface | Rule 3 — by hand, against the deployment |

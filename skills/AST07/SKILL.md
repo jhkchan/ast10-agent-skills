@@ -46,6 +46,10 @@ one, so AST07 still owes its own row — `declared-and-uncovered`, naming which 
 by-hand steps went unanswered. A category routed away leaves the same blank in a report
 as a category that passed, and a blank is read as a pass by everyone downstream.
 
+**The table above is step zero of every path below, not a preface to them.** Run it
+against what you are actually holding, and take a path only once no row has claimed it —
+a route consulted after the procedure has started is not a route, it is a footnote.
+
 **Then descend by need — one section each, in reading order:**
 
 - Triaging a pin, or judging a proposed remediation → *Why patch lag and blind
@@ -186,7 +190,13 @@ list, in good faith, and the step will look complete.
    "no evidence of compromise".
 3. **Obtain the resolver's decision record, for Rollback Attack.** *Sufficient:* the
    requested constraint, the candidate set offered, the version resolved — **and** an
-   operator-intent record separating a deliberate pin-back from an imposed one. *Cannot
+   operator-intent record separating a deliberate pin-back from an imposed one.
+   *Insufficient:* somebody's recollection that the pin-back was deliberate, a ticket
+   saying the version was rolled back, or the resolved version without the candidate set
+   it was chosen from — the first two record that a decision is believed to have been
+   made and the third records its outcome, while the scenario turns on who imposed it.
+   Say which of those you were offered and what it leaves undecided; leaving it
+   unaddressed reads as the intent half having been supplied. *Cannot
    get the intent half:* stop. Rule 2 is the reason: convicting on "version decreased"
    alone convicts every legitimate rollback, which is a worse outcome than an undecided
    row.

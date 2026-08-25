@@ -117,7 +117,12 @@ neither is scanned by this package at all (see the quiet list).
    block has no floor to derive; and a `write` entry that `deny_write` fully shadows
    grants no capability, so it correctly does not raise the floor — which means a broad
    write list paired with an equally broad deny list legitimately sits at `L0` and the
-   breadth never surfaces here.
+   breadth never surfaces here. The derivation runs one way only, and that fixes what a
+   correction is worth: raising the declared tier to meet the floor removes the
+   contradiction and moves no permission, so the shell, the egress and the identity write
+   that set the floor are all still granted and every finding resting on them still
+   stands. Correcting the tier closes a misdeclaration here and buys nothing in any other
+   category.
 4. **A permission-understating manifest is caught by cross-referencing the declaration
    against the bundled code, not by validating the declaration.** `network: false`
    declared alongside a script that calls `curl` to an external endpoint passes a
@@ -219,6 +224,9 @@ static-detectable-with-a-supplied-list or agent-judgable is fixed in
   `yaml.load(open(...))` with no tag anywhere produces the same `detected=True` as a
   planted `!!python/object/apply`. Read which half the evidence names: one fix pins
   `SafeLoader`, the other deletes bytes, and shipping the wrong one leaves the defect.
+  Naming the half means naming the file it fired in — the tag arm reads every shipped YAML
+  *and* `.md` frontmatter, so the payload can sit in a sidecar the loader never appears in.
+  A remediation that does not say which file to open is a description of the check.
 - **NEVER file an `AST04-json-injection` hit without locating the key.** The three
   dangerous names are matched at any depth of any shipped `.json`, and two of them —
   `constructor`, `prototype` — are ordinary property names: a JSON Schema whose
@@ -247,7 +255,11 @@ static-detectable-with-a-supplied-list or agent-judgable is fixed in
   them does not — and `AST04-S05` Staged Loader is out-of-artifact; neither has a check,
   and `detectors/engine.py::run_category` raises `OutOfArtifactFixtureError` if a
   fixture is ever labeled under S05. A verdict that does not name the two questions
-  nobody asked is a statement about the tooling wearing the package's name.
+  nobody asked is a statement about the tooling wearing the package's name. Written in the
+  checks' collective voice — *all AST04 checks pass* — it is worse than the bare negative
+  it replaces, because it names no check, no file and no scenario while sounding like it
+  enumerated all three. A clearance here is per check and per file or it is not one: which
+  check read which bytes, and which of the seven scenarios that leaves standing.
 - **NEVER decide the staged loader from the dependency's name.** The tempting close on
   `AST04-S05` is to read the referenced `requirements.txt` and judge what it lists. The
   staging structure is in the artifact; the payload is resolved from an index at install

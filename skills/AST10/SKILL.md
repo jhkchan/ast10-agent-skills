@@ -160,6 +160,13 @@ is out-of-artifact and left them believing the one in-artifact answer was comple
 report that gives the bound and stops offers a careful account of one check as though it
 were the category. Both, every time.
 
+Both are qualifications, and a qualification needs something to qualify: an answer giving
+the scope and the bound and never issuing the verdict the question asked for has reported
+the shape of the question and withheld the answer, which reads downstream as a pass. State
+it in the package's own nouns as well — the field, the file, the literal's own name as the
+source spells it. A bound written in this page's vocabulary is checkable against this page
+and against nothing the reader is holding.
+
 `detect_encoded_payload_injection` fires on two structural conditions and nothing else:
 **C1**, an encoded blob whose decoded text matches a payload-behaviour signature, and
 **C2**, an encoded literal whose decoded result reaches an execution sink on the same

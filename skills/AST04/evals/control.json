@@ -1,0 +1,20 @@
+{
+  "skill_name": "ast04-insecure-metadata",
+  "control": "BLIND CONTROL — do not tune against this file. Do not read a number out of it while a SKILL.md is open, and do not quote a per-skill delta from it in any brief that also proposes an edit. These eleven cases were authored from each skill's SKILL.md, its coverage-matrix.md and scenarios/registry.yaml, never from a measured result, and they are the only thing in this repository that can tell an improvement from an overfit. Reading these results to guide an edit SPENDS this control, exactly as iteration 3 spent the last one, and the iteration that spends it owes the next one a replacement set authored the same way. Say what that costs, because the cost is now the point: this is the THIRD corpus (evals.json tuned, regression.json spent, this one blind), and an eval programme that burns a control per iteration is not sustainable — every replacement is authored by someone who has already read the failure it is supposed to be blind to, the authoring cost recurs every iteration, and the supply of untouched scenarios and fixtures is finite. A future iteration should rotate a portion instead of replacing wholesale: retire and re-author only the two or three skills whose results actually steered an edit, and leave the rest sealed.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Package review and I have talked myself into a corner. The package below ships a manifest.json and a scripts/merge.js. The last config-injection finding we closed was a YAML one and the fix was to pin SafeLoader, so the draft I have written here says 'same class of bug, pin the parser'. Before I send it: is it the same class of bug, what exactly is the defect, and what is the fix I should actually be asking for?",
+      "expected_output": "It is a finding, and it is not the same class of bug. The defect is the __proto__ key under `defaults` in the shipped manifest.json together with deepMerge in scripts/merge.js, which recurses and assigns straight onto the target object — the unsafe merge that turns an own property into a poisoned prototype. The three declared formats are not one vulnerability class and do not share a detector: YAML's risk is a deserialization construct reachable only through a legacy unsafe loader, whereas JSON.parse executes nothing and creates only an own __proto__ property, so parsing is not the exploitable step. There is no loader here to pin, and a parser or schema change fixes nothing. The fix is the merge: refuse or skip __proto__, constructor and prototype keys, or merge onto a target that cannot inherit, or use a merge implementation that does not assign onto the prototype chain. Two riders belong in the write-up. The in-package merge is corroborating evidence rather than a requirement — the exploiting merge usually lives in the host, and a package that ships only the poisoned manifest is the ordinary shape. And a hit on one of those key names has to be located before it is written up, because constructor and prototype are ordinary property names and the check returns on its first hit.",
+      "assertions": [
+        "The response confirms a finding and names both halves of it — the polluting key in the shipped manifest.json and the recursive merge in scripts/merge.js that assigns onto the target.",
+        "The response rejects pinning a safe loader as the fix and explains that JSON parsing executes nothing and creates only an own property, so the exploitable step is the later unsafe merge rather than the parse.",
+        "The response states the fix in terms of the merge — refusing or skipping the polluting key names, or merging onto a target that cannot inherit — rather than as a parser, loader or schema change.",
+        "The response says an in-package merge is corroborating evidence rather than a requirement, because the exploiting merge commonly lives in the host and a package shipping only the poisoned manifest is the ordinary shape."
+      ],
+      "files": [
+        "fixtures/AST04/V3-json-metadata-injection"
+      ]
+    }
+  ]
+}

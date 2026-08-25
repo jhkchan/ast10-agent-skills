@@ -306,6 +306,16 @@ def render(iterations: list[tuple[int, dict[str, Any]]], authored: tuple[int, in
         "`assertion-review.json`, written by `python3 eval/skill_eval_grade.py review`."
     )
     add(
+        "- **A `-heldout-` row is a spent control, and its delta is not evidence of "
+        "generalisation.** Those rows were produced by the corpus then called `heldout.json`, "
+        "which answered *did this edit generalise* until iteration 3 tuned an advisory fix "
+        "against one of its cases and published per-skill deltas from all eleven. It has been "
+        "retired to `skills/*/evals/regression.json`, a regression suite and not a control; "
+        "the control that answers that question now is `skills/*/evals/control.json`, whose "
+        "rows carry a `-control-` slug. The run directories keep the name they were written "
+        "under, because the workspace is frozen evidence."
+    )
+    add(
         "- **Some assertions are answerable from the attached fixture files alone.** The labelled "
         "fixture packages carry their own provenance header, so both arms can read a scenario id "
         "off the input. Which assertions those are is measured and frozen by "

@@ -185,13 +185,16 @@ from adapters.base import response_excerpt  # noqa: E402
 SKILLS_DIR = REPO_ROOT / "skills"
 WORKSPACE = REPO_ROOT / "eval" / "skill-eval-workspace"
 
-#: The two authored corpora, and which one this module reads unless told otherwise.
-#: `evals.json` is the TUNED set an iteration edits a SKILL.md against; `heldout.json`
-#: is the HELD-OUT control that says whether those edits generalised. They are graded
-#: one at a time, never pooled — see `load_eval_index`.
+#: The three authored corpora, and which one this module reads unless told
+#: otherwise. `evals.json` is the TUNED set an iteration edits a SKILL.md against;
+#: `control.json` is the BLIND CONTROL that says whether those edits generalised;
+#: `regression.json` is the corpus that held that role until iteration 3 spent it
+#: and is now a regression suite whose numbers prove nothing about generalisation.
+#: They are graded one at a time, never pooled — see `load_eval_index`.
 DEFAULT_CASE_FILE = "evals.json"
-HELDOUT_CASE_FILE = "heldout.json"
-CASE_FILES: tuple[str, ...] = (DEFAULT_CASE_FILE, HELDOUT_CASE_FILE)
+CONTROL_CASE_FILE = "control.json"
+REGRESSION_CASE_FILE = "regression.json"
+CASE_FILES: tuple[str, ...] = (DEFAULT_CASE_FILE, CONTROL_CASE_FILE, REGRESSION_CASE_FILE)
 
 #: The two arms. Order is fixed for reporting, never for grading — see
 #: :func:`grading_order`, which shuffles so the arm cannot be read off position.
@@ -315,10 +318,10 @@ class EvalCase:
         key space of ``feedback.json``; two modules writing that file under two
         spellings would give a reviewer two half-filled templates and no error.
 
-        A case from the held-out control set carries its file's stem —
-        ``AST01-heldout-case-1`` — for the same reason: the tuned corpus and the
-        control answer different questions, and a workspace directory has to name
-        which one produced it.
+        A case from either non-tuned corpus carries its file's stem —
+        ``AST01-control-case-1``, ``AST01-regression-case-1`` — for the same
+        reason: the three corpora answer three different questions, and a
+        workspace directory has to name which one produced it.
         """
         stem = Path(self.case_file).stem
         infix = "" if self.case_file == DEFAULT_CASE_FILE else f"{stem}-"
@@ -351,10 +354,10 @@ def load_eval_index(skills_dir: Path = SKILLS_DIR, case_file: str = DEFAULT_CASE
     other, and the totals would still look plausible.
 
     ``case_file`` selects the corpus, defaulting to the tuned ``evals.json``. The
-    two are loaded one at a time rather than merged, because a benchmark computed
-    over both would pool a set the skills were tuned against with the control that
-    exists to check that tuning — and the pooled mean would look like evidence
-    while hiding the only comparison worth making.
+    three are loaded one at a time rather than merged, because a benchmark computed
+    over more than one would pool a set the skills were tuned against with the
+    control that exists to check that tuning — and the pooled mean would look like
+    evidence while hiding the only comparison worth making.
     """
     index: dict[str, EvalCase] = {}
     for path in sorted(skills_dir.glob(f"*/evals/{case_file}")):
@@ -1661,7 +1664,8 @@ def build_parser() -> argparse.ArgumentParser:
         choices=CASE_FILES,
         help=(
             "which authored corpus the workspace under grading came from: the tuned "
-            "%(default)s, or heldout.json for a run of the held-out control set"
+            "%(default)s, control.json for a run of the blind control set, or "
+            "regression.json for the spent corpus kept as a regression suite"
         ),
     )
     grade.add_argument("--agent-model", default=None, help="fallback agent id when a run has no run.json")

@@ -1,6 +1,6 @@
 ---
 name: advisory
-description: "Route a free-text agent-skill security finding to the one OWASP AST01-AST10 category that owns its root cause, separate that origin from the contributing control failures that co-fired with it, and hand off to that category's skill with an honest statement of what a check there can and cannot confirm. Use when a finding arrives as prose rather than as a package to scan, when two AST categories both plausibly fit, when a scanner gap and a payload appear in the same report, when a finding names a symptom louder than its cause, or when you need to know whether the category you are about to route to ships any check at all."
+description: "Route a free-text agent-skill security finding to the one OWASP AST01-AST10 category that owns its root cause, separate that origin from the contributing control failures that co-fired with it, and hand off to that category's skill with an honest statement of what a check there can and cannot confirm. Use when a finding arrives as prose rather than as a package to scan, when two AST categories both plausibly fit, when a scanner gap and a payload appear in the same report, when a finding names a symptom louder than its cause, when the artifact a finding is about may not be a skill at all, or when you need to know whether the category you are about to route to ships any check at all."
 permissions:
   network: false
   shell: false
@@ -10,10 +10,10 @@ risk_tier: L0
 
 # Advisory - routing a finding to the category that owns it
 
-Pattern: Process. Three phases - name the origin, resolve the co-fires, hand off - at
-medium freedom, with the two halves of that freedom named below. Deliberately *not*
-Navigation, despite this being a router: a ten-row table of links is what this file used
-to be, and a table of links cannot answer the only question that is ever hard here.
+Pattern: Process. A scope gate, then three phases - name the origin, resolve the co-fires,
+hand off - at medium freedom, with the two halves of that freedom named below. Deliberately
+*not* Navigation, despite this being a router: a ten-row table of links is what this file
+used to be, and a table of links cannot answer the only question that is ever hard here.
 
 The governing rule, and the reason a link table fails: **the whitepaper's decision tree
 sorts a finding by its symptom; a finding is owned by its origin.** Those two agree on
@@ -25,11 +25,12 @@ the condition that created it.
 
 **Fires when** the input is a *finding in prose* - a ticket, a pentest line item, a
 disclosure, a scanner's own output read as a sentence - and the open question is which
-AST category owns it.
+AST category owns it. Prose is the input test, never the scope test: Phase 0 still has
+to establish that the finding is about a skill.
 
-**Decides** four things: which single AST id is the origin; which co-fired categories are
-contributing failures and who owns each; which file to hand the finding to; and what that
-target can honestly confirm.
+**Decides** four things, once Phase 0 has established there is anything to decide: which
+single AST id is the origin; which co-fired categories are contributing failures and who
+owns each; which file to hand the finding to; and what that target can honestly confirm.
 
 **Does not decide** whether the finding is true. This skill never opens the package under
 discussion. It has no detector, declares no scenario, and is excluded from every `--tier`
@@ -53,7 +54,7 @@ request for manual triage is a correct output of this skill, not a failure of it
 | --- | --- |
 | A skill package, not a finding | Go straight to the category skill, or run the repo's audit/dogfood path. Routing a package means scanning it, and nothing here scans. |
 | A finding whose category you already know | Skip this file entirely; open `skills/<ASTnn>/SKILL.md` and use its own orientation table. This file adds nothing once the category is settled. |
-| A finding about an MCP server, a bare tool, or a host plugin | Out of scope. AST01-AST10 apply to the skill form specifically - the whitepaper draws that boundary itself in its Skill / Tool / MCP server / Plugin section, and MCP servers belong to the MCP Top 10. Return null. |
+| A finding whose subject is not a skill - a tool, a server, a host plugin, a pipeline | Out of scope by the whitepaper's own scope split. Phase 0 settles which form you are holding and what the record says when it is not a skill: no AST id, primary or contributing. |
 | A coverage number, an F1, or a binding tier | `docs/f1-report.md`, the target's `coverage-matrix.md`, and `scenarios/registry.yaml`. The tier table in Phase 3 is a routing summary, not the authority. |
 | The question "did this package do X?" | A detector. `skills/<ASTnn>/scripts/detector.py`, through the repo CLI. |
 
@@ -67,7 +68,44 @@ produced from the wrong input type is not a routing error that a later scan will
 it is a finding invented for an artifact nobody opened, and it arrives at the target
 already worded as confirmed.
 
+## Phase 0 - establish the form before routing
+
+Every predicate in Phase 1 opens with "the artifact" and every one of them means *a skill*.
+The whitepaper's decision tree branches over skills throughout, so it holds no branch for a
+finding about anything else and cannot report that one arrived: run it on the wrong form and
+it still returns a category, by elimination, and the record cannot tell that apart from a
+category returned by evidence. Settle the form first.
+
+> **AST01-AST10 are about the skill form specifically - a bundle of instructions and
+> resources an agent discovers and loads into its own context. A tool is one callable
+> function; a server is a separate process reached over a protocol; a host plugin or
+> extension is an installable that may bundle any of the above. Only the first is this
+> document's subject.**
+
+Two consequences, and the second is the one that gets skipped:
+
+- **A decline is a whole record, not a demoted primary.** Contributing entries are AST ids
+  too, making the same claim about the same artifact one layer down, so "no origin, but
+  AST08 contributing" still asserts the scope the origin just declined. Out of scope means
+  `ast_id: null`, `contributing: []`, and no hand-off to any `skills/<ASTnn>/SKILL.md`.
+- **Give the boundary as the reason, and name where the finding does belong.** "Not a skill"
+  is a conclusion about scope, not a shortage of evidence, so it closes rather than
+  escalates - worded as thin evidence it invites the reporter to send more facts about an
+  artifact no fact will move inside. Other bodies of work own the other forms, and the
+  artifact has operators of its own: an MCP server's findings belong to the MCP Top 10 and
+  to whoever runs that server. A decline that names no recipient is re-triaged by the next
+  reader, who has fewer facts than you do.
+
+**The wrapper is not the subject.** Ask what form the artifact *the finding is about* takes,
+not what shipped it. A plugin that bundles a skill can carry a finding whose condition is a
+fact about that skill's own instructions, manifest, or referenced content, and that finding
+routes normally under Phase 1; the rest of the bundle does not become in scope for having
+travelled with it. The test is subtraction - if the condition would still hold with the
+skill removed from the bundle, the finding is not the skill's and the gate closes.
+
 ## Phase 1 - name the origin
+
+*Phase 0 first: every predicate below says "the artifact" and means that skill.*
 
 Ask what had to *already be true* for the finding to be possible. That question is not
 the whitepaper tree's question, and the difference is the point: the tree asks what the
@@ -294,8 +332,10 @@ number for them is the failure this repository declines by name.
    Where that column reads `declared-and-uncovered`, the recipient is a named person and a
    named process rather than a file path; there is no run for a file to be the entry point
    of.
-5. **If unrouted**: `ast_id: null` and escalate. Do not narrow a vague finding by guessing;
-   ask the reporter which condition was true.
+5. **If unrouted**: `ast_id: null`, and which kind of null decides what happens next.
+   A finding too vague to route escalates - do not narrow it by guessing, ask the
+   reporter which condition was true. A finding declined at Phase 0 does not escalate;
+   it closes, with the scope boundary as its reason and its real recipient named.
 
 ## NEVER
 
@@ -321,9 +361,11 @@ number for them is the failure this repository declines by name.
   fixture corpus, not this finding, and for AST03, AST05, and AST06 part or all of the
   published number is `artifact-signal-only` - a precondition proxy this repository
   forbids labelling as scenario coverage.
-- **NEVER invent an AST id for something that is not a skill.** An MCP server, a bare
-  tool, or a host plugin is outside AST01-AST10 by the whitepaper's own scope split.
-  `triage()` returns null for unmatched text; the null is the answer.
+- **NEVER invent an AST id for something that is not a skill** - and the contributing
+  list is AST ids too. A tool, a server, or a host plugin is outside AST01-AST10 by the
+  whitepaper's own scope split, so a contributing entry there re-asserts the scope the
+  primary just declined, in a field nobody re-reads. `triage()` returns null for
+  unmatched text; the null is the answer.
 
 ## Mechanism, and Layer 3
 

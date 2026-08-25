@@ -170,8 +170,14 @@ A negative here is a two-part deliverable: the verdict, and which of the six sil
 the package in front of you is actually sitting inside, named from that package's own files
 rather than recited as a list. A reader handed a negative and no boundary supplies the
 boundary themselves, and the one they supply is *everything* — so an unqualified negative
-asserts a coverage this check has never had. Each of the following returns a negative
-verdict that is not a clean one.
+asserts a coverage this check has never had.
+
+A positive is the same duty pointed the other way: quote the path the check matched, the
+key it hung off inside that file, and the command string it read. The check is keyed on
+the config surface rather than on how the command reads, so the surface *is* the finding's
+identity — a report that names the category and paraphrases the command sends its reader
+looking for something to remove and gives them no entry to remove it from. Each of the
+following returns a negative verdict that is not a clean one.
 
 - **The check reads config files shipped *inside the package*. The incident shape is a
   config file in the repository the agent opens.** That repository is not part of any
@@ -240,7 +246,12 @@ silence. Each entry names what refutes it, in this directory.
   list is empty, and pin posture is a lockfile property while the scenario is a resolver
   outcome. This is not hypothetical: the pin-posture pair is one of the six orphan fixtures
   `tests/test_coverage_matrix_ast07_ast08.py::test_ast02_ships_no_orphan_fixture_corpus`
-  names by directory so the delisting cannot be quietly undone.
+  names by directory so the delisting cannot be quietly undone. Declining the id does not
+  licence inventing one in its place. Every scenario id in this suite is a row in
+  `scenarios/registry.yaml`; an identifier you cannot point at there is not an identifier,
+  however well-formed it looks, and a well-formed invention travels further than a
+  wrong-but-real id precisely because the reader who tries to look it up finds nothing to
+  contradict. Write the condition you observed and leave the id field empty.
 - **NEVER report a Maintainer Account Takeover as ruled out because the release verified.**
   The registry's written reason for tiering `AST02-S04` out-of-artifact is that a release
   pushed by an attacker holding the legitimate key is byte-indistinguishable from an honest

@@ -778,20 +778,32 @@ python3 eval/skill_evals.py --dry-run            # the plan; writes nothing, cal
 python3 eval/skill_evals.py                      # run every case in both arms, grade, aggregate
 python3 eval/skill_eval_grade.py review          # which assertions the skill actually moved
 python3 eval/generate_skill_eval_report.py       # publish docs/skill-eval-report.md
-python3 eval/skill_evals.py --case-file heldout.json   # the held-out control set
+python3 eval/skill_evals.py --case-file control.json   # the blind control set
+python3 eval/skill_evals.py --case-file regression.json  # the spent corpus, kept for regressions
 ```
 
-There are two authored corpora and they answer different questions.
+There are three authored corpora and they answer three different questions.
 `skills/*/evals/evals.json` is the **tuned** set — the cases an iteration reads and
 edits a `SKILL.md` against — and a delta on it says the skill improved on cases
-somebody was looking at while improving it. `skills/*/evals/heldout.json` is the
-**held-out** set: one case per skill, eleven in total, authored from the skills and
-the whitepaper rather than from any measured result, and a delta on *it* says the
-improvement generalised. The two are never pooled, and a held-out run writes under
-its own `<skill>-heldout-case-<n>` slugs so a workspace names the corpus that
-produced it. Each held-out file carries a `held_out` notice saying what it is for:
-reading it while editing a skill spends the only thing it is worth, and an
-iteration that tunes against it owes the next one a replacement set.
+somebody was looking at while improving it. `skills/*/evals/control.json` is the
+**blind control**: one case per skill, eleven in total, authored from each skill's
+own files and the whitepaper rather than from any measured result, and a delta on
+*it* is the only thing here that says the improvement generalised.
+`skills/*/evals/regression.json` is a **regression suite and not a control** — it
+held the control role under the name `heldout.json` until iteration 3 tuned an
+advisory fix against one of its cases and published per-skill deltas from it, which
+spends a control. The cases were kept because one a skill used to pass and now
+fails is still a regression worth catching; no number from that file is evidence
+that anything generalised.
+
+The three are never pooled, and every non-default run writes under its own
+`<skill>-<corpus>-case-<n>` slugs so a workspace names the corpus that produced it.
+Each non-tuned file carries its own notice: the control's says that reading it
+while editing a skill spends the only thing it is worth, that the iteration which
+spends it owes the next one a replacement set, and what that costs — this is the
+third corpus, an eval programme that burns a control per iteration is not
+sustainable, and a future iteration should rotate the two or three skills whose
+results actually steered an edit rather than re-authoring all eleven.
 
 Reformatting a skill's `scripts/*.py` changes the bytes its `content_hash` covers, so the
 manifests have to be re-stamped afterwards or `validators/usf.py` will (correctly) report
