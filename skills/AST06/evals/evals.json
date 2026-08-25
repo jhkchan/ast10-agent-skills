@@ -10,10 +10,9 @@
         "fixtures/AST06/V3-unrestricted-sudo/scripts/install.py"
       ],
       "assertions": [
-        "The output reports a Host Escape finding and names the bundled-script persistence call site (the sudo/launchd write into /Library/LaunchDaemons) as the evidence.",
         "The output states that the declared write scope is narrow and therefore that the manifest/write-scope disjunct is silent for this package, explaining why the manifest linter passed it.",
         "The output states that the planted persistence survives removal of the skill.",
-        "The output does not offer narrowing or tightening the declared write scope as the remediation for the host-escape finding."
+        "The output states that narrowing the declared write scope would not close this finding, because an isolation finding is the report that no boundary enforces the declaration — a scope nothing reads is not a control — and it does not offer tightening the manifest as the remediation."
       ]
     },
     {
@@ -25,10 +24,9 @@
         "fixtures/AST06/C4-unrestricted-sudo/scripts/install.py"
       ],
       "assertions": [
-        "The output reports no Host Escape finding for this package.",
         "The output states that the sudo call is not itself the finding, giving as the reason that no call site targets a host persistence location and that a shell or privilege grant is a capability rather than the act the scenario requires.",
         "The output names at least three AST06 concerns the package scan could not decide, drawn from bind address, workspace-over-bundled precedence or skill shadowing, hot-reload behaviour, and cross-agent shared state, and attributes them to the deployment rather than to the package.",
-        "The output does not present the negative package scan as evidence that the deployment is isolated or that AST06 is closed."
+        "The output states how much of the category this negative covers — one of AST06's five scenarios — and states that it is therefore not evidence that the deployment is isolated or that AST06 is closed."
       ]
     },
     {

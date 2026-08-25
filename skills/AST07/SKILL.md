@@ -40,7 +40,11 @@ The table is an index, and it splits two ways. The last three rows are seams —
 incident producing two separately-fixable findings — and *Distinguishing AST07 from its
 neighbors*, below, argues each one. The two AST01 rows are not seams but ownership: a
 payload and a hash field are both decidable from the bytes, so they belong to the
-category that ships a check for them, and nothing is left behind in AST07.
+category that ships a check for them, and nothing is left behind in AST07. On a seam,
+something is: handing the neighbour its half answers the neighbour's question, never this
+one, so AST07 still owes its own row — `declared-and-uncovered`, naming which of the
+by-hand steps went unanswered. A category routed away leaves the same blank in a report
+as a category that passed, and a blank is read as a pass by everyone downstream.
 
 **Then descend by need — one section each, in reading order:**
 
@@ -160,7 +164,11 @@ the finding — do not fill it.
 Nothing fires here, so the audit *is* the reviewer. Four steps, in order. Each names what
 makes an answer sufficient and what to do when you cannot get one — the second half
 matters more, because three of the four steps routinely fail and the failure has to
-survive into the write-up instead of quietly becoming a pass.
+survive into the write-up instead of quietly becoming a pass. Each *Sufficient* entry is
+a conjunction: an evidence request that asks for part of one comes back answered and
+still decides nothing, so ask for the whole set at once and hand over the *Insufficient*
+list with it — whoever is collecting will otherwise return exactly the items on that
+list, in good faith, and the step will look complete.
 
 1. **Read the two artifact-decidable facts — only one of them is automated.**
    `node cli/bin/cli.js audit <package>` prints AST07 as `no static detectors` and

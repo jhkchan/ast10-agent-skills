@@ -152,6 +152,14 @@ an AST01-relevant exposure) — record both, since they are fixed by different a
 
 ## Where the one shipped check goes quiet
 
+Two different qualifications ride on a negative here, and neither one discharges the
+other. *Scope* is how much of the category a single package can decide at all — one
+scenario of six. *Bound* is what the check that actually ran was able to look at on this
+package. A report that gives the scope and stops has told its reader that most of AST10
+is out-of-artifact and left them believing the one in-artifact answer was complete; a
+report that gives the bound and stops offers a careful account of one check as though it
+were the category. Both, every time.
+
 `detect_encoded_payload_injection` fires on two structural conditions and nothing else:
 **C1**, an encoded blob whose decoded text matches a payload-behaviour signature, and
 **C2**, an encoded literal whose decoded result reaches an execution sink on the same

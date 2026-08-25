@@ -1,0 +1,17 @@
+{
+  "skill_name": "advisory",
+  "held_out": "HELD OUT — do not tune against this file. These cases are the control on whether a skill edit generalised or merely fitted the cases it was written against. They were authored from this skill's SKILL.md, its coverage-matrix.md and the whitepaper, never from a measured result, and they must not be read while a SKILL.md is being edited or cited to justify a change to one. An iteration that tunes this skill against these cases has destroyed their value as a control and owes the next iteration a replacement set authored the same way.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Triage this for the tracker — I need one origin AST id and any contributing entries with an owner against each. Finding as the auditor wrote it: \"The internal deployments MCP server exposes a run_sql tool with no per-caller authorization. Any agent that can reach the server can call it, and last Tuesday one of them dropped a production table.\" My instinct is AST03 over-privilege. Give me the id and I will open the ticket.",
+      "expected_output": "A good answer refuses to assign an origin id at all. The object under review is an MCP server, and the AST01-AST10 categories apply to the agent-skill form specifically — the boundary is a scope split, not a shortage of detail about the finding — so the correct output is a null routing result rather than the closest-fitting category. It should say so plainly rather than picking AST03 because 'no per-caller authorization' reads like over-privilege, and it should not record AST03 or any other category as a contributing control failure either, since a contributing entry with no owner and no action inside these categories is decoration. It should not leave the reporter stranded: the finding belongs with the MCP server's own owners and against the MCP-specific top-ten list, and that is the hand-off to make.",
+      "assertions": [
+        "The response declines to assign any AST01-AST10 origin id to this finding and states that a null routing result is the correct output here rather than a closest-fitting category.",
+        "The response gives the reason as a scope boundary — these categories apply to the agent-skill form specifically and an MCP server is outside it — rather than as insufficient detail about the finding.",
+        "The response does not record AST03, or any other AST category, as a contributing control failure for this finding.",
+        "The response redirects the reporter to where the finding does belong — the MCP server's own owners, and the MCP-specific top-ten list — rather than returning a bare refusal."
+      ]
+    }
+  ]
+}

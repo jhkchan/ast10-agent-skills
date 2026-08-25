@@ -57,6 +57,16 @@ request for manual triage is a correct output of this skill, not a failure of it
 | A coverage number, an F1, or a binding tier | `docs/f1-report.md`, the target's `coverage-matrix.md`, and `scenarios/registry.yaml`. The tier table in Phase 3 is a routing summary, not the authority. |
 | The question "did this package do X?" | A detector. `skills/<ASTnn>/scripts/detector.py`, through the repo CLI. |
 
+**Triage takes a claim, not an artifact.** Everything this file decides - origin,
+contributing entries, hand-off, what the target can confirm - is a statement about *a claim
+someone is making*, so where no claim has been made there is nothing to route: a package, a
+diff, a fixture or a directory listing is an artifact, and turning an artifact into a claim
+means reading it, which is scanning. **The rows above are terminal.** Name the entry point
+and stop - no origin, no contributing list, no hand-off record, no `ast_id`. A verdict
+produced from the wrong input type is not a routing error that a later scan will correct;
+it is a finding invented for an artifact nobody opened, and it arrives at the target
+already worded as confirmed.
+
 ## Phase 1 - name the origin
 
 Ask what had to *already be true* for the finding to be possible. That question is not
@@ -99,7 +109,7 @@ admitting registry versus whoever operates the scanner, the inventory, or the up
 policy - and that ownership split is what makes the distinction worth recording rather
 than a matter of taste. Two consequences:
 
-- **A contributing entry that carries no owner and no action is decoration.** Drop it.
+- **A contributing entry that carries no owner, or no action, is decoration.** Drop it.
   Listing AST08 beside every finding because a scanner exists somewhere adds a line to
   the report and no work to anyone's queue.
 - **Different owners do not license a second primary.** `skills/AST10/SKILL.md` is the one
@@ -269,14 +279,21 @@ number for them is the failure this repository declines by name.
 ### The record to hand over
 
 1. **Origin AST id, and the one sentence of evidence that settled it** - the condition
-   from the Phase 1 table that had to be true, in the reporter's own facts.
+   from the Phase 1 table that had to be true, in the reporter's own facts, attributed to
+   them. The record says where the claim belongs; it does not say the claim holds. Nothing
+   here opened the artifact, so *routed to* is the strongest verb this file is entitled to,
+   and *confirmed as* is the target's to write once it has run something.
 2. **Target**: `skills/<ASTnn>/SKILL.md`. Enter through *its* orientation table and do not
    re-triage there. Its routing rows exist to catch a *mis*-route arriving from outside;
    treating them as a second opinion on a call you already made under Phase 2 is how one
    finding acquires two categories.
-3. **Contributing entries, each with an owner and an action.** No owner, no line.
+3. **Contributing entries, each with an owner and an action.** No owner or no action, no
+   line.
 4. **What the target can confirm**, from the table above, stated before anyone runs
    anything - so that a silence from an empty tier is never read back as a clean result.
+   Where that column reads `declared-and-uncovered`, the recipient is a named person and a
+   named process rather than a file path; there is no run for a file to be the entry point
+   of.
 5. **If unrouted**: `ast_id: null` and escalate. Do not narrow a vague finding by guessing;
    ask the reporter which condition was true.
 

@@ -12,7 +12,7 @@
         "The response reports the AST07 status as declared-and-uncovered (or an equivalent 'not decidable from this package' status) and does not report the category as pass, clean, no findings, or an equivalent all-clear.",
         "The response explicitly declines to treat the declared sha256 content hash as evidence that no malicious update occurred, and supports that with a reason about authorship of the bytes or about an operator accepting a new hash.",
         "The response names all three AST07 attack scenarios — Malicious Update, Rollback Attack, and Hot-Reload Abuse — and states for each that a single point-in-time package cannot decide it.",
-        "For each of the three scenarios the response names at least one concrete piece of off-artifact evidence that would be required, such as a signed release-transparency or operator-held version-to-hash-to-publisher-key record, a resolver decision record paired with an operator-intent record, or host reload telemetry paired with directory ownership.",
+        "The response names at least one concrete off-artifact record that would be required and says which of the three scenarios that record decides — for example a signed version-to-hash-to-publisher-key release record for Malicious Update, a resolver decision record paired with an operator-intent record for Rollback Attack, or host reload telemetry paired with directory ownership for Hot-Reload Abuse.",
         "The response does not tell the user the ticket can be closed on the strength of the pin."
       ]
     },
@@ -42,8 +42,7 @@
         "The response attributes the described drift to AST05 (drift in externally referenced content) rather than to AST07, and says so explicitly rather than merely mentioning AST05 in passing.",
         "The response rejects tightening or hardening the version pin as the remediation, and gives as the reason that the package's own pin held byte-for-byte so a stronger pin closes nothing.",
         "The response observes that this package declares no content hash (it ships no skill.usf.yaml manifest) and attributes that finding to AST01's content-hash-missing check rather than counting it as AST07 coverage.",
-        "The response does not report a detected, confirmed, or convicted AST07 finding for this package, and reports AST07 as declared-and-uncovered.",
-        "The response names the remediation that actually applies to the referenced content — pinning, wrapping or boundary-marking the fetched material — rather than only rejecting the proposed one."
+        "The response does not report a detected, confirmed, or convicted AST07 finding for this package, and reports AST07 as declared-and-uncovered."
       ]
     }
   ]

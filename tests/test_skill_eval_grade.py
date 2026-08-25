@@ -157,16 +157,21 @@ def test_an_unknown_directory_name_is_refused_with_the_shape_it_expected():
 def test_no_authored_assertion_is_script_decidable_today():
     """A recorded count, not a target.
 
-    All 162 authored assertions are semantic claims about a response; none is a
+    All 120 authored assertions are semantic claims about a response; none is a
     file-exists or valid-JSON check a script settles better. The split is
     implemented and every result records its mechanism, so the day an author
     writes a mechanical assertion this number moves and this test says so out
     loud rather than the change passing unnoticed.
+
+    The count was 162 through iteration 1. Acting on that run's
+    `passed_in_both` bucket removed 42 assertions a skill-less baseline already
+    satisfied; the surviving 120 are the ones a with/without delta can be read
+    from.
     """
     index = GRADE.load_eval_index()
     assertions = [a for case in {c.slug: c for c in index.values()}.values() for a in case.assertions]
     scripted = [a for a in assertions if GRADE.classify_assertion(a) is not None]
-    assert len(assertions) == 162, f"the corpus holds {len(assertions)} assertions, not 162"
+    assert len(assertions) == 120, f"the corpus holds {len(assertions)} assertions, not 120"
     assert scripted == [], f"{len(scripted)} assertion(s) are now script-decidable: {scripted}"
 
 

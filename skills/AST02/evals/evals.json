@@ -10,9 +10,7 @@
         "fixtures/AST02/C4-control-plane-env-override/.claude/settings.json"
       ],
       "assertions": [
-        "The response reports no AST02-S03 Config-File Hijacking finding against this package.",
-        "The response names the two variables the env block actually sets (EDITOR and PAGER) and distinguishes them from a control-plane variable such as ANTHROPIC_BASE_URL on the grounds that they do not redirect where the agent sends traffic or what it loads.",
-        "The response advises against blocking the install on the basis of the presence of an env block alone.",
+        "The response names the two variables the env block actually sets (EDITOR and PAGER) and states the discriminator as a rule rather than as an observation about these two variables: the finding is an override of a control-plane variable — one that steers where the agent sends traffic or what it loads — and a variable that steers neither is not one.",
         "The response names at least one limit of this negative result — for example that the check reads config shipped inside the package rather than the workspace repository the agent opens, or that the set of config paths scanned is closed and host-specific."
       ]
     },
@@ -25,11 +23,8 @@
         "fixtures/AST02/V1-hook-command-on-session-start/.claude/settings.json"
       ],
       "assertions": [
-        "The response names .claude/settings.json as the file carrying the execution path and identifies the SessionStart hook entry's command value as the specific key.",
-        "The response identifies the finding as AST02-S03 Config-File Hijacking, by scenario id or by title.",
-        "The response states that the check is keyed on the config surface the host auto-reads, not on the presence of a command string, and therefore that the same command inside a bundled script is not this finding.",
-        "The response states that the trigger is execution at project open, without a user dialog or an explicit run step.",
-        "The response names setup.attacker-drop.example, or otherwise reproduces the remote host the hook's command fetches from."
+        "The response names .claude/settings.json and the SessionStart hook entry's command key as the execution path, and quotes the value actually sitting at that key, including the remote endpoint the command fetches from, as the evidence.",
+        "The response states that the check is keyed on the config surface the host auto-reads rather than on the presence of a command string — so the same command inside a bundled script is not this finding — and states that the set of auto-read config paths is a closed one, so the same hook written into a location outside that set is uncovered rather than clean."
       ]
     },
     {
@@ -37,11 +32,8 @@
       "prompt": "We're standing up an internal skill registry for about 400 packages. The install-time plan is: compute the package digest, look it up in the registry index, and if the index returns a match, stamp the install `provenance: verified`. Two questions. Does that close AST02 for us? And can a package scanner tell me whether a given skill came out of a flooded namespace or was published from a maintainer account somebody had taken over?",
       "expected_output": "A no to both, with the reasons separated. On the first: membership, signature and log integrity are three different assertions and this plan answers only the cheapest one — an index lookup does not verify a signature over a canonical serialization against a resolvable publisher key, and it does not detect a rewritten log history, and each unanswered question silently degrades to a pass so the composite verdict looks identical either way. On the second: Registry Flooding, Dependency Confusion and Maintainer Account Takeover are properties of a corpus, a resolver and an account, not of a package — one package is indistinguishable from one member of a flood, and a takeover produces a release that verifies exactly as an honest one does because the attacker holds the legitimate key. The answer should name at least one control that lives outside the package (signing over the whole declared bundle, inclusion/consistency proofs against a monitored root, revocation) rather than proposing a deeper scan.",
       "assertions": [
-        "The response states that a registry membership lookup does not verify a signature, and separately does not establish that the registry's own history has not been rewritten — treating membership, signing and log integrity as distinct questions.",
-        "The response names at least two of Registry Flooding, Dependency Confusion and Maintainer Account Takeover as not decidable from a single package artifact.",
-        "The response explains that a maintainer-account takeover yields a release that passes signature verification, because the attacker holds the legitimate publishing key.",
-        "The response recommends at least one control located outside the package itself — for example a signature covering a canonical digest of the skill file plus every declared resource, inclusion or consistency proofs against a monitored log root, or a revocation path — rather than proposing a deeper scan of the package as the fix.",
-        "The response does not claim that a package scanner can detect registry flooding or maintainer-account takeover from the package's contents."
+        "The response separates membership, signature verification and log integrity into three questions answered independently, and states that the digest lookup answers only the first — it does not verify a signature over the package against a resolvable publisher key, and it does not establish that the registry's own history has not been rewritten.",
+        "The response explains that a maintainer-account takeover yields a release that passes signature verification, because the attacker holds the legitimate publishing key."
       ]
     }
   ]

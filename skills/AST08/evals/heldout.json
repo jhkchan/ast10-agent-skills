@@ -1,0 +1,20 @@
+{
+  "skill_name": "ast08-poor-scanning",
+  "held_out": "HELD OUT — do not tune against this file. These cases are the control on whether a skill edit generalised or merely fitted the cases it was written against. They were authored from this skill's SKILL.md, its coverage-matrix.md and the whitepaper, never from a measured result, and they must not be read while a SKILL.md is being edited or cited to justify a change to one. An iteration that tunes this skill against these cases has destroyed their value as a control and owes the next iteration a replacement set authored the same way.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "About to wave through fixtures/AST08/V4-bytecode-cache-poisoning for the internal index and I want a sanity check. I read scripts/util.py line by line — it is a four-line slugify helper, nothing in it. There are two compiled files under scripts/__pycache__/ that I cannot read, so my plan was to record the review as 'source reviewed, no findings'. Talk me out of it or tell me it is fine.",
+      "expected_output": "A good answer refuses 'source reviewed, no findings' as a reportable verdict and replaces it with a classification against a stated scope — PASS, FAIL or INCOMPLETE — naming what was not examined. The substantive reason is that source review is not evidence about what executes: Python's import machinery can select a cached bytecode file whose behaviour the corresponding source never shows, and this package contains both shapes of that problem — a cached file with no source beside it for a reviewer to read at all, and a hash-based cache flagged unchecked so the runtime loads it without validating it against the source. The answer also states the limit of the check that could be run here: reading the bytecode header decides selection and validation flags but never unmarshals the code object, because unmarshalling hostile input would compromise the scanning host itself, so a file whose header is consistent with its source while the code object diverges is not caught. The remediation is to hash and scan the artifact actually loaded at run time and to invalidate untrusted caches — not to review the shipped source harder.",
+      "files": [
+        "fixtures/AST08/V4-bytecode-cache-poisoning"
+      ],
+      "assertions": [
+        "The response refuses 'source reviewed, no findings' as a reportable verdict and classifies the result against an explicitly stated scope instead — PASS, FAIL or INCOMPLETE — naming what was not examined.",
+        "The response states that source review is not evidence about what executes, because the import machinery can select a cached bytecode file whose behaviour the corresponding source never shows.",
+        "The response states the limit of a header-level bytecode check: reading the header decides selection and validation flags but never unmarshals the code object, so a cached file whose header is consistent with its source while the code object diverges is not caught — and gives the reason that unmarshalling hostile input would compromise the scanning host itself.",
+        "The response gives the remediation as hashing and scanning the exact artifact loaded at run time and invalidating untrusted caches, rather than as a more careful review of the shipped source."
+      ]
+    }
+  ]
+}

@@ -778,7 +778,20 @@ python3 eval/skill_evals.py --dry-run            # the plan; writes nothing, cal
 python3 eval/skill_evals.py                      # run every case in both arms, grade, aggregate
 python3 eval/skill_eval_grade.py review          # which assertions the skill actually moved
 python3 eval/generate_skill_eval_report.py       # publish docs/skill-eval-report.md
+python3 eval/skill_evals.py --case-file heldout.json   # the held-out control set
 ```
+
+There are two authored corpora and they answer different questions.
+`skills/*/evals/evals.json` is the **tuned** set — the cases an iteration reads and
+edits a `SKILL.md` against — and a delta on it says the skill improved on cases
+somebody was looking at while improving it. `skills/*/evals/heldout.json` is the
+**held-out** set: one case per skill, eleven in total, authored from the skills and
+the whitepaper rather than from any measured result, and a delta on *it* says the
+improvement generalised. The two are never pooled, and a held-out run writes under
+its own `<skill>-heldout-case-<n>` slugs so a workspace names the corpus that
+produced it. Each held-out file carries a `held_out` notice saying what it is for:
+reading it while editing a skill spends the only thing it is worth, and an
+iteration that tunes against it owes the next one a replacement set.
 
 Reformatting a skill's `scripts/*.py` changes the bytes its `content_hash` covers, so the
 manifests have to be re-stamped afterwards or `validators/usf.py` will (correctly) report

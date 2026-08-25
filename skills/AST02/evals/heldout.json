@@ -1,0 +1,17 @@
+{
+  "skill_name": "ast02-supply-chain-compromise",
+  "held_out": "HELD OUT — do not tune against this file. These cases are the control on whether a skill edit generalised or merely fitted the cases it was written against. They were authored from this skill's SKILL.md, its coverage-matrix.md and the whitepaper, never from a measured result, and they must not be read while a SKILL.md is being edited or cited to justify a change to one. An iteration that tunes this skill against these cases has destroyed their value as a control and owes the next iteration a replacement set authored the same way.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our tracker will not accept a ticket without a scenario ID in the title, so I need one from you. The SBOM job flagged the nested requirements.txt shipped inside our `pdf-summariser` skill: every line is a mutable range — requests>=2.25.0, pyyaml>=6.0, boto3>=1.34 — and not one of them carries a --hash. I want to title it AST02-S02 Dependency Confusion. Give me the ID line and I will file it.",
+      "expected_output": "A good answer refuses to put a named AST02 scenario id on this observation and does not quietly substitute a different one. It explains that range-versus-hash pin posture is an enabling precondition read off this package's own lockfile — a declared artifact signal with no shipped check behind it — while the scenario itself is an outcome of a resolver acting in a namespace the package does not contain, so filing the precondition under the scenario id produces a coverage table that looks complete over a measurement of nothing. It then keeps the observation alive rather than dismissing it: unpinned ranges are a real defect, hash-checking mode requires every package in the transitive tree to carry a hash so a partial pin is not a pin, and what would actually decide the scenario is resolver-side evidence — the index configuration and a record of which index served each package — not another scan of this artifact.",
+      "assertions": [
+        "The response declines to put a named AST02 scenario id on this observation, and does not substitute a different AST02 scenario id in its place.",
+        "The response explains the refusal by distinguishing what the observation is — an enabling precondition or artifact signal read off this package's own lockfile — from coverage of the scenario, and states that the scenario is an outcome of a resolver acting in a namespace this package does not contain.",
+        "The response still reports the unpinned ranges as a real defect worth fixing, and states that hash-checking requires every package in the transitive dependency tree to carry a hash, so a partial pin is not a pin.",
+        "The response names evidence outside this package that would decide the scenario — for example the resolver's index configuration, or a record of which index actually served each package — rather than proposing another scan of the package."
+      ]
+    }
+  ]
+}

@@ -84,7 +84,20 @@ against an explicitly bounded scope, never as an unqualified "clean" — a scan 
 skipped a `.docx` archive or truncated on a padded file and reports zero findings has
 produced an INCOMPLETE result wearing a PASS label.
 
+The bound has to be the one that actually applies, and it has to travel with the result.
+Report a negative together with the blind spot of the check that produced it — *What the
+four shipped checks decide* states each one — because a qualification offered after the
+verdict arrives after the verdict has been quoted. This cuts both ways: naming a limit
+the scan hit (a decode depth, an archive cap) and not the verdict that hit forces
+reports the machinery while withholding the finding.
+
 ## Decision rules
+
+Every example in these rules illustrates a parse, a decode or a matching failure — none
+of them is a finding. What a rule convicts is the bytes in front of you, so a report
+quotes the artifact's own text: the decoded string, the normalized view, the archive
+member. An answer that describes a payload resembling one of the illustrations below,
+rather than what this package actually contains, has reported the rule and not the scan.
 
 1. **Parse shell text as the shell parses it; do not pattern-match the literal
    verb.** POSIX shells perform quote removal last and split fields on `IFS` after
@@ -170,6 +183,11 @@ AST04 smuggling; failing rule 3 misses AST04 metadata-tier attacks; failing rule
 over-convicts legitimate AST03-adjacent API-integration patterns. Classify the
 underlying missed attack under its own category and the tool/process gap that missed
 it under AST08 — do not merge them into one finding.
+
+The split holds when AST08's own answer is negative. A scanner that missed nothing has
+cleared the miss and nothing else: a payload the tooling saw in the clear still belongs
+to the category that owns payloads, and "no AST08 finding" standing alone reads as an
+artifact that was looked at and found clean. Say where the other half went.
 
 ## What the four shipped checks decide, and the boundary each one buys
 

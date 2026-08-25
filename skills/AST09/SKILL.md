@@ -89,10 +89,14 @@ different population — see decision rule 4.
    inventory so unmatched identities surface. Applying only endpoint scanning and
    reporting a clean result over-claims coverage for this scenario specifically.
 5. **Scope/permission drift is itself a discovery signal, not just a change to log
-   after the fact.** A new OAuth consent grant, a widened scope, or a fresh
+   after the fact — and it is the signal that reaches the population rule 4's chosen
+   method cannot.** A new OAuth consent grant, a widened scope, or a fresh
    app-to-app connection should trigger inventory and revocation workflows the moment
-   it is observed — treating drift as routine telemetry to review later misses the
-   window where the drift itself was the actionable event.
+   it is observed: a grant is frequently the first trace an uninventoried skill leaves
+   anywhere, so a coverage claim that names its discovery method and stops has answered
+   for the skills that method can see and left the rest to whatever drift review exists.
+   Treating drift as routine telemetry to review later misses the window where the drift
+   itself was the actionable event.
 6. **Revocation tied only to explicit incident response misses the routine case.**
    Orphaned Skill (a departed employee's still-active, still-credentialed skill) is
    not an incident — it is an unremarkable, high-frequency offboarding gap. The

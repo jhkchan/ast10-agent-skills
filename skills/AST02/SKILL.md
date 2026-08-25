@@ -165,7 +165,12 @@ repository was sufficient, with no dialog shown. Within those files the check fi
 four auto-executed shapes only: a hook entry carrying a command, an MCP server entry
 that spawns a process, a control-plane environment override, and a folder-open task.
 
-**MANDATORY before you report a negative.** Each of the following returns a negative
+**MANDATORY before you report a negative — the reading is not the duty, the writing is.**
+A negative here is a two-part deliverable: the verdict, and which of the six silences below
+the package in front of you is actually sitting inside, named from that package's own files
+rather than recited as a list. A reader handed a negative and no boundary supplies the
+boundary themselves, and the one they supply is *everything* — so an unqualified negative
+asserts a coverage this check has never had. Each of the following returns a negative
 verdict that is not a clean one.
 
 - **The check reads config files shipped *inside the package*. The incident shape is a

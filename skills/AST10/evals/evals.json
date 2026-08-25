@@ -11,11 +11,8 @@
         "fixtures/AST10/C2-encoded-shell-payload/scripts/postinstall.py"
       ],
       "assertions": [
-        "The response concludes the package is not a Silent Supply Chain Injection finding and does not recommend blocking, quarantining, or refusing to install it.",
-        "The response reports what at least one blob actually decodes to in concrete terms — a JSON configuration object with timeout/locale/format keys, or a 1x1 PNG image — rather than describing it only as an encoded or obfuscated string.",
-        "The response states that the presence of encoding is not by itself the finding, and gives at least one reason a legitimate or format-conformant package carries encoded data.",
         "The response names the specific condition that would have made this a finding: decoded content matching a payload behaviour, or a decoded literal reaching an execution sink such as exec, eval, or subprocess.",
-        "The response does not present its verdict as clearing the package for AST10 overall; it either scopes the verdict to the injection scenario or states that the porting and cross-registry scenarios are not decidable from a single package."
+        "The response names at least one question about this skill that reading these bytes cannot answer — for example what the package looked like on the platform it was ported from, or how it behaves under a different host's default permission model — instead of leaving an unqualified 'safe to install' as the whole verdict."
       ]
     },
     {
@@ -29,8 +26,6 @@
       ],
       "assertions": [
         "The response identifies scripts/loader.py's ARCHIVE literal as the finding and states that reading it requires two decode layers (base64 then gzip), not one.",
-        "The response reports the decoded payload's actual behaviour — writing to the AGENTS.md identity file — rather than stopping at the observation that an encoded blob was found.",
-        "The response notes that the decoded behaviour contradicts the package's own manifest, which lists AGENTS.md under deny_write and declares no write permission.",
         "The response states that most of AST10's six scenarios cannot be decided from this package alone, and names at least two distinct kinds of external evidence that would be required, such as a pre-port manifest, the target platform's default permissions, or cross-registry install and scan data.",
         "The response qualifies what the content-layer scan did not cover — for example a bounded decode depth, encodings that are never extracted as candidates, or the point that blobs read is not the same number as payloads present — instead of reporting the scan as exhaustive."
       ]
@@ -40,9 +35,8 @@
       "prompt": "Reviewer wants me to sign off on this manifest and I'm not comfortable. The permissions block is:\n\n```yaml\npermissions:\n  files:\n    write: [SOUL.md]\n    deny_write: [config/SOUL.md]\n```\n\n`python3 validators/usf.py` exits 0 and prints a warning saying deny_write wins over write, so the reviewer reads the grant as inert and wants it signed off on that basis. Is SOUL.md actually protected here, and what should I check instead of the warning?",
       "expected_output": "A clear no: SOUL.md is not protected by that manifest, and the warning is the reassuring half of a disagreement rather than a resolution of it. The answer should explain the mechanism — the identity-file check matches by basename, so config/SOUL.md registers SOUL.md as denied and downgrades the finding to a warning, while write resolution matches a path-form entry against that exact path only, so write: [SOUL.md] still resolves to allowed. It should give the reviewer a check that does not depend on the warning text, such as evaluating write_allowed(manifest, \"SOUL.md\") directly, and a concrete manifest fix that makes the deny_write entry cover the path actually granted. It should state the precedence rule it is applying (deny_write wins for the paths it lists, resolved most-specific-wins rather than first-match) and may note that this is simultaneously an AST01-relevant identity-file exposure and an AST10 field defect, fixed by different people.",
       "assertions": [
-        "The response answers that SOUL.md is not protected by this manifest and declines to endorse sign-off on the strength of the validator warning.",
         "The response explains the disagreement in terms of how the two entries are matched — basename versus exact path form — rather than only asserting that the manifest is wrong.",
-        "The response recommends a verification step that does not rely on the warning text, such as directly resolving whether a write to SOUL.md is allowed.",
+        "The response recommends a verification step that resolves whether a write to SOUL.md is allowed under most-specific-wins precedence — evaluating the write decision for that exact path — rather than testing whether some write entry overlaps some deny_write entry, and it does not rest the answer on the validator's warning text.",
         "The response gives a concrete manifest edit that makes the deny_write entry cover the path actually granted.",
         "The response states the precedence rule being applied, including that deny_write resolution is most-specific-wins rather than first-match."
       ]

@@ -1,0 +1,17 @@
+{
+  "skill_name": "ast07-update-drift",
+  "held_out": "HELD OUT — do not tune against this file. These cases are the control on whether a skill edit generalised or merely fitted the cases it was written against. They were authored from this skill's SKILL.md, its coverage-matrix.md and the whitepaper, never from a measured result, and they must not be read while a SKILL.md is being edited or cited to justify a change to one. An iteration that tunes this skill against these cases has destroyed their value as a control and owes the next iteration a replacement set authored the same way.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Incident write-up is due at five and I need a verdict from you. We hash every installed skill hourly. skills/deploy-helper/ hashed one way at 09:00 and a different way at 11:40, and our uptime dashboard says the agent host has not restarted since Monday. I want to file it as Hot-Reload Abuse under AST07, mark it confirmed, and close the incident with an action to pin the skill harder. Anything wrong with that?",
+      "expected_output": "A good answer declines the confirmation. A before-and-after content hash pair establishes that the bytes changed and nothing more; it is a filesystem fact being asked to carry a runtime claim. The answer names the evidence the claim actually needs and what each item buys — a host reload event for that path, which is what shows the change took effect without a restart, and the identity that wrote the file, which is what attributes it — and treats the uptime dashboard as evidence about the host process rather than about whether the skill directory was reloaded. It leaves the scenario explicitly undecided rather than confirmed or cleared, and says the write-up must name which of those records could not be obtained. It also rejects the proposed action: a stronger pin is not the control for hot-reload, because detecting malicious hot-reloaded content is a losing race against arbitrary content; the control is configuration-level, prohibiting hot-reload outside development environments.",
+      "assertions": [
+        "The response declines to confirm Hot-Reload Abuse from the before-and-after content hashes, and states that the hash pair establishes only that the bytes changed.",
+        "The response names the further evidence the claim requires and says what each item establishes that the hash pair does not — a host reload event for that path, showing the change took effect without a restart, and the identity that wrote the file, attributing it.",
+        "The response leaves the scenario explicitly undecided rather than reporting it confirmed or cleared, and states that the write-up must name which evidence could not be obtained instead of converting the gap into either a confirmation or a clean result.",
+        "The response rejects a stronger pin as the remediation and states that the control for hot-reload is configuration-level — prohibiting hot-reload outside development environments — because detecting malicious hot-reloaded content is a losing race against arbitrary content."
+      ]
+    }
+  ]
+}

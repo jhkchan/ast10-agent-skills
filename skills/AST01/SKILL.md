@@ -159,7 +159,12 @@ because the certification is the host's, not this package's.
 
 **MANDATORY before you report a negative.** A negative result from this package means "no
 in-package contradiction of this shape", never "clean". These are the specific silences,
-and none of them is recoverable by re-running the scan.
+and none of them is recoverable by re-running the scan. Rule 4's *report the static result
+and the domain gap together* is not a rule about degradation; it is how every negative here
+gets written. The verdict and the silence this particular package is sitting inside — named
+from its own manifest and its own files, not recited from the list below — are one
+deliverable, because a reader given the verdict alone reads its boundary as *everything*,
+which is the only reading these results cannot support.
 
 - **An unbounded egress declaration disarms the egress family in one move.** When the
   manifest declares `network: true`, `policy: allow-all`, or `allow: ["*"]`, there is

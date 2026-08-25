@@ -11,11 +11,10 @@
         "fixtures/AST01/C14-undeclared-egress/scripts/report.py"
       ],
       "assertions": [
-        "The response reports no AST01 Data Exfiltration finding (AST01-S10, by scenario id or by title) against this package.",
-        "The response names collector.example.com as the destination in scripts/report.py AND as an entry in the manifest's permissions.network.allow list, and uses that match as the reason the egress is declared rather than undeclared.",
+        "The response reports no AST01 Data Exfiltration finding (AST01-S10, by scenario id or by title) against this package, and scopes that negative to the bytes of this package as they stand rather than to the package's behaviour in general.",
         "The response states that an egress construct on its own is not a finding — that a finding here requires the construct plus a contradiction of the package's own declaration.",
         "The response names at least one question this negative result does not answer (for example: behaviour that only accumulates across repeated invocations, or that a negative is not a clean bill of health for the package as a whole).",
-        "The response does not recommend blocking, quarantining or rejecting the package on the basis of the requests.post call."
+        "The response advises against blocking, quarantining or rejecting the package on the basis of the requests.post call, and at the same time declines to endorse the package as clean overall."
       ]
     },
     {
@@ -28,11 +27,8 @@
         "fixtures/AST01/V13-undeclared-egress/scripts/report.py"
       ],
       "assertions": [
-        "The response identifies the finding as AST01-S10 Data Exfiltration, by scenario id or by the scenario title.",
-        "The response names collector.attacker-drop.example as the destination hardcoded in the bundled script.",
-        "The response names status.example.com as the only host the manifest's network allowlist declares.",
-        "The response states that the finding is the contradiction between the script's destination and the manifest's declaration, not the presence of an outbound HTTP call.",
-        "The response states that the same script would not be an AST01-S10 finding if the destination host appeared in the manifest's declared allowlist."
+        "The response states that the finding is the contradiction between the script's destination and the manifest's declaration, and that neither half on its own — an outbound HTTP call, or a host missing from the allowlist — is a finding.",
+        "The response states that the package cannot settle which of the two remediation directions is correct — adding the destination to the declared allowlist, or removing it from the code — because whether that destination is a legitimate one is a fact about the deployment rather than about the package's bytes."
       ]
     },
     {
@@ -44,7 +40,7 @@
         "The response identifies the reported behaviour as AST01-S07 Cognitive Degradation and Agent Drift, by scenario id or by title.",
         "The response states that this scenario is out-of-artifact — not decidable from one package snapshot — rather than treating it as a scan that has not been run yet.",
         "The response names at least two concrete evidence sources outside the package that would decide it, one of which is a cross-session diff or history of the identity/memory artifacts and one of which is the host's own invocation or runtime telemetry.",
-        "The response does not attribute the degradation to any shipped AST01 static check, and does not claim any static check covers retry-loop growth or context growth."
+        "The response states that no shipped AST01 static check covers climbing retry counts or context growth, and does not attribute the reported degradation to any such check."
       ]
     }
   ]

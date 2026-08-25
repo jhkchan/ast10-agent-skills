@@ -11,7 +11,7 @@
         "The response attaches both an owner and an action to the contributing entry.",
         "The response justifies the origin with a prevent-versus-catch distinction rather than by matching keywords in the finding's wording.",
         "The response states the condition under which AST08 would instead be the origin: when the scanner, its coverage claim, or a scan result is itself the thing under review.",
-        "The response does not claim to have verified the finding or to have inspected any package."
+        "The response states that it has not opened or inspected any package, and that routing decides which category owns the finding and not whether the finding is true."
       ]
     },
     {
@@ -22,8 +22,7 @@
         "The response names exactly one origin category and it is AST09.",
         "The response justifies AST09 as missing installation control rather than missing version control, for example by noting there is no approved baseline for the install to have drifted from.",
         "The response states that AST09 ships no detector and that no scan of the package can confirm this finding.",
-        "The response warns against closing or parking the ticket pending a scan, and routes the hand-off to a named human process such as revocation wired into offboarding.",
-        "Every contributing entry the response lists carries both an owner and an action, or the response explains why a plausible contributing category such as the over-scoped credential was dropped instead of listed."
+        "The response warns against closing or parking the ticket pending a scan, and routes the hand-off to a named human process such as revocation wired into offboarding."
       ]
     },
     {

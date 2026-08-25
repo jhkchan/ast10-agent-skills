@@ -44,7 +44,11 @@ exception is worth naming before the rules rather than after them:
 | **Deciding what a result means** | High — this is the work, and rules 1–6 supply its questions, not its answers | Whether a fetch surface is too wide for the function, whether a named boundary does anything, what a clean run over a package that fetches through a shell is worth: nothing in this repository closes any of them. A page that implied a rule here would be manufacturing certainty the category does not have. |
 
 A clean run of the five checks with no manual step beside it is an incomplete review, not
-a negative finding — name the step from *Where the shipped checks go quiet* that you ran.
+a negative finding — and the steps that bound it belong to the same deliverable, not to a
+follow-up. Walk *Where the shipped checks go quiet* and name every bullet that applies to
+the code in front of you: a single named step leaves the remaining blind spots reported
+as surfaces the checks covered, which is the same over-claim as reporting the clean run
+bare.
 
 **Route first.** Reasoning for each cross-category call is in *Distinguishing AST05 from
 its neighbors*; this table is only the jump.

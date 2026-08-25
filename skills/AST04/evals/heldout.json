@@ -1,0 +1,21 @@
+{
+  "skill_name": "ast04-insecure-metadata",
+  "held_out": "HELD OUT — do not tune against this file. These cases are the control on whether a skill edit generalised or merely fitted the cases it was written against. They were authored from this skill's SKILL.md, its coverage-matrix.md and the whitepaper, never from a measured result, and they must not be read while a SKILL.md is being edited or cited to justify a change to one. An iteration that tunes this skill against these cases has destroyed their value as a control and owes the next iteration a replacement set authored the same way.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Second opinion wanted before I raise a PR. The package at fixtures/AST04/V5-toml-metadata-injection ships a config.toml. Our config linter parses it with tomllib, the parse raises, the linter logs 'unparseable, skipped' and moves on — so the file has never actually been reviewed. My plan was to fix it the way we fixed the YAML packages, by pinning a safe loader. Is that the right fix, and what is actually wrong with the file?",
+      "expected_output": "A good answer locates the defect in config.toml itself: the [permissions] table is defined twice and the two definitions disagree, the first declaring write and shell false and the second declaring both true. It rejects the safe-loader remediation and gives the reason — TOML has no deserialization or code-execution construct at all, so this is an unvalidated key-override and precedence defect, a different vulnerability class from the YAML one and not fixable by the same change. It states that the linter's 'unparseable, skipped' outcome is not a scan: a file the parser rejected yields the same negative as a clean file, which is why a redefined table has to be found by a text scan before the parse rather than after it. And it stops short of asserting which permission set the runner ends up applying, because the package does not carry the runner's precedence rule — it asks for that rule instead of inventing an effective posture.",
+      "files": [
+        "fixtures/AST04/V5-toml-metadata-injection/SKILL.md",
+        "fixtures/AST04/V5-toml-metadata-injection/config.toml"
+      ],
+      "assertions": [
+        "The response locates the defect in config.toml's second [permissions] table definition and states that the two definitions disagree — the first declaring write and shell false, the second declaring both true.",
+        "The response rejects the safe-loader remediation and gives the reason that TOML carries no deserialization or code-execution construct at all, so this is an unvalidated key-override and precedence defect rather than the same vulnerability class as the YAML packages.",
+        "The response states that the linter's 'unparseable, skipped' outcome is not a scan result — a file the parser rejected produces the same negative as a genuinely clean file — and that the redefinition therefore has to be found by a text scan performed before the parse.",
+        "The response declines to state which permission set the runner actually applies, on the ground that the package does not carry the runner's precedence rule, and asks for that rule rather than asserting an effective posture."
+      ]
+    }
+  ]
+}

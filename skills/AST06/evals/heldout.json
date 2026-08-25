@@ -1,0 +1,20 @@
+{
+  "skill_name": "ast06-weak-isolation",
+  "held_out": "HELD OUT — do not tune against this file. These cases are the control on whether a skill edit generalised or merely fitted the cases it was written against. They were authored from this skill's SKILL.md, its coverage-matrix.md and the whitepaper, never from a measured result, and they must not be read while a SKILL.md is being edited or cited to justify a change to one. An iteration that tunes this skill against these cases has destroyed their value as a control and owes the next iteration a replacement set authored the same way.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Settle an argument for me. fixtures/AST06/V1-filesystem-root-write-scope/SKILL.md ships no scripts at all — it is a manifest and some prose, nothing executable anywhere in the package. My co-reviewer says AST06 needs a persistence call site to convict, so with no code in the package there is nothing here to find. Is he right? And if there is a finding, tell me what tightening the manifest actually buys us.",
+      "expected_output": "A good answer contradicts the co-reviewer: the scenario's defining condition is stated as a disjunction, so the manifest alone decides it — a declared write scope of filesystem root with an empty deny_write means every host persistence location is already inside the declared scope, and no bundled script or call site is required. It then supplies the two limits a reviewer inherits. The root comparison runs against a closed set of literal spellings of root, home and bare wildcards, so a broad-but-not-root scope such as /etc/** or /var/** returns negative and has to be read by hand. And this decides one scenario out of the category's five: bind address, workspace-over-bundled precedence, hot-reload behaviour and cross-agent shared state are properties of a running deployment that no package carries, so the package's silence about them is not a pass. Finally it answers the manifest question honestly — narrowing the declared write list removes the declared disjunct but is not evidence that any boundary enforces the manifest at run time.",
+      "files": [
+        "fixtures/AST06/V1-filesystem-root-write-scope/SKILL.md"
+      ],
+      "assertions": [
+        "The response contradicts the co-reviewer and reports a finding from the manifest alone — a declared write scope of filesystem root with an empty deny_write — stating that a bundled script or persistence call site is not required because the defining condition is a disjunction.",
+        "The response states that the root-scope comparison runs against a closed set of literal spellings of root, home and bare wildcards, so a broad-but-not-root scope such as /etc/** or /var/** returns negative and has to be read by hand.",
+        "The response states how much of the category this decides — one scenario out of AST06's five — and names at least two facts about the running deployment that no package carries, drawn from bind address, workspace-over-bundled precedence, hot-reload behaviour, or cross-agent shared state.",
+        "The response states that narrowing the declared write list is not on its own evidence that any boundary enforces the manifest at run time, so the manifest edit does not close the isolation question."
+      ]
+    }
+  ]
+}

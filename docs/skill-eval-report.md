@@ -18,7 +18,7 @@ The three are never averaged and never plotted together. A `pass_rate` on this p
 
 ## The authored corpus
 
-`skills/*/evals/evals.json` currently holds **33 cases** carrying **162 assertions**, hand-authored in the field names the [agentskills.io evaluating-skills guidance](https://agentskills.io/skill-creation/evaluating-skills) fixes. A full iteration is therefore 33 × 2 = 66 agent runs. `tests/test_eval_cases.py` gates the shape of every case; `python3 eval/skill_evals.py --dry-run` prints the plan without calling a model.
+`skills/*/evals/evals.json` currently holds **33 cases** carrying **120 assertions**, hand-authored in the field names the [agentskills.io evaluating-skills guidance](https://agentskills.io/skill-creation/evaluating-skills) fixes. A full iteration is therefore 33 × 2 = 66 agent runs. `tests/test_eval_cases.py` gates the shape of every case; `python3 eval/skill_evals.py --dry-run` prints the plan without calling a model.
 
 ## Results by iteration
 

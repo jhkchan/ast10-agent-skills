@@ -18,6 +18,19 @@ the route sends you. Mechanism (manifest-vs-behavior diffing) lives in
   reaching `SOUL.md`/`MEMORY.md`/`AGENTS.md` that `deny_write` does not shadow. The other
   three checks are `artifact-signal-only` or `category-precondition` in the module's own
   `CHECK_COVERAGE`; reading them as coverage is the overclaim the tier lock exists to stop.
+- **A scenario id names the condition that was observed, not the category it sits in.**
+  `AST03-S03` is the id for that write-versus-floor condition and for nothing else. A signal
+  that is real but decides no scenario is escalated under its own description with the id
+  field left empty, and when a tracker, a template or a reviewer demands an identifier the
+  evidence cannot support, what you write is the condition you did observe plus the evidence
+  that is missing — an id supplied to fill a required field reports a finding nobody made,
+  to an owner who will act on it.
+- **State the declared set completely, in the manifest's own strings.** A scope is a pair —
+  what `write` names and what `deny_write` removes under most-specific-wins — so quoting one
+  half of it states no scope at all, and a reader handed the entry without the boundary can
+  check neither the grant you reasoned from nor the entry you passed over. Completeness is
+  what makes a permissions verdict falsifiable; this file's vocabulary is not a substitute
+  for the strings the package declares.
 - **Never decides** whether a grant is broad *for this skill's function*, or whether an
   injected instruction will later exercise it. Grants are in the manifest; exercises happen
   in a runtime this package never sees.
@@ -46,6 +59,11 @@ the route sends you. Mechanism (manifest-vs-behavior diffing) lives in
 | What the shipped checks decide, and where they go quiet | **MANDATORY before you report a negative, and before you extend any check by hand.** The last silence is why a previous version of the identity check false-positived against every conformant USF manifest |
 | NEVER | **always, and again before a finding is written down or a number published.** What the three non-covering checks and the three out-of-artifact scenarios invite you to conclude; each entry names the check, tier or test that refutes it |
 | Scope and out-of-artifact boundary | you are being asked whether an LPCI trigger will actually fire |
+
+**A negative is a two-part deliverable**: the result, and the limit that produced it — which
+check ran, over what, and what it did not look at. The result on its own leaves a reader
+unable to tell a clean package from an unexamined one, which is why the quiet list is the
+one row in the table above marked mandatory rather than conditional.
 
 **Do NOT load `coverage-matrix.md`** to decide whether something is a finding. It is the
 tier contract and the F1 denominator; open it only to cite the authoritative tier of a

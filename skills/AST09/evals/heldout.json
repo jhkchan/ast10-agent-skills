@@ -1,0 +1,17 @@
+{
+  "skill_name": "ast09-no-governance",
+  "held_out": "HELD OUT — do not tune against this file. These cases are the control on whether a skill edit generalised or merely fitted the cases it was written against. They were authored from this skill's SKILL.md, its coverage-matrix.md and the whitepaper, never from a measured result, and they must not be read while a SKILL.md is being edited or cited to justify a change to one. An iteration that tunes this skill against these cases has destroyed their value as a control and owes the next iteration a replacement set authored the same way.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Second read before I file this, please. An engineer left in March. Her `invoice-sync` skill is still installed on two agent hosts and still holds the service credential she provisioned for it. Security's draft writes it up as AST03 over-privilege with the single action 'reduce the credential scope to read-only', and adds 'pending package scan' as the status. That feels wrong to me and I cannot articulate why. Which is it, and what should the action be?",
+      "expected_output": "A good answer relocates the origin: what had to be true first is that no revocation step is wired into the offboarding workflow, and that is an unremarkable, high-frequency gap rather than something an incident-response playbook would ever trigger on. It rejects the proposed action, because narrowing the credential leaves the offboarding path untouched and the same condition returns at the next departure — the reroute is fixable-looking and fixes nothing. It rejects the 'pending package scan' status too: an approved copy and an unapproved copy of the same skill are byte identical, approval, inventory and identity state are records the organisation holds about the artifact rather than facts in it, and this category ships no detector, so the ticket must not wait on a scan that will never decide it. Finally, if it proposes joining against an inventory row keyed on the package's content hash, it requires the hashed surface to be recorded alongside the key — two teams hashing the same package over different surfaces produce two keys and an empty join, which then gets written up as an approval that never happened.",
+      "assertions": [
+        "The response names the origin as the absent revocation step in the offboarding workflow rather than as an over-broad grant, and states that this is a routine, high-frequency offboarding gap rather than something an incident-response playbook would trigger on.",
+        "The response rejects reducing the credential's scope as the remediation, and gives the reason that it leaves the offboarding path untouched so the same condition recurs at the next departure.",
+        "The response rejects the 'pending package scan' status and states that no scan of the package can decide this, because approval, inventory and identity state are records the organisation holds about the artifact rather than facts in it.",
+        "The response requires an inventory lookup keyed on the package's content hash to also record which file surface produced that hash, giving the reason that two teams hashing the same package over different surfaces produce two keys and an empty join that then reads as an approval that never happened."
+      ]
+    }
+  ]
+}

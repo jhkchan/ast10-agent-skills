@@ -1,0 +1,23 @@
+{
+  "skill_name": "ast10-cross-platform-reuse",
+  "held_out": "HELD OUT — do not tune against this file. These cases are the control on whether a skill edit generalised or merely fitted the cases it was written against. They were authored from this skill's SKILL.md, its coverage-matrix.md and the whitepaper, never from a measured result, and they must not be read while a SKILL.md is being edited or cited to justify a change to one. An iteration that tunes this skill against these cases has destroyed their value as a control and owes the next iteration a replacement set authored the same way.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "This arrived from the Cursor side of the house and I am told it was ported cleanly. Package is fixtures/AST10/V3-hex-escaped-payload. scripts/report.py assigns a long run of \\x escapes to _STAGE, the manifest declares shell: false with an empty network allowlist, our content scanner reported nothing, and the manifest validator exits 0. What do I write in the supplier review, and what have those two green results actually established?",
+      "expected_output": "A good answer reads the escape run rather than describing it: unescaped, _STAGE is a command that uploads the caller's SSH private key to a third-party host, and it is handed straight to os.system, so both the decoded behaviour and the decode-to-execution path are present. It states the discipline that keeps such a check usable — encoding is not itself the finding, since icons, config blobs and the format's own hash and signature fields are all encoded; what makes it a finding is decoded content matching a payload behaviour, or a decoded literal reaching an execution sink. It reports what the content scan examined rather than treating its silence as coverage: the decode is bounded in depth and size, and only certain encodings are ever extracted as candidates, so base32, base85 or a custom alphabet is never decoded at all and unexamined is not examined-and-cleared. It records the manifest's shell: false beside a bundled script calling os.system as a separate misdeclaration finding owned by AST04, not as a second AST10 finding. And it declines to read the validator's exit 0 as evidence that nothing was stripped in the port, because the signals that most directly mark a port are warnings rather than errors and the default exit code discards them.",
+      "files": [
+        "fixtures/AST10/V3-hex-escaped-payload/SKILL.md",
+        "fixtures/AST10/V3-hex-escaped-payload/skill.usf.yaml",
+        "fixtures/AST10/V3-hex-escaped-payload/scripts/report.py"
+      ],
+      "assertions": [
+        "The response reads the escape run in scripts/report.py and reports the finding, naming both what it decodes to — a command uploading the caller's SSH private key to an external host — and the path from the decoded literal into os.system.",
+        "The response states that encoding is not itself the finding, and gives the condition that makes it one: decoded content matching a payload behaviour, or a decoded literal reaching an execution sink.",
+        "The response reports what the content scan actually examined rather than treating its silence as coverage — for example the bounded decode depth and per-blob size limit, or that only certain encodings are extracted as candidates so base32, base85 or a custom alphabet is never decoded at all.",
+        "The response records the manifest's shell: false beside a bundled script calling os.system as a separate misdeclaration finding belonging to AST04, rather than as a second AST10 finding or as part of this one.",
+        "The response declines to read the manifest validator's exit 0 as evidence that nothing was stripped in the port, on the ground that the signals which most directly mark a port are warnings rather than errors and the default exit code discards them."
+      ]
+    }
+  ]
+}

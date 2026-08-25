@@ -185,6 +185,14 @@ from adapters.base import response_excerpt  # noqa: E402
 SKILLS_DIR = REPO_ROOT / "skills"
 WORKSPACE = REPO_ROOT / "eval" / "skill-eval-workspace"
 
+#: The two authored corpora, and which one this module reads unless told otherwise.
+#: `evals.json` is the TUNED set an iteration edits a SKILL.md against; `heldout.json`
+#: is the HELD-OUT control that says whether those edits generalised. They are graded
+#: one at a time, never pooled — see `load_eval_index`.
+DEFAULT_CASE_FILE = "evals.json"
+HELDOUT_CASE_FILE = "heldout.json"
+CASE_FILES: tuple[str, ...] = (DEFAULT_CASE_FILE, HELDOUT_CASE_FILE)
+
 #: The two arms. Order is fixed for reporting, never for grading — see
 #: :func:`grading_order`, which shuffles so the arm cannot be read off position.
 CONFIGURATIONS: tuple[str, ...] = ("with_skill", "without_skill")
@@ -287,7 +295,7 @@ class GraderAdapter(Protocol):
 
 @dataclass(frozen=True)
 class EvalCase:
-    """One hand-authored case from ``skills/<skill>/evals/evals.json``."""
+    """One hand-authored case from ``skills/<skill>/evals/<case file>``."""
 
     skill_dir: str
     skill_name: str
@@ -296,6 +304,7 @@ class EvalCase:
     expected_output: str
     assertions: tuple[str, ...]
     files: tuple[str, ...] = ()
+    case_file: str = DEFAULT_CASE_FILE
 
     @property
     def slug(self) -> str:
@@ -305,13 +314,28 @@ class EvalCase:
         it is used here rather than a second one on purpose. The slug is also the
         key space of ``feedback.json``; two modules writing that file under two
         spellings would give a reviewer two half-filled templates and no error.
+
+        A case from the held-out control set carries its file's stem —
+        ``AST01-heldout-case-1`` — for the same reason: the tuned corpus and the
+        control answer different questions, and a workspace directory has to name
+        which one produced it.
         """
-        return f"{self.skill_dir}-case-{self.case_id}"
+        stem = Path(self.case_file).stem
+        infix = "" if self.case_file == DEFAULT_CASE_FILE else f"{stem}-"
+        return f"{self.skill_dir}-{infix}case-{self.case_id}"
 
     @property
     def alias_slugs(self) -> tuple[str, ...]:
         """Other spellings accepted on lookup, so a workspace laid out by a
-        different runner still resolves to the case it is about."""
+        different runner still resolves to the case it is about.
+
+        The zero-padded aliases exist for the tuned corpus only. They carry no
+        case-file component, so emitting them for a second corpus would make
+        ``AST01-01`` ambiguous between two cases — and an ambiguous alias in this
+        index does not fail loudly, it grades one run twice.
+        """
+        if self.case_file != DEFAULT_CASE_FILE:
+            return (self.slug.lower(),)
         return (
             self.slug.lower(),
             f"{self.skill_name}-{self.case_id:02d}",
@@ -319,15 +343,21 @@ class EvalCase:
         )
 
 
-def load_eval_index(skills_dir: Path = SKILLS_DIR) -> dict[str, EvalCase]:
-    """Every authored case, keyed by :attr:`EvalCase.slug` and by its alias.
+def load_eval_index(skills_dir: Path = SKILLS_DIR, case_file: str = DEFAULT_CASE_FILE) -> dict[str, EvalCase]:
+    """Every authored case in one corpus, keyed by :attr:`EvalCase.slug` and alias.
 
     Raises on a duplicate key rather than letting one case shadow another: two
     cases resolving to one slug would grade one run twice and never grade the
     other, and the totals would still look plausible.
+
+    ``case_file`` selects the corpus, defaulting to the tuned ``evals.json``. The
+    two are loaded one at a time rather than merged, because a benchmark computed
+    over both would pool a set the skills were tuned against with the control that
+    exists to check that tuning — and the pooled mean would look like evidence
+    while hiding the only comparison worth making.
     """
     index: dict[str, EvalCase] = {}
-    for path in sorted(skills_dir.glob("*/evals/evals.json")):
+    for path in sorted(skills_dir.glob(f"*/evals/{case_file}")):
         payload = json.loads(path.read_text(encoding="utf-8"))
         skill_dir = path.parent.parent.name
         skill_name = payload["skill_name"]
@@ -340,6 +370,7 @@ def load_eval_index(skills_dir: Path = SKILLS_DIR) -> dict[str, EvalCase]:
                 expected_output=raw["expected_output"],
                 assertions=tuple(raw["assertions"]),
                 files=tuple(raw.get("files", ())),
+                case_file=case_file,
             )
             for key in (case.slug, *case.alias_slugs):
                 if key in index and index[key] is not case:
@@ -1519,7 +1550,7 @@ def _write_json_if_changed(path: Path, payload: Any, *, check: bool) -> bool:
 
 def cmd_grade(args: argparse.Namespace) -> int:
     iteration_dir = Path(args.iteration_dir) if args.iteration_dir else latest_iteration_dir(Path(args.workspace))
-    index = load_eval_index()
+    index = load_eval_index(case_file=args.case_file)
     runs = discover_runs(iteration_dir)
     if not runs:
         print(f"no run directories under {iteration_dir}", file=sys.stderr)
@@ -1624,6 +1655,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     grade = subparsers.add_parser("grade", help="write grading.json for every ungraded run")
     grade.add_argument("--grader", required=True, help="grader adapter, e.g. bedrock/qwen3-235b")
+    grade.add_argument(
+        "--case-file",
+        default=DEFAULT_CASE_FILE,
+        choices=CASE_FILES,
+        help=(
+            "which authored corpus the workspace under grading came from: the tuned "
+            "%(default)s, or heldout.json for a run of the held-out control set"
+        ),
+    )
     grade.add_argument("--agent-model", default=None, help="fallback agent id when a run has no run.json")
     grade.add_argument("--regrade", action="store_true", help="re-grade runs that already have a grading.json")
     grade.add_argument("--with-reference", action="store_true", help="show the grader the case's expected_output")

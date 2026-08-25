@@ -43,7 +43,7 @@ its neighbors*; this table is only the jump.
 
 | What you are holding | Go to |
 | --- | --- |
-| A bundled script writing a cron table, systemd unit, shell rc or launch agent | *What the two shipped checks decide* — script disjunct |
+| A bundled script writing a cron table, systemd unit, shell rc or launch agent | *What the two shipped checks decide* — script disjunct, then rule 5 for what the finding means |
 | A declared write scope of `/`, `~`, `$HOME` or `*` | Same section — manifest disjunct |
 | "We ship a sandbox, it's available if you configure it" | *Why "available if configured" does not close this finding* |
 | A `0.0.0.0` or loopback-bound control interface | Rule 3 — by hand, against the deployment |
@@ -56,7 +56,10 @@ its neighbors*; this table is only the jump.
 **Stop after *Decision rules*** if you are producing a verdict or a remediation. Read
 *What the two shipped checks decide, and where they go quiet* only when a check returned
 **negative** and you must decide whether that is a pass or a blind spot. Read
-*NEVER — the ways an AST06 review closes on nothing* before either one is written down.
+*NEVER — the ways an AST06 review closes on nothing* before either one is written down. A
+negative is itself a two-part deliverable — the result, and the limit that produced it:
+which check ran, over what, and what it did not look at. Reported without its limit, a
+negative cannot be told apart from a package nobody examined.
 
 **Layer 3 — load on condition, never by default.**
 
@@ -117,6 +120,14 @@ about the deployment. Note which one you have before you close it.
    only a proven cross-contamination incident. When state must be shared, the
    required control is preserving provenance and validating artifacts before
    consumption, not merely logging the share.
+5. **Planted persistence outlives the package that planted it.** Host Escape's defining
+   condition is an act, and the act writes into a lifecycle the package does not own — a
+   cron table, a systemd unit, a shell rc, a launch agent. Uninstalling the skill, revoking
+   its grants or narrowing its manifest leaves that entry in place, because nothing in the
+   host's boot or login path consults the skill that created it. So the verdict carries two
+   remediations and is incomplete with one: neutralise the planted artifact by name, and
+   separately deal with the skill. It is also why the condition is an act rather than a
+   capability — a granted shell ends when the grant does, and a planted entry does not.
 
 ## Distinguishing AST06 from its neighbors
 

@@ -156,6 +156,28 @@ Usage::
     python3 eval/skill_evals.py --iteration 3          # resume iteration-3
     python3 eval/skill_evals.py --iteration 3 --benchmark-only   # recompute from disk
     python3 eval/skill_evals.py --no-grade             # runs only; grade with skill_eval_grade.py
+    python3 eval/skill_evals.py --case-file heldout.json          # the held-out control set
+
+THE TUNED SET AND THE HELD-OUT SET
+==================================
+
+`--case-file` chooses which authored corpus runs. The default, `evals.json`, is
+the **tuned** set: the cases an iteration reads, argues with, and edits a
+`SKILL.md` against. `heldout.json` is the **held-out** control — one case per
+skill, eleven in total, authored from the skills and the whitepaper and never from
+a measured result.
+
+They answer different questions and must not be pooled. A delta on the tuned set
+says the skill improved on cases somebody looked at while improving it; a delta on
+the held-out set says the improvement generalised. Running both and averaging them
+would destroy exactly the distinction the second set exists to draw, so this runner
+never merges them: one invocation runs one corpus, and a held-out run writes its
+runs under `<skill>-heldout-case-<n>` so a workspace directory names the corpus
+that produced it.
+
+The held-out set's own value is spent the moment it is used to steer an edit. That
+rule travels inside each file, in a top-level `held_out` string, and
+`tests/test_eval_cases.py` requires it to be there.
 """
 
 from __future__ import annotations
@@ -196,6 +218,23 @@ from eval.skill_eval_grade import STDDEV_NOTE  # noqa: E402
 
 SKILLS_DIR = REPO / "skills"
 WORKSPACE_ROOT = REPO / "eval" / "skill-eval-workspace"
+
+#: The authored case file this runner reads by default: the TUNED set, the one an
+#: iteration edits a SKILL.md against.
+DEFAULT_CASE_FILE = "evals.json"
+
+#: The HELD-OUT control set, selected with `--case-file heldout.json`. One case per
+#: skill, authored from the skills and the whitepaper rather than from any measured
+#: result. It answers a question the tuned set structurally cannot: did an
+#: iteration's edits generalise, or did they only fit the cases they were made
+#: against? Its value is destroyed the moment it is used to steer an edit, so it is
+#: never merged into the default run — a reader of a workspace has to be able to
+#: tell which corpus produced the delta they are looking at, and the run slugs
+#: carry that distinction (`EvalCase.slug`).
+HELDOUT_CASE_FILE = "heldout.json"
+
+#: Both, for the small number of places that need to name the pair.
+CASE_FILES: tuple[str, ...] = (DEFAULT_CASE_FILE, HELDOUT_CASE_FILE)
 
 #: The two arms. Order matters only for printing.
 CONFIGURATIONS: tuple[str, ...] = ("with_skill", "without_skill")
@@ -290,11 +329,21 @@ class EvalCase:
     expected_output: str
     files: tuple[str, ...]
     assertions: tuple[str, ...]
+    case_file: str = DEFAULT_CASE_FILE
 
     @property
     def slug(self) -> str:
-        """The workspace directory name for this case, and its key in feedback.json."""
-        return f"{self.skill}-case-{self.case_id}"
+        """The workspace directory name for this case, and its key in feedback.json.
+
+        The tuned file keeps the bare `AST01-case-1` spelling it has always had.
+        Any other case file inserts its own stem — `AST01-heldout-case-1` — so a
+        control run and a tuned run can never land in the same directory, share a
+        `feedback.json` key, or be averaged into one another's benchmark by a
+        reader who assumed one workspace held one corpus.
+        """
+        stem = Path(self.case_file).stem
+        infix = "" if self.case_file == DEFAULT_CASE_FILE else f"{stem}-"
+        return f"{self.skill}-{infix}case-{self.case_id}"
 
     @property
     def skill_md(self) -> Path:
@@ -305,24 +354,31 @@ def discover_cases(
     skills: list[str] | None = None,
     case_ids: list[int] | None = None,
     skills_dir: Path = SKILLS_DIR,
+    case_file: str = DEFAULT_CASE_FILE,
 ) -> list[EvalCase]:
     """Every authored case, filtered by `--skills` / `--cases`.
 
     Discovered from disk rather than from a list held here: a skill that adds
     cases is run the moment the file lands. A `--skills` entry that matches no
     directory raises rather than quietly running fewer cases than asked for.
+
+    `case_file` selects WHICH authored set to run. It defaults to the tuned
+    `evals.json`; `HELDOUT_CASE_FILE` is the held-out control set, one case per
+    skill, and the whole reason it can be trusted is that nothing consults it
+    while a `SKILL.md` is being edited. Running it is a separate, deliberate act,
+    which is why it is a flag and not a merge.
     """
-    available = sorted(d.name for d in skills_dir.iterdir() if (d / "evals" / "evals.json").is_file())
+    available = sorted(d.name for d in skills_dir.iterdir() if (d / "evals" / case_file).is_file())
     wanted = list(available)
     if skills:
         unknown = [s for s in skills if s not in available]
         if unknown:
-            raise SkillEvalError(f"--skills names {unknown} which ship no evals/evals.json; have {available}")
+            raise SkillEvalError(f"--skills names {unknown} which ship no evals/{case_file}; have {available}")
         wanted = [s for s in available if s in skills]
 
     cases: list[EvalCase] = []
     for skill in wanted:
-        payload = json.loads((skills_dir / skill / "evals" / "evals.json").read_text(encoding="utf-8"))
+        payload = json.loads((skills_dir / skill / "evals" / case_file).read_text(encoding="utf-8"))
         for raw in payload.get("evals", []):
             if case_ids is not None and raw["id"] not in case_ids:
                 continue
@@ -335,6 +391,7 @@ def discover_cases(
                     expected_output=raw["expected_output"],
                     files=tuple(raw.get("files", [])),
                     assertions=tuple(raw["assertions"]),
+                    case_file=case_file,
                 )
             )
     return cases
@@ -993,6 +1050,16 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument("--workspace", default=str(WORKSPACE_ROOT), help="workspace root (default: %(default)s)")
+    parser.add_argument(
+        "--case-file",
+        default=DEFAULT_CASE_FILE,
+        choices=CASE_FILES,
+        help=(
+            "which authored set to run: the tuned %(default)s, or heldout.json — the "
+            "held-out control that says whether a skill edit generalised. Held-out runs "
+            "get their own slugs, so the two never share a workspace directory."
+        ),
+    )
     return parser
 
 
@@ -1015,7 +1082,7 @@ def main(argv: list[str] | None = None) -> int:
         models["grader"] = args.grader_model
 
     try:
-        cases = discover_cases(_parse_csv(args.skills), _parse_csv_ints(args.cases))
+        cases = discover_cases(_parse_csv(args.skills), _parse_csv_ints(args.cases), case_file=args.case_file)
     except SkillEvalError as exc:
         print(f"FATAL: {exc}", file=sys.stderr)
         return 2

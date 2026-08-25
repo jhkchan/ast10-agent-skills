@@ -11,11 +11,8 @@
         "fixtures/AST04/V1-yaml-frontmatter-injection/scripts/loader.py"
       ],
       "assertions": [
-        "The output names metadata.yaml and scripts/loader.py as two distinct pieces of evidence, not as one finding with one location.",
-        "The output identifies the `!!python/object/apply` tag in metadata.yaml as the code-executing payload AND identifies the `yaml.load(...)` call with no `Loader=` argument in scripts/loader.py as the unsafe call site.",
-        "The output prescribes `yaml.safe_load` or `SafeLoader` as the acceptable loader and does not present `FullLoader`, `UnsafeLoader`, or a bare `yaml.load()` as an acceptable remediation.",
         "The output states that remediating only one of the two halves leaves the other defect in place, i.e. it counts at least two required changes.",
-        "The output attributes the finding to metadata.yaml and scripts/loader.py rather than to the SKILL.md frontmatter of this package."
+        "The output states that this package's own SKILL.md frontmatter carries no injected payload, and locates the finding in the metadata.yaml sidecar together with the bundled loader."
       ]
     },
     {
@@ -26,10 +23,8 @@
         "fixtures/AST04/V9-risk-tier-spoofing/SKILL.md"
       ],
       "assertions": [
-        "The output reports a risk-tier contradiction and names the declared value `L0` as the under-declaration.",
-        "The output derives the floor from the declared permissions and names both contributing grants — shell execution and a non-shadowed write entry — rather than asserting a tier from the prose.",
-        "The output states that a tier declared ABOVE its derived floor is not a finding, i.e. the check is one-directional.",
-        "The output's remediation corrects the declared `risk_tier` rather than reducing or rewriting the permission block."
+        "The output derives the floor from the declared permissions and names both contributing grants — shell execution, and a write entry that no deny_write entry shadows — and states that a write entry fully shadowed by deny_write would not raise the floor.",
+        "The output states what correcting the declared tier does and does not change: it resolves the declaration against the derived floor, and it leaves the package's actual privileges, and the floor they derive, exactly where they were."
       ]
     },
     {
@@ -41,9 +36,8 @@
         "fixtures/AST04/C8-permission-understating/scripts/fetch.sh"
       ],
       "assertions": [
-        "The output reports no AST04 permission-understating finding and states that every host reached in scripts/fetch.sh appears on the manifest's declared allowlist.",
-        "The output does not treat the presence of curl, an egress call, or `shell: true` as itself an AST04 finding.",
-        "The output qualifies the pass by naming at least one AST04 question that package bytes cannot settle — brand impersonation (needs an external trademark or vendor-namespace corpus) and/or the staged loader (payload resolves off-artifact at install).",
+        "The output states that an egress primitive such as curl, and a declared shell: true, are capabilities rather than AST04 findings — AST04 is keyed on a contradiction between what the manifest declares and what the code reaches — and does not treat the presence of either as a finding.",
+        "The sign-off line the output supplies is scoped rather than a blanket clearance: it says which AST04 question was decided (every host reached by the bundled script appears on the declared allowlist) and does not present the package as clean overall or claim that runtime behaviour matches the declaration.",
         "If the output raises the breadth of the declared `shell: true` at all, it attributes that to AST03 over-privilege rather than to AST04 misdeclaration."
       ]
     }
