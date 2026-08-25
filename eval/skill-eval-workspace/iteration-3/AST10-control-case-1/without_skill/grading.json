@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response refuses all three claims in the drafted line rather than only the weakest one.",
+      "passed": false,
+      "evidence": "The response says the drafted line is supportable, not that it refuses any of the three claims."
+    },
+    {
+      "text": "The response explains that the reported signature state is a check on the field's shape and that the validator never verifies the signature, and says to call the verification explicitly so that unverifiable cannot be recorded as verified.",
+      "passed": false,
+      "evidence": "The response never mentions the signature field's shape, that the validator never verifies the signature, or to call verify_signature explicitly."
+    },
+    {
+      "text": "The response states that a present or matching content hash covers only the hashed surface \u2014 SKILL.md and the Python scripts \u2014 so files outside it can be rewritten with the hash unmoved.",
+      "passed": false,
+      "evidence": "The response does not state that a present/matching hash only covers SKILL.md and scripts or that files outside can be rewritten."
+    },
+    {
+      "text": "The response says the port markers are warnings that a default run's exit code discards, and directs the reviewer to run the validator in strict mode.",
+      "passed": false,
+      "evidence": "The response does not mention port markers being warnings, exit\u2011code discarding, or advise running the validator in strict mode."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST10-control-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:48:33.662352+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,9 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+--- BEGIN REQUEST ---
+This skill came over from OpenClaw and the porting tool reports that it translated cleanly. I ran `python3 validators/usf.py skill.usf.yaml`, it printed `OK (signature=signed, hash=present)` and exited 0, and that validator run is the only gate we apply to ported packages. On that basis the supplier-review line I have drafted reads: 'signature verified; content hash matches; nothing was stripped in the port'. Is that line supportable, and if not, what do I run instead?
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

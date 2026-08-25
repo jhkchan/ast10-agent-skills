@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response gives AST02 as the single origin and records AST07 as a contributing control failure carrying its own owner and action, rather than as a second primary.",
+      "passed": false,
+      "evidence": "Response gives Origin AST ID: AST-2023-9847 and no mention of AST02 or AST07."
+    },
+    {
+      "text": "The response refuses to supply a date by which a scan will confirm the finding, and gives the reason that nothing in triage opens the package, so 'routed to' is the strongest claim available.",
+      "passed": false,
+      "evidence": "Response provides a Confirmation Date (2023-10-21) and gives no reason about triage limitations."
+    },
+    {
+      "text": "The response states that neither the origin nor the contributing category has a check that could confirm this finding \u2014 maintainer account takeover is not decidable from a package, and AST07 ships no detector and no F1 \u2014 so the hand-off is to a named person and process rather than to a scan queue.",
+      "passed": false,
+      "evidence": "Response does not discuss lack of checks, maintainer takeover, or AST07; it assigns a queue."
+    },
+    {
+      "text": "The response declines the tracker's two closure options instead of choosing the nearer one, and says a ticket closed pending a scan that will never run is worse than an open ticket.",
+      "passed": false,
+      "evidence": "Response chooses the 'confirmed' closure option instead of declining both."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "advisory-control-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:48:54.641254+00:00",
+  "grader_attempts": 1
+}

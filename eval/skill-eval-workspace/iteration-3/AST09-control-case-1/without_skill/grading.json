@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response says the finding is not safe to file as written and identifies the cause as two different hashed surfaces producing two different join keys.",
+      "passed": false,
+      "evidence": "Response says finding not safe to file but never mentions join keys; it only cites different file sets as cause."
+    },
+    {
+      "text": "The response states that an empty join under mismatched keys is a join failure rather than evidence that an approval never happened.",
+      "passed": false,
+      "evidence": "Response contains no statement about an empty join being a join failure versus evidence of missing approval."
+    },
+    {
+      "text": "The response requires the inventory row to record which surface produced the hash, and the join to be recomputed over one agreed surface before any count is reported.",
+      "passed": false,
+      "evidence": "Response never requires inventory rows to record which surface produced the hash nor specifies recomputing the join over one agreed surface before reporting."
+    },
+    {
+      "text": "The response does not simply drop the finding: it says whatever residue survives a corrected join is a real finding to be written up by name, and it does not offer 'inconclusive' as the write-up.",
+      "passed": false,
+      "evidence": "Response does not say residue from a corrected join is a real finding nor reject using \"inconclusive\" as the write\u2011up."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-control-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:48:08.867844+00:00",
+  "grader_attempts": 1
+}

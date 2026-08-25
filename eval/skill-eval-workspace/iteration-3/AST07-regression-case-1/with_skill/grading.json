@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to confirm Hot-Reload Abuse from the before-and-after content hashes, and states that the hash pair establishes only that the bytes changed.",
+      "passed": true,
+      "evidence": "Do not file this as Hot-Reload Abuse under AST07, do not mark it confirmed... you cannot claim Hot-Reload Abuse without all three required evidences. A content\u2011hash change... is not sufficient."
+    },
+    {
+      "text": "The response names the further evidence the claim requires and says what each item establishes that the hash pair does not \u2014 a host reload event for that path, showing the change took effect without a restart, and the identity that wrote the file, attributing it.",
+      "passed": true,
+      "evidence": "you must also prove: 1. A host reload event that correlates with the file change, and 2. Directory ownership showing the change came from an untrusted source."
+    },
+    {
+      "text": "The response leaves the scenario explicitly undecided rather than reporting it confirmed or cleared, and states that the write-up must name which evidence could not be obtained instead of converting the gap into either a confirmation or a clean result.",
+      "passed": true,
+      "evidence": "File the incident as inconclusive for AST07, and record AST07 as declared-and-uncovered, explicitly listing that step\u202f4 (hot\u2011reload telemetry and ownership) could not be obtained."
+    },
+    {
+      "text": "The response rejects a stronger pin as the remediation and states that the control for hot-reload is configuration-level \u2014 prohibiting hot-reload outside development environments \u2014 because detecting malicious hot-reloaded content is a losing race against arbitrary content.",
+      "passed": false,
+      "evidence": "The response rejects \"pin the skill harder\" but does not state that the control is configuration\u2011level prohibiting hot\u2011reload outside development environments or that detection is a losing race."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-regression-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:52:39.846000+00:00",
+  "grader_attempts": 1
+}

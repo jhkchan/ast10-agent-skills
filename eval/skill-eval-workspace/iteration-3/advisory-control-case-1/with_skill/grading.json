@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response gives AST02 as the single origin and records AST07 as a contributing control failure carrying its own owner and action, rather than as a second primary.",
+      "passed": true,
+      "evidence": "**ast_id**: AST02 ... Contributing control failures: - **AST07** \u2014 Missing Update Verification **Owner**: The team operating the agent host ... **Action**: Introduce manual review..."
+    },
+    {
+      "text": "The response refuses to supply a date by which a scan will confirm the finding, and gives the reason that nothing in triage opens the package, so 'routed to' is the strongest claim available.",
+      "passed": false,
+      "evidence": "The response does not mention triage opening the package or that 'routed to' is the strongest claim; it only says no scan can confirm."
+    },
+    {
+      "text": "The response states that neither the origin nor the contributing category has a check that could confirm this finding \u2014 maintainer account takeover is not decidable from a package, and AST07 ships no detector and no F1 \u2014 so the hand-off is to a named person and process rather than to a scan queue.",
+      "passed": false,
+      "evidence": "The response notes AST02 lacks a detector but does not state that AST07 ships no detector or no F1, though it does give a hand\u2011off to a team."
+    },
+    {
+      "text": "The response declines the tracker's two closure options instead of choosing the nearer one, and says a ticket closed pending a scan that will never run is worse than an open ticket.",
+      "passed": false,
+      "evidence": "The response says the ticket cannot be closed as 'confirmed' or 'false positive' via a scan, but does not explicitly claim that closing pending a never\u2011run scan is worse than leaving it open."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "advisory-control-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:48:46.284146+00:00",
+  "grader_attempts": 1
+}

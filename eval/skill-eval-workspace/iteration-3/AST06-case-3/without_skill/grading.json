@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output declines to close the finding on the evidence offered.",
+      "passed": false,
+      "evidence": "Yes, that should be sufficient to close the AST06 finding."
+    },
+    {
+      "text": "The output states that a sandbox which is optional or available-if-configured is evidence for the finding, because the exposed population is the one running the default execution mode.",
+      "passed": false,
+      "evidence": "The fact that the container sandbox is available and can be enabled with a single config line demonstrates mitigation capability."
+    },
+    {
+      "text": "The output states that a loopback-bound control interface is not sufficient isolation without authentication, and cites the named precedent (ClawJacked / CVE-2026-32025) or an equivalent documented loopback WebSocket bypass.",
+      "passed": false,
+      "evidence": "WebSocket binding exclusively to 127.0.0.1 (localhost) significantly reduces attack surface by preventing remote exposure."
+    },
+    {
+      "text": "The output distinguishes evidence about the product (vendor page, config reference, capability statement) from evidence about the deployment, and states that only the latter can close the finding.",
+      "passed": false,
+      "evidence": "By providing the vendor security page and config reference, you're giving Security clear evidence of both the built-in controls and how they are intended to be configured."
+    },
+    {
+      "text": "The output names the specific evidence that would close it: this deployment runs sandboxed by default with host mode behind a documented explicit opt-in.",
+      "passed": false,
+      "evidence": "The fact that the container sandbox is available and can be enabled with a single config line demonstrates mitigation capability."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:35:49.138992+00:00",
+  "grader_attempts": 1
+}

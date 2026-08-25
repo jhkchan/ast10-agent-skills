@@ -1,0 +1,9 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+--- BEGIN REQUEST ---
+We're standing up an internal skill registry for about 400 packages. The install-time plan is: compute the package digest, look it up in the registry index, and if the index returns a match, stamp the install `provenance: verified`. Two questions. Does that close AST02 for us? And can a package scanner tell me whether a given skill came out of a flooded namespace or was published from a maintainer account somebody had taken over?
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

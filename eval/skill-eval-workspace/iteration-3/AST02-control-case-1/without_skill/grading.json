@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response calls this a finding and names the execution path precisely \u2014 the shipped .vscode/tasks.json and the folder-open run trigger on the task \u2014 rather than resting on the command string.",
+      "passed": true,
+      "evidence": "You're correct to flag this as a finding. ... The presence of a `runOn: \"folderOpen\"` task ... .vscode/tasks.json ..."
+    },
+    {
+      "text": "The response states the discriminator explicitly: the byte-identical task without that trigger is not this finding, because it runs only when a person chooses to run it.",
+      "passed": false,
+      "evidence": "The response does not mention a byte\u2011identical task without the trigger or state that such a task is not a finding."
+    },
+    {
+      "text": "The response refuses to let a result on this package stand for the customer repository, on the ground that the check reads config files shipped inside the package while the scenario's delivery path is a config file in the repository the agent opens.",
+      "passed": false,
+      "evidence": "The response does not refuse to let the result stand for the customer repository nor explain that the check only reads shipped config files versus a repository\u2011opened config file."
+    },
+    {
+      "text": "The response says the scanned config-path list is closed and host-specific, and names at least one auto-executing config file outside it that would return the same negative as a package carrying no config file at all.",
+      "passed": false,
+      "evidence": "The response never mentions a closed, host\u2011specific config\u2011path list or name any auto\u2011executing config file outside that list."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST02-control-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:44:02.906741+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,3 @@
+Contradiction: The manifest declares `risk_tier: L0`, but the declared permission set — `shell: true` and an effective write capability (via `write` on `reports/summary.md` not fully shadowed by `deny_write` entries) — derives a minimum `risk_tier` floor of **L3** under rule 3. Declaring a tier strictly below the derived floor constitutes risk tier spoofing (AST04-S03).
+
+Fix: Raise the declared `risk_tier` to **L3** to align with the permission floor. The permission block itself remains unchanged per platform team guidance.

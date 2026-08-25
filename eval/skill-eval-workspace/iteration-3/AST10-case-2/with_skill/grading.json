@@ -1,0 +1,33 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response identifies scripts/loader.py's ARCHIVE literal as the finding and states that reading it requires two decode layers (base64 then gzip), not one.",
+      "passed": true,
+      "evidence": "The response mentions \"scripts/loader.py\": \"An encoded literal (ARCHIVE) using base64 encoding\" and \"The decoded content is piped immediately through gzip.decompress\" indicating base64 then gzip, i.e., two decode layers."
+    },
+    {
+      "text": "The response states that most of AST10's six scenarios cannot be decided from this package alone, and names at least two distinct kinds of external evidence that would be required, such as a pre-port manifest, the target platform's default permissions, or cross-registry install and scan data.",
+      "passed": true,
+      "evidence": "It states \"your audit cannot close five of the six AST10 scenarios\" and lists required external evidence such as \"pre\u2011port manifest\" (AST10\u2011S04) and \"target platform\u2019s default permissions\" (AST10\u2011S05) and cross\u2011registry data (AST10\u2011S02)."
+    },
+    {
+      "text": "The response qualifies what the content-layer scan did not cover \u2014 for example a bounded decode depth, encodings that are never extracted as candidates, or the point that blobs read is not the same number as payloads present \u2014 instead of reporting the scan as exhaustive.",
+      "passed": false,
+      "evidence": "The response does not mention any scan limitations (e.g., bounded decode depth, missed encodings, blob vs payload count) and reports the content\u2011layer check as decisive."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 1,
+    "total": 3,
+    "pass_rate": 0.6667
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST10-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:40:51.303907+00:00",
+  "grader_attempts": 1
+}

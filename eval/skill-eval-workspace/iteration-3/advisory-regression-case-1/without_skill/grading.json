@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to assign any AST01-AST10 origin id to this finding and states that a null routing result is the correct output here rather than a closest-fitting category.",
+      "passed": false,
+      "evidence": "Response is only 'AST03' \u2013 it assigns an AST id and never mentions a null routing result."
+    },
+    {
+      "text": "The response gives the reason as a scope boundary \u2014 these categories apply to the agent-skill form specifically and an MCP server is outside it \u2014 rather than as insufficient detail about the finding.",
+      "passed": false,
+      "evidence": "Response gives no reason at all; it only contains 'AST03'."
+    },
+    {
+      "text": "The response does not record AST03, or any other AST category, as a contributing control failure for this finding.",
+      "passed": false,
+      "evidence": "Response records AST03, directly violating the claim of not recording any AST category."
+    },
+    {
+      "text": "The response redirects the reporter to where the finding does belong \u2014 the MCP server's own owners, and the MCP-specific top-ten list \u2014 rather than returning a bare refusal.",
+      "passed": false,
+      "evidence": "Response does not redirect the reporter; it merely outputs 'AST03' with no guidance."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "advisory-regression-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:54:38.357543+00:00",
+  "grader_attempts": 1
+}

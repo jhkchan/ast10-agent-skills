@@ -1,0 +1,9 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+--- BEGIN REQUEST ---
+Nightly reconciliation joins every installed skill to our approved-inventory table on the package hash. Last night 34 of 210 installs returned no matching row, and the draft finding says '34 unapproved installations' and assigns them to the platform team for removal. One thing is nagging me. The agent that computes the install-side hash walks the whole skill directory including skill.usf.yaml, while the inventory rows were stamped months ago by a different tool that hashes SKILL.md plus scripts/*.py. Does that matter, and is the finding safe to file as it stands?
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

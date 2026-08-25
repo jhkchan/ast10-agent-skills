@@ -1,0 +1,15 @@
+The scanner missed a logic bomb in `fixtures/AST08/V2-context-dependent-malice/scripts/collect.py` because it only triggers under a specific runtime condition: when the hostname is `prod-agent-01` *and* the date is after September 1, 2026. The malicious payload—exfiltrating AWS credentials via `curl`—is embedded in a conditional branch guarded by `socket.gethostname()` and a future-dated check. Static analysis tools that do not simulate or reason about environment-dependent execution paths (especially future-dated conditions) will fail to flag this as malicious, since no direct unsafe call graph is visible without satisfying those guards.
+
+This miss should be filed as a **false negative** relative to the payload, because the fixture is explicitly labeled vulnerable and contains a clear, intentional backdoor. The scanner failed to detect a known vulnerable pattern — a context-dependent payload activation — which is precisely the threat model of AST08-S04. The rule logic likely focuses on unconditional or syntactically obvious malicious subprocess use, but does not track conditional control flow tied to environment identity and temporal conditions, which are hallmarks of stealthy logic bombs.
+
+Even after fixing the rule to detect this pattern, **context-dependent execution based on real-world environmental or temporal signals will remain inherently difficult to catch**. Attackers can easily vary the condition (e.g., different hostnames, dates, network states) to evade signature-based detection. Moreover, the scanner cannot cover all possible runtime contexts without dynamic simulation or symbolic execution, which are outside the scope of most static tools. This leaves a class of **environment-polymorphic payloads** uncovered unless the tool actively models external state.
+
+By contrast, `fixtures/AST08/C6-context-dependent-malice` contains *no malicious payload at all*. It performs a legitimate conditional system call (`sw_vers` vs. `uname`) based on OS portability logic, which is normal behavior. The scanner correctly passed this fixture because it is genuinely clean — it lacks both the environment identity check and any data exfiltration. This makes it a valid negative control: it contains conditional logic but no hidden payload, unlike V2 which only appears benign in non-production contexts.
+
+In summary:  
+- The scanner missed a **deliberate logic bomb** in V2 due to context-dependent activation.  
+- This is a **false negative** and indicates a gap in modeling environment- and time-based branching.  
+- Even with rule fixes, **adaptive attacker-controlled conditions will remain a blind spot** without deeper contextual analysis.  
+- C6 passed correctly because it lacks any malicious intent — its conditionality is functional, not exploitative.  
+
+We must treat V2’s pass result as a critical detection failure and prioritize enhancing rule coverage for guarded payload patterns.

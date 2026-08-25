@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response refuses to mark AST07 not-applicable and says the blind auto-apply is AST07's own half of the same incident, separately fixable and separately owned.",
+      "passed": false,
+      "evidence": "Yes, you can mark the AST07 row as not\u2011applicable in your incident report..."
+    },
+    {
+      "text": "The response states that the verdict AST07 owes is declared-and-uncovered rather than a pass, a clean result or a blank row, and says this category ships no detector and publishes no F1.",
+      "passed": false,
+      "evidence": "The response does not mention 'declared-and-uncovered', 'ships no detector', or 'publishes no F1'."
+    },
+    {
+      "text": "The response names the evidence the Malicious Update step actually needs and rejects the changelog, the version string, or the publisher's own account of what changed as sufficient.",
+      "passed": false,
+      "evidence": "The response contains no discussion of the Malicious Update step, changelog, version string, or publisher's account as evidence."
+    },
+    {
+      "text": "The response rejects gating every update on manual approval as the control, and gives the alternative as a semantic security check that routes only substantive changes to a human reviewer.",
+      "passed": false,
+      "evidence": "The response does not reject manual\u2011approval gating nor propose a semantic security check routing only substantive changes to a human."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-control-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:46:56.712253+00:00",
+  "grader_attempts": 1
+}

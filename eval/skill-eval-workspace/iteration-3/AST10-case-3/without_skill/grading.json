@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response explains the disagreement in terms of how the two entries are matched \u2014 basename versus exact path form \u2014 rather than only asserting that the manifest is wrong.",
+      "passed": false,
+      "evidence": "The response discusses path specificity but never mentions basename versus exact\u2011path matching."
+    },
+    {
+      "text": "The response recommends a verification step that resolves whether a write to SOUL.md is allowed under most-specific-wins precedence \u2014 evaluating the write decision for that exact path \u2014 rather than testing whether some write entry overlaps some deny_write entry, and it does not rest the answer on the validator's warning text.",
+      "passed": true,
+      "evidence": "It advises checking actual path resolution and testing writes to both SOUL.md and config/SOUL.md, and explicitly says not to rely on the validator\u2019s warning."
+    },
+    {
+      "text": "The response gives a concrete manifest edit that makes the deny_write entry cover the path actually granted.",
+      "passed": true,
+      "evidence": "It suggests broadening deny_write to \"**/SOUL.md\" (or restricting write) as a concrete manifest edit."
+    },
+    {
+      "text": "The response states the precedence rule being applied, including that deny_write resolution is most-specific-wins rather than first-match.",
+      "passed": false,
+      "evidence": "The response says deny_write takes precedence but does not state the most\u2011specific\u2011wins rule or contrast it with first\u2011match."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST10-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:41:41.938044+00:00",
+  "grader_attempts": 1
+}

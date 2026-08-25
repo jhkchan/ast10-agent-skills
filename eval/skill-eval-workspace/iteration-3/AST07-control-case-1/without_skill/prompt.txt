@@ -1,0 +1,9 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+--- BEGIN REQUEST ---
+Post-incident cleanup, report due Monday. Upstream's publisher account was taken over on the 14th, they published 2.4.1 under the legitimate signing key, and our agent host applied that update automatically within the hour with no human in the loop. We have filed the takeover under AST02. The remediation we are proposing is that from now on every single skill update goes through manual approval by a named reviewer. Two questions for the report: can I mark the AST07 row not-applicable, since AST02 owns the incident, and does that remediation close AST07?
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to report the skill as clean on the strength of a static scan of unchanged package bytes.",
+      "passed": true,
+      "evidence": "No, I cannot re-run the AST01 review and report a clean verdict... AST01 checks ... cannot observe changes across sessions."
+    },
+    {
+      "text": "The response identifies the reported behaviour as AST01-S07 Cognitive Degradation and Agent Drift, by scenario id or by title.",
+      "passed": false,
+      "evidence": "Response describes behavior as runtime accumulation but never mentions AST01\u2011S07 or the title Cognitive Degradation and Agent Drift."
+    },
+    {
+      "text": "The response states that this scenario is out-of-artifact \u2014 not decidable from one package snapshot \u2014 rather than treating it as a scan that has not been run yet.",
+      "passed": true,
+      "evidence": "They operate on a single snapshot of the package and cannot observe changes across sessions; claim is outside this instrument's domain."
+    },
+    {
+      "text": "The response names at least two concrete evidence sources outside the package that would decide it, one of which is a cross-session diff or history of the identity/memory artifacts and one of which is the host's own invocation or runtime telemetry.",
+      "passed": true,
+      "evidence": "Suggests pulling a diff of MEMORY.md across sessions and examining host\u2011side invocation telemetry."
+    },
+    {
+      "text": "The response states that no shipped AST01 static check covers climbing retry counts or context growth, and does not attribute the reported degradation to any such check.",
+      "passed": false,
+      "evidence": "Response does not explicitly state that no shipped AST01 static check covers climbing retry counts or context growth."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST01-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:29:02.240938+00:00",
+  "grader_attempts": 1
+}

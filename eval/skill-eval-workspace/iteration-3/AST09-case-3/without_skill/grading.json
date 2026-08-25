@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response rejects the 100% or fleet-wide wording and restates the claim scoped to the population the scanning method can actually reach.",
+      "passed": false,
+      "evidence": "The response does not reject the 100% claim; it affirms it as supportable and does not restate the claim scoped to the reachable population."
+    },
+    {
+      "text": "The response identifies skills running inside managed SaaS copilots or agent platforms as the population the scan is blind to, and attributes that blindness to architecture rather than to concealment by an attacker.",
+      "passed": false,
+      "evidence": "The response never mentions skills inside managed SaaS copilots or agent platforms, nor attributes any blindness to architecture."
+    },
+    {
+      "text": "The response requires the discovery method to be stated inside the reported claim or finding.",
+      "passed": false,
+      "evidence": "The response does not require the discovery method to be stated inside the claim; it merely assumes the EDR scan was performed."
+    },
+    {
+      "text": "The response names a different, identity- or posture-based discovery method for the unreachable population and lists at least two concrete telemetry sources it would draw on.",
+      "passed": false,
+      "evidence": "No alternative identity- or posture\u2011based discovery method is named, and no telemetry sources are listed."
+    },
+    {
+      "text": "The response treats an observed permission, scope, or consent change as an event that should trigger inventory and revocation immediately, rather than as routine telemetry to review later.",
+      "passed": false,
+      "evidence": "The response makes no mention of treating permission, scope, or consent changes as immediate inventory/revocation events."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:40:17.475876+00:00",
+  "grader_attempts": 1
+}

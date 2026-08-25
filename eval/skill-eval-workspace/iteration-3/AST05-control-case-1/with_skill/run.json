@@ -1,0 +1,17 @@
+{
+  "eval": "AST05-control-case-1",
+  "skill": "AST05",
+  "case_id": 1,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST05/V3-eval-remote-response"
+  ],
+  "prompt_chars": 24350,
+  "ran_at": "2026-08-25T04:45:29.069803+00:00"
+}

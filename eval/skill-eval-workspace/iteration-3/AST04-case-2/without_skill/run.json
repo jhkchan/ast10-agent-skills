@@ -1,0 +1,17 @@
+{
+  "eval": "AST04-case-2",
+  "skill": "AST04",
+  "case_id": 2,
+  "configuration": "without_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": false,
+  "input_files": [
+    "fixtures/AST04/V9-risk-tier-spoofing/SKILL.md"
+  ],
+  "prompt_chars": 1986,
+  "ran_at": "2026-08-25T04:32:15.110886+00:00"
+}

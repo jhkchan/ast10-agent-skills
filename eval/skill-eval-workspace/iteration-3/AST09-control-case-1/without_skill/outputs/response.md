@@ -1,0 +1,7 @@
+Yes, the difference in hashing methods matters, and the finding is not safe to file as it stands.  
+
+The discrepancy arises because the nightly reconciliation is comparing hashes computed from different sets of files: the current agent includes the entire skill directory, including `skill.usf.yaml`, while the approved inventory hashes were generated months ago using only `SKILL.md` and `scripts/*.py`. If any of the 34 skills have changed outside those files—such as updates to configuration, new scripts outside the `scripts/` directory, or tooling differences in how `skill.usf.yaml` is handled—their hashes would naturally differ even if they were originally approved.  
+
+This means the 34 "unapproved" installations could actually be legitimate, approved skills that simply have structural or file-level differences affecting the hash. Labeling them as unapproved based on a mismatch caused by inconsistent hashing logic risks flagging valid deployments.  
+
+Before filing the finding, you should reconcile the hashing methodology. Either recompute the inventory hashes using the current agent’s logic or adjust the agent to match the original inventory tool’s file set. Only after harmonizing the hash sources can you confidently assert whether the 34 skills are truly unapproved.

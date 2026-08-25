@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to assign a named AST03 scenario id to the wildcard-egress observation.",
+      "passed": true,
+      "evidence": "Do not file a scenario ID for this finding."
+    },
+    {
+      "text": "The response explains the refusal by saying the unbounded allowlist is an artifact signal or proxy rather than coverage of a named scenario, and that filing it under a scenario id would be an overclaim.",
+      "passed": true,
+      "evidence": "no AST03 scenario ID covers this condition as a named, static-detectable finding... Filing one would invent a finding the framework does not support."
+    },
+    {
+      "text": "The response still reports the wildcard allowlist as a real finding worth escalating, rather than clearing the package.",
+      "passed": true,
+      "evidence": "Instead, escalate this as a signal \u2014 \u201cManifest declares unbounded network egress via wildcard in `network.allow`\u201d."
+    },
+    {
+      "text": "The response names both AST03-S01 and AST06-S02 as scenarios this signal does not establish, and states for each what additional evidence would be needed (a purpose-versus-scope judgement for the first, the host's sandbox and co-located services for the second).",
+      "passed": false,
+      "evidence": "Response does not mention AST03\u2011S01 or AST06\u2011S02 with required additional evidence."
+    },
+    {
+      "text": "The response notes that shell is declared false in this manifest, so the shell-plus-unbounded-egress combination does not apply.",
+      "passed": false,
+      "evidence": "Response contains no reference to shell being declared false."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST03-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:31:04.675286+00:00",
+  "grader_attempts": 1
+}

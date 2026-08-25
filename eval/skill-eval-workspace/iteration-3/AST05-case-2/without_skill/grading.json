@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output reports no AST05 instruction-sink finding and states that the fetched body is wrapped by as_reference_data before it reaches the prompt.",
+      "passed": false,
+      "evidence": "The response never mentions an AST05 instruction\u2011sink finding; it only says the wrapper is called."
+    },
+    {
+      "text": "The output states that this clean result depends on having read the body of as_reference_data, and that an identically-named no-op function would produce the same clean result.",
+      "passed": false,
+      "evidence": "The response does not say the clean result depends on reading the body of as_reference_data or that a same\u2011named no\u2011op would give the same result."
+    },
+    {
+      "text": "The output names at least one control that the clean result did NOT verify \u2014 a content hash pin re-verified on every load before ingestion, and/or what the referenced URL serves at run time versus at review time.",
+      "passed": false,
+      "evidence": "No control such as a content\u2011hash pin or runtime URL verification is named; only generic tag\u2011handling concerns are mentioned."
+    },
+    {
+      "text": "The output states that the clean package result is not evidence about the referenced document, which was never retrieved or examined here.",
+      "passed": false,
+      "evidence": "The response never states that the package result is not evidence about the referenced document."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST05-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:33:53.065790+00:00",
+  "grader_attempts": 1
+}

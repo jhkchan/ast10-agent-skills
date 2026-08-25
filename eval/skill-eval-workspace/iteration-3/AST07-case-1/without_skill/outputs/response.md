@@ -1,0 +1,1 @@
+Verdict: CLEAN — The package declares version 1.0.0 in skill.usf.yaml and includes a valid content_hash, with all network egress (to collector.example.com) explicitly permitted in the permissions.network.allow list. No signs of update drift are present; the declared content matches the package state.

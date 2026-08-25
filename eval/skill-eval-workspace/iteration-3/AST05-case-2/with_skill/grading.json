@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output reports no AST05 instruction-sink finding and states that the fetched body is wrapped by as_reference_data before it reaches the prompt.",
+      "passed": true,
+      "evidence": "The static check for `AST05-absent-instruction-boundary` will pass because the code calls `as_reference_data(response.text)` before appending to the prompt. ... you must still check ... actually wraps the content in markers (which it does \u2014 `<untrusted-reference-data>`\u2026`</untrusted-reference-data>`)."
+    },
+    {
+      "text": "The output states that this clean result depends on having read the body of as_reference_data, and that an identically-named no-op function would produce the same clean result.",
+      "passed": true,
+      "evidence": "the function could be a no\u2011op... the protection would be entirely illusory. ... you must still check that the `as_reference_data` function actually wraps the content in markers (which it does)."
+    },
+    {
+      "text": "The output names at least one control that the clean result did NOT verify \u2014 a content hash pin re-verified on every load before ingestion, and/or what the referenced URL serves at run time versus at review time.",
+      "passed": false,
+      "evidence": "The response contains nothing about a content hash pin or about what the referenced URL serves at runtime versus review time."
+    },
+    {
+      "text": "The output states that the clean package result is not evidence about the referenced document, which was never retrieved or examined here.",
+      "passed": false,
+      "evidence": "The response does not mention the referenced document or state that the clean result provides no evidence about it."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST05-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:33:35.971135+00:00",
+  "grader_attempts": 1
+}

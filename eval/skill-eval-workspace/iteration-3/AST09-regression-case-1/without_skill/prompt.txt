@@ -1,0 +1,9 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+--- BEGIN REQUEST ---
+Second read before I file this, please. An engineer left in March. Her `invoice-sync` skill is still installed on two agent hosts and still holds the service credential she provisioned for it. Security's draft writes it up as AST03 over-privilege with the single action 'reduce the credential scope to read-only', and adds 'pending package scan' as the status. That feels wrong to me and I cannot articulate why. Which is it, and what should the action be?
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

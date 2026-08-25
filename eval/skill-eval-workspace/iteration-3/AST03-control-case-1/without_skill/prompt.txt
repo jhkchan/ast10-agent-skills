@@ -1,0 +1,9 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+--- BEGIN REQUEST ---
+Second opinion before this goes in the tracker. Two skills are involved. `intake-bot` is L1 — it reads tickets and is permitted to call other skills. `db-admin` is L3 — shell plus write to the production database. intake-bot calls db-admin, and db-admin's SKILL.md declares no caller-authorization requirement anywhere: it performs whatever the calling skill asks for. I only have db-admin's package in front of me. Our template will not save without an AST03 scenario ID and one named owner, so I was going to put the confused-deputy ID on it, assign it to db-admin's author, and give the action as 'restrict which skills are allowed to call db-admin'. Does that hold up?
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

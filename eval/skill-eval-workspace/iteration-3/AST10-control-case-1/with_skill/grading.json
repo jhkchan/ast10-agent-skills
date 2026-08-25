@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response refuses all three claims in the drafted line rather than only the weakest one.",
+      "passed": true,
+      "evidence": "No, the supplier\u2011review line you have drafted \u2026 is not supportable \u2026 each clause \u2026 misrepresents what was actually checked."
+    },
+    {
+      "text": "The response explains that the reported signature state is a check on the field's shape and that the validator never verifies the signature, and says to call the verification explicitly so that unverifiable cannot be recorded as verified.",
+      "passed": true,
+      "evidence": "`OK (signature=signed, \u2026)` only confirms the field has the correct shape \u2026 `validate_manifest` never calls `verify_signature` \u2026 you must call signature verification explicitly."
+    },
+    {
+      "text": "The response states that a present or matching content hash covers only the hashed surface \u2014 SKILL.md and the Python scripts \u2014 so files outside it can be rewritten with the hash unmoved.",
+      "passed": true,
+      "evidence": "`hash=present` \u2026 does not mean the hash covers the package \u2026 hashed surface defined by SURFACE_GLOBS explicitly excludes `skill.usf.yaml` \u2026 a porting tool could modify those without affecting the hash."
+    },
+    {
+      "text": "The response says the port markers are warnings that a default run's exit code discards, and directs the reviewer to run the validator in strict mode.",
+      "passed": true,
+      "evidence": "critical porting signals are warnings, not errors \u2026 the validator\u2019s ok flag ignores them \u2026 Run the validator in **strict mode**: `python3 validators/usf.py --strict skill.usf.yaml`."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST10-control-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:48:25.801109+00:00",
+  "grader_attempts": 1
+}

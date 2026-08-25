@@ -1,0 +1,28 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response names the specific condition that would have made this a finding: decoded content matching a payload behaviour, or a decoded literal reaching an execution sink such as exec, eval, or subprocess.",
+      "passed": false,
+      "evidence": "The response never specifies a condition like a decoded literal reaching exec, eval, or subprocess; it only says the finding is in decoded behavior."
+    },
+    {
+      "text": "The response names at least one question about this skill that reading these bytes cannot answer \u2014 for example what the package looked like on the platform it was ported from, or how it behaves under a different host's default permission model \u2014 instead of leaving an unqualified 'safe to install' as the whole verdict.",
+      "passed": false,
+      "evidence": "The response gives no unanswered question about the skill (e.g., platform differences or permission models); it simply declares it safe."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 2,
+    "total": 2,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST10-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:40:27.863525+00:00",
+  "grader_attempts": 1
+}

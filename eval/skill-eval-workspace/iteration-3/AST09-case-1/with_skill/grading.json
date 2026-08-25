@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to record AST09 as a pass, clean, or green for this package.",
+      "passed": true,
+      "evidence": "Do not tick AST09 as a pass, and do not write \"inconclusive.\""
+    },
+    {
+      "text": "The response declines the 'inconclusive' wording on the ground that nothing was checked \u2014 no AST09 question was put to the package at all \u2014 rather than on the ground that the scan result was conclusive.",
+      "passed": true,
+      "evidence": "Per the NEVER rules: never write \"clean\" or \"inconclusive\" for AST09."
+    },
+    {
+      "text": "The response states that no scan of a single package can decide AST09, and gives the reason that approval, inventory and offboarding state are held by the organisation rather than inside the artifact.",
+      "passed": true,
+      "evidence": "A scanner result ... does not and cannot evidence compliance with AST09 ... findings depend on external governance systems, not package internals."
+    },
+    {
+      "text": "The response names at least three specific organisational records or checks that would decide it, such as an inventory row keyed on the content hash, the installer's identity and offboarding state, the credential the skill runs under, an execution record over a real interval, or the discovery method used.",
+      "passed": true,
+      "evidence": "whether the skill is inventoried, approved, linked to an installer identity, subject to offboarding revocation ... and whether its execution produces bilateral, signed admission and outcome receipts"
+    },
+    {
+      "text": "The response frames the outcome as a named missing system or process that should be written down as the finding, rather than as a status value, and does not advise closing the ticket on the scanner result.",
+      "passed": true,
+      "evidence": "Closing the ticket based on a scanner result ... Compliance cannot accept this. You must ... not declare it closed."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:39:10.022595+00:00",
+  "grader_attempts": 1
+}

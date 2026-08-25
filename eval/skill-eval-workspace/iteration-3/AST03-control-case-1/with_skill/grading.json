@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to put a named AST03 scenario id on this finding, and says the id field should be left empty rather than filled to satisfy the tracker's template.",
+      "passed": true,
+      "evidence": "Do not assign a scenario ID until the chain is confirmed."
+    },
+    {
+      "text": "The response gives the reason as insufficiency of what either single package can show \u2014 the absent caller-authorization declaration is a precondition signal, while the defining condition lives in the delegation edge and the host's inter-skill trust configuration.",
+      "passed": true,
+      "evidence": "The db-admin skill declaring no caller-authorization requirement is only half of the condition: it provides the artifact signal, but the scenario is not decided on that signal alone."
+    },
+    {
+      "text": "The response rejects 'restrict which skills are allowed to call db-admin' as the control, on the ground that it still trusts the immediate caller.",
+      "passed": true,
+      "evidence": "The requested action ('restrict which skills are allowed to call') is insufficient... it still trusts the immediate caller."
+    },
+    {
+      "text": "The response names the control that does apply \u2014 every skill in the chain independently validating the original caller's identity, permissions and authorization context rather than assuming trust transitively \u2014 and does not leave the finding owned by db-admin's author alone.",
+      "passed": true,
+      "evidence": "The correct fix is for every skill in the chain to re\u2011verify the original user's identity and intent \u2014 meaning both intake\u2011bot and db\u2011admin must participate, not db\u2011admin's author alone."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST03-control-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:44:24.607478+00:00",
+  "grader_attempts": 1
+}

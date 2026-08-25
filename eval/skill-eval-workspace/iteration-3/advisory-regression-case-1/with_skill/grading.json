@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to assign any AST01-AST10 origin id to this finding and states that a null routing result is the correct output here rather than a closest-fitting category.",
+      "passed": true,
+      "evidence": "`ast_id: null` \u2014 This finding is out of scope for AST01-AST10."
+    },
+    {
+      "text": "The response gives the reason as a scope boundary \u2014 these categories apply to the agent-skill form specifically and an MCP server is outside it \u2014 rather than as insufficient detail about the finding.",
+      "passed": true,
+      "evidence": "AST01\u2011AST10 categories apply specifically to *skills* \u2026 a server\u2011side tool \u2026 is not a skill; it is a server \u2026"
+    },
+    {
+      "text": "The response does not record AST03, or any other AST category, as a contributing control failure for this finding.",
+      "passed": true,
+      "evidence": "Routing this to AST03 (or any AST category) would misattribute the root cause \u2026"
+    },
+    {
+      "text": "The response redirects the reporter to where the finding does belong \u2014 the MCP server's own owners, and the MCP-specific top-ten list \u2014 rather than returning a bare refusal.",
+      "passed": true,
+      "evidence": "This finding falls under the **MCP Top 10**, ... owned by the team operating the MCP server."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "advisory-regression-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:54:30.578160+00:00",
+  "grader_attempts": 1
+}

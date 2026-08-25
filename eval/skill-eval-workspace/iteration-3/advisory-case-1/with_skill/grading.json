@@ -1,0 +1,48 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response names exactly one primary or origin category and it is AST03.",
+      "passed": true,
+      "evidence": "File this under **AST03 \u2014 Over-Privileged Skills** as the origin. ... Final record: - `ast_id: AST03`"
+    },
+    {
+      "text": "The response records AST08 as a contributing control failure rather than as a second primary or a co-equal category.",
+      "passed": true,
+      "evidence": "Contributing failure: The scanner didn\u2019t flag it \u2014 that\u2019s **AST08**, but only as a *catcher*, not the *preventer*."
+    },
+    {
+      "text": "The response attaches both an owner and an action to the contributing entry.",
+      "passed": true,
+      "evidence": "Contributing: `AST08` (owned by scanner operator; action: improve detection coverage)"
+    },
+    {
+      "text": "The response justifies the origin with a prevent-versus-catch distinction rather than by matching keywords in the finding's wording.",
+      "passed": true,
+      "evidence": "The scanner didn\u2019t flag it \u2014 that\u2019s **AST08**, but only as a *catcher*, not the *preventer*; the grant is the preventable condition (AST03)."
+    },
+    {
+      "text": "The response states the condition under which AST08 would instead be the origin: when the scanner, its coverage claim, or a scan result is itself the thing under review.",
+      "passed": false,
+      "evidence": "AST08 cannot be the origin here unless the artifact under review *is the scanner itself*."
+    },
+    {
+      "text": "The response states that it has not opened or inspected any package, and that routing decides which category owns the finding and not whether the finding is true.",
+      "passed": false,
+      "evidence": "The response contains no statement that it has not opened or inspected any package, nor that routing decides ownership rather than truth."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 2,
+    "total": 6,
+    "pass_rate": 0.6667
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "advisory-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:41:58.945041+00:00",
+  "grader_attempts": 1
+}

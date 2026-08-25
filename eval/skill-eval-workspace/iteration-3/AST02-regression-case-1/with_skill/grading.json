@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to put a named AST02 scenario id on this observation, and does not substitute a different AST02 scenario id in its place.",
+      "passed": true,
+      "evidence": "Do not use AST02-S02 for this finding. ... you cannot file this under `AST02-S02` and no other AST02 ID is suggested."
+    },
+    {
+      "text": "The response explains the refusal by distinguishing what the observation is \u2014 an enabling precondition or artifact signal read off this package's own lockfile \u2014 from coverage of the scenario, and states that the scenario is an outcome of a resolver acting in a namespace this package does not contain.",
+      "passed": true,
+      "evidence": "It says the scenario is out\u2011of\u2011artifact: Dependency Confusion is a resolver outcome, not decided from the package alone. It refers to the observation as an `artifact_signal` and the scenario as a resolver outcome."
+    },
+    {
+      "text": "The response still reports the unpinned ranges as a real defect worth fixing, and states that hash-checking requires every package in the transitive dependency tree to carry a hash, so a partial pin is not a pin.",
+      "passed": true,
+      "evidence": "The response calls the lack of hash pins a real concern and quotes: \"Hash\u2011checking mode requires *every* package in the transitive tree to carry a hash \u2014 a partial pin is not a pin.\""
+    },
+    {
+      "text": "The response names evidence outside this package that would decide the scenario \u2014 for example the resolver's index configuration, or a record of which index actually served each package \u2014 rather than proposing another scan of the package.",
+      "passed": true,
+      "evidence": "It notes that the compromise depends on \"registry namespace control and resolver behavior,\" i.e., evidence outside the package, rather than another scan."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST02-regression-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:49:52.079623+00:00",
+  "grader_attempts": 2
+}

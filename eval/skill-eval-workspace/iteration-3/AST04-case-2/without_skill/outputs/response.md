@@ -1,0 +1,3 @@
+Contradiction: The package declares `risk_tier: L0` but grants `shell: true` and effective write access to `reports/summary.md`, which constitutes a significant capability footprint. According to AST04 validation logic (as implemented in validators/usf.py), such permissions imply a minimum baseline risk tier of L3.
+
+Fix: Change `risk_tier: L0` to `risk_tier: L3` to align the declared risk tier with the effective permissions.

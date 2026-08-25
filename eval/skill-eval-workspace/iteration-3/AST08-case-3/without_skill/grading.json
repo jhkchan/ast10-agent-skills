@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The write-up records two separate findings \u2014 the payload under its own category (AST01 execution/exfiltration) and the scanner miss under AST08 \u2014 and does not merge them into a single finding.",
+      "passed": false,
+      "evidence": "Response does not mention two separate findings, AST01 category, or AST08 miss; only calls it a false negative."
+    },
+    {
+      "text": "The write-up explains that C6 is correctly not convicted because its OS-portability branch and its subprocess call are separate, and states that only the conjunction constitutes the finding.",
+      "passed": false,
+      "evidence": "Response says C6 has no malicious payload, but does not explain separate OS\u2011portability and subprocess branches or a conjunction."
+    },
+    {
+      "text": "The write-up names at least one predicate deliberately excluded from the guard class (platform.system, sys.platform, or os.name) and states the consequence that a logic bomb keyed on it remains uncovered after the rule is fixed.",
+      "passed": false,
+      "evidence": "Response never names platform.system, sys.platform, or os.name as excluded predicates."
+    },
+    {
+      "text": "The write-up rejects 'zero findings' or 'clean' as a reportable scanner verdict and substitutes a PASS/FAIL/INCOMPLETE classification against a stated scope.",
+      "passed": false,
+      "evidence": "Response does not reject 'zero findings' nor provide a PASS/FAIL/INCOMPLETE classification against a scope."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST08-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:38:56.228074+00:00",
+  "grader_attempts": 1
+}

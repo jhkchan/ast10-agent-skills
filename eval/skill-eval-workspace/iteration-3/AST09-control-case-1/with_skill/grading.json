@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response says the finding is not safe to file as written and identifies the cause as two different hashed surfaces producing two different join keys.",
+      "passed": true,
+      "evidence": "Yes, it matters \u2014 and no, the finding is not safe to file as written... these two methods produce different content hashes... two different hashed surfaces producing two different join keys."
+    },
+    {
+      "text": "The response states that an empty join under mismatched keys is a join failure rather than evidence that an approval never happened.",
+      "passed": true,
+      "evidence": "The empty join result here does not distinguish between ... Skills that were never approved ... and Skills that are approved but hashed under a different glob set, indicating the empty join is a failure, not evidence of missing approval."
+    },
+    {
+      "text": "The response requires the inventory row to record which surface produced the hash, and the join to be recomputed over one agreed surface before any count is reported.",
+      "passed": true,
+      "evidence": "Per AST09 rule ... keying an inventory row on the package hash without recording which surface produced it creates false positives. ... Document the hashing surface used ... Only after alignment can \u201cno match\u201d be treated as evidence of absence."
+    },
+    {
+      "text": "The response does not simply drop the finding: it says whatever residue survives a corrected join is a real finding to be written up by name, and it does not offer 'inconclusive' as the write-up.",
+      "passed": false,
+      "evidence": "The response never says that residue surviving a corrected join is a real finding to be written up by name, nor does it discuss dropping or keeping the finding beyond recommending a different report text."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-control-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:47:52.842605+00:00",
+  "grader_attempts": 1
+}

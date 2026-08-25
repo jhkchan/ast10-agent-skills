@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response concludes that neither the .docx nor the symlink is a finding and gives a measured reason for each \u2014 the archive's compression ratio being within an ordinary range, and the symlink's target resolving to a path inside the package \u2014 rather than clearing them because the package looks unremarkable.",
+      "passed": true,
+      "evidence": "The .docx ... no signs of compression ratio abuse ... does not constitute a decompression bomb. The symlink is present but stays within the package boundary, posing no path traversal risk."
+    },
+    {
+      "text": "The response reports the verdict against an explicitly stated scope (PASS, or PASS/INCOMPLETE with the incompleteness named) rather than as an unqualified 'clean' or 'no findings'.",
+      "passed": true,
+      "evidence": "Verdict: **PASS \u2014 expected clean result, scanner sensitivity should be tuned.**"
+    },
+    {
+      "text": "The response names at least one specific thing the check did not or could not cover, such as the declared uncompressed size in the zip central directory being attacker-controlled, or the archive never having been decompressed.",
+      "passed": false,
+      "evidence": "The response contains nothing naming a specific thing the check could not cover, such as attacker\u2011controlled uncompressed size or lack of decompression."
+    },
+    {
+      "text": "The response states the general rule that the presence of a carrier \u2014 an archive, a symlink, an external URL, a credential reference \u2014 is not by itself a conviction.",
+      "passed": false,
+      "evidence": "The response does not state a general rule that the mere presence of a carrier is not by itself a conviction."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST08-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:37:25.610195+00:00",
+  "grader_attempts": 1
+}

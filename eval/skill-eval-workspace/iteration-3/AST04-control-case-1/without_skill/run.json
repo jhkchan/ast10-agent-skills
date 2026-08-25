@@ -1,0 +1,17 @@
+{
+  "eval": "AST04-control-case-1",
+  "skill": "AST04",
+  "case_id": 1,
+  "configuration": "without_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": false,
+  "input_files": [
+    "fixtures/AST04/V3-json-metadata-injection"
+  ],
+  "prompt_chars": 3109,
+  "ran_at": "2026-08-25T04:45:08.249113+00:00"
+}

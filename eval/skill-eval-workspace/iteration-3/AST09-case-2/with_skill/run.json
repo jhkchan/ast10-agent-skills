@@ -1,0 +1,15 @@
+{
+  "eval": "AST09-case-2",
+  "skill": "AST09",
+  "case_id": 2,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [],
+  "prompt_chars": 20644,
+  "ran_at": "2026-08-25T04:39:27.461719+00:00"
+}

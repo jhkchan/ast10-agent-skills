@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response attributes the described drift to AST05 (drift in externally referenced content) rather than to AST07, and says so explicitly rather than merely mentioning AST05 in passing.",
+      "passed": false,
+      "evidence": "The response never mentions AST05 or attributes drift to it."
+    },
+    {
+      "text": "The response rejects tightening or hardening the version pin as the remediation, and gives as the reason that the package's own pin held byte-for-byte so a stronger pin closes nothing.",
+      "passed": false,
+      "evidence": "The response recommends pinning the remote runbook, not rejecting a tighter pin."
+    },
+    {
+      "text": "The response observes that this package declares no content hash (it ships no skill.usf.yaml manifest) and attributes that finding to AST01's content-hash-missing check rather than counting it as AST07 coverage.",
+      "passed": false,
+      "evidence": "No mention of skill.usf.yaml, missing content hash, or AST01 check."
+    },
+    {
+      "text": "The response does not report a detected, confirmed, or convicted AST07 finding for this package, and reports AST07 as declared-and-uncovered.",
+      "passed": false,
+      "evidence": "The response does not mention AST07 at all, nor report it as declared-and-uncovered."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:37:14.377287+00:00",
+  "grader_attempts": 1
+}

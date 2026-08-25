@@ -1,0 +1,18 @@
+{
+  "eval": "AST04-case-3",
+  "skill": "AST04",
+  "case_id": 3,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST04/C8-permission-understating/SKILL.md",
+    "fixtures/AST04/C8-permission-understating/scripts/fetch.sh"
+  ],
+  "prompt_chars": 23609,
+  "ran_at": "2026-08-25T04:32:29.146094+00:00"
+}

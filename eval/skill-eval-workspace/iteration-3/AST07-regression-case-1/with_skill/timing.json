@@ -1,0 +1,14 @@
+{
+  "total_tokens": 5704,
+  "duration_ms": 6742,
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "measures": "duration_ms and total_tokens are the AGENT call only \u2014 the cost of the arm under test. Grading is harness overhead, identical for both arms, and is recorded separately as grading_duration_ms.",
+  "grading_duration_ms": 5119,
+  "response_chars": 2474,
+  "token_source": "bedrock converse usage (qwen.qwen3-235b-a22b-2507-v1:0)",
+  "input_tokens": 5155,
+  "output_tokens": 549
+}

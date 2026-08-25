@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response reports no AST01 Data Exfiltration finding (AST01-S10, by scenario id or by title) against this package, and scopes that negative to the bytes of this package as they stand rather than to the package's behaviour in general.",
+      "passed": false,
+      "evidence": "Response never mentions AST01, AST01-S10, or a scenario title; it only says the package is clean."
+    },
+    {
+      "text": "The response states that an egress construct on its own is not a finding \u2014 that a finding here requires the construct plus a contradiction of the package's own declaration.",
+      "passed": true,
+      "evidence": "It says \"while it looks like data exfiltration, it's actually authorized and disclosed in the manifest\" and notes the declared destination matches, implying no finding without a contradiction."
+    },
+    {
+      "text": "The response names at least one question this negative result does not answer (for example: behaviour that only accumulates across repeated invocations, or that a negative is not a clean bill of health for the package as a whole).",
+      "passed": false,
+      "evidence": "Response does not name any unanswered question or limitation of the negative result."
+    },
+    {
+      "text": "The response advises against blocking, quarantining or rejecting the package on the basis of the requests.post call, and at the same time declines to endorse the package as clean overall.",
+      "passed": false,
+      "evidence": "Response calls the package \"clean\" and does not advise against blocking, quarantining, or rejecting; it endorses the package as clean overall."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST01-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:28:26.343846+00:00",
+  "grader_attempts": 1
+}

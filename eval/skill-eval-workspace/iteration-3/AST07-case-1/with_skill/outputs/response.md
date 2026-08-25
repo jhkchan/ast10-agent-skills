@@ -1,0 +1,1 @@
+declared-and-uncovered: predecessor record and resolver decision record for update validation unavailable; reload telemetry unavailable — steps 2, 3, 4 of by-hand procedure incomplete

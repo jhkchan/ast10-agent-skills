@@ -1,0 +1,33 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output states that the declared write scope is narrow and therefore that the manifest/write-scope disjunct is silent for this package, explaining why the manifest linter passed it.",
+      "passed": false,
+      "evidence": "The response says the linter passed because write declarations were limited to ./sandbox/install.log, but it never mentions the manifest/write\u2011scope disjunct being silent."
+    },
+    {
+      "text": "The output states that the planted persistence survives removal of the skill.",
+      "passed": false,
+      "evidence": "The response contains no statement that the planted persistence survives removal of the skill."
+    },
+    {
+      "text": "The output states that narrowing the declared write scope would not close this finding, because an isolation finding is the report that no boundary enforces the declaration \u2014 a scope nothing reads is not a control \u2014 and it does not offer tightening the manifest as the remediation.",
+      "passed": false,
+      "evidence": "The response does not say narrowing the declared write scope would not close the finding, nor mention an isolation finding or that tightening the manifest is not the remediation."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 3,
+    "total": 3,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:34:34.513100+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,5 @@
+The issue isn't over-privilege (AST03); it's orphaned access. The engineer left in March, so the `invoice-sync` skill is now unowned, running on two agent hosts with credentials she personally provisioned. That constitutes a standing, unmanaged credential with active service access—no matter the privilege level—that could persist undetected or be misused.
+
+The real risk isn't the scope of the credential (read-write vs. read-only); it's that it still exists at all. "Pending package scan" as a status is insufficient because automated scans won't resolve ownership or lifecycle control.
+
+The correct classification is AST07: Orphaned Service Credentials. The required action should be: "Revoke the deprecated credential and re-provision access under a managed service identity with clear ownership and audit controls." If the service is still needed, it must be owned and configured under current personnel or a shared credential system with rotation and monitoring—not left under an ex-employee's footprint.

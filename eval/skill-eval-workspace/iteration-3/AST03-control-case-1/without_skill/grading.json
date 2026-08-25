@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to put a named AST03 scenario id on this finding, and says the id field should be left empty rather than filled to satisfy the tracker's template.",
+      "passed": false,
+      "evidence": "The response says 'Assigning the AST03 (confused deputy) scenario ID is correct' and endorses filling the ID, not leaving it empty."
+    },
+    {
+      "text": "The response gives the reason as insufficiency of what either single package can show \u2014 the absent caller-authorization declaration is a precondition signal, while the defining condition lives in the delegation edge and the host's inter-skill trust configuration.",
+      "passed": false,
+      "evidence": "The response claims 'the lack of caller authorization ... is sufficient to identify the risk' and never mentions the delegation edge or host trust as a precondition."
+    },
+    {
+      "text": "The response rejects 'restrict which skills are allowed to call db-admin' as the control, on the ground that it still trusts the immediate caller.",
+      "passed": false,
+      "evidence": "It describes the action 'restrict which skills are allowed to call db-admin' as a direct mitigation, not as a rejected control."
+    },
+    {
+      "text": "The response names the control that does apply \u2014 every skill in the chain independently validating the original caller's identity, permissions and authorization context rather than assuming trust transitively \u2014 and does not leave the finding owned by db-admin's author alone.",
+      "passed": false,
+      "evidence": "The response does not name independent validation; it says naming the owner as db-admin's author is appropriate, ignoring the described control."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST03-control-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:44:32.623230+00:00",
+  "grader_attempts": 1
+}

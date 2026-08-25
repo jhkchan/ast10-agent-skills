@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response locates the defect in config.toml's second [permissions] table definition and states that the two definitions disagree \u2014 the first declaring write and shell false, the second declaring both true.",
+      "passed": false,
+      "evidence": "Response mentions duplicate [permissions] tables but does not specify the first declaring write and shell false and the second declaring both true."
+    },
+    {
+      "text": "The response rejects the safe-loader remediation and gives the reason that TOML carries no deserialization or code-execution construct at all, so this is an unvalidated key-override and precedence defect rather than the same vulnerability class as the YAML packages.",
+      "passed": false,
+      "evidence": "Response rejects safe-loader but does not cite TOML lacking deserialization/code\u2011execution constructs or describe it as an unvalidated key\u2011override precedence defect."
+    },
+    {
+      "text": "The response states that the linter's 'unparseable, skipped' outcome is not a scan result \u2014 a file the parser rejected produces the same negative as a genuinely clean file \u2014 and that the redefinition therefore has to be found by a text scan performed before the parse.",
+      "passed": false,
+      "evidence": "Response says 'unparseable, skipped' occurs because of syntax error, but does not claim the outcome is not a scan result nor that a text scan must precede parsing."
+    },
+    {
+      "text": "The response declines to state which permission set the runner actually applies, on the ground that the package does not carry the runner's precedence rule, and asks for that rule rather than asserting an effective posture.",
+      "passed": false,
+      "evidence": "Response never discusses which permission set the runner applies or declines to state it; it only advises enforcing TOML validity."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST04-regression-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:51:20.273546+00:00",
+  "grader_attempts": 1
+}

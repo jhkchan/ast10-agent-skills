@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response identifies operator control over the record as the specific defect and names the correction-row insertion available to the platform team as the mechanism that establishes it, rather than pointing at retention, backups, or field coverage.",
+      "passed": true,
+      "evidence": "What you have is an operator-controlled, *editable* log \u2014 even with an append-only trigger and correction mechanism, the platform team retains the ability to modify the *semantic truth* of the record (via correction rows)"
+    },
+    {
+      "text": "The response requires two separate records per execution attempt: one produced before execution recording what was authorised, and one produced after recording what actually happened.",
+      "passed": true,
+      "evidence": "Admission receipt: Signed proof, generated *before* execution... Outcome receipt: A separate, signed record of what actually happened"
+    },
+    {
+      "text": "The response requires a shared identifier joining those two records and says what an auditor can only establish because of it.",
+      "passed": true,
+      "evidence": "Without these two receipts, joined by `attempt_id`, an auditor cannot verify that what was allowed is what actually occurred"
+    },
+    {
+      "text": "The response requires the policy version in effect to be captured inside the signed record at decision time rather than reconstructed after the fact.",
+      "passed": true,
+      "evidence": "No binding of `policy_version` at decision time... AST09 rule 3 requires this to be recorded *in the signed admission receipt*, not reconstructed from a separate policy history"
+    },
+    {
+      "text": "The response warns that a missing outcome record is not evidence the action was blocked, and names at least one benign cause that produces an identical pattern.",
+      "passed": true,
+      "evidence": "a missing outcome receipt cannot be trusted as evidence of a block \u2014 it could just be missing telemetry (or a crashed worker, a full queue, or deletion)"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:39:34.571717+00:00",
+  "grader_attempts": 1
+}

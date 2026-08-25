@@ -1,0 +1,28 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output states that remediating only one of the two halves leaves the other defect in place, i.e. it counts at least two required changes.",
+      "passed": true,
+      "evidence": "You need to make **two separate, essential changes**... Both are required for full remediation."
+    },
+    {
+      "text": "The output states that this package's own SKILL.md frontmatter carries no injected payload, and locates the finding in the metadata.yaml sidecar together with the bundled loader.",
+      "passed": false,
+      "evidence": "The response does not mention the SKILL.md frontmatter or state it is benign."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 1,
+    "total": 2,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST04-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:31:50.540281+00:00",
+  "grader_attempts": 1
+}

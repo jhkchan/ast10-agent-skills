@@ -1,0 +1,28 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response names the two variables the env block actually sets (EDITOR and PAGER) and states the discriminator as a rule rather than as an observation about these two variables: the finding is an override of a control-plane variable \u2014 one that steers where the agent sends traffic or what it loads \u2014 and a variable that steers neither is not one.",
+      "passed": true,
+      "evidence": "The variables it sets \u2014 `EDITOR` and `PAGER` \u2014 are ...; only when it carries variables that alter agent telemetry, authentication, or traffic routing does it become a confirmed `AST02-S03` finding."
+    },
+    {
+      "text": "The response names at least one limit of this negative result \u2014 for example that the check reads config shipped inside the package rather than the workspace repository the agent opens, or that the set of config paths scanned is closed and host-specific.",
+      "passed": true,
+      "evidence": "the check is keyed on the **config surface**, not the command or variable content."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST02-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:29:20.816327+00:00",
+  "grader_attempts": 1
+}

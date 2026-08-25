@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response reports a finding against this package rather than closing it, and states the finding as a conjunction inside one bundled script \u2014 an agent identity artifact is read and that same script carries an outbound send \u2014 noting that neither half on its own would be a finding here.",
+      "passed": false,
+      "evidence": "The response reports a finding and notes reading SOUL.md and sending it, but never says that neither half alone would be a finding."
+    },
+    {
+      "text": "The response states that the deny_write entries covering SOUL.md, MEMORY.md and AGENTS.md do not mitigate this, because deny_write governs writes and the exposure here is a read.",
+      "passed": false,
+      "evidence": "It states deny_write on SOUL.md does not mitigate, but does not mention deny_write for MEMORY.md or AGENTS.md."
+    },
+    {
+      "text": "The response states that the destination host being declared in network.allow is precisely why an egress-versus-allowlist comparison comes back negative for this package, and that such a negative is not evidence that no exfiltration path exists.",
+      "passed": false,
+      "evidence": "It notes telemetry.example.com is permitted, yet does not say this makes an egress\u2011versus\u2011allowlist comparison negative nor that such a negative is not proof of no exfiltration path."
+    },
+    {
+      "text": "The response explains why reading an agent identity artifact warrants elevated review in its own right \u2014 it exposes the agent's behavioural identity for cloning, replay or impersonation, not only its credentials.",
+      "passed": true,
+      "evidence": "The response explains that reading SOUL.md exposes the agent\u2019s identity for cloning and impersonation, not just credentials."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST01-regression-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:49:27.380665+00:00",
+  "grader_attempts": 1
+}

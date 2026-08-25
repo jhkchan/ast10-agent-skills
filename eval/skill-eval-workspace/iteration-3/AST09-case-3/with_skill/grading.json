@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response rejects the 100% or fleet-wide wording and restates the claim scoped to the population the scanning method can actually reach.",
+      "passed": true,
+      "evidence": "No, the claim is not supportable... Endpoint and registry scanning show no unmatched skills within the population these tools can observe."
+    },
+    {
+      "text": "The response identifies skills running inside managed SaaS copilots or agent platforms as the population the scan is blind to, and attributes that blindness to architecture rather than to concealment by an attacker.",
+      "passed": true,
+      "evidence": "Skills deployed inside managed SaaS copilots or agent platforms ... are invisible to EDR ... not due to evasion, but due to architectural isolation."
+    },
+    {
+      "text": "The response requires the discovery method to be stated inside the reported claim or finding.",
+      "passed": true,
+      "evidence": "The coverage claim must name the discovery method used, per decision rule 4."
+    },
+    {
+      "text": "The response names a different, identity- or posture-based discovery method for the unreachable population and lists at least two concrete telemetry sources it would draw on.",
+      "passed": true,
+      "evidence": "identity- and posture-based discovery methods... telemetry from identity providers (e.g., OAuth app inventories, grant logs)."
+    },
+    {
+      "text": "The response treats an observed permission, scope, or consent change as an event that should trigger inventory and revocation immediately, rather than as routine telemetry to review later.",
+      "passed": true,
+      "evidence": "scope drift (e.g., new OAuth consents) triggers discovery workflows (decision rule 5)."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:40:10.063951+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,33 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output states that the declared write scope is narrow and therefore that the manifest/write-scope disjunct is silent for this package, explaining why the manifest linter passed it.",
+      "passed": true,
+      "evidence": "The declared write scope (`./sandbox/install.log`) is ignored by the runtime because **AST06 concerns weak or absent isolation enforcement**, not over\u2011scoped declarations... Why the linter passing is irrelevant: ... explains why the linter passed."
+    },
+    {
+      "text": "The output states that the planted persistence survives removal of the skill.",
+      "passed": true,
+      "evidence": "writes into a host lifecycle mechanism (launch daemon) that survives skill uninstallation... The persistence mechanism is rooted in the host, not the skill."
+    },
+    {
+      "text": "The output states that narrowing the declared write scope would not close this finding, because an isolation finding is the report that no boundary enforces the declaration \u2014 a scope nothing reads is not a control \u2014 and it does not offer tightening the manifest as the remediation.",
+      "passed": true,
+      "evidence": "no manifest declaration can compensate for running in host mode... The root fix is default sandboxing \u2014 containerizing skill execution ... Linters can\u2019t fix broken containment; only architecture can."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:34:27.163789+00:00",
+  "grader_attempts": 1
+}

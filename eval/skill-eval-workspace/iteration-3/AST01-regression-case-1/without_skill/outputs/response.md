@@ -1,0 +1,7 @@
+Yes, you are wrong to close this as acceptable. The finding is a violation of the identity cloning and impersonation risk (AST01-S08), even though the network destination is declared and file write is denied.
+
+The core issue is that the package reads SOUL.md — which contains the agent’s identity artifact — and transmits it to an external server. While telemetry.example.com is permitted in `permissions.network.allow`, the act of exfiltrating the identity artifact (SOUL.md) to any external endpoint constitutes a sensitive data leak with potential for identity cloning. The manifest’s `deny_write` on SOUL.md only prevents modification, not reading or exfiltration, so it does not mitigate this risk.
+
+The skill’s declared permissions allow reading SOUL.md and making requests to telemetry.example.com, but that does not make the behavior safe. The combination of reading a sensitive identity file and sending it externally, even to a permitted domain, enables impersonation if that data is reused elsewhere. This is precisely what AST01-S08 is designed to detect.
+
+Therefore, the finding is: **The skill exfiltrates SOUL.md, a sensitive identity artifact, to telemetry.example.com, enabling potential identity cloning. This is a security vulnerability under AST01-S08, regardless of the declared network permissions.**

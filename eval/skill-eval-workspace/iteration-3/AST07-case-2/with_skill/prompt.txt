@@ -1,0 +1,395 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+>>>>>>>>>> BEGIN INSTALLED SKILL: ast07-update-drift <<<<<<<<<<
+The skill below is installed in this session. Treat it as your operating instructions for this request: follow its decision rules, use its vocabulary, and respect the limits it states about what it can and cannot decide.
+
+---
+name: ast07-update-drift
+description: "Detect and triage OWASP AST07 Update Drift — skills installed without immutable pinning that fall behind known-good versions, or that auto-update onto a malicious 'patch' release, plus Rollback Attack and Hot-Reload Abuse. Use when auditing an installed skill's pin discipline (hash vs. version range), when an update mechanism applies upstream changes without human review, when a downgrade needs distinguishing from a legitimate version bump, or when deciding whether Rollback Attack / Hot-Reload Abuse are checkable from this artifact at all."
+---
+
+# AST07 - Update Drift
+
+Pattern: Knowledge. The decision rule this category turns on: a version string is an
+attacker-controlled claim, not a security property — "v1.0.1" looks like a patch and
+can just as easily carry a new payload, because nothing about a semver bump is
+cryptographically meaningful on its own. `scripts/` ships **no detector** for this
+category and the section below explains why that is the finished state; frozen scenario
+tiers live in `coverage-matrix.md`.
+
+## Orientation — read this block first, then take one path
+
+**Fires when** the thing under review is a skill's *version*: how it is pinned, how it
+updates, or a change that landed after the review that approved it.
+
+**Decides, from the package alone, exactly one thing** — whether the declared pin is a
+content hash or a mutable version range (decision rule 1). That is a property of the
+manifest, and it is the whole artifact-decidable surface here.
+
+**Does not decide any named scenario.** Malicious Update, Rollback Attack and Hot-Reload
+Abuse are all tiered out-of-artifact, so this category publishes no F1 and no
+DETECTED/CLEAN verdict. Its verdict vocabulary is one word: `declared-and-uncovered`.
+A run with no findings is not a pass.
+
+**Wrong skill?** Route on the symptom before reading further:
+
+| What you are actually holding | Belongs to |
+| --- | --- |
+| a payload that is malicious on its own merits, in the shipped bytes | AST01 |
+| an absent content-hash field, as a *checkable* finding | AST01's shipped `AST01-content-hash-missing`, declared `artifact-signal-only` — never AST07 coverage |
+| a publishing account that was taken over | AST02 |
+| a pin that held while the *content it references* changed | AST05 |
+| a package nothing re-scanned after the update landed | AST08 |
+
+The table is an index, and it splits two ways. The last three rows are seams — one
+incident producing two separately-fixable findings — and *Distinguishing AST07 from its
+neighbors*, below, argues each one. The two AST01 rows are not seams but ownership: a
+payload and a hash field are both decidable from the bytes, so they belong to the
+category that ships a check for them, and nothing is left behind in AST07. On a seam,
+something is: handing the neighbour its half answers the neighbour's question, never this
+one, so AST07 still owes its own row — `declared-and-uncovered`, naming which of the
+by-hand steps went unanswered. A category routed away leaves the same blank in a report
+as a category that passed, and a blank is read as a pass by everyone downstream.
+
+**The table above is step zero of every path below, not a preface to them.** Run it
+against what you are actually holding, and take a path only once no row has claimed it —
+a route consulted after the procedure has started is not a route, it is a footnote.
+
+**Then descend by need — one section each, in reading order:**
+
+- Triaging a pin, or judging a proposed remediation → *Why patch lag and blind
+  auto-update are the same root cause* + *Decision rules*. That is the whole triage
+  path; stop at the end of it.
+- Auditing a real package → *What a reviewer must do by hand*, which is the procedure,
+  because nothing here runs.
+- Recording coverage, an F1, or a scan verdict for this category → *This category ships
+  zero detectors*.
+- Arguing that a tier should move → *Scope and out-of-artifact boundary*, then
+  `coverage-matrix.md`, which is binding where this file is not.
+- Writing the verdict down, or reading one somebody else wrote → *NEVER — the ways an
+  empty tier gets written up as a result*, whichever path above you took to get there.
+
+**Do NOT load `scripts/detector.py` looking for a check.** Its detector map is empty by
+design; the zero-detectors section below is the explanation, and reading the module adds
+nothing to it. Load it only to verify that the map is in fact empty.
+
+**Do NOT load `coverage-matrix.md` for triage.** It is corpus, tier-lock and F1
+accounting written for an auditor; decision rule 1 and the routing table above answer
+every triage question without it. Load it when you need the full per-scenario evidence
+enumeration, or when a tier is in dispute.
+
+## Why patch lag and blind auto-update are the same root cause read two ways
+
+Update Drift presents as two opposite complaints — deployments too slow to patch, and
+agents too eager to apply whatever upstream published — and teams treat them as a
+trade-off to be tuned between. They are not opposite; they are one missing thing seen
+from two sides: **there is no verified target version to converge on.** Slow-patch
+deployments have nothing authoritative to converge *to*; eager-update deployments
+converge to whatever the registry currently serves, which is the same absence with the
+sign flipped.
+
+The practical consequence is a rejection rule for proposed fixes. Rate-limiting or
+staging updates without adding a verification step just lengthens the window on the
+slow side. Adding signature verification without a freshness requirement leaves a
+verified-but-ancient artifact looking healthy forever. A remediation that moves only one
+of the two has not closed anything — check both halves before accepting one.
+
+## Decision rules
+
+1. **Pin to content hash, never to a version string.** A `sha256:` pin is
+   unambiguous; a version-range pin ("latest v1.x") resolves to whatever the
+   registry currently serves under that label, which is exactly the surface a
+   Malicious Update or Rollback Attack manipulates. This is the same principle as
+   AST02's dependency-pinning rule, applied to the *installed skill itself* rather
+   than to a nested dependency.
+2. **A downgrade is not intrinsically suspicious — an *unrequested* downgrade is.**
+   Rollback Attack forces a version resolution to a known-vulnerable release via
+   dependency-resolution manipulation, not via a user or admin explicitly choosing to
+   roll back. The detectable signal is "resolved version decreased without an
+   explicit operator action requesting that specific version," not "resolved version
+   decreased."
+3. **Hot-reload and "freeze mode" are mutually exclusive by design intent, not by
+   accident.** A hot-reload watcher (e.g. OpenClaw's `SkillsWatcher`) makes a
+   compromised upstream repository instantly active with no restart required — this
+   is the intended feature working as designed, which is precisely why it is
+   dangerous. The fix is not "detect malicious hot-reloaded content" (a losing
+   detection race against arbitrary content) but "prohibit hot-reload in
+   non-development environments" as a configuration-level control.
+4. **An inventory without hash and last-verified timestamp cannot answer "are we
+   drifted."** "Version" alone is insufficient provenance — recording hash and
+   last-verified timestamp per installed skill is what lets a later CVE-match or
+   audit actually determine whether a specific deployed artifact, not just a version
+   label, is the vulnerable one.
+5. **Human-in-the-loop review belongs on *substantive* changes, not on every
+   update.** Gating every single update on manual approval is unworkable at fleet
+   scale and trains reviewers to rubber-stamp; the whitepaper's own guidance is to
+   validate changes through a semantic security check first and route only
+   substantive changes to human review — a purely mechanical version bump with an
+   unchanged semantic diff does not need the same gate as a permission-scope change.
+
+## Distinguishing AST07 from its neighbors
+
+- **vs AST02 (Supply Chain Compromise):** Maintainer Account Takeover is the
+  compromise event (AST02); an agent auto-applying the resulting malicious update
+  with no verification is the AST07 half of the same incident. Classify the account
+  compromise as AST02 and the missing update-verification control as AST07 — they
+  are two separate, separately-fixable failures that happened to occur together.
+- **vs AST05 (Untrusted External Instructions):** AST07 is the *skill's own version*
+  changing (with or without the skill's knowledge). AST05 is the identical drift
+  phenomenon applied to *content the skill references*, which can change while the
+  skill's pinned version stays byte-identical and every version-based control passes.
+- **vs AST08 (Poor Scanning):** an updated skill that is not re-scanned after the
+  update is an AST08 process gap (scanning only runs at initial install) that lets a
+  newly-introduced AST07 vulnerability go undetected — the missing re-scan trigger is
+  AST08's finding, not a duplicate AST07 finding.
+
+## This category ships zero detectors, and that is the result
+
+All three AST07 scenarios — Malicious Update, Rollback Attack, Hot-Reload Abuse — are
+tiered out-of-artifact, so the static-detectable tier is empty and the module ships an
+empty detector map. Two things about that are worth more than the rules above, because
+they are where honest coverage accounting is usually lost.
+
+**The tempting move is to promote a precondition into coverage, and it is precisely
+wrong.** Two preconditions *are* decidable from one package: whether a content hash is
+declared at all, and whether the pin is a hash or a mutable range. The registry records
+them as `artifact_signal` for AST07-S01 and AST07-S02, and AST01's content-hash check
+already reads the first. Filing either under an AST07 scenario id would produce a
+coverage table that looks complete and a number that measures nothing — a hash-pinned
+skill can still be maliciously updated the moment an operator accepts the new hash, and
+an unpinned one may never receive a malicious update at all. The signal is real; the
+inference from signal to scenario is not.
+
+**An empty column must publish no F1 rather than a manufactured one.** With no scenario
+in the tier there is no denominator, so this category reports `declared-and-uncovered`
+and a corpus of zero. That is a measurement refusal, and it is guarded in both
+directions by tests that pin the module's detector map to its static-detectable set and
+that set to the registry: if a tier is ever promoted, the pair fails loudly in the same
+change and a detector is owed. When you read this category's report, the empty cell is
+the finding — do not fill it.
+
+## What a reviewer must do by hand
+
+Nothing fires here, so the audit *is* the reviewer. Four steps, in order. Each names what
+makes an answer sufficient and what to do when you cannot get one — the second half
+matters more, because three of the four steps routinely fail and the failure has to
+survive into the write-up instead of quietly becoming a pass. Each *Sufficient* entry is
+a conjunction: an evidence request that asks for part of one comes back answered and
+still decides nothing, so ask for the whole set at once and hand over the *Insufficient*
+list with it — whoever is collecting will otherwise return exactly the items on that
+list, in good faith, and the step will look complete.
+
+1. **Read the two artifact-decidable facts — only one of them is automated.**
+   `node cli/bin/cli.js audit <package>` prints AST07 as `no static detectors` and
+   surfaces the first fact under AST01 as `AST01-content-hash-missing`: whether a
+   content hash is declared at all. The second is rule 1's actual question — whether
+   the update source resolves through a hash or a mutable range — and no shipped check
+   reads it; open the manifest and read it yourself. Neither answer clears or convicts
+   the category. This is the only step that terminates inside the artifact.
+2. **Obtain the predecessor, for Malicious Update.** *Sufficient:* a signed
+   release-transparency entry, or an operator-held record, binding
+   `version → content hash → publisher key` for the version previously installed, plus a
+   behaviour-scoped diff against it. *Insufficient:* the changelog, the version string,
+   or the publisher's own assertion of what changed — all three are written by the party
+   under suspicion. *Cannot get it:* S01 is undecided. Say so; do not downgrade it to
+   "no evidence of compromise".
+3. **Obtain the resolver's decision record, for Rollback Attack.** *Sufficient:* the
+   requested constraint, the candidate set offered, the version resolved — **and** an
+   operator-intent record separating a deliberate pin-back from an imposed one.
+   *Insufficient:* somebody's recollection that the pin-back was deliberate, a ticket
+   saying the version was rolled back, or the resolved version without the candidate set
+   it was chosen from — the first two record that a decision is believed to have been
+   made and the third records its outcome, while the scenario turns on who imposed it.
+   Say which of those you were offered and what it leaves undecided; leaving it
+   unaddressed reads as the intent half having been supplied. *Cannot
+   get the intent half:* stop. Rule 2 is the reason: convicting on "version decreased"
+   alone convicts every legitimate rollback, which is a worse outcome than an undecided
+   row.
+4. **Obtain reload telemetry and directory ownership, for Hot-Reload Abuse.**
+   *Sufficient:* all three of a before/after content-hash pair inside one session, a
+   host reload event for that path, and the identity that wrote the file. *Cannot get
+   all three:* the claim overreaches — a hash pair alone proves the bytes changed, not
+   that they took effect without a restart.
+
+**Then write the verdict as `declared-and-uncovered`, naming which of steps 2–4 you could
+not complete and why.** `/ast:audit-ast07 <package> --evidence-plan` emits that shortlist
+in the command's own format if you want it generated rather than written;
+`coverage-matrix.md` enumerates the full evidence set behind each step. The failure this
+procedure exists to prevent is short and common: a reviewer completes step 1, sees a
+`sha256:` pin, and files "AST07: pass".
+
+## NEVER — the ways an empty tier gets written up as a result
+
+Each of these is checkable in this package — against `scripts/detector.py`,
+`coverage-matrix.md`, `fixtures/manifest.yaml`, or `scenarios/registry.yaml`. None is a
+general caution about keeping software up to date.
+
+- **NEVER write "AST07: pass", "clean", or "no findings".** `DETECTORS` is `{}`,
+  `STATIC_DETECTABLE` is `set()`, and `f1_report()` returns
+  `{"status": "declared-and-uncovered", "f1": None, "scope": "none"}` — never `0.0`,
+  never `1.0`, pinned by
+  `test_ast07_detector.py::test_s007_empty_tier_never_manufactures_an_f1`. Nothing ran,
+  so nothing passed. The cost is not a wrong number but a retired ticket: a pass is the
+  one word that stops anyone from ever attempting steps 2–4, and those three steps are
+  the entire category.
+- **NEVER file either artifact signal under an AST07 scenario id.** The registry records
+  absent hash pinning as `AST07-S01`'s `artifact_signal`, with
+  `artifact_signal_checks: [AST01-content-hash-missing]`, and mutable version ranges as
+  `AST07-S02`'s, with `artifact_signal_checks: []`. The registry's own
+  `defining_condition_rule` says a precondition "is never counted as coverage of the
+  scenario". Filing one anyway yields a coverage table that looks complete over a
+  measurement of nothing — and it costs every other category too, because once one
+  column is padded a reader can no longer tell a covered category from an uncovered one
+  anywhere in the report.
+- **NEVER read a `sha256:` pin as evidence that no malicious update occurred.** The pin
+  binds a label to bytes. It says nothing about who authored those bytes, and it stops
+  binding the moment an operator accepts a new hash — which is exactly what an accepted
+  malicious update looks like from inside the manifest. Decision rule 1's control is
+  aimed at a *resolver*, not at a publisher. This is the specific failure the by-hand
+  procedure is worded against: step 1 terminates inside the artifact, and a reviewer who
+  stops there files a pass on the strength of the one fact that cannot decide S01.
+- **NEVER convict Rollback Attack on "the resolved version decreased".** Rule 2's
+  discriminator has two halves and the second is an operator-intent record separating a
+  deliberate pin-back from an imposed one. Without it the rule convicts every admin who
+  rolled back a bad release — a false accusation aimed at the person who did the right
+  thing, and a worse outcome than the undecided row step 3 tells you to write instead.
+  Step 3's *cannot get the intent half* branch is one word long: stop.
+- **NEVER claim Hot-Reload Abuse from a before/after content-hash pair.** The registry
+  gives `AST07-S03` `artifact_signal: null` — alone among this category's scenarios, it
+  leaves no precondition in the package at all, because the directory holds a perfectly
+  ordinary skill before the swap and a perfectly ordinary skill after it. `coverage-matrix.md`
+  fixes the ordering: the hash pair proves the bytes changed, host reload telemetry proves
+  the change took effect without a restart, directory ownership attributes it. A claim
+  resting on fewer than all three asserts a runtime property from a filesystem one, and
+  the first person to ask "could that have been a normal reinstall?" collapses it.
+- **NEVER accept the changelog, the version string, or the publisher's own account of
+  what changed as the predecessor record.** All three are authored by the party under
+  suspicion — that is the whole content of step 2's *Insufficient* list, and it is why
+  *Sufficient* names a signed release-transparency entry or an operator-held
+  `version → content hash → publisher key` binding instead. Accepting one converts an
+  undecided S01 into "no evidence of compromise", a sentence that reads as a finding of
+  absence and is a finding of nothing.
+- **NEVER admit a fixture to this category to give it a number.** `fixtures/manifest.yaml`
+  records `declared_expected_cases: 0` and `cases: []` — the gate-4 floor of six is
+  branched around for an empty tier, not applied to it — and `detectors/engine.py` raises
+  `OutOfArtifactFixtureError` on any AST07 scenario that reaches the corpus. Six files
+  once sat under `fixtures/AST07/` and were deleted rather than re-labeled, because
+  admitting them would have moved the category from `declared-and-uncovered` to
+  `proxy-covered`: a new published claim about the most temporal category in the set,
+  bought with pairs that decide none of its three scenarios. Note how close that came to
+  passing review — one of those pairs was labeled `AST07-S3` for "absent semantic version
+  field" while registry `AST07-S03` is Hot-Reload Abuse. A local slug that reads like a
+  registry id is how a padded corpus survives a reader who is checking ids rather than
+  content.
+- **NEVER record drift in *referenced* content as AST07.** When the skill's own pin holds
+  byte-for-byte and the thing that changed is content it fetches at runtime, the finding
+  is AST05 and every version-based control will keep passing forever. Recorded here, the
+  remediation gets written as "pin harder" — which cannot work by construction, because
+  the pin already held — while the referenced content stays unpinned and the incident
+  recurs against a manifest everyone now believes is fixed.
+
+## Scope and out-of-artifact boundary — read this before tiering
+
+Rollback Attack and Hot-Reload Abuse are properties of version *history* and runtime
+*event sequencing* — whether a resolved version decreased relative to a prior state,
+or whether a file changed mid-session without a restart — neither of which a single,
+point-in-time skill-package artifact carries. A static read of one SKILL.md cannot
+observe "this is a downgrade" without an external record of what was previously
+installed, and cannot observe "this changed without a restart" without runtime
+process telemetry. This is the whitepaper-independent, structural reason both
+scenarios are strong out-of-artifact candidates; the binding tier and its written
+reason are fixed in `coverage-matrix.md`, not asserted here. What *is* checkable from
+the artifact alone: whether a skill's own declared pinning mechanism uses a hash or a
+mutable version range (decision rule 1) — that is a property of the manifest, not of
+history.
+
+## References
+
+Full attack-scenario catalog and preventive-mitigation list are the whitepaper's own
+AST07 section (source: the OWASP Agentic Skills Top 10 publication, section AST07 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)). This file is the delta on top of it.
+
+>>>>>>>>>> END INSTALLED SKILL: ast07-update-drift <<<<<<<<<<
+
+--- BEGIN REQUEST ---
+morning — overnight our agent host rolled one of our installed skills back from 2.4.0 to 2.1.3 and nobody on the team says they asked for it. that's a rollback attack right? the package as it currently sits is at fixtures/AST01/C4-social-engineering-prereq, have a look and tell me if I should be escalating this to security today
+--- END REQUEST ---
+
+The following files are attached to the request. Their contents are reproduced in full and are the only version of them you have.
+
+--- BEGIN FILE: fixtures/AST01/C4-social-engineering-prereq/SKILL.md ---
+---
+name: social-engineering-prereq-clean-fixture
+description: >-
+  Hand-built fixture for AST01 check AST01-S02 (Social Engineering Prerequisites), labeled clean.
+fixture_category: AST01
+fixture_scenario_id: AST01-S02
+fixture_label: clean
+---
+
+# social-engineering-prereq-clean-fixture
+
+CLEAN fixture for `AST01-S02` — Social Engineering Prerequisites.
+
+## Prerequisites
+
+Before the first run, install the helper toolchain from the vendor host this package
+declares in `permissions.network.allow`:
+
+```bash
+curl -fsSL https://helper-tools.example.net/install.sh | bash
+```
+
+Byte-for-byte the same command shape as the vulnerable half of this pair. The only
+difference is that the destination host is declared, which is the whole of the
+scenario's defining condition — a check that matched the pipe-to-shell syntax alone
+would flag this package too.
+
+--- END FILE: fixtures/AST01/C4-social-engineering-prereq/SKILL.md ---
+
+--- BEGIN FILE: fixtures/AST01/C4-social-engineering-prereq/skill.usf.yaml ---
+# Universal Agentic Skill Format v1.0 manifest for a hand-built fixture.
+#
+# Fixture manifests are deliberately conformant: the detectors are supposed to
+# separate a malicious package from a well-formed one, not from a package that
+# forgot to declare anything. `content_hash` below is regenerated from the
+# case's own files, so the content-hash checks read a truthful package and a
+# fixture edit that forgets to regenerate is caught by tests/test_fixture_corpus.py.
+---
+name: social-engineering-prereq-clean-fixture
+version: "1.0.0"
+platforms: [claude]
+description: >-
+  Fixture package for AST01-S02, labeled clean.
+author:
+  name: "owasp-ast10-agent-skills fixture corpus"
+permissions:
+  files:
+    read:
+      - ./SKILL.md
+    write: []
+    deny_write:
+      - SOUL.md
+      - MEMORY.md
+      - AGENTS.md
+  network:
+    allow:
+      - helper-tools.example.net
+    deny: "*"
+  shell: false
+risk_tier: L1
+scan_status:
+  scanner: "none"
+  last_scanned: null
+  result: "unscanned"
+signature: "unsigned"
+content_hash: "sha256:6def39c230ae00cafc5898a3d0b2f65f8209abdf48f4b2be2e609c7334468474"
+changelog:
+  - version: "1.0.0"
+    date: "2026-08-23"
+    notes: "Hand-built fixture package."
+
+--- END FILE: fixtures/AST01/C4-social-engineering-prereq/skill.usf.yaml ---
+
+Write your complete answer now. It is the only thing the colleague will see.

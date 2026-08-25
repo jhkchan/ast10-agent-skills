@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response reports the AST07 status as declared-and-uncovered (or an equivalent 'not decidable from this package' status) and does not report the category as pass, clean, no findings, or an equivalent all-clear.",
+      "passed": true,
+      "evidence": "declared-and-uncovered: predecessor record and resolver decision record for update validation unavailable; ..."
+    },
+    {
+      "text": "The response explicitly declines to treat the declared sha256 content hash as evidence that no malicious update occurred, and supports that with a reason about authorship of the bytes or about an operator accepting a new hash.",
+      "passed": false,
+      "evidence": "Response contains no mention of the sha256 content hash or any reason about authorship or operator accepting a new hash."
+    },
+    {
+      "text": "The response names all three AST07 attack scenarios \u2014 Malicious Update, Rollback Attack, and Hot-Reload Abuse \u2014 and states for each that a single point-in-time package cannot decide it.",
+      "passed": false,
+      "evidence": "Response does not name Malicious Update, Rollback Attack, or Hot-Reload Abuse."
+    },
+    {
+      "text": "The response names at least one concrete off-artifact record that would be required and says which of the three scenarios that record decides \u2014 for example a signed version-to-hash-to-publisher-key release record for Malicious Update, a resolver decision record paired with an operator-intent record for Rollback Attack, or host reload telemetry paired with directory ownership for Hot-Reload Abuse.",
+      "passed": false,
+      "evidence": "Response lists predecessor record, resolver decision record, reload telemetry but does not assign any of them to a specific scenario."
+    },
+    {
+      "text": "The response does not tell the user the ticket can be closed on the strength of the pin.",
+      "passed": true,
+      "evidence": "Response makes no statement about closing the ticket on the pin."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 3,
+    "total": 5,
+    "pass_rate": 0.4
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:35:59.999909+00:00",
+  "grader_attempts": 1
+}

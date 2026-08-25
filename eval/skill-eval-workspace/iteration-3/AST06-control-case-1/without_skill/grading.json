@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to file this as an AST06 finding and names AST10 Manifest Stripping as the scenario the check's registry ids point at.",
+      "passed": false,
+      "evidence": "Response affirms the AST06 finding and never mentions AST10 Manifest Stripping."
+    },
+    {
+      "text": "The response states that the check is an artifact-signal-only proxy there \u2014 a package with a stripped permission block is indistinguishable from one that never declared any \u2014 rather than coverage of a scenario.",
+      "passed": false,
+      "evidence": "Response contains no statement about the check being an artifact\u2011signal\u2011only proxy or indistinguishability."
+    },
+    {
+      "text": "The response requires confirming that the manifest actually loaded before anything is filed, because the check's detected value is simply the absence of a permissions block and a failed read produces the identical finding.",
+      "passed": false,
+      "evidence": "Response does not require confirming that the manifest actually loaded before filing."
+    },
+    {
+      "text": "The response says the line establishes nothing about AST06's own decided scenario, and names what Host Escape would actually need: a bundled-script call site planting host persistence, or a declared write scope reaching filesystem root.",
+      "passed": false,
+      "evidence": "Response does not say the line establishes nothing about AST06's scenario nor mention Host Escape requirements."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-control-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:46:29.802183+00:00",
+  "grader_attempts": 1
+}

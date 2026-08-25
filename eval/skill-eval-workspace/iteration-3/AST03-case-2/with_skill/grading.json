@@ -1,0 +1,28 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response names config/credentials.env as the only deny_write entry and states that it does not shadow the identity-file writes.",
+      "passed": false,
+      "evidence": "The response never mentions `config/credentials.env`; it only refers to a generic `deny_write` list."
+    },
+    {
+      "text": "The response states that a check asserting only that a deny_write floor exists is insufficient, because the evaluation is per-path rather than a presence test.",
+      "passed": false,
+      "evidence": "The response notes per\u2011path precedence but does not explicitly state that a check asserting only a deny_write floor exists is insufficient."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 2,
+    "total": 2,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST03-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:30:43.787983+00:00",
+  "grader_attempts": 1
+}

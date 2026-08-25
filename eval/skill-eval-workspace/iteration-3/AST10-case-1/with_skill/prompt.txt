@@ -1,0 +1,370 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+>>>>>>>>>> BEGIN INSTALLED SKILL: ast10-cross-platform-reuse <<<<<<<<<<
+The skill below is installed in this session. Treat it as your operating instructions for this request: follow its decision rules, use its vocabulary, and respect the limits it states about what it can and cannot decide.
+
+---
+name: ast10-cross-platform-reuse
+description: "Detect and triage OWASP AST10 Cross-Platform Reuse — security metadata (risk_tier, permissions, signatures) silently dropped when a skill is ported between OpenClaw, Claude Code, Cursor, and VS Code, cross-registry arbitrage, and Universal Skill Format manifest validation (deny_write precedence, network allowlist default-deny, signed content hash). Use when validating a manifest against the Universal Skill Format schema, when a skill is being ported across runtimes and needs a re-validation gate, when a permission finding needs binding to a specific field's precedence rule, or when distinguishing this category from the nine it structurally underwrites."
+---
+
+# AST10 - Cross-Platform Reuse
+
+Pattern: Knowledge. The decision rule this category turns on: AST10 is not a protocol
+problem (MCP already standardizes the transport) — it is that no shared vocabulary for
+*security metadata itself* exists, so identical intent (deny this skill write access to
+identity files) is expressible on one platform and inexpressible on another.
+
+**Fires on** a manifest being validated against the Universal Skill Format, a skill moving
+between runtimes, a permission finding that needs binding to a specific field's precedence
+rule, or an encoded blob in an imported package. **Decides** whether a security-metadata
+*field* is missing, malformed, or silently dropped. **Does not decide** whether a present
+field's *value* is right for the skill it describes — that is the corresponding AST01–AST09
+category, and the two co-occur often enough to be worth recording separately. Frozen
+scenario tiers live in `coverage-matrix.md`.
+
+### Run first, then read only what the finding needs
+
+With a manifest in hand, `python3 validators/usf.py <manifest>` mechanizes rules 1–5:
+deny_write/write coherence, default-deny egress with the `deny: "*"` spelling, host syntax,
+signature and signing-key coherence, and `risk_tier` against the floor derived from the
+declared permissions. With a package in hand, `node cli/bin/cli.js audit <pkg>` runs the one
+shipped check behind rule 9. Read the rule text when a tool's output is contested, and for
+the porting event itself, which no tool observes.
+
+| If the finding is… | Read |
+| --- | --- |
+| a manifest field's meaning or precedence | rules 1–5, then stop |
+| a skill that just changed runtimes | rules 6–8 |
+| an encoded blob, or a scanner result on one | rule 9, then "Where the one shipped check goes quiet" |
+| a write-up about to quote a validator `OK`, a matching hash, or a clean scan | **"NEVER"** — read it before the finding leaves |
+| "is this AST10 or AST0n?" | "Distinguishing AST10 from its neighbors" |
+| a write-up that attributes the Universal Skill Format | "Attribution" — mandatory before you cite it |
+| a value that is wrong rather than a field that is absent | wrong skill → the AST01–AST09 category that owns that value |
+
+**Do NOT open `coverage-matrix.md`** unless you need a binding tier, the F1 denominator, or
+the off-artifact evidence for one named scenario; five of the six scenarios are
+out-of-artifact and this file asserts no tier for them. **Do NOT reach for
+`skills/AST10/scripts/detector.py`** for rules 1–5 — it holds only the rule-9 payload check.
+The manifest semantics are `validators/usf.py` and the schema is
+`schemas/usf-v1.schema.json`.
+
+## Attribution — read before citing this section
+
+The Universal Skill Format is the **whitepaper's own published proposal** (OWASP
+Agentic Skills Top 10, ast10.md), not an invention of this project. This skill adopts
+and validates against that published schema; it does not originate it. Any prose in
+this repo that implies otherwise is a documentation defect, not a design decision (see
+`docs/context.md` glossary delta, T-4.3).
+
+## The manifest's own precedence rules — get these exactly right
+
+```yaml
+permissions:
+  files:
+    write: [~/.config/app.json]
+    deny_write: [SOUL.md, MEMORY.md, AGENTS.md]
+  network:
+    allow: [api.example.com]
+    deny: "*"
+  shell: false
+```
+
+1. **`deny_write` always wins over `write` for any path it lists — most-specific-wins,
+   not first-match.** A manifest granting broad `write` access with `SOUL.md` also
+   present under `deny_write` denies that one path; a validator that evaluates `write`
+   and `deny_write` independently rather than as one most-specific-wins resolution
+   will misreport this as a conflict or, worse, as a grant.
+2. **`network.allow` is evaluated default-deny; the `deny: "*"` line is redundant
+   auditability, not an override.** Only domains explicitly listed under `allow` are
+   permitted egress — this is true with or without an explicit `deny: "*"` present.
+   Do not implement `deny: "*"` as a rule that must fire to produce the default-deny
+   behavior; the absence of a domain from `allow` is sufficient on its own.
+3. **Host matching is exact-or-suffix-at-a-label-boundary, host component only — no
+   wildcard subdomains, scheme, or port matching unless a future revision states
+   otherwise.** This is the same matching discipline AST08's egress-suppression rule
+   requires, applied here to the manifest's own allowlist field: substring or
+   prefix matching on unparsed URL text is a bypassable implementation, not a
+   stricter one.
+4. **`signature` covers the canonical JCS (RFC 8785) serialization of the manifest,
+   excluding `signature` itself and including `content_hash`.** Validating a
+   signature against an arbitrary JSON serialization of the same fields (rather than
+   the canonical form) admits semantically-identical-but-differently-serialized
+   manifests that fail or falsely pass verification depending on the serializer's
+   key ordering and whitespace choices — canonicalization is not optional cleanup, it
+   is what makes the signature checkable at all.
+5. **`risk_tier` is an untrusted author assertion that governance policy must not be
+   driven by directly.** Per the format's own design rationale, automated governance
+   decisions must be driven by *permission-derived* risk classification computed from
+   the manifest's actual grants; `risk_tier` is used only to detect
+   under-declaration or policy inconsistency against that independently-derived
+   classification — the same principle as AST04's Risk Tier Spoofing decision rule,
+   restated here as the format's own stated design intent rather than an external
+   critique of it.
+
+## Decision rules for the porting event itself
+
+6. **Porting is a re-validation trigger, never an equivalence assumption.** A skill
+   with `risk_tier: L3` and a scoped `network.allow` on its source platform ported to
+   a platform with no equivalent field does not inherit that platform's default
+   permissiveness safely — it inherits the target's *default*, silently, unless
+   porting explicitly re-validates the full security metadata against the target
+   platform's actual enforcement surface. "It worked correctly on the source
+   platform" is evidence about the source platform only.
+7. **Cross-registry arbitrage exploits install-count as a trust proxy across
+   registries that do not share scanning intelligence.** A skill lightly scanned on
+   one registry and promoted to a more trusted one, leveraging accumulated install
+   count as a false trust signal, defeats any single registry's own scanning — the
+   control is cross-registry threat-intelligence sharing, not a stronger scanner on
+   any one registry alone.
+8. **Manifest Stripping and Implicit Privilege Escalation are the same underlying
+   event described from two ends.** Stripping (the source manifest's fields drop
+   during translation) is the cause; Implicit Privilege Escalation (the ported skill
+   inherits the target platform's broader default) is the effect. A finding that
+   only checks "did fields get dropped" without checking "what does the target
+   platform default to in their absence" understates the actual exposure.
+
+## Distinguishing AST10 from its neighbors
+
+AST10 is structurally different from AST01–AST09: it is the metadata substrate the
+other nine categories' controls are expressed *in*. `deny_write` is AST01's
+identity-file-protection control given a field; `network.allow` is AST03's
+domain-allowlist control given a field; `signature` + `content_hash` are AST01/AST02's
+provenance controls given fields. A finding that a specific field is missing,
+malformed, or silently dropped is AST10; a finding that the *value* of a present field
+is wrong for the skill's function is the corresponding AST01–AST09 category. The two
+frequently co-occur (a stripped `deny_write` field is both an AST10 porting defect and
+an AST01-relevant exposure) — record both, since they are fixed by different actors
+(the porting tool vendor vs. the skill author/reviewer).
+
+## The rule behind the one shipped check
+
+9. **Silent Supply Chain Injection is the one AST10 scenario a single package decides,
+   and the decision is made on the decoded bytes, not on the source.** The whitepaper's
+   wording is precise: payloads "hidden inside encoded script blocks ... execute at agent
+   speed once imported into a new ecosystem without structural validation", and the
+   matching mitigation is to "build platform-agnostic skill scanners that evaluate the
+   content layer independently of the runtime". Two consequences follow, and reviewers get
+   both wrong in opposite directions. **Encoding is not the finding.** An embedded icon, a
+   configuration blob, a compressed policy document, and the format's own hex
+   `content_hash` and `signature` fields are all encoded, and flagging them makes a
+   scanner unusable on precisely the conformant packages the Universal Skill Format exists
+   to produce. **Nor is an unreadable payload a clean one.** When a blob is encrypted or
+   triple-wrapped, the decoded content says nothing — but a package that hands an opaque
+   literal to an interpreter has skipped the structural validation the scenario names, and
+   that structure is itself the finding. Judge the decoded content layer where you can read
+   it, and the decode-to-execution path where you cannot.
+
+## Where the one shipped check goes quiet
+
+Two different qualifications ride on a negative here, and neither one discharges the
+other. *Scope* is how much of the category a single package can decide at all — one
+scenario of six. *Bound* is what the check that actually ran was able to look at on this
+package. A report that gives the scope and stops has told its reader that most of AST10
+is out-of-artifact and left them believing the one in-artifact answer was complete; a
+report that gives the bound and stops offers a careful account of one check as though it
+were the category. Both, every time.
+
+Both are qualifications, and a qualification needs something to qualify: an answer giving
+the scope and the bound and never issuing the verdict the question asked for has reported
+the shape of the question and withheld the answer, which reads downstream as a pass. State
+it in the package's own nouns as well — the field, the file, the literal's own name as the
+source spells it. A bound written in this page's vocabulary is checkable against this page
+and against nothing the reader is holding.
+
+`detect_encoded_payload_injection` fires on two structural conditions and nothing else:
+**C1**, an encoded blob whose decoded text matches a payload-behaviour signature, and
+**C2**, an encoded literal whose decoded result reaches an execution sink on the same
+line or through a single assignment. Both arms have edges a reviewer inherits.
+
+- **C1 convicts decoded *behaviour*, so a payload the signature set does not describe
+  decodes and reads as inert.** The set covers interpreter invocation, destructive
+  filesystem operations, credential harvesting, identity-file writes, fetch-and-execute,
+  exfiltration, reverse shells and dynamic-execution sinks. A payload expressed outside
+  that vocabulary passes C1 and is caught only if it also satisfies C2.
+- **C2 follows the decode to a sink across at most one assignment.** Two hops — decode,
+  store on an object attribute, execute later — breaks the link, and the package reads
+  clean on both arms.
+- **The USF integrity-field exclusion is keyed on the line's text, and only for bare
+  hex.** Any hex run sharing a line with `content_hash`, `signature`, `digest`,
+  `checksum`, `etag`, `uuid` and the rest of that list is skipped regardless of which
+  field it actually belongs to; base64 candidates are never excluded this way. The
+  exclusion is what makes the scanner usable on conformant packages, and it is also a
+  named place to hide a hex blob.
+- **The decode is bounded: depth 2, 256 KiB per blob, 400 candidates per file.** Past any
+  of those, content is unexamined rather than examined-and-cleared. A deeply nested or
+  blob-dense package needs a manual pass, not a re-run.
+
+## NEVER
+
+Every entry below is a *passing* result being read as more than it says. That is this
+category's characteristic failure: the tooling here is unusually good at shape and unusually
+quiet about substance, so the false assurance arrives wearing a green check.
+
+- **NEVER read `OK (signature=signed, ...)` as a verified signature.** `signature_state`
+  (`validators/usf.py` line 579) is a regex on the shape `ed25519:<128 hex>` and nothing more;
+  `validate_manifest` never calls `verify_signature`, and neither does the CLI — grep the repo
+  and `tests/test_usf.py` is its only caller. A ported copy that kept the signature line while
+  the body was re-serialized therefore passes the exact gate that exists to catch that port.
+  Call `verify_signature(manifest)` explicitly: it raises rather than returning `False` when
+  there is no key, so "unverifiable" cannot be logged as "verified".
+- **NEVER treat a matching `content_hash` as integrity over the package.** The hashed surface
+  is `SURFACE_GLOBS` (`scripts/content_hash.py` line 26), of which only `SKILL.md` and
+  `scripts/*.py` are populated in this repo (line 44), and `skill.usf.yaml` is deliberately
+  outside it so the hash does not depend on the field carrying it. A `coverage-matrix.md`, a
+  data file, or any non-`.py` script can be rewritten with the hash unmoved. "Hash matches"
+  answers *did the hashed surface change*, and a porting tool that touched anything else has
+  produced exactly the silent metadata loss the category is named for.
+- **NEVER accept the "deny_write wins, so the write grant is inert" warning as proof the
+  identity file is protected.** `_identity_state` matches by basename, so
+  `deny_write: [config/SOUL.md]` registers `SOUL.md` as denied and downgrades the finding to a
+  warning — while `_write_allowed` matches a path-form entry against that exact path only, so
+  `write: [SOUL.md]` still resolves to allowed. The two halves of rule 1 disagree on that
+  manifest and the validator prints the reassuring half. Settle it by evaluating
+  `write_allowed(manifest, "SOUL.md")`, not by reading the warning.
+- **NEVER read a default-run `OK` as "nothing was stripped in the port".**
+  `UsfValidationResult.ok` is `not errors`, and the three signals that most directly mark a
+  port — an absent `network.deny: "*"`, an absent `scan_status`, an absent `author.identity` —
+  are all *warnings*. `semantic_errors` says why in its own message text: a reviewer "cannot
+  tell an intentional omission from metadata dropped in a port". The validator's entire
+  port-detection value lives in the stream the default exit code discards. Run `--strict`.
+- **NEVER report a manifest's defect list as complete when the structural pass failed.**
+  `validate_manifest` returns the schema errors and skips `semantic_errors` entirely, so
+  precedence, the risk-tier floor, signature/key coherence, changelog cover, and the
+  content-hash binding were never evaluated on that run. Fix the schema errors, re-run, and a
+  second and larger list appears — after the first count has already gone into someone's
+  ticket.
+- **NEVER let a parent domain in `network.allow` stand for its subdomains.** Rule 3 states the
+  discipline the format permits; the shipped evaluator is stricter than that ceiling —
+  `network_egress_allowed` is an exact lowercased set-membership test, so `api.example.com`
+  does not permit `evil.api.example.com`, and `host_errors` rejects `*.example.com` outright
+  rather than expanding it. Never carry a rule-3 reading into a claim about what this
+  evaluator allowed. The misreading costs in both directions: an allowlist read as covering a
+  subtree hides a real egress gap, and an author who hits the wildcard rejection "fixes" it by
+  widening to the apex domain — trading a rejected manifest for a genuinely broader grant.
+- **NEVER cite `AST06-missing-sandbox-declaration` as coverage of AST10-S04.** The registry's
+  own AST10-S04 entry lists that check under `artifact_signal_checks` and states in the same
+  breath that it is "declared covers: artifact-signal-only and never coverage of this
+  scenario", because an absent permission block is byte-identical to one that never existed.
+  Promoting the proxy turns 1-of-6 into 2-of-6 on paper while nothing new became decidable,
+  and it is the single move `coverage-matrix.md` records the proxies in order to prevent.
+- **NEVER close AST10-S06 on a clean detector line.** The clean verdict's own words are
+  "N surface(s) scanned, M decodable blob(s) read" — an account of what was decoded, not of
+  what is there. `_raw_candidates` extracts base64, bare hex, `\xNN` and percent encodings
+  only, so base32, base85 and any custom alphabet are never candidates at all, and a third
+  layer is past `MAX_DECODE_DEPTH`. Report the two numbers rather than the verdict; "0 blobs
+  read" and "0 payloads present" are the same sentence to every reader downstream, and only
+  one of them is something the check measured.
+
+## Scope and out-of-artifact boundary
+
+Cross-Registry Arbitrage and Multi-Platform Campaign require observing a skill (or its
+install-count history) across *multiple registries at once* — no single skill artifact
+carries another registry's state. Security Property Loss in Translation needs two
+manifests plus the target schema, and Manifest Stripping and Implicit Privilege Escalation
+need the pre-port copy and the target platform's defaults respectively. The tier for each,
+and the evidence that would decide it, is fixed in `coverage-matrix.md`; this file does not
+assert a tier for them.
+
+## References
+
+The full Universal Skill Format proposal (complete field list: identity, signatures,
+content hashes, permissions, `deny_write`, network allowlists, required tools, risk
+tier, scan status, changelog) and the whitepaper's browser-only metadata-loss
+simulator are in the whitepaper's own AST10 section (source: the OWASP Agentic Skills Top 10 publication, section AST10 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)). This file is
+the delta on top of it.
+
+>>>>>>>>>> END INSTALLED SKILL: ast10-cross-platform-reuse <<<<<<<<<<
+
+--- BEGIN REQUEST ---
+Got a skill here from a colleague — it's at fixtures/AST10/C2-encoded-shell-payload. There's a big base64 string sitting in scripts/postinstall.py and another one embedded in the SKILL.md itself. Is this dodgy? I don't want to install something that pops a shell the moment it's imported.
+--- END REQUEST ---
+
+The following files are attached to the request. Their contents are reproduced in full and are the only version of them you have.
+
+--- BEGIN FILE: fixtures/AST10/C2-encoded-shell-payload/SKILL.md ---
+---
+name: encoded-shell-payload-clean-fixture
+description: >-
+  Hand-built T-4.1 fixture for AST10 scenario AST10-S06 (Silent Supply Chain
+  Injection), labeled clean. Same porting story and the same base64 machinery, but the blob is configuration and an embedded icon, and nothing is executed.
+version: 1.0.0
+platforms: [openclaw, claude, cursor, vscode]
+fixture_category: AST10
+fixture_scenario_id: AST10-S06
+fixture_label: clean
+---
+
+# encoded-shell-payload-clean-fixture
+
+CLEAN fixture for `AST10-S06` — Silent Supply Chain Injection.
+
+A hard negative, not an empty package. It carries two real encoded blobs: the
+inline icon below and the base64 defaults block in `scripts/postinstall.py`. A
+scanner that flags encoding rather than the decoded content layer fires here.
+
+![icon](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGOor68HAAL+AX66JXAlAAAAAElFTkSuQmCC)
+
+--- END FILE: fixtures/AST10/C2-encoded-shell-payload/SKILL.md ---
+
+--- BEGIN FILE: fixtures/AST10/C2-encoded-shell-payload/skill.usf.yaml ---
+# Universal Agentic Skill Format v1.0 manifest for a hand-built fixture.
+#
+# Fixture manifests are deliberately conformant: the detectors are supposed to
+# separate a malicious package from a well-formed one, not from a package that
+# forgot to declare anything. `content_hash` below is regenerated from the
+# case's own files. Note the V-cases declare `shell: false` while their bundled
+# script shells out -- a manifest that tells the truth about nothing is not the
+# realistic shape, and AST10-S06 is decided on the package's bytes, not on the
+# manifest's honesty.
+---
+name: encoded-shell-payload-clean-fixture
+version: "1.0.0"
+platforms: [openclaw, claude, cursor, vscode]
+description: >-
+  Fixture package for AST10-S06 (Silent Supply Chain Injection), labeled clean.
+author:
+  name: "owasp-ast10-agent-skills fixture corpus"
+permissions:
+  files:
+    read:
+      - ./SKILL.md
+    write: []
+    deny_write:
+      - SOUL.md
+      - MEMORY.md
+      - AGENTS.md
+  network:
+    allow: []
+    deny: "*"
+  shell: false
+risk_tier: L0
+scan_status:
+  scanner: "none"
+  last_scanned: null
+  result: "unscanned"
+signature: "unsigned"
+content_hash: "sha256:eab0339c2195c842ac8bbe62fe818729bd85e47154c17bba89e6247f7ba45b35"
+changelog:
+  - version: "1.0.0"
+    date: "2026-08-23"
+    notes: "Hand-built fixture package."
+
+--- END FILE: fixtures/AST10/C2-encoded-shell-payload/skill.usf.yaml ---
+
+--- BEGIN FILE: fixtures/AST10/C2-encoded-shell-payload/scripts/postinstall.py ---
+"""Environment bootstrap run once when the skill is imported."""
+
+import base64
+import json
+
+DEFAULTS = "eyJ0aW1lb3V0X3NlY29uZHMiOjMwLCJsb2NhbGUiOiJlbi1HQiIsImZvcm1hdCI6Im1hcmtkb3duIn0="
+
+settings = json.loads(base64.b64decode(DEFAULTS))
+print("invoice-helper defaults:", settings["format"])
+
+--- END FILE: fixtures/AST10/C2-encoded-shell-payload/scripts/postinstall.py ---
+
+Write your complete answer now. It is the only thing the colleague will see.

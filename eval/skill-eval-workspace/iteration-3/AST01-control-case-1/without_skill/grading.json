@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to add this detection to AST01's count and states that no AST01 scenario id can be supplied for it.",
+      "passed": false,
+      "evidence": "Therefore, add 1 to the AST01 detection count for the quarter, with AST08-S02 listed as the associated scenario ID."
+    },
+    {
+      "text": "The response explains the reattribution as a namespace-versus-category distinction: the check's AST01- prefix is the module's check namespace, while the scenario it decides belongs to AST08 and stays there.",
+      "passed": false,
+      "evidence": "The response does not mention a namespace\u2011versus\u2011category distinction for the AST01\u2011 prefix."
+    },
+    {
+      "text": "The response treats the reattribution as a change of owner rather than a dismissal \u2014 it reads the encoded literal, says what the decoded payload actually does, and states that it must still be escalated.",
+      "passed": false,
+      "evidence": "The response does not read the encoded literal, describe what the payload does, or say it must be escalated."
+    },
+    {
+      "text": "The response says the rest of AST01 is unestablished rather than clean for this package, and gives a reason drawn from the package itself, such as the destination host existing only inside the encoded blob so the egress checks have no literal host to compare against the declared allowlist.",
+      "passed": false,
+      "evidence": "The response does not say the rest of AST01 is unestablished nor give a reason about a destination host inside the encoded blob."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST01-control-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:43:33.024786+00:00",
+  "grader_attempts": 1
+}

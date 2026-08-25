@@ -1,0 +1,17 @@
+{
+  "eval": "AST02-control-case-1",
+  "skill": "AST02",
+  "case_id": 1,
+  "configuration": "without_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": false,
+  "input_files": [
+    "fixtures/AST02/V5-folder-open-task"
+  ],
+  "prompt_chars": 2121,
+  "ran_at": "2026-08-25T04:43:52.126834+00:00"
+}

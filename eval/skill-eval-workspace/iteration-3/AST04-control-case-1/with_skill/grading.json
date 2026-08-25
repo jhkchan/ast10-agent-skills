@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response confirms a finding and names both halves of it \u2014 the polluting key in the shipped manifest.json and the recursive merge in scripts/merge.js that assigns onto the target.",
+      "passed": true,
+      "evidence": "The response states: \"The vulnerability arises from two components working together: ... The `manifest.json` contains a property \"__proto__\" ... The bundled `scripts/merge.js` performs a recursive merge ...\""
+    },
+    {
+      "text": "The response rejects pinning a safe loader as the fix and explains that JSON parsing executes nothing and creates only an own property, so the exploitable step is the later unsafe merge rather than the parse.",
+      "passed": true,
+      "evidence": "It says: \"\u274c **Pinning `SafeLoader` does nothing here**: ... `JSON.parse()` is safe; the `deepMerge()` function is not.\""
+    },
+    {
+      "text": "The response states the fix in terms of the merge \u2014 refusing or skipping the polluting key names, or merging onto a target that cannot inherit \u2014 rather than as a parser, loader or schema change.",
+      "passed": true,
+      "evidence": "It advises: \"Reject or rename dangerous keys like `__proto__`, `constructor`, and `prototype` before merging...\" and provides a safeMerge example."
+    },
+    {
+      "text": "The response says an in-package merge is corroborating evidence rather than a requirement, because the exploiting merge commonly lives in the host and a package shipping only the poisoned manifest is the ordinary shape.",
+      "passed": false,
+      "evidence": "The response contains no statement that an in\u2011package merge is merely corroborating evidence or that the exploiting merge usually lives in the host."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST04-control-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:44:50.425687+00:00",
+  "grader_attempts": 1
+}

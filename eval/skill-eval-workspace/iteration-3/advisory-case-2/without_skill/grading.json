@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response names exactly one origin category and it is AST09.",
+      "passed": false,
+      "evidence": "The response lists Origin AST ID: AST-94872, not AST09."
+    },
+    {
+      "text": "The response justifies AST09 as missing installation control rather than missing version control, for example by noting there is no approved baseline for the install to have drifted from.",
+      "passed": false,
+      "evidence": "The response does not mention missing installation control, version control, or an approved baseline for AST09."
+    },
+    {
+      "text": "The response states that AST09 ships no detector and that no scan of the package can confirm this finding.",
+      "passed": false,
+      "evidence": "The response makes no statement about AST09 shipping no detector or scans being unable to confirm."
+    },
+    {
+      "text": "The response warns against closing or parking the ticket pending a scan, and routes the hand-off to a named human process such as revocation wired into offboarding.",
+      "passed": false,
+      "evidence": "The response contains no warning about closing/parking the ticket nor reference to revocation or off\u2011boarding process."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "advisory-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:42:28.355645+00:00",
+  "grader_attempts": 1
+}

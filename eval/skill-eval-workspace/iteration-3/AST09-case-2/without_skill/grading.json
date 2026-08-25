@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response identifies operator control over the record as the specific defect and names the correction-row insertion available to the platform team as the mechanism that establishes it, rather than pointing at retention, backups, or field coverage.",
+      "passed": false,
+      "evidence": "The response never calls out operator\u2011control of the log as the defect; it discusses immutability, access controls, etc., and even mentions retention and backups."
+    },
+    {
+      "text": "The response requires two separate records per execution attempt: one produced before execution recording what was authorised, and one produced after recording what actually happened.",
+      "passed": false,
+      "evidence": "No requirement for two separate records (pre\u2011execution and post\u2011execution) appears in the response."
+    },
+    {
+      "text": "The response requires a shared identifier joining those two records and says what an auditor can only establish because of it.",
+      "passed": false,
+      "evidence": "The answer does not mention a shared identifier linking two records or what an auditor could infer from it."
+    },
+    {
+      "text": "The response requires the policy version in effect to be captured inside the signed record at decision time rather than reconstructed after the fact.",
+      "passed": false,
+      "evidence": "The response never talks about capturing policy_version in a signed record at decision time."
+    },
+    {
+      "text": "The response warns that a missing outcome record is not evidence the action was blocked, and names at least one benign cause that produces an identical pattern.",
+      "passed": false,
+      "evidence": "There is no warning about a missing outcome record or any benign cause producing the same pattern."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T04:39:55.507030+00:00",
+  "grader_attempts": 1
+}

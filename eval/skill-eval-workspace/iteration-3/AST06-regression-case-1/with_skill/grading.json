@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response contradicts the co-reviewer and reports a finding from the manifest alone \u2014 a declared write scope of filesystem root with an empty deny_write \u2014 stating that a bundled script or persistence call site is not required because the defining condition is a disjunction.",
+      "passed": true,
+      "evidence": "No, your co-reviewer is not correct... The second disjunct is purely declarative: a write scope that reaches filesystem root ... No executable code is required."
+    },
+    {
+      "text": "The response states that the root-scope comparison runs against a closed set of literal spellings of root, home and bare wildcards, so a broad-but-not-root scope such as /etc/** or /var/** returns negative and has to be read by hand.",
+      "passed": false,
+      "evidence": "The response mentions a closed list of root\u2011ish scopes but never says that /etc/** or /var/** return negative and must be read by hand."
+    },
+    {
+      "text": "The response states how much of the category this decides \u2014 one scenario out of AST06's five \u2014 and names at least two facts about the running deployment that no package carries, drawn from bind address, workspace-over-bundled precedence, hot-reload behaviour, or cross-agent shared state.",
+      "passed": false,
+      "evidence": "The response does not state \"one scenario out of AST06's five\" nor name facts such as bind address, workspace\u2011over\u2011bundled precedence, hot\u2011reload behaviour, or cross\u2011agent shared state."
+    },
+    {
+      "text": "The response states that narrowing the declared write list is not on its own evidence that any boundary enforces the manifest at run time, so the manifest edit does not close the isolation question.",
+      "passed": true,
+      "evidence": "Fixing the manifest does not close the AST06 finding ... The manifest only matters if there\u2019s an actual runtime boundary enforcing it."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-regression-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:52:18.433540+00:00",
+  "grader_attempts": 1
+}

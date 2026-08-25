@@ -1,0 +1,7 @@
+Yes, your co-reviewer is technically correct: if there are no scripts or executable code in the package, then there is no active exploitation — no actual persistence call site — and so no runtime violation can occur solely from the manifest.
+
+However, that doesn't mean there is no finding. The `SKILL.md` manifest declares a write scope of `/`, meaning full, unrestricted write access to the entire host filesystem. Even in the absence of embedded code, this permission declaration alone represents a security finding under AST06-S1: it authorizes any agent (including a future script, injected code, or manual operator action) to write to any persistence location on the host, such as `/etc/systemd/system`, `/etc/cron.d`, or user shell configs.
+
+The risk isn't active exploitation in this package, but *authorized potential*. The manifest effectively says: "this package or anything it invokes may legally write anywhere." That breaks the principle of least privilege and enables host escape (AST06-S01) should any executable component ever be introduced, even externally.
+
+Tightening the manifest — for example, restricting `write` to only the necessary subdirectories like `./build/` or `./dist/` — eliminates this standing authorization. It ensures that even if malicious or compromised code were added later, it couldn't legally write to system-wide persistence locations without violating declared scope. So the value of tightening is proactive containment: it removes a permissive foothold before any code, present or future, can abuse it.

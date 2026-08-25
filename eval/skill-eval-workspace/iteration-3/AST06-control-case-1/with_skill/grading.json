@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to file this as an AST06 finding and names AST10 Manifest Stripping as the scenario the check's registry ids point at.",
+      "passed": true,
+      "evidence": "The response declines to file as AST06 and says: \"It is formally assigned to **AST10-S04 (Manifest Stripping)**, not any AST06 scenario.\""
+    },
+    {
+      "text": "The response states that the check is an artifact-signal-only proxy there \u2014 a package with a stripped permission block is indistinguishable from one that never declared any \u2014 rather than coverage of a scenario.",
+      "passed": true,
+      "evidence": "The response notes the check \"covers: artifact-signal-only\" and links it to AST10\u2011S04, indicating it is an artifact\u2011signal\u2011only proxy rather than a scenario coverage."
+    },
+    {
+      "text": "The response requires confirming that the manifest actually loaded before anything is filed, because the check's detected value is simply the absence of a permissions block and a failed read produces the identical finding.",
+      "passed": false,
+      "evidence": "The response never mentions confirming that the manifest actually loaded before filing; it only states the check detects the absence of a permissions block."
+    },
+    {
+      "text": "The response says the line establishes nothing about AST06's own decided scenario, and names what Host Escape would actually need: a bundled-script call site planting host persistence, or a declared write scope reaching filesystem root.",
+      "passed": false,
+      "evidence": "The response does not mention Host Escape, bundled\u2011script call sites, or a declared write scope; it only says the line establishes nothing about AST06's own scenario."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-control-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T04:46:23.282762+00:00",
+  "grader_attempts": 1
+}

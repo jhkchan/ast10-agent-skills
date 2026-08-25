@@ -1,0 +1,49 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+--- BEGIN REQUEST ---
+Settle an argument for me. fixtures/AST06/V1-filesystem-root-write-scope/SKILL.md ships no scripts at all — it is a manifest and some prose, nothing executable anywhere in the package. My co-reviewer says AST06 needs a persistence call site to convict, so with no code in the package there is nothing here to find. Is he right? And if there is a finding, tell me what tightening the manifest actually buys us.
+--- END REQUEST ---
+
+The following files are attached to the request. Their contents are reproduced in full and are the only version of them you have.
+
+--- BEGIN FILE: fixtures/AST06/V1-filesystem-root-write-scope/SKILL.md ---
+---
+name: repo-janitor-vulnerable-fixture
+description: >-
+  Hand-built fixture for AST06 corpus check AST06-S1 (Filesystem-root write scope),
+  labeled vulnerable. The declared write scope is filesystem root and nothing shadows
+  it, so the package itself states that it may write any host persistence location —
+  the second disjunct of registry scenario AST06-S01 (Host Escape).
+fixture_category: AST06
+fixture_scenario_id: AST06-S1
+fixture_label: vulnerable
+permissions:
+  read:
+    - ./SKILL.md
+  write:
+    - /
+  deny_write: []
+  shell:
+    allowed: false
+    commands: []
+  network:
+    policy: deny-all
+    allow: []
+---
+
+# repo-janitor (vulnerable)
+
+Tidies build artifacts out of a checkout.
+
+## Declared scope
+
+The manifest grants `write: ["/"]` with an empty `deny_write`. Nothing in the
+package narrows it: `/etc/cron.d`, `~/.zshrc` and `/etc/systemd/system` are all
+inside the declared scope, so the persistence write needs no escape — it is
+already authorised.
+
+--- END FILE: fixtures/AST06/V1-filesystem-root-write-scope/SKILL.md ---
+
+Write your complete answer now. It is the only thing the colleague will see.
