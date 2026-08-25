@@ -1,0 +1,592 @@
+{
+ "generated_by": "scripts/external_validation.py --record",
+ "run": {
+  "date": "2026-08-25",
+  "before_tree": "091928ab27fe8dbd681b0ada5bfac22ecf616100",
+  "after_tree": "091928ab + the two fixes under review (uncommitted working tree)"
+ },
+ "corpora": [
+  {
+   "label": "A",
+   "packages": 43,
+   "independence": "an unaffiliated third party",
+   "shape": "the complete `skills/` directory of a public agent-skill toolkit, [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) \u2014 the upstream this repository already vendors its judge rubric from, and the only corpus here written by someone with no connection to it"
+  },
+  {
+   "label": "B",
+   "packages": 200,
+   "independence": "this repository's maintainer",
+   "shape": "a 200-package subset of a public 409-package repository of cloud-operations skills; the subset is pinned by name to the one the pre-fix run measured, because that run's sampling procedure was not recorded"
+  },
+  {
+   "label": "C",
+   "packages": 30,
+   "independence": "a colleague at the maintainer's organisation",
+   "shape": "the complete `skills/` directory of a public repository from the same organisation as this one, committed by a different author"
+  },
+  {
+   "label": "D",
+   "packages": 87,
+   "independence": "this repository's maintainer",
+   "shape": "every directory containing a `SKILL.md` across five agent-skill repositories from one author \u2014 which, deliberately, includes vendored copies and in-repo test fixtures as well as shipped skills",
+   "composition": {
+    "shipped skill": 59,
+    "in-repo test fixture": 17,
+    "installed copy under .claude/skills": 10,
+    "vendored third-party package": 1
+   }
+  }
+ ],
+ "totals": {
+  "packages": 360,
+  "checks_per_package": 36,
+  "check_runs": 12960,
+  "packages_by_label": {
+   "A": 43,
+   "B": 200,
+   "C": 30,
+   "D": 87
+  },
+  "firings_before": 1087,
+  "firings_after": 1085
+ },
+ "wild_declarations": {
+  "packages": 360,
+  "manifest_readable": 360,
+  "declares_permissions": 0,
+  "declares_network": 0,
+  "declares_content_hash": 0,
+  "usf_manifest_file": 0
+ },
+ "fixture_declarations": {
+  "per_category": {
+   "AST01": {
+    "cases": 16,
+    "declares_permissions": 16,
+    "declares_network": 16,
+    "declares_content_hash": 16,
+    "usf_manifest_file": 16
+   },
+   "AST02": {
+    "cases": 6,
+    "declares_permissions": 0,
+    "declares_network": 0,
+    "declares_content_hash": 0,
+    "usf_manifest_file": 0
+   },
+   "AST03": {
+    "cases": 6,
+    "declares_permissions": 6,
+    "declares_network": 6,
+    "declares_content_hash": 0,
+    "usf_manifest_file": 0
+   },
+   "AST04": {
+    "cases": 10,
+    "declares_permissions": 10,
+    "declares_network": 10,
+    "declares_content_hash": 0,
+    "usf_manifest_file": 0
+   },
+   "AST05": {
+    "cases": 6,
+    "declares_permissions": 6,
+    "declares_network": 6,
+    "declares_content_hash": 0,
+    "usf_manifest_file": 0
+   },
+   "AST06": {
+    "cases": 6,
+    "declares_permissions": 6,
+    "declares_network": 6,
+    "declares_content_hash": 0,
+    "usf_manifest_file": 0
+   },
+   "AST08": {
+    "cases": 8,
+    "declares_permissions": 0,
+    "declares_network": 0,
+    "declares_content_hash": 0,
+    "usf_manifest_file": 0
+   },
+   "AST10": {
+    "cases": 6,
+    "declares_permissions": 6,
+    "declares_network": 6,
+    "declares_content_hash": 6,
+    "usf_manifest_file": 6
+   }
+  },
+  "total": {
+   "cases": 64,
+   "declares_permissions": 50,
+   "declares_network": 50,
+   "declares_content_hash": 22,
+   "usf_manifest_file": 22
+  }
+ },
+ "checks": [
+  {
+   "category": "AST01",
+   "check": "AST01-content-hash-missing",
+   "covers": "artifact-signal-only",
+   "registry_ids": [
+    "AST05-S01",
+    "AST07-S01"
+   ],
+   "tier": "static-detectable",
+   "before": 360,
+   "after": 360
+  },
+  {
+   "category": "AST01",
+   "check": "AST01-content-hash-mismatch",
+   "covers": "category-precondition",
+   "registry_ids": [],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST01",
+   "check": "AST01-social-engineering-prerequisites",
+   "covers": "full",
+   "registry_ids": [
+    "AST01-S02"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST01",
+   "check": "AST01-soul-md-persistence",
+   "covers": "full",
+   "registry_ids": [
+    "AST01-S05"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST01",
+   "check": "AST01-memory-poisoning",
+   "covers": "full",
+   "registry_ids": [
+    "AST01-S06"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST01",
+   "check": "AST01-identity-clone-exfiltration",
+   "covers": "full",
+   "registry_ids": [
+    "AST01-S08"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST01",
+   "check": "AST01-websocket-c2",
+   "covers": "full",
+   "registry_ids": [
+    "AST01-S09"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST01",
+   "check": "AST01-undeclared-egress",
+   "covers": "full",
+   "registry_ids": [
+    "AST01-S10"
+   ],
+   "tier": "static-detectable",
+   "before": 2,
+   "after": 0
+  },
+  {
+   "category": "AST01",
+   "check": "AST01-hidden-output-injection",
+   "covers": "full",
+   "registry_ids": [
+    "AST01-S11"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST01",
+   "check": "AST01-obfuscated-payload-exec",
+   "covers": "full",
+   "registry_ids": [
+    "AST08-S02"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST02",
+   "check": "AST02-config-file-hijacking",
+   "covers": "full",
+   "registry_ids": [
+    "AST02-S03"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST03",
+   "check": "AST03-identity-file-write-grant",
+   "covers": "full",
+   "registry_ids": [
+    "AST03-S03"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST03",
+   "check": "AST03-unbounded-write-scope",
+   "covers": "category-precondition",
+   "registry_ids": [],
+   "tier": "static-detectable",
+   "before": 360,
+   "after": 360
+  },
+  {
+   "category": "AST03",
+   "check": "AST03-shell-network-privilege-combo",
+   "covers": "artifact-signal-only",
+   "registry_ids": [
+    "AST03-S01",
+    "AST06-S02"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST03",
+   "check": "AST03-wildcard-network-egress",
+   "covers": "artifact-signal-only",
+   "registry_ids": [
+    "AST06-S02"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST04",
+   "check": "AST04-permission-understating",
+   "covers": "full",
+   "registry_ids": [
+    "AST04-S02"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST04",
+   "check": "AST04-risk-tier-spoofing",
+   "covers": "full",
+   "registry_ids": [
+    "AST04-S03"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST04",
+   "check": "AST04-yaml-injection",
+   "covers": "full",
+   "registry_ids": [
+    "AST04-S04"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST04",
+   "check": "AST04-json-injection",
+   "covers": "full",
+   "registry_ids": [
+    "AST04-S06"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST04",
+   "check": "AST04-toml-injection",
+   "covers": "full",
+   "registry_ids": [
+    "AST04-S07"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST04",
+   "check": "AST04-invisible-unicode-smuggling",
+   "covers": "category-precondition",
+   "registry_ids": [],
+   "tier": "static-detectable",
+   "before": 3,
+   "after": 3
+  },
+  {
+   "category": "AST05",
+   "check": "AST05-fetched-content-instruction-sink",
+   "covers": "artifact-signal-only",
+   "registry_ids": [
+    "AST05-S01",
+    "AST05-S05"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST05",
+   "check": "AST05-remote-response-executed",
+   "covers": "artifact-signal-only",
+   "registry_ids": [
+    "AST05-S05"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST05",
+   "check": "AST05-absent-instruction-boundary",
+   "covers": "artifact-signal-only",
+   "registry_ids": [
+    "AST05-S04",
+    "AST05-S05"
+   ],
+   "tier": "static-detectable",
+   "before": 1,
+   "after": 1
+  },
+  {
+   "category": "AST05",
+   "check": "AST05-unrestricted-network-fetch",
+   "covers": "artifact-signal-only",
+   "registry_ids": [
+    "AST06-S02"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST05",
+   "check": "AST05-wildcard-domain-allowlist",
+   "covers": "artifact-signal-only",
+   "registry_ids": [
+    "AST06-S02"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST06",
+   "check": "AST06-host-persistence-write",
+   "covers": "full",
+   "registry_ids": [
+    "AST06-S01"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST06",
+   "check": "AST06-root-write-scope",
+   "covers": "full",
+   "registry_ids": [
+    "AST06-S01"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST06",
+   "check": "AST06-unrestricted-shell-exec",
+   "covers": "category-precondition",
+   "registry_ids": [],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST06",
+   "check": "AST06-unscoped-shared-state-write",
+   "covers": "artifact-signal-only",
+   "registry_ids": [
+    "AST06-S05"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST06",
+   "check": "AST06-missing-sandbox-declaration",
+   "covers": "artifact-signal-only",
+   "registry_ids": [
+    "AST10-S04"
+   ],
+   "tier": "static-detectable",
+   "before": 360,
+   "after": 360
+  },
+  {
+   "category": "AST08",
+   "check": "AST08-S02",
+   "covers": "full",
+   "registry_ids": [
+    "AST08-S02"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST08",
+   "check": "AST08-S04",
+   "covers": "full",
+   "registry_ids": [
+    "AST08-S04"
+   ],
+   "tier": "static-detectable",
+   "before": 1,
+   "after": 1
+  },
+  {
+   "category": "AST08",
+   "check": "AST08-S07",
+   "covers": "full",
+   "registry_ids": [
+    "AST08-S07"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST08",
+   "check": "AST08-S08",
+   "covers": "full",
+   "registry_ids": [
+    "AST08-S08"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  },
+  {
+   "category": "AST10",
+   "check": "AST10-S06",
+   "covers": "full",
+   "registry_ids": [
+    "AST10-S06"
+   ],
+   "tier": "static-detectable",
+   "before": 0,
+   "after": 0
+  }
+ ],
+ "adjudications": [
+  {
+   "check": "AST01-undeclared-egress",
+   "covers": "full",
+   "corpus": "D",
+   "before": 1,
+   "after": 0,
+   "verdict": "false positive \u2014 fixed",
+   "what": "`requests.get(args.url, ...)` in a bundled helper whose `--url` defaults to `http://localhost:11434/api/chat`, a local model server. The allowlist it was compared against was `[]` because the package declares no network policy at all"
+  },
+  {
+   "check": "AST01-undeclared-egress",
+   "covers": "full",
+   "corpus": "C",
+   "before": 1,
+   "after": 0,
+   "verdict": "false positive \u2014 fixed",
+   "what": "`httpx.get()` to the public dataset API the skill exists to read. The same degeneracy: nothing was declared, so nothing was contradicted"
+  },
+  {
+   "check": "AST08-S04",
+   "covers": "full",
+   "corpus": "A",
+   "before": 1,
+   "after": 1,
+   "verdict": "false positive \u2014 OPEN",
+   "what": "`if path.exists(): shutil.rmtree(path)` at line 40 of a bundled test-environment setup script \u2014 the ordinary clean-the-scratch-directory idiom, read as an environment-keyed guard wrapping a destructive branch"
+  },
+  {
+   "check": "AST04-invisible-unicode-smuggling",
+   "covers": "category-precondition",
+   "corpus": "A",
+   "before": 1,
+   "after": 1,
+   "verdict": "correct \u2014 carrier observed, nothing convicted",
+   "what": "two U+200B inside a quoted sample of machine-written prose in a reference file: copy-paste residue, not a payload"
+  },
+  {
+   "check": "AST04-invisible-unicode-smuggling",
+   "covers": "category-precondition",
+   "corpus": "C",
+   "before": 1,
+   "after": 1,
+   "verdict": "correct \u2014 carrier observed, nothing convicted",
+   "what": "U+200C and U+200D in a linguistics skill's `SKILL.md`, in a table documenting Persian ZWNJ and emoji ZWJ sequences. The code points are the subject matter"
+  },
+  {
+   "check": "AST04-invisible-unicode-smuggling",
+   "covers": "category-precondition",
+   "corpus": "D",
+   "before": 1,
+   "after": 1,
+   "verdict": "correct \u2014 carrier observed, nothing convicted",
+   "what": "the same linguistics skill republished under a different name in a second repository; the two `SKILL.md` files differ only in frontmatter and carry the identical table, so this row and the one above it are one authored file counted twice"
+  },
+  {
+   "check": "AST05-absent-instruction-boundary",
+   "covers": "artifact-signal-only",
+   "corpus": "D",
+   "before": 1,
+   "after": 1,
+   "verdict": "accurate signal \u2014 never a conviction",
+   "what": "the package does fetch external content and its prose does not state an instruction-versus-data boundary. A true statement about the artifact, recorded beside AST05-S04/S05 rather than as coverage of them"
+  }
+ ],
+ "corpus_hygiene": {
+  "distinct_skill_md_digests": 352,
+  "exact_duplicate_packages": 8,
+  "note": "Measured, not corrected. Trimming a corpus after seeing its results is how a false-positive rate gets talked downwards."
+ }
+}

@@ -61,6 +61,10 @@ malicious skill from a skill that merely mentions the same words:
   AST01-S10  an egress call site in a bundled script whose hardcoded
              destination host the manifest does not declare -- the in-package
              diff between what the code does and what the manifest promises.
+             A package that declares no egress policy at all has promised
+             nothing to contradict, so it is a precondition (AST03's and
+             AST06's) rather than this scenario; and a loopback destination
+             is not egress at all, declared or not.
   AST01-S11  a concealment carrier (invisible control code points, or a
              base64 blob that decodes to text) inside the package's OUTPUT
              templates -- content the skill returns, not content it ships.
@@ -101,7 +105,7 @@ import base64
 import binascii
 import hashlib
 import re
-from typing import Callable
+from typing import Callable, NamedTuple
 
 from detectors.scaffold import (
     INVISIBLE_UNICODE_RE,
@@ -238,7 +242,13 @@ CHECK_COVERAGE: dict[str, dict] = {
             "The in-package diff the registry names: an egress destination hardcoded in a "
             "bundled script and absent from the manifest's declared allowlist. Neither half "
             "alone fires -- a script with no egress call site and a script whose destinations "
-            "the manifest declares are both clear."
+            "the manifest declares are both clear. Because the scenario IS the diff, the check "
+            "requires a declaration to diff against: a package with no permissions.network key "
+            "has promised nothing, so nothing contradicts it, and convicting there would be "
+            "convicting a named scenario on AST06's and AST03's precondition -- which this "
+            "repository's own doctrine forbids a covers: full check from doing. Loopback "
+            "destinations are excluded before the allowlist is read at all, because a packet "
+            "that never leaves the machine is not egress whatever the manifest says."
         ),
     },
     "AST01-hidden-output-injection": {
@@ -286,6 +296,28 @@ def _files_with_suffix(pkg: dict, *suffixes: str) -> dict[str, str]:
     return {p: c for p, c in files.items() if isinstance(c, str) and p.lower().endswith(suffixes)}
 
 
+def _declares_egress_policy(pkg: dict) -> bool:
+    """Does the package state an egress policy AT ALL?
+
+    Distinct from "is the allowlist empty", and the distinction is the whole
+    point. USF v1 makes ``permissions.network.allow`` a required key precisely
+    so that an author granting nothing still has to say so, and
+    ``schemas/usf-v1.schema.json`` writes the reason on the sibling
+    ``files`` block: "a declared-empty list and an absent list are the same
+    thing to a permissive target runtime". They are not the same thing to a
+    detector. ``allow: []`` is a promise of no egress, which a script calling
+    out CONTRADICTS; an absent ``network`` key is no promise at all, which
+    nothing can contradict.
+
+    Presence of the key is the test, in any of the three vocabularies
+    ``detectors/scaffold.py`` documents -- USF's ``network: {allow: [...]}``,
+    the detector shape's ``network: {policy: ...}``, and frontmatter's bare
+    ``network: true`` / ``network: false``. A frontmatter ``network: false`` is
+    a declaration (of nothing) and is treated as one.
+    """
+    return "network" in permissions(pkg)
+
+
 def _egress_declared(pkg: dict, host: str) -> bool:
     """Does the package's own manifest declare egress to ``host``?
 
@@ -303,15 +335,136 @@ def _egress_declared(pkg: dict, host: str) -> bool:
     return network_egress_allowed(pkg.get("manifest") or {}, host)
 
 
-def _undeclared_hosts(pkg: dict, hosts) -> list[str]:
-    seen: list[str] = []
-    for host in hosts:
-        normalized = host.split(":")[0].strip().lower().rstrip(".")
-        if not normalized or normalized in seen:
+# --------------------------------------------------------------------------
+# Where a hardcoded destination actually goes
+# --------------------------------------------------------------------------
+#
+# An allowlist comparison presupposes that the destination is somewhere an
+# allowlist could govern. Two classes of host literal are not, and reading
+# either as "absent from the allowlist" is a category error rather than a
+# tuning problem:
+#
+#   loopback     ``localhost``, ``127.0.0.0/8``, ``::1``, ``0.0.0.0``, and the
+#                RFC 6761 s6.3 ``.localhost`` names, all of which the resolver
+#                is REQUIRED to send back to the same machine. A packet that
+#                never reaches a network cannot exfiltrate anything, so this
+#                holds whether or not a manifest exists and whether or not the
+#                allowlist happens to name the host. The observed false
+#                positive was exactly this shape: a helper defaulting to
+#                ``http://localhost:11434/api/chat``, Ollama's local API.
+#   unqualified  a dotless, non-literal name -- ``ollama``, ``minio``, a
+#                compose service name. Where it resolves is a property of the
+#                RUNTIME's search domain, not of the package's bytes, so the
+#                artifact does not decide it. Reported as undecided, which is
+#                the same answer AST01-S02 already gives a ``curl $URL | sh``
+#                with no literal host, and for the same reason.
+#
+# Everything else is a routable destination and goes to the allowlist.
+
+_LOOPBACK = "loopback"
+_UNQUALIFIED = "unqualified"
+_ROUTABLE = "routable"
+
+_IPV4_LITERAL_RE = re.compile(r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$")
+_IPV6_LOOPBACK_LITERALS = frozenset({"::1", "0:0:0:0:0:0:0:1"})
+
+
+def _normalize_host(host: str) -> str:
+    """A host literal reduced to the name an allowlist would be compared against.
+
+    Strips a trailing port and root dot and lowercases. IPv6 needs two special
+    cases, because ``host.split(":")[0]`` turns ``::1`` into the empty string:
+    a bracketed host (``[::1]:8080``) is unwrapped first, and a bare literal is
+    recognised by carrying more than one colon and left whole. No extractor in
+    this module currently emits either form -- the URL host classes are
+    ``[A-Za-z0-9._~-]+`` and match neither ``[`` nor ``:`` -- so both arms are
+    defensive, and the IPv6 handling in ``_destination_class`` is reachable
+    only through them.
+    """
+    host = host.strip().lower()
+    if host.startswith("["):
+        inside, _, _after = host[1:].partition("]")
+        return inside.rstrip(".")
+    if host.count(":") > 1:  # bare IPv6 literal, not host:port
+        return host.rstrip(".")
+    return host.split(":")[0].rstrip(".")
+
+
+def _destination_class(host: str) -> str:
+    """``loopback`` / ``unqualified`` / ``routable`` for one normalized host."""
+    if host in _IPV6_LOOPBACK_LITERALS:
+        return _LOOPBACK
+    if host.startswith("::ffff:"):  # IPv4-mapped IPv6
+        return _destination_class(host[len("::ffff:") :])
+    if host == "localhost" or host == "localhost.localdomain" or host.endswith(".localhost"):
+        return _LOOPBACK
+    octets = _IPV4_LITERAL_RE.match(host)
+    if octets:
+        values = [int(part) for part in octets.groups()]
+        if any(value > 255 for value in values):
+            return _ROUTABLE  # not a valid literal; treat as a name, and names route
+        # 127.0.0.0/8 is the whole loopback block, not just 127.0.0.1.
+        # 0.0.0.0 is the unspecified address: as a *destination* every stack
+        # sends it to this host.
+        return _LOOPBACK if values[0] == 127 or values == [0, 0, 0, 0] else _ROUTABLE
+    if "." not in host and ":" not in host:
+        return _UNQUALIFIED
+    return _ROUTABLE
+
+
+class _Destinations(NamedTuple):
+    """One script's hosts, split by what an allowlist can say about them.
+
+    A ``NamedTuple`` and not a ``@dataclass`` on purpose, and the reason is a
+    live one rather than a style preference. This module is loaded through
+    ``importlib.util.spec_from_file_location`` by several callers and they do
+    not agree on registration: ``detectors/fixture_loader.py`` and
+    ``cli/lib/bridge.py`` assign ``sys.modules[spec.name]`` before
+    ``exec_module``, ``scripts/dogfood.py`` does not. Under
+    ``from __future__ import annotations``, ``@dataclass`` resolves its field
+    annotations through ``sys.modules[cls.__module__].__dict__`` at
+    class-creation time, so a dataclass here raises
+    ``AttributeError: 'NoneType' object has no attribute '__dict__'`` inside
+    dogfood -- which is how this was found. ``NamedTuple`` keeps its
+    annotations as strings and does not look the module up. Fixing the loader
+    instead would work; keeping the module loadable by every loader that
+    already exists is the smaller claim.
+    """
+
+    undeclared: tuple[str, ...]  # routable AND absent from a declared allowlist
+    loopback: tuple[str, ...]  # never left the machine; not egress at all
+    unqualified: tuple[str, ...]  # not decidable from the package's own bytes
+
+
+def _classify_hosts(pkg: dict, hosts) -> _Destinations:
+    """Split host literals into the three answers an allowlist comparison has.
+
+    Order matters: the destination class is settled BEFORE the allowlist is
+    consulted, so a declared allowlist that omits ``localhost`` still does not
+    make a loopback call exfiltration.
+    """
+    undeclared: list[str] = []
+    loopback: list[str] = []
+    unqualified: list[str] = []
+    for raw in hosts:
+        host = _normalize_host(raw)
+        if not host:
             continue
-        if not _egress_declared(pkg, normalized):
-            seen.append(normalized)
-    return seen
+        bucket = _destination_class(host)
+        if bucket == _LOOPBACK:
+            if host not in loopback:
+                loopback.append(host)
+        elif bucket == _UNQUALIFIED:
+            if host not in unqualified:
+                unqualified.append(host)
+        elif host not in undeclared and not _egress_declared(pkg, host):
+            undeclared.append(host)
+    return _Destinations(tuple(undeclared), tuple(loopback), tuple(unqualified))
+
+
+def _undeclared_hosts(pkg: dict, hosts) -> list[str]:
+    """The routable destinations among ``hosts`` that no declaration covers."""
+    return list(_classify_hosts(pkg, hosts).undeclared)
 
 
 def _snippet(text: str, limit: int = 120) -> str:
@@ -659,8 +812,37 @@ def detect_websocket_c2(pkg: dict) -> Finding:
 
 def detect_undeclared_egress(pkg: dict) -> Finding:
     """AST01-S10: a hardcoded destination a bundled script sends to, that the
-    manifest never declared. The in-package diff between code and manifest."""
+    manifest never declared. The in-package diff between code and manifest.
+
+    Three things must hold before this fires, and the first two are the ones a
+    manifest-carrying fixture corpus can never exercise:
+
+    1. **There is a declaration to depart from.** "Undeclared egress"
+       presupposes a declaration; a package with no ``permissions.network`` key
+       has made no promise, so no script can contradict one. That absence is
+       already a finding -- ``AST06-missing-sandbox-declaration`` and
+       ``AST03-unbounded-write-scope`` state it as their preconditions -- and a
+       ``covers: full`` check may not convict a named scenario on another
+       category's precondition. Measured over 360 third-party skill packages,
+       those two preconditions fired on 360; a check that degenerates to
+       "makes a network call and declares nothing" convicts every real skill
+       that calls anything.
+    2. **The destination is somewhere an allowlist could govern.** Loopback is
+       not egress and an unqualified name is not decidable from the artifact;
+       ``_destination_class`` settles both before the allowlist is consulted.
+    3. **The destination is absent from that declaration.** Unchanged, and the
+       whole scenario: a manifest declaring ``status.example.com`` beside a
+       script posting to ``collector.attacker-drop.example`` still convicts.
+
+    The negatives are not interchangeable, and only the evidence string carries
+    which one happened -- the same distinction AST01-S02 already draws between
+    *undecided* and *clean*.
+    """
     scenario = "AST01-undeclared-egress"
+    declared_policy = _declares_egress_policy(pkg)
+    unevaluated: list[str] = []
+    undecided: list[str] = []
+    local_only: list[str] = []
     for path, content in sorted(_files_with_suffix(pkg, *_SCRIPT_SUFFIXES).items()):
         call_site = _egress_call_site(path, content)
         if not call_site:
@@ -668,14 +850,59 @@ def detect_undeclared_egress(pkg: dict) -> Finding:
         hosts = _QUOTED_HTTP_URL_RE.findall(content)
         if path.lower().endswith(_SHELL_SUFFIXES):
             hosts = hosts + _URL_HOST_RE.findall(content)
-        undeclared = _undeclared_hosts(pkg, hosts)
-        if undeclared:
+        if not declared_policy:
+            # Precondition, not this scenario. Still name what went unexamined:
+            # a reviewer handed the boolean alone would read "no egress here".
+            named = sorted({_normalize_host(host) for host in hosts if _normalize_host(host)})
+            unevaluated.append(f"{path}: {call_site} to {named or 'no literal host'}")
+            continue
+        destinations = _classify_hosts(pkg, hosts)
+        if destinations.undeclared:
             return Finding(
                 scenario,
                 True,
-                f"{path}: egress call ({call_site}) to host(s) {undeclared} absent from the declared allowlist "
-                f"{list(network_allowlist(permissions(pkg)))}",
+                f"{path}: egress call ({call_site}) to host(s) {list(destinations.undeclared)} absent from the "
+                f"declared allowlist {list(network_allowlist(permissions(pkg)))}",
             )
+        if destinations.unqualified:
+            undecided.append(f"{path}: {call_site} to unqualified host(s) {list(destinations.unqualified)}")
+        elif destinations.loopback:
+            local_only.append(f"{path}: {call_site} to loopback host(s) {list(destinations.loopback)}")
+
+    if unevaluated:
+        more = f" (+{len(unevaluated) - 1} more)" if len(unevaluated) > 1 else ""
+        return Finding(
+            scenario,
+            False,
+            "precondition, not this scenario: the package declares no egress policy at all "
+            "(permissions.network is absent, which is not the same as an allowlist declared empty), so "
+            "there is no declaration for a destination to depart from. That absence is "
+            "AST06-missing-sandbox-declaration's and AST03-unbounded-write-scope's finding. Left "
+            f"unevaluated here: {unevaluated[0]}{more}",
+        )
+    if undecided:
+        return Finding(
+            scenario,
+            False,
+            "undecided (an unqualified host resolves through the runtime's search domain, which the "
+            f"package's own bytes do not fix): {undecided[0]}",
+        )
+    if local_only:
+        return Finding(
+            scenario,
+            False,
+            f"not egress -- the destination never leaves the machine: {local_only[0]}",
+        )
+    if not declared_policy:
+        # Nothing reached the precondition branch, so there was no egress call
+        # site at all. Saying "covered by the declared allowlist" here would
+        # credit a comparison against an allowlist that does not exist.
+        return Finding(
+            scenario,
+            False,
+            "no bundled script carries an egress call site; the package also declares no egress "
+            "policy, so no allowlist comparison was available in any case",
+        )
     return Finding(scenario, False, "every hardcoded egress destination is covered by the declared allowlist")
 
 

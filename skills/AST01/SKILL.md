@@ -183,11 +183,28 @@ which is the only reading these results cannot support.
   AST06's — and reading AST01's silence there as "no exfiltration path" is the single
   most common misread of these results. Score the breadth first, then hand the egress
   destinations to manual review.
-- **A package with no permissions block at all disarms the declaration half
-  everywhere.** The identity checks fall back to the bundled-script scan only, and
-  every egress check clears. Frontmatter-only skills (`network: true` and nothing more)
-  are the common real-world shape, not an edge case; treat "no manifest" as an
-  escalation trigger rather than as a missing input.
+- **A package with no permissions block at all disarms the declaration half, and the
+  three egress checks do not all answer it the same way.** The identity checks fall back
+  to the bundled-script scan only. `AST01-S10` clears with `declares no egress policy at
+  all` in its evidence — an absent `permissions.network` is no promise, so no script can
+  contradict one, and the absence itself is AST06's and AST03's finding rather than this
+  one's. `AST01-S02` and `AST01-S09` keep firing, because the registry defines them as an
+  artifact the allowlist could have *exculpated* rather than as a departure from it, and
+  with nothing declared there is simply nothing to exculpate. This shape is not an edge
+  case: across 360 third-party skill packages audited for this repository, 360 shipped no
+  manifest. Treat "no manifest" as an escalation trigger rather than as a missing input.
+- **Loopback destinations are excluded before any allowlist is read.** A host in
+  `127.0.0.0/8`, at `::1` or `0.0.0.0`, or under a `localhost` name never reaches a
+  network, so `AST01-S02`, `AST01-S09` and `AST01-S10` all clear it whatever the manifest
+  says — a declared allowlist that omits `localhost` does not make a call to a local model
+  server exfiltration. A *dotless* name (`ollama`, a compose service) resolves through the
+  runtime's search domain, which the package's bytes do not fix, and is reported
+  `undecided` for the same reason a host-parameterised installer is. Both are stated in
+  the evidence; a consumer reading only the boolean loses both. This is a claim about a
+  *destination* and is not the claim AST06 rejects: AST06's own evals hold that a
+  loopback-bound **listener** is not isolation without authentication (ClawJacked /
+  CVE-2026-32025), and a skill that opens a local port is that shape, not this one. AST01
+  clearing a call *to* `127.0.0.1` says nothing about a service listening *on* it.
 - **`AST01-S02` distinguishes *undecided* from *clean*, and only the evidence string
   carries it.** A command with no literal destination host gives the allowlist nothing
   to evaluate, so the check reports negative with `undecided` in its evidence. Any

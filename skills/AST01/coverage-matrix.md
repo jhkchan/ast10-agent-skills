@@ -93,7 +93,7 @@ categories to that split.
 | `detect_content_hash_missing` | `AST01-content-hash-missing` | `artifact-signal-only` | AST05-S01, AST07-S01 — the enabling precondition, never coverage |
 | `detect_content_hash_mismatch` | `AST01-content-hash-mismatch` | `category-precondition` | none — derives from AST02's signing mitigation |
 
-### Three narrowings, stated rather than hidden
+### Five narrowings, stated rather than hidden
 
 1. **AST01-S05/S06 do not treat an absent `deny_write` entry as a write.** The registry
    lists three structural facts and the detector implements two of them. The third — "an
@@ -110,7 +110,36 @@ categories to that split.
    *contradiction* between code and manifest, and a manifest that promised everything has
    not been contradicted. Unbounded egress is a real finding — it is AST03's and AST06's,
    and their checks own it.
-4. **Through the CLI, AST01's checks see only the declared shipped surface.**
+4. **AST01-S10 clears a package that declares no egress policy at all.** The same
+   reasoning as narrowing 1, on the egress side, and it was found the same way narrowing 1
+   was not: by running the detectors over 360 third-party skill packages that nobody wrote
+   with any knowledge of them. Every fixture in `fixtures/` carries a conformant USF
+   manifest — deliberately, so the checks separate a malicious package from a well-formed
+   one rather than from a careless one — so no fixture can put a check in the state 360 of
+   those 360 packages were in. In that state `_egress_declared` returns false for every
+   host and the check degenerates to *makes a network call and declares nothing*, which is
+   true of every real skill that calls anything. "Undeclared egress" presupposes a
+   declaration to depart from; with `permissions.network` absent there is no allowlist, and
+   the correct finding is that the package declares no egress policy — which
+   `AST06-missing-sandbox-declaration` and `AST03-unbounded-write-scope` already state as
+   their preconditions. A `covers: full` check convicting a named scenario on another
+   category's precondition is what narrowing 1 already forbids.
+   `test_no_declared_egress_policy_is_a_precondition_not_this_scenario` and
+   `test_an_allowlist_declared_empty_is_not_an_allowlist_that_is_absent` pin both halves:
+   `network: {allow: []}` is a *declared* promise of no egress and a routable call still
+   contradicts it, while an absent `network` key is no promise at all.
+5. **Loopback is not egress, in any check that compares a host to an allowlist.** A
+   destination in `127.0.0.0/8`, at `::1`, at `0.0.0.0`, or under a `localhost` name never
+   reaches a network, so no manifest can make reaching it exfiltration — including a
+   declared allowlist that omits it. `_destination_class` settles this *before* the
+   allowlist is read, and it lives in the shared host classifier rather than in one check
+   because where a destination goes is a property of the destination: `AST01-S09` gets it
+   too, and a WebSocket to a dev server on `127.0.0.1` stops reading as a C2 channel. The
+   third class the same function returns is *unqualified* — a dotless, non-literal name
+   like `ollama` or a compose service — which resolves through the runtime's search domain
+   and is therefore not decidable from the package's own bytes; it is reported undecided in
+   the evidence, exactly as narrowing 2 does for a host-parameterised installer.
+6. **Through the CLI, AST01's checks see only the declared shipped surface.**
    `cli/lib/bridge.py` lists AST01 in `SURFACE_SCOPED`, so `run_all` receives
    `scripts/content_hash.py`'s `SURFACE_GLOBS` file set (`SKILL.md`, `references/*.md`,
    `scripts/*.py`, `evals/evals.json`) rather than every file in the candidate directory.
@@ -122,6 +151,20 @@ categories to that split.
    calling the module directly. Closing it needs per-check scoping in the bridge rather
    than per-category, which is a change to the CLI contract and is recorded here rather
    than made silently.
+
+**Narrowing 4 is deliberately not shared with AST01-S02 and AST01-S09, and narrowing 5
+is.** `scenarios/registry.yaml` words the three reasons differently and the difference
+decides it. AST01-S10's is "an in-package **diff** between what the code does and what the
+manifest promises" — the departure *is* the scenario, so no declaration means no scenario.
+AST01-S02's is "both halves are in SKILL.md" and AST01-S09's is "a scheme-and-host
+**match** over the package's own source" — there the artifact is the scenario and the
+allowlist only exculpates, so a package with nothing to exculpate still convicts, and
+should. Narrowing 5 is not about declarations at all, so it applies wherever a host is
+classified. `test_the_precondition_gate_is_deliberately_not_shared_with_s02_and_s09` pins
+the asymmetry so neither side can drift silently. The residual risk is stated rather than
+resolved: a manifest-less skill opening a `wss://` channel to a legitimate service is a
+false positive this ruling leaves in place. None of the 360 audited packages produced one
+— an observation at that corpus, not a bound.
 
 ### The signal-symmetry ruling, applied here
 

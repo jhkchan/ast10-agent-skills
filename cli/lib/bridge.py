@@ -42,9 +42,27 @@ if str(ROOT) not in sys.path:
 
 import yaml  # noqa: E402  (after the sys.path fix-up, deliberately)
 
+from detectors.scaffold import VALID_COVERS  # noqa: E402
 from scripts import dogfood  # noqa: E402
 
 CATEGORIES: tuple[str, ...] = tuple(f"AST{n:02d}" for n in range(1, 11))
+
+# The three claims a check may make over the whitepaper's named scenarios, in
+# DESCENDING order of what a firing means -- which is the order the renderer
+# prints them in, and the order is the point. `detectors/scaffold.py` owns the
+# vocabulary; this tuple only fixes a display order over it, and the assertion
+# below fails loudly if the two ever disagree rather than letting a fourth mode
+# fall silently into the unclassified bucket.
+COVERAGE_MODES: tuple[str, ...] = ("full", "artifact-signal-only", "category-precondition")
+assert set(COVERAGE_MODES) == set(VALID_COVERS), (
+    f"detectors/scaffold.py declares {sorted(VALID_COVERS)}; the CLI orders {list(COVERAGE_MODES)}"
+)
+
+#: Bucket for a firing whose check declares no `covers` at all. Unreachable
+#: while `tests/test_coverage_matrix*.py` hold -- every shipped check has a
+#: CHECK_COVERAGE entry -- and kept so that a future check that slips through
+#: is counted somewhere visible instead of vanishing from the totals.
+UNDECLARED_COVERAGE = "coverage-undeclared"
 
 # Categories whose detectors are defined over the package's DECLARED SHIPPED
 # SURFACE rather than over every file present. Today that is AST01 alone: its
@@ -375,6 +393,60 @@ def check_tiers(module) -> dict[str, str]:
     return {check: tiers.get(check, "static-detectable") for check in getattr(module, "DETECTORS", {})}
 
 
+def check_claims(module) -> dict[str, dict]:
+    """What each shipped check CLAIMS over the whitepaper's named scenarios.
+
+    The third of the three questions a row in the audit table answers, and the
+    one that never reached the operator. `SCENARIO_TIERS` says what the registry
+    rules about a scenario; `check_tiers` above says whether a check is decidable
+    from bytes; `CHECK_COVERAGE` -- already declared by every module, already
+    validated by `tests/test_coverage_matrix*.py` -- says whether a check that
+    FIRES has decided anything at all:
+
+      full                   the check decides the linked registry scenario.
+      artifact-signal-only   it computes an enabling precondition the registry
+                             records as some scenario's `artifact_signal`;
+                             never coverage of that scenario.
+      category-precondition  it derives from a category's preventive mitigations
+                             and decides no named scenario whatever.
+
+    Carried into the payload rather than recomputed in `cli/bin/cli.js`, for the
+    same reason `route` and `audit` live here at all: the modules own the claim,
+    and a second table in JavaScript would be a second source of truth for it.
+    """
+    coverage: dict[str, dict] = dict(getattr(module, "CHECK_COVERAGE", {}))
+    claims: dict[str, dict] = {}
+    for check in getattr(module, "DETECTORS", {}):
+        entry = coverage.get(check) or {}
+        claims[check] = {
+            "covers": entry.get("covers"),
+            "registry_ids": [str(scenario) for scenario in (entry.get("registry_ids") or [])],
+        }
+    return claims
+
+
+def declaration_state(manifest: dict, manifest_source: str) -> dict:
+    """What security metadata the candidate declared, as three plain facts.
+
+    A candidate that ships no USF manifest trips every check whose predicate is
+    "the declaration is absent" -- today `AST01-content-hash-missing`,
+    `AST03-unbounded-write-scope` and `AST06-missing-sandbox-declaration`, which
+    fired on 360 of 360 real third-party packages in the external validation
+    run. That is one fact about the package reported three times, and a renderer
+    can only say so once if it is told the fact separately from the three checks
+    that restate it. USF v1 is a proposal, so "absent" is the norm rather than
+    the exception, and the CLI says that in the sentence it prints.
+    """
+    permissions = manifest.get("permissions")
+    content_hash = manifest.get("content_hash")
+    return {
+        "source": manifest_source,
+        "manifest_found": manifest_source not in ("none", "SKILL.md (no parseable frontmatter)"),
+        "declares_permissions": bool(permissions),
+        "declares_content_hash": bool(content_hash),
+    }
+
+
 # ---------------------------------------------------------------------------
 # Commands
 # ---------------------------------------------------------------------------
@@ -399,6 +471,10 @@ def audit(target: str) -> dict:
     categories: list[dict] = []
     checks_run = 0
     detected_total = 0
+    #: Firings split by what the firing check CLAIMS. `detected` alone answers
+    #: "did a rule match", which on a package that ships no manifest is answered
+    #: "yes, three times" by three checks that between them decide nothing.
+    detected_by_coverage: dict[str, int] = {mode: 0 for mode in COVERAGE_MODES}
     for category in CATEGORIES:
         module = load_detector(category)
         tiers: dict[str, str] = dict(getattr(module, "SCENARIO_TIERS", {}))
@@ -419,10 +495,13 @@ def audit(target: str) -> dict:
             continue
         surface_scoped = category in SURFACE_SCOPED
         mechanism_tiers = check_tiers(module)
+        claims = check_claims(module)
         findings = [
             {
                 "scenario": f.scenario,
                 "tier": mechanism_tiers.get(f.scenario),
+                "covers": claims.get(f.scenario, {}).get("covers"),
+                "registry_ids": claims.get(f.scenario, {}).get("registry_ids", []),
                 "detected": bool(f.detected),
                 "evidence": f.evidence,
             }
@@ -430,6 +509,10 @@ def audit(target: str) -> dict:
         ]
         checks_run += len(findings)
         detected_total += sum(1 for f in findings if f["detected"])
+        for finding in findings:
+            if finding["detected"]:
+                mode = finding["covers"] if finding["covers"] in detected_by_coverage else UNDECLARED_COVERAGE
+                detected_by_coverage[mode] = detected_by_coverage.get(mode, 0) + 1
         categories.append(
             {
                 "category": category,
@@ -445,6 +528,7 @@ def audit(target: str) -> dict:
         "command": "audit",
         "path": str(pkg_dir),
         "manifest_source": manifest_source,
+        "declaration": declaration_state(manifest, manifest_source),
         "adapter_notes": adapter_notes,
         "scan_files": sorted(scan_files),
         "surface_files": sorted(surface_files),
@@ -455,6 +539,7 @@ def audit(target: str) -> dict:
             "categories_without_detectors": sum(1 for c in categories if c["status"] == "no-static-detectors"),
             "checks_run": checks_run,
             "detected": detected_total,
+            "detected_by_coverage": detected_by_coverage,
         },
     }
 

@@ -769,6 +769,13 @@ regenerated-and-compared by the test suite rather than trusted:
 - [`docs/skill-eval-report.md`](docs/skill-eval-report.md) — the **with/without**
   eval delta. Written by `python3 eval/generate_skill_eval_report.py` from the
   committed runs under `eval/skill-eval-workspace/`.
+- [`docs/external-validation.md`](docs/external-validation.md) — the detectors
+  run over **360 skill packages this repository did not write**, with per-check
+  firing counts before and after the two fixes that run produced. The machine-
+  readable record is [`eval/external-validation.json`](eval/external-validation.json);
+  written by `python3 scripts/external_validation.py`. It is a false-positive
+  study and establishes nothing about recall — the corpora contain no labelled
+  malicious skill, and the report says so in those words.
 - **The badge row under this page's own H1** — every figure in it is derived from
   the artifact that produced it, never typed. Written by
   `python3 scripts/generate_badges.py`, which rewrites only the block between its
@@ -794,6 +801,13 @@ Only the third one has ever measured an agent's output. Every case in
 without it and nothing else changed — and the delta is the deliverable. The agent
 under test and the grader are always different models, and both are recorded in
 every artifact. Nothing on that surface feeds the ship gate.
+
+All three are measured over material this repository authored. The one
+measurement that is not is [`docs/external-validation.md`](docs/external-validation.md),
+and it is a **fourth unit again** — how often the detectors fire on benign work
+nobody wrote for them. It is never averaged with the three above, it feeds no
+gate, and because every package in its corpora is presumed benign it says nothing
+whatever about whether these detectors would catch a real attack.
 
 ```bash
 python3 eval/skill_evals.py --dry-run            # the plan; writes nothing, calls nothing

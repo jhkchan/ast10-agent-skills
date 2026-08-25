@@ -75,6 +75,63 @@ def repackage(package: dict, *, files: dict | None = None, allow: list | None = 
     return {"manifest": manifest, "files": files if files is not None else dict(package["files"])}
 
 
+#: A local model server's default endpoint, and the exact shape of the false
+#: positive the loopback rule exists to stop -- an audit of 360 third-party
+#: skills convicted one for defaulting `--url` to Ollama's local API.
+#: Deliberately held on a line carrying no egress primitive: scanning this file
+#: then finds a URL and no call site, which is the state both AST01's own
+#: `_egress_call_site` and AST04's `_egress_call_sites` require before they
+#: report anything. Rewording it to escape a scan would be the inward evasion
+#: `config/dogfood_waivers.yml` forbids; keeping the call site out is not.
+LOOPBACK_ENDPOINT = "http://localhost:11434/api/chat"
+
+
+def without_manifest(package: dict) -> dict:
+    """The same files with no manifest at all — the shape real skills ship.
+
+    Every fixture in `fixtures/` carries a conformant USF manifest, on purpose:
+    the detectors are meant to separate a malicious package from a well-formed
+    one. That makes the corpus structurally unable to show what a check does
+    when there is no manifest, which is the state 360 of 360 audited
+    third-party skills were in. These cases supply it.
+    """
+    return {"manifest": {}, "files": dict(package["files"])}
+
+
+def destination_url_of(package: dict) -> str:
+    """The absolute URL the fixture's own script sends to, whatever its scheme.
+
+    Read out of the corpus rather than restated here, and not only for this
+    module's header reason. Writing `wss://relay.attacker-c2.example` into this
+    file makes AST01's own WebSocket check fire on AST01's own package — the
+    self-match the header describes, reproduced by the very test that widens
+    the check. Reading the host from the fixture keeps the payload where
+    `fixtures/` already carries it, and a hardcoded copy would silently stop
+    matching the day the fixture's host changes.
+    """
+    _path, source = script_of(package)
+    for scheme in ('"http', '"ws'):
+        _before, marker, rest = source.partition(scheme)
+        if marker:
+            url, _closing, _after = rest.partition('"')
+            return marker[1:] + url
+    raise AssertionError("the fixture's script must carry a quoted absolute URL")
+
+
+def rehost(package: dict, url: str) -> dict:
+    """The fixture's script with its destination swapped for ``url``.
+
+    The call site, the read it exfiltrates, and the manifest all stay exactly
+    as the corpus wrote them. Only where the bytes go changes — which is what
+    isolates the destination classification from every other half of the
+    predicate.
+    """
+    path, source = script_of(package)
+    swapped = source.replace(destination_url_of(package), url)
+    assert swapped != source, "nothing was swapped; the fixture's URL shape moved"
+    return repackage(package, files={path: swapped})
+
+
 def manifest_only(**file_scopes) -> dict:
     """A package that declares permissions and ships nothing else."""
     scopes = {"read": [], "write": [], "deny_write": []}
@@ -418,6 +475,156 @@ def test_undeclared_egress_clears_when_the_manifest_declares_unbounded_egress():
     vulnerable = case("V13-undeclared-egress")
     unbounded = repackage(vulnerable, allow=["*"])
     assert detector.detect_undeclared_egress(unbounded).detected is False
+
+
+# ---------------------------------------------------------------------------
+# AST01-S10 -- the two states the fixture corpus cannot express
+#
+# Every fixture carries a manifest and every fixture's destination is routable,
+# so neither "no declaration exists" nor "the destination never leaves the
+# machine" appears anywhere in `fixtures/`. Both are the common case in the
+# wild: 360 of 360 audited third-party packages ship no manifest at all.
+# ---------------------------------------------------------------------------
+
+
+def test_no_declared_egress_policy_is_a_precondition_not_this_scenario():
+    """(a) "Undeclared egress" presupposes a declaration to depart from.
+
+    Same bytes as the vulnerable fixture -- the same read, the same POST, the
+    same routable attacker host -- with the manifest removed. Nothing was
+    promised, so nothing was contradicted, and the diff the registry defines
+    AST01-S10 as does not exist. The absence itself is a real finding and two
+    other checks already make it: AST06-missing-sandbox-declaration and
+    AST03-unbounded-write-scope both name it as their precondition. A
+    `covers: full` check convicting a named scenario on another category's
+    precondition is what `coverage-matrix.md`'s first narrowing already
+    forbids for AST01-S05/S06; this is the same rule on the egress side.
+    """
+    finding = detector.detect_undeclared_egress(without_manifest(case("V13-undeclared-egress")))
+    assert finding.detected is False
+    assert "declares no egress policy at all" in finding.evidence
+
+
+def test_the_precondition_negative_still_names_what_went_unevaluated():
+    """A negative here is not "no egress in this package", and only the
+    evidence carries the difference. AST01-S02 draws the same distinction
+    between *undecided* and *clean*, and SKILL.md records that any consumer
+    reading the boolean alone loses it."""
+    finding = detector.detect_undeclared_egress(without_manifest(case("V13-undeclared-egress")))
+    assert "collector.attacker-drop.example" in finding.evidence
+    assert "unevaluated" in finding.evidence
+
+
+def test_an_allowlist_declared_empty_is_not_an_allowlist_that_is_absent():
+    """The discrimination the fix turns on, both halves in one test.
+
+    USF makes `permissions.network.allow` a required key precisely so that an
+    author granting nothing still has to say so. `allow: []` is a promise of no
+    egress, which a POST to a routable host contradicts; an absent `network`
+    key is no promise at all. Identical bytes, opposite verdicts.
+    """
+    vulnerable = case("V13-undeclared-egress")
+    declared_empty = repackage(vulnerable, allow=[])
+    assert detector.detect_undeclared_egress(declared_empty).detected is True
+    assert detector.detect_undeclared_egress(without_manifest(vulnerable)).detected is False
+
+
+def test_a_loopback_destination_is_not_egress_even_when_the_allowlist_omits_it():
+    """(b) A packet that never reaches a network cannot exfiltrate anything.
+
+    The manifest here is the fixture's own -- a real, non-empty allowlist that
+    does not name localhost -- so the allowlist comparison alone would convict.
+    It must not: the destination class is settled before the allowlist is read.
+    """
+    loopback = rehost(case("V13-undeclared-egress"), LOOPBACK_ENDPOINT)
+    assert detector.network_allowlist(detector.permissions(loopback)), "the fixture must declare a real allowlist"
+    finding = detector.detect_undeclared_egress(loopback)
+    assert finding.detected is False
+    assert "never leaves the machine" in finding.evidence
+
+
+def test_a_loopback_destination_is_not_egress_against_an_empty_allowlist_either():
+    """`allow: []` is the strictest declaration USF can make and still does not
+    turn a loopback call into exfiltration."""
+    loopback = repackage(rehost(case("V13-undeclared-egress"), LOOPBACK_ENDPOINT), allow=[])
+    assert detector.detect_undeclared_egress(loopback).detected is False
+
+
+def test_the_genuine_scenario_still_convicts_after_both_narrowings():
+    """The real AST01-S10: a declaration exists, the destination is routable,
+    and the manifest does not name it. Neither narrowing may reach this."""
+    vulnerable = case("V13-undeclared-egress")
+    assert detector._declares_egress_policy(vulnerable) is True
+    host = destination_url_of(vulnerable).split("//", 1)[1].split("/", 1)[0]
+    assert detector._destination_class(host) == detector._ROUTABLE
+    finding = detector.detect_undeclared_egress(vulnerable)
+    assert finding.detected is True
+    assert host in finding.evidence
+
+
+@pytest.mark.parametrize(
+    "host,expected",
+    [
+        ("localhost", detector._LOOPBACK),
+        ("localhost.localdomain", detector._LOOPBACK),
+        ("app.localhost", detector._LOOPBACK),  # RFC 6761 s6.3 reserves the whole name space
+        ("127.0.0.1", detector._LOOPBACK),
+        ("127.255.255.254", detector._LOOPBACK),  # 127.0.0.0/8, not just .0.1
+        ("0.0.0.0", detector._LOOPBACK),  # the unspecified address; as a destination, this host
+        ("::1", detector._LOOPBACK),
+        ("0:0:0:0:0:0:0:1", detector._LOOPBACK),
+        ("::ffff:127.0.0.1", detector._LOOPBACK),  # IPv4-mapped
+        ("128.0.0.1", detector._ROUTABLE),  # one octet outside the block
+        ("2001:db8::1", detector._ROUTABLE),
+        ("::ffff:8.8.8.8", detector._ROUTABLE),
+        ("api.example.com", detector._ROUTABLE),
+        ("notlocalhost.example.com", detector._ROUTABLE),  # substring, not the name
+        ("ollama", detector._UNQUALIFIED),
+    ],
+)
+def test_destination_class_separates_loopback_from_routable(host, expected):
+    assert detector._destination_class(detector._normalize_host(host)) == expected
+
+
+def test_normalize_host_strips_a_port_without_destroying_an_ipv6_literal():
+    assert detector._normalize_host("LOCALHOST:11434") == "localhost"
+    assert detector._normalize_host("[::1]:8080") == "::1"
+    assert detector._normalize_host("::1") == "::1"
+    assert detector._normalize_host("example.com.") == "example.com"
+
+
+def test_an_unqualified_host_is_reported_undecided_rather_than_convicted():
+    """A dotless name resolves through the RUNTIME's search domain, which the
+    package's own bytes do not fix. Same answer AST01-S02 gives `curl $URL |
+    sh`, and for the same reason -- recorded in the evidence, not guessed."""
+    unqualified = rehost(case("V13-undeclared-egress"), "http://ollama:11434/api/chat")
+    finding = detector.detect_undeclared_egress(unqualified)
+    assert finding.detected is False
+    assert "undecided" in finding.evidence
+
+
+def test_the_loopback_rule_reaches_the_websocket_check_too():
+    """Where a destination goes is a property of the destination, so the rule
+    lives in the shared classifier rather than in one check. A dev server on
+    127.0.0.1 is not a C2 channel."""
+    assert detector.detect_websocket_c2(rehost(case("V11-websocket-c2"), "ws://127.0.0.1:8765/agent")).detected is False
+
+
+def test_the_precondition_gate_is_deliberately_not_shared_with_s02_and_s09():
+    """The asymmetry is pinned so it cannot drift silently either way.
+
+    `scenarios/registry.yaml` words the three reasons differently and the
+    difference is load-bearing. AST01-S10's is "an in-package DIFF between what
+    the code does and what the manifest promises" — the departure is the
+    scenario, so no declaration means no scenario. AST01-S02's is "both halves
+    are in SKILL.md" and AST01-S09's is "a scheme-and-host MATCH over the
+    package's own source" — the artifact is the scenario and the allowlist only
+    exculpates. With nothing to exculpate, a `curl | sh` from an attacker host
+    and a WebSocket to one still convict, and should.
+    """
+    v3 = without_manifest(case("V3-social-engineering-prereq"))
+    assert detector.detect_social_engineering_prerequisites(v3).detected
+    assert detector.detect_websocket_c2(without_manifest(case("V11-websocket-c2"))).detected
 
 
 # ---------------------------------------------------------------------------

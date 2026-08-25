@@ -799,6 +799,158 @@ function wrap(text, width) {
 // ---------------------------------------------------------------------------
 // Command: audit
 // ---------------------------------------------------------------------------
+//
+// WHAT A FIRING MEANS, AND WHY THE WORD "DETECTED" WAS WRONG FOR MOST OF THEM
+// ---------------------------------------------------------------------------
+// Every row this command prints used to read `DETECTED` or `clear`, which
+// answers one question — did a rule match — and hides the one an operator is
+// actually asking: does the match mean anything about this package's behaviour.
+// The repository has always carried the answer. Each module declares
+// `CHECK_COVERAGE`, one entry per shipped check, ruling it `full`,
+// `artifact-signal-only` or `category-precondition`; `cli/lib/bridge.py` now
+// carries that ruling out with each finding. This was a presentation defect,
+// not a modelling one.
+//
+// It mattered because the three checks that fire on a package with no USF
+// manifest are exactly the three that decide nothing:
+//
+//     AST01-content-hash-missing         artifact-signal-only
+//     AST03-unbounded-write-scope        category-precondition
+//     AST06-missing-sandbox-declaration  artifact-signal-only
+//
+// Run over 360 real third-party skill packages, all three fired on 360 of 360.
+// They were not detecting a vulnerability; they were detecting the absence of a
+// USF manifest, which is the normal state of a published skill because USF v1
+// is a proposal. Three lines reading `DETECTED` on every package in the world,
+// indistinguishable from a line reading `DETECTED` because a bundled script
+// ships a credential exfiltrator, is a report that cannot be read at all.
+//
+// The vocabulary below, one word per row, in descending order of what a firing
+// claims:
+//
+//   FINDING   `covers: full`. The check decides a named whitepaper scenario and
+//             it fired. This is a finding about the package. Capitalised, and
+//             the only row class that is.
+//   signal    `covers: artifact-signal-only`. The check computed an enabling
+//             precondition the registry records as some scenario's
+//             `artifact_signal` — package-decidable, and never coverage of that
+//             scenario. Present, not adjudicated.
+//   observed  `covers: category-precondition`. A property of the package that
+//             decides no named scenario in any category: usually "it declares
+//             nothing", sometimes a carrier class such as AST04's invisible
+//             code points, which that skill's own SKILL.md says are "flagged as
+//             a carrier class and stopped there, not convicted as an
+//             instruction". Observed, not adjudicated.
+//   clear     the check ran and did not fire.
+//
+// The summary counts the three classes apart and then states, in a sentence,
+// whether anything decided a named scenario — because a reader who stops at the
+// summary must not come away with the wrong impression, and `3 detected` is
+// actively misleading when all three are preconditions.
+
+//: Row label, gloss, and sort order per `covers` value. Keyed by the vocabulary
+//: `detectors/scaffold.py::VALID_COVERS` owns; an unknown value renders under
+//: `UNCLASSIFIED_ROW` rather than being silently styled as a finding.
+const COVERAGE_ROWS = {
+  full: {
+    label: "FINDING",
+    noun: "finding",
+    plural: "findings",
+    gloss: "decides a named scenario, and fired",
+  },
+  "artifact-signal-only": {
+    label: "signal",
+    noun: "signal",
+    plural: "signals",
+    gloss: "an enabling precondition beside a scenario — never coverage of it",
+  },
+  "category-precondition": {
+    label: "observed",
+    noun: "observed property",
+    plural: "observed properties",
+    gloss: "a property of the package; decides no named scenario at all",
+  },
+};
+const COVERAGE_ORDER = ["full", "artifact-signal-only", "category-precondition"];
+const UNCLASSIFIED_ROW = {
+  label: "?",
+  noun: "unclassified firing",
+  plural: "unclassified firings",
+  gloss: "the check declares no `covers` value — report this as a bug",
+};
+const CLEAR_LABEL = "clear";
+const LABEL_WIDTH = 8;
+
+function coverageRow(covers) {
+  return COVERAGE_ROWS[covers] || UNCLASSIFIED_ROW;
+}
+
+/** The claim column: what this check would decide if it fired. */
+function claimText(finding) {
+  const ids = Array.isArray(finding.registry_ids) ? finding.registry_ids : [];
+  if (finding.covers === "full") {
+    return ids.length > 0 ? `decides ${ids.join(", ")}` : "decides a named scenario";
+  }
+  if (finding.covers === "artifact-signal-only") {
+    return ids.length > 0 ? `signal beside ${ids.join(", ")} — not coverage` : "signal only — not coverage";
+  }
+  if (finding.covers === "category-precondition") {
+    return "decides no named scenario";
+  }
+  return "coverage undeclared";
+}
+
+/**
+ * The one sentence that must be true if the reader stops here.
+ *
+ * Derived from the `full` count alone, because that is the only class of firing
+ * that decides one of the whitepaper's named scenarios.
+ */
+function verdictLine(payload) {
+  const deciding = [];
+  for (const category of payload.categories) {
+    for (const finding of category.findings || []) {
+      if (finding.detected && finding.covers === "full") {
+        const ids = Array.isArray(finding.registry_ids) ? finding.registry_ids : [];
+        deciding.push(ids.length > 0 ? `${finding.scenario} (${ids.join(", ")})` : finding.scenario);
+      }
+    }
+  }
+  if (deciding.length === 0) {
+    return "Nothing in this audit decides a named attack scenario.";
+  }
+  return (
+    `${deciding.length} check(s) decided a named attack scenario: ${deciding.join("; ")}.`
+  );
+}
+
+/**
+ * The absent-declaration note, printed ONCE or not at all.
+ *
+ * A package with no permissions block and no content_hash trips every check
+ * whose predicate is "the declaration is absent". Printing that reason once,
+ * above the table, is what stops one fact about the package from reading as
+ * several separate results further down.
+ */
+function declarationNote(payload) {
+  const declaration = payload.declaration || {};
+  if (declaration.declares_permissions || declaration.declares_content_hash) return [];
+  const source =
+    declaration.manifest_found === false
+      ? "no skill.usf.yaml and no parseable SKILL.md frontmatter"
+      : `a manifest (${payload.manifest_source}) that declares neither`;
+  return [
+    "NO SECURITY DECLARATION — read the rows below in this light.",
+    ...wrap(
+      `This package declares no permissions block and no content_hash: ${source}. ` +
+        "Every check whose predicate is the ABSENCE of a declaration therefore fires, and " +
+        "those firings are one fact about the package restated, not separate results. USF v1 " +
+        "is a proposal rather than a shipped format, so essentially no published skill carries " +
+        "a manifest and this is the normal state of a real package — not a finding about this one.",
+      74
+    ).map((line) => `  ${line}`),
+  ];
+}
 
 function cmdAudit(target, options) {
   if (!target) fail("audit needs a path to a candidate skill package");
@@ -809,6 +961,7 @@ function cmdAudit(target, options) {
   }
 
   const manifest = readFixtureManifest();
+  const byCoverage = payload.totals.detected_by_coverage || {};
   console.log(`\nAudit: ${payload.path}`);
   console.log(DISCLAIMER);
   console.log(rule());
@@ -817,6 +970,11 @@ function cmdAudit(target, options) {
     `Files scanned:    ${payload.scan_files.length} ` +
       `(declared shipped surface: ${payload.surface_files.length})`
   );
+  const note = declarationNote(payload);
+  if (note.length > 0) {
+    console.log("");
+    for (const line of note) console.log(line);
+  }
   console.log("");
 
   for (const category of payload.categories) {
@@ -833,16 +991,26 @@ function cmdAudit(target, options) {
       console.log("");
       continue;
     }
-    const detected = category.findings.filter((f) => f.detected);
+    // Per-category tally in the same vocabulary as the summary, so a category
+    // header never says "2 detected" where the two rows below it are a signal
+    // and a package property.
+    const fired = category.findings.filter((f) => f.detected);
+    const tally = COVERAGE_ORDER.map((mode) => {
+      const count = fired.filter((f) => f.covers === mode).length;
+      const row = COVERAGE_ROWS[mode];
+      return `${count} ${count === 1 ? row.noun : row.plural}`;
+    }).join(", ");
     console.log(
       `${pad(category.category, 8)}${pad(name, 34)}` +
-        `${category.findings.length} check(s), ${detected.length} detected  ` +
+        `${category.findings.length} check(s): ${tally}  ` +
         `[scope: ${category.scope}]`
     );
     for (const finding of category.findings) {
-      const flag = finding.detected ? "DETECTED" : "clear   ";
-      console.log(`  ${flag}  ${pad(finding.scenario, 42)}${finding.tier || "untiered"}`);
-      console.log(`            ${finding.evidence}`);
+      const label = finding.detected ? coverageRow(finding.covers).label : CLEAR_LABEL;
+      console.log(
+        `  ${pad(label, LABEL_WIDTH)}  ${pad(finding.scenario, 42)}${claimText(finding)}`
+      );
+      console.log(`  ${" ".repeat(LABEL_WIDTH)}  ${finding.evidence}`);
     }
     if (category.agent_judgable.length > 0) {
       console.log(
@@ -855,10 +1023,26 @@ function cmdAudit(target, options) {
 
   console.log(rule());
   console.log(
-    `Summary: ${payload.totals.checks_run} check(s) over ${payload.totals.categories} categories, ` +
-      `${payload.totals.detected} detected; ` +
+    `Summary: ${payload.totals.checks_run} check(s) over ${payload.totals.categories} categories; ` +
       `${payload.totals.categories_without_detectors} categories ship no static detector.`
   );
+  for (const mode of COVERAGE_ORDER) {
+    const row = COVERAGE_ROWS[mode];
+    const count = byCoverage[mode] || 0;
+    console.log(
+      `  ${padStart(count, 3)} ${pad(count === 1 ? row.noun : row.plural, 20)}${row.gloss}`
+    );
+  }
+  const unclassified = byCoverage["coverage-undeclared"] || 0;
+  if (unclassified > 0) {
+    console.log(
+      `  ${padStart(unclassified, 3)} ${pad(
+        unclassified === 1 ? UNCLASSIFIED_ROW.noun : UNCLASSIFIED_ROW.plural,
+        20
+      )}${UNCLASSIFIED_ROW.gloss}`
+    );
+  }
+  console.log(verdictLine(payload));
   if (payload.adapter_notes.length > 0) {
     console.log("");
     console.log("Manifest adapter notes (USF v1 -> detector package shape):");
