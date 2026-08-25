@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response rejects the 100% or fleet-wide wording and restates the claim scoped to the population the scanning method can actually reach.",
+      "passed": true,
+      "evidence": "No, the claim is not supportable... Reporting \"100% skill governance coverage\" ... over-claims... only proves coverage over a subset of the skill population: those within the security team's direct scanning perimeter."
+    },
+    {
+      "text": "The response identifies skills running inside managed SaaS copilots or agent platforms as the population the scan is blind to, and attributes that blindness to architecture rather than to concealment by an attacker.",
+      "passed": true,
+      "evidence": "cannot detect skills hosted inside managed SaaS copilots or agent platforms... These skills are invisible by architecture to endpoint\u2011based tools, not due to evasion."
+    },
+    {
+      "text": "The response requires the discovery method to be stated inside the reported claim or finding.",
+      "passed": true,
+      "evidence": "Per decision rule 4, a coverage claim must name its discovery method... You must disclose that your discovery method (endpoint + registry scanning) does not extend..."
+    },
+    {
+      "text": "The response names a different, identity- or posture-based discovery method for the unreachable population and lists at least two concrete telemetry sources it would draw on.",
+      "passed": true,
+      "evidence": "you would also need to demonstrate reconciliation of identity\u2011based telemetry \u2014 such as OAuth grants, connected app inventories, non\u2011human identity activity, and scope assignments."
+    },
+    {
+      "text": "The response treats an observed permission, scope, or consent change as an event that should trigger inventory and revocation immediately, rather than as routine telemetry to review later.",
+      "passed": false,
+      "evidence": "The response does not state that observed permission, scope, or consent changes should trigger inventory and revocation immediately; it only mentions needing identity\u2011based telemetry."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:21:49.356948+00:00",
+  "grader_attempts": 1
+}

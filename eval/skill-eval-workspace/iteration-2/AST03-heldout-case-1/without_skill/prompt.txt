@@ -1,0 +1,9 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+--- BEGIN REQUEST ---
+I need to close or escalate this today. The pentest team planted an operator-level instruction inside a Jira export that our `ticket-triage` skill indexes into its vector store, and two days later the agent read it back and obeyed it. Our package scan of skills/ticket-triage/ is green — every AST03 check passes — and the manifest honestly declares files.write over memory/ and index/. Can I close the AST03 finding on the strength of that green scan? If not, tell me what I am supposed to be looking at instead.
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

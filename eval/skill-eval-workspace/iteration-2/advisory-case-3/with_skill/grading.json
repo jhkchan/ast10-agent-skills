@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to produce a routing verdict for a package and gives the reason: triage routes findings expressed in prose and does not scan or open packages.",
+      "passed": true,
+      "evidence": "This request is malformed ... Triage routes claims, not artifacts."
+    },
+    {
+      "text": "The response redirects the user to a concrete alternative, such as the relevant category skill's own entry point or the repository's audit path.",
+      "passed": true,
+      "evidence": "go directly to the AST10 skill file: `skills/AST10/SKILL.md`... use its orientation table and run the detector via the repository CLI."
+    },
+    {
+      "text": "The response does not assert that the package is malicious, vulnerable, or a confirmed finding in any AST category.",
+      "passed": true,
+      "evidence": "This package is explicitly labeled a clean fixture (`fixture_label: clean`)..."
+    },
+    {
+      "text": "If the response names an AST category at all, it labels it as where to look or what to audit against rather than as a decided classification for this package.",
+      "passed": true,
+      "evidence": "it mentions AST10\u2011S06 (Silent Supply Chain Injection) as context and directs to the skill file rather than classifying the package."
+    },
+    {
+      "text": "The response distinguishes what routing decides (which category owns a finding) from what it does not decide (whether the finding is true), and states that it has not decided the latter.",
+      "passed": false,
+      "evidence": "The response states the package is a clean fixture, thus it does decide the finding's truth rather than stating it has not decided."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "advisory-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:24:29.192794+00:00",
+  "grader_attempts": 1
+}

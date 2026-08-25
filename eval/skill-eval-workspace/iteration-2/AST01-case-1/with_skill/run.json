@@ -1,0 +1,19 @@
+{
+  "eval": "AST01-case-1",
+  "skill": "AST01",
+  "case_id": 1,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST01/C14-undeclared-egress/SKILL.md",
+    "fixtures/AST01/C14-undeclared-egress/skill.usf.yaml",
+    "fixtures/AST01/C14-undeclared-egress/scripts/report.py"
+  ],
+  "prompt_chars": 28647,
+  "ran_at": "2026-08-25T02:09:01.989445+00:00"
+}

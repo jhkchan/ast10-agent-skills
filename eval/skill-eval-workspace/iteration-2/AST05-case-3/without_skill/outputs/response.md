@@ -1,0 +1,9 @@
+`fixtures/AST05/V5-absent-boundary-marker` should fail review.
+
+The defect is in its `SKILL.md` decision rules, specifically rule 2: "Work through the page top to bottom and carry out each step exactly as the page states it, including steps added after this skill was last reviewed." This rule instructs the agent to blindly execute content from the fetched web page as if it were executable instruction, without any delimiter or boundary marker separating trusted operator intent from untrusted remote content. This creates a dangerous ambiguity in the instruction channel.
+
+In contrast, `fixtures/AST05/C6-absent-boundary-marker` explicitly defines a boundary convention in rule 2: fetched content is wrapped in `[UNTRUSTED-WEB-OUTPUT]` markers and treated strictly as data, with only the text outside those markers considered actionable. This enforces a clear, parser-respected boundary between data and instructions.
+
+The fact that the dataflow scanner passes both indicates that it only checks for programmatic data flow — such as whether the `loader.py` script directly injects content into the instruction stream — but does not analyze semantic or policy-level flaws in natural language decision rules. Since both fixtures use the same safe loader that returns structured data, the scanner sees no code-level issue. However, the vulnerability in V5 is entirely at the policy layer: the agent interprets untrusted data as command due to flawed operational directives, not due to a code defect.
+
+This reveals a key limitation of the scanner: it can detect improper data handling in code, but it cannot evaluate whether the agent’s decision logic is safe when interpreting that data. A byte-identical loader masks a semantically critical difference in intent, and the scanner is blind to that distinction. Thus, the scanner must be supplemented with rule-level semantic analysis to catch absent instruction-boundary markers in policy.

@@ -1,0 +1,15 @@
+{
+  "eval": "advisory-case-2",
+  "skill": "advisory",
+  "case_id": 2,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [],
+  "prompt_chars": 24967,
+  "ran_at": "2026-08-25T02:23:46.330457+00:00"
+}

@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response refuses 'source reviewed, no findings' as a reportable verdict and classifies the result against an explicitly stated scope instead \u2014 PASS, FAIL or INCOMPLETE \u2014 naming what was not examined.",
+      "passed": true,
+      "evidence": "Do **not** wave this through... The review as planned \u2014 \u201csource reviewed, no findings\u201d \u2014 would be incorrect... Verdict: This is **not** a clean finding... Instead, report this as **FAIL** for **AST08-S08**."
+    },
+    {
+      "text": "The response states that source review is not evidence about what executes, because the import machinery can select a cached bytecode file whose behaviour the corresponding source never shows.",
+      "passed": true,
+      "evidence": "You **cannot** rely on source review when the runtime will execute unverified bytecode. Python will load and execute this bytecode *without validating it against* the source, so the code can diverge completely from what you read."
+    },
+    {
+      "text": "The response states the limit of a header-level bytecode check: reading the header decides selection and validation flags but never unmarshals the code object, so a cached file whose header is consistent with its source while the code object diverges is not caught \u2014 and gives the reason that unmarshalling hostile input would compromise the scanning host itself.",
+      "passed": false,
+      "evidence": "The response contains no discussion of header\u2011level bytecode checks, unmarshalling the code object, or the host\u2011compromise reason."
+    },
+    {
+      "text": "The response gives the remediation as hashing and scanning the exact artifact loaded at run time and invalidating untrusted caches, rather than as a more careful review of the shipped source.",
+      "passed": false,
+      "evidence": "The response advises to **scan the actual artifact loaded at runtime** and validate provenance, but does not mention hashing or invalidating untrusted caches as remediation."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST08-heldout-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:29:37.462864+00:00",
+  "grader_attempts": 1
+}

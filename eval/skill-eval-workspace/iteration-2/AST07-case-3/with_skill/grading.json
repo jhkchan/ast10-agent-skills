@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response attributes the described drift to AST05 (drift in externally referenced content) rather than to AST07, and says so explicitly rather than merely mentioning AST05 in passing.",
+      "passed": true,
+      "evidence": "This is **AST05: Untrusted External Instructions**, not AST07."
+    },
+    {
+      "text": "The response rejects tightening or hardening the version pin as the remediation, and gives as the reason that the package's own pin held byte-for-byte so a stronger pin closes nothing.",
+      "passed": true,
+      "evidence": "The skill\u2019s package bytes are identical ... its version pin held ... Pinning the skill harder will not help: the skill is not the drifting component."
+    },
+    {
+      "text": "The response observes that this package declares no content hash (it ships no skill.usf.yaml manifest) and attributes that finding to AST01's content-hash-missing check rather than counting it as AST07 coverage.",
+      "passed": false,
+      "evidence": "Response contains no mention of a missing content hash, skill.usf.yaml, or AST01 content\u2011hash\u2011missing check."
+    },
+    {
+      "text": "The response does not report a detected, confirmed, or convicted AST07 finding for this package, and reports AST07 as declared-and-uncovered.",
+      "passed": false,
+      "evidence": "Response does not report an AST07 finding nor state AST07 as declared\u2011and\u2011uncovered; it only says AST07 is not involved."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:18:58.755045+00:00",
+  "grader_attempts": 1
+}

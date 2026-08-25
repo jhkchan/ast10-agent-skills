@@ -1,0 +1,28 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output locates the defect in V5's SKILL.md decision rules and states that scripts/loader.py is not the defect, being identical in both packages.",
+      "passed": true,
+      "evidence": "The defect is in its `SKILL.md` decision rules... Both fixtures use the same safe loader that returns structured data, so `loader.py` is not the defect."
+    },
+    {
+      "text": "The output states that a code-level or dataflow scan cannot discriminate this pair, so the scanner's pass is not evidence that either package is clean.",
+      "passed": true,
+      "evidence": "The fact that the dataflow scanner passes both indicates ... it cannot separate this pair, so its pass is not evidence that either package is clean."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST05-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:16:03.671502+00:00",
+  "grader_attempts": 1
+}

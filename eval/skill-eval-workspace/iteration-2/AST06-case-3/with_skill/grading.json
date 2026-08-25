@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output declines to close the finding on the evidence offered.",
+      "passed": true,
+      "evidence": "No, that is not enough to close the AST06 finding."
+    },
+    {
+      "text": "The output states that a sandbox which is optional or available-if-configured is evidence for the finding, because the exposed population is the one running the default execution mode.",
+      "passed": true,
+      "evidence": "Saying \u201cthe sandbox is available if configured\u201d is evidence for the finding, not against it, because the population at risk runs the default (host mode)."
+    },
+    {
+      "text": "The output states that a loopback-bound control interface is not sufficient isolation without authentication, and cites the named precedent (ClawJacked / CVE-2026-32025) or an equivalent documented loopback WebSocket bypass.",
+      "passed": true,
+      "evidence": "loopback binding alone is not secure isolation \u2014 as demonstrated by ClawJacked (CVE-2026-32025), where a browser-origin WebSocket client bypassed authentication on a localhost-bound gateway."
+    },
+    {
+      "text": "The output distinguishes evidence about the product (vendor page, config reference, capability statement) from evidence about the deployment, and states that only the latter can close the finding.",
+      "passed": true,
+      "evidence": "Vendor pages and config references are product-level assurances; AST06 requires deployment-level proof."
+    },
+    {
+      "text": "The output names the specific evidence that would close it: this deployment runs sandboxed by default with host mode behind a documented explicit opt-in.",
+      "passed": true,
+      "evidence": "You must demonstrate that container isolation is enforced by default \u2014 i.e., the agent runs sandboxed unless explicitly overridden."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:17:27.726503+00:00",
+  "grader_attempts": 1
+}

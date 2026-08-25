@@ -1,0 +1,28 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response separates membership, signature verification and log integrity into three questions answered independently, and states that the digest lookup answers only the first \u2014 it does not verify a signature over the package against a resolvable publisher key, and it does not establish that the registry's own history has not been rewritten.",
+      "passed": true,
+      "evidence": "Your plan performs only one of the three distinct provenance checks... 1. \"Is this package listed?\" \u2014 Yes, via digest lookup. 2. \"Is this the digest the publisher actually signed?\" \u2014 No... 3. \"Has the registry log been rewritten?\" \u2014 No."
+    },
+    {
+      "text": "The response explains that a maintainer-account takeover yields a release that passes signature verification, because the attacker holds the legitimate publishing key.",
+      "passed": true,
+      "evidence": "Maintainer account takeover produces packages that are cryptographically indistinguishable from legitimate ones if the attacker holds the signing key."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST02-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:11:44.640651+00:00",
+  "grader_attempts": 1
+}

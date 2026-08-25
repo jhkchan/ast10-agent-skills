@@ -1,0 +1,17 @@
+{
+  "eval": "AST08-heldout-case-1",
+  "skill": "AST08",
+  "case_id": 1,
+  "configuration": "without_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": false,
+  "input_files": [
+    "fixtures/AST08/V4-bytecode-cache-poisoning"
+  ],
+  "prompt_chars": 2715,
+  "ran_at": "2026-08-25T02:29:40.374913+00:00"
+}

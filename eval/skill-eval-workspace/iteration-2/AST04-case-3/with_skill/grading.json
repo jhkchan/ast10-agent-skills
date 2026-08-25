@@ -1,0 +1,33 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output states that an egress primitive such as curl, and a declared shell: true, are capabilities rather than AST04 findings \u2014 AST04 is keyed on a contradiction between what the manifest declares and what the code reaches \u2014 and does not treat the presence of either as a finding.",
+      "passed": false,
+      "evidence": "Response says 'There is no permission understating (AST04\u2011S02)' but does not state that curl or shell: true are merely capabilities and not findings."
+    },
+    {
+      "text": "The sign-off line the output supplies is scoped rather than a blanket clearance: it says which AST04 question was decided (every host reached by the bundled script appears on the declared allowlist) and does not present the package as clean overall or claim that runtime behaviour matches the declaration.",
+      "passed": false,
+      "evidence": "Sign-off line reads 'Approved \u2014 AST04 does not block publication' and 'All AST04 checks pass', a blanket clearance not a scoped statement."
+    },
+    {
+      "text": "If the output raises the breadth of the declared `shell: true` at all, it attributes that to AST03 over-privilege rather than to AST04 misdeclaration.",
+      "passed": false,
+      "evidence": "Response never mentions AST03 or attributes the breadth of shell:true to AST03; it only notes the shell:true declaration."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 3,
+    "total": 3,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST04-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:14:15.054124+00:00",
+  "grader_attempts": 1
+}

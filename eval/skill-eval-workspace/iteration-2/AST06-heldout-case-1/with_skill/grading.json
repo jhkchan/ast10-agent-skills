@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response contradicts the co-reviewer and reports a finding from the manifest alone \u2014 a declared write scope of filesystem root with an empty deny_write \u2014 stating that a bundled script or persistence call site is not required because the defining condition is a disjunction.",
+      "passed": true,
+      "evidence": "Your co-reviewer is incorrect... The fixture declares `write: [\"/\"]` with no `deny_write` entries, satisfying the second disjunct without needing a script."
+    },
+    {
+      "text": "The response states that the root-scope comparison runs against a closed set of literal spellings of root, home and bare wildcards, so a broad-but-not-root scope such as /etc/** or /var/** returns negative and has to be read by hand.",
+      "passed": false,
+      "evidence": "The response does not mention a closed set of literal spellings or that /etc/** or /var/** returns negative and must be read by hand."
+    },
+    {
+      "text": "The response states how much of the category this decides \u2014 one scenario out of AST06's five \u2014 and names at least two facts about the running deployment that no package carries, drawn from bind address, workspace-over-bundled precedence, hot-reload behaviour, or cross-agent shared state.",
+      "passed": false,
+      "evidence": "The response never says it decides one of five AST06 scenarios nor lists facts such as bind address, workspace\u2011over\u2011bundled precedence, hot\u2011reload behaviour, or cross\u2011agent shared state."
+    },
+    {
+      "text": "The response states that narrowing the declared write list is not on its own evidence that any boundary enforces the manifest at run time, so the manifest edit does not close the isolation question.",
+      "passed": true,
+      "evidence": "It states tightening the `write` scope does not prove any boundary enforces the manifest and does not close the isolation issue."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-heldout-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:28:45.174114+00:00",
+  "grader_attempts": 1
+}

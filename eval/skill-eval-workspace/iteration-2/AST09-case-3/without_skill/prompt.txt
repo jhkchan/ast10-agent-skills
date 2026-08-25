@@ -1,0 +1,9 @@
+You are an AI agent answering one request from a colleague.
+
+This session has NO tool access and NO filesystem access. Everything you are permitted to rely on appears below; if something is not below, you do not have it. Answer the request directly, completely, and in your own words.
+
+--- BEGIN REQUEST ---
+Sanity-check a coverage claim against AST09 before it goes out. Our EDR agent scanned every managed endpoint plus the internal package registry, and every agent skill it found matched an approved inventory entry — zero unmatched. I'm about to report 100% skill governance coverage to the risk committee on Thursday. Is that claim supportable?
+--- END REQUEST ---
+
+Write your complete answer now. It is the only thing the colleague will see.

@@ -1,0 +1,28 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response names config/credentials.env as the only deny_write entry and states that it does not shadow the identity-file writes.",
+      "passed": true,
+      "evidence": "The declared deny_write only blocks writing to config/credentials.env, leaving SOUL.md and MEMORY.md unprotected and writable."
+    },
+    {
+      "text": "The response states that a check asserting only that a deny_write floor exists is insufficient, because the evaluation is per-path rather than a presence test.",
+      "passed": false,
+      "evidence": "The response does not mention per\u2011path evaluation or state that a presence\u2011test check is insufficient."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 1,
+    "total": 2,
+    "pass_rate": 0.5
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST03-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:12:39.854825+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to put a named AST02 scenario id on this observation, and does not substitute a different AST02 scenario id in its place.",
+      "passed": true,
+      "evidence": "The response says \"DO NOT FILE THIS AS `AST02-S02`\" and provides a different ID `AST08-M01`, thus declines to use an AST02 ID and does not substitute another AST02 ID."
+    },
+    {
+      "text": "The response explains the refusal by distinguishing what the observation is \u2014 an enabling precondition or artifact signal read off this package's own lockfile \u2014 from coverage of the scenario, and states that the scenario is an outcome of a resolver acting in a namespace this package does not contain.",
+      "passed": false,
+      "evidence": "The response distinguishes the artifact (mutable ranges) from resolver behavior, but does not describe the observation as an \"enabling precondition\" read from a lockfile, nor explicitly reference a lockfile."
+    },
+    {
+      "text": "The response still reports the unpinned ranges as a real defect worth fixing, and states that hash-checking requires every package in the transitive dependency tree to carry a hash, so a partial pin is not a pin.",
+      "passed": false,
+      "evidence": "The response calls the missing hash pins a defect, but does not explicitly state that hash\u2011checking requires every package in the transitive tree to have a hash or that a partial pin is not a pin."
+    },
+    {
+      "text": "The response names evidence outside this package that would decide the scenario \u2014 for example the resolver's index configuration, or a record of which index actually served each package \u2014 rather than proposing another scan of the package.",
+      "passed": false,
+      "evidence": "The response mentions resolver behavior but does not name concrete evidence outside the package such as index configuration or records of which index served each package."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST02-heldout-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:25:49.267724+00:00",
+  "grader_attempts": 1
+}

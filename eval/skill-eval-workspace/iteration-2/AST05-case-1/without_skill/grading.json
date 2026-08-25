@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output states that a declared boundary and an implemented boundary are indistinguishable to a static check \u2014 a function with a boundary-sounding name whose body returns its input unchanged would clear it \u2014 so reading the body is a required manual step.",
+      "passed": false,
+      "evidence": "The response does not mention a static check, a boundary\u2011sounding function, or that reading the body is required."
+    },
+    {
+      "text": "The output labels the finding as an enabling precondition or artifact-signal rather than as coverage of a named AST05 scenario, and does not report a rug-pull, bait-and-switch, chaining, or relay-amplification verdict.",
+      "passed": false,
+      "evidence": "The response never labels the finding as an enabling precondition or artifact\u2011signal, nor does it discuss named AST05 scenarios."
+    },
+    {
+      "text": "The output states that what https://docs.example.com/runbook.md serves is not observable from this package \u2014 not what it serves now, not what it will serve at run time, not what it serves to a different caller \u2014 and makes no claim about its content.",
+      "passed": false,
+      "evidence": "The response makes no statement that the content served by https://docs.example.com/runbook.md is unobservable or avoids any claim about its content."
+    },
+    {
+      "text": "The output explains why this is AST05 and not AST01 by pointing out that the shipped package body carries no payload and the instruction arrives from referenced content.",
+      "passed": false,
+      "evidence": "The response does not explain why this is AST05 rather than AST01; it gives no comparison of payload or referenced content."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST05-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:15:06.399662+00:00",
+  "grader_attempts": 1
+}

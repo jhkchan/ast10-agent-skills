@@ -1,0 +1,19 @@
+{
+  "eval": "AST10-case-2",
+  "skill": "AST10",
+  "case_id": 2,
+  "configuration": "without_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": false,
+  "input_files": [
+    "fixtures/AST10/V5-gzip-archive-payload/SKILL.md",
+    "fixtures/AST10/V5-gzip-archive-payload/skill.usf.yaml",
+    "fixtures/AST10/V5-gzip-archive-payload/scripts/loader.py"
+  ],
+  "prompt_chars": 3687,
+  "ran_at": "2026-08-25T02:22:36.318036+00:00"
+}

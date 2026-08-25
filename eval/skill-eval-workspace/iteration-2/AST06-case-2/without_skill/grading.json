@@ -1,0 +1,33 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output states that the sudo call is not itself the finding, giving as the reason that no call site targets a host persistence location and that a shell or privilege grant is a capability rather than the act the scenario requires.",
+      "passed": false,
+      "evidence": "Response says sudo is not disqualifying because it is read\u2011only, but never mentions that the sudo call does not target a host persistence location nor that privilege grant is merely a capability."
+    },
+    {
+      "text": "The output names at least three AST06 concerns the package scan could not decide, drawn from bind address, workspace-over-bundled precedence or skill shadowing, hot-reload behaviour, and cross-agent shared state, and attributes them to the deployment rather than to the package.",
+      "passed": false,
+      "evidence": "Response contains no mention of bind address, workspace\u2011over\u2011bundled precedence, skill shadowing, hot\u2011reload behaviour, or cross\u2011agent shared state."
+    },
+    {
+      "text": "The output states how much of the category this negative covers \u2014 one of AST06's five scenarios \u2014 and states that it is therefore not evidence that the deployment is isolated or that AST06 is closed.",
+      "passed": false,
+      "evidence": "Response notes the audit covers scenario AST06\u2011S2 (one of five) but does not state that this does not prove deployment isolation or that AST06 is closed."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 3,
+    "total": 3,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:17:07.933783+00:00",
+  "grader_attempts": 1
+}

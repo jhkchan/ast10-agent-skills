@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to record AST09 as a pass, clean, or green for this package.",
+      "passed": false,
+      "evidence": "\"You can safely tick AST09 as a **pass** and close the ticket.\" the response affirms a pass rather than declining it."
+    },
+    {
+      "text": "The response declines the 'inconclusive' wording on the ground that nothing was checked \u2014 no AST09 question was put to the package at all \u2014 rather than on the ground that the scan result was conclusive.",
+      "passed": false,
+      "evidence": "The response rejects 'inconclusive' because the scanner was clean, not because nothing was checked; it does not cite lack of an AST09 question."
+    },
+    {
+      "text": "The response states that no scan of a single package can decide AST09, and gives the reason that approval, inventory and offboarding state are held by the organisation rather than inside the artifact.",
+      "passed": false,
+      "evidence": "The response never states that a single\u2011package scan cannot decide AST09 or mention organisational approval/inventory constraints."
+    },
+    {
+      "text": "The response names at least three specific organisational records or checks that would decide it, such as an inventory row keyed on the content hash, the installer's identity and offboarding state, the credential the skill runs under, an execution record over a real interval, or the discovery method used.",
+      "passed": false,
+      "evidence": "No organisational records are named; the answer only cites the scanner, manifest and postinstall.py, not inventory rows or identity records."
+    },
+    {
+      "text": "The response frames the outcome as a named missing system or process that should be written down as the finding, rather than as a status value, and does not advise closing the ticket on the scanner result.",
+      "passed": false,
+      "evidence": "It tells the user to \"tick AST09 as a pass and close the ticket,\" not to frame a missing system or avoid closing based on the scanner result."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:21:06.941680+00:00",
+  "grader_attempts": 1
+}

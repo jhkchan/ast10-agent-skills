@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response concludes that neither the .docx nor the symlink is a finding and gives a measured reason for each \u2014 the archive's compression ratio being within an ordinary range, and the symlink's target resolving to a path inside the package \u2014 rather than clearing them because the package looks unremarkable.",
+      "passed": false,
+      "evidence": "The response does not mention compression ratio or symlink target resolution, merely saying 'without any malicious characteristics like excessive compression... or symbolic link escapes'."
+    },
+    {
+      "text": "The response reports the verdict against an explicitly stated scope (PASS, or PASS/INCOMPLETE with the incompleteness named) rather than as an unqualified 'clean' or 'no findings'.",
+      "passed": false,
+      "evidence": "The response says the package is 'flagged as clean' and 'you can safely wave this one through' but does not give a PASS or PASS/INCOMPLETE verdict."
+    },
+    {
+      "text": "The response names at least one specific thing the check did not or could not cover, such as the declared uncompressed size in the zip central directory being attacker-controlled, or the archive never having been decompressed.",
+      "passed": false,
+      "evidence": "The response provides no mention of any limitation of the check, such as uncompressed size or lack of decompression."
+    },
+    {
+      "text": "The response states the general rule that the presence of a carrier \u2014 an archive, a symlink, an external URL, a credential reference \u2014 is not by itself a conviction.",
+      "passed": true,
+      "evidence": "The response states 'These alone aren't sufficient to trigger resource exhaustion or host compromise,' indicating carriers are not convictions."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST08-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:19:34.637822+00:00",
+  "grader_attempts": 1
+}

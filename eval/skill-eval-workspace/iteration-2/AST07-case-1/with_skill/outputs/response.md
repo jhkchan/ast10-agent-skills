@@ -1,0 +1,1 @@
+`declared-and-uncovered: could not obtain predecessor record (for Malicious Update), resolver decision record (for Rollback Attack), or reload telemetry with directory ownership (for Hot-Reload Abuse) — human-in-the-loop review steps incomplete`

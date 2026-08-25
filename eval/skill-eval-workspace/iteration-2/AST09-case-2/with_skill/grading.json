@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response identifies operator control over the record as the specific defect and names the correction-row insertion available to the platform team as the mechanism that establishes it, rather than pointing at retention, backups, or field coverage.",
+      "passed": true,
+      "evidence": "operators control the database, can alter the narrative post\u2011hoc, and because the platform team can insert correction rows (even with a reason code) \u2026"
+    },
+    {
+      "text": "The response requires two separate records per execution attempt: one produced before execution recording what was authorised, and one produced after recording what actually happened.",
+      "passed": true,
+      "evidence": "Admission receipt: Signed log entry before execution\u2026 Outcome receipt: Signed log entry after execution"
+    },
+    {
+      "text": "The response requires a shared identifier joining those two records and says what an auditor can only establish because of it.",
+      "passed": true,
+      "evidence": "attempt_id (to bind authorization and execution)\u2026 Link receipts by attempt_id so auditors can trace approval to outcome."
+    },
+    {
+      "text": "The response requires the policy version in effect to be captured inside the signed record at decision time rather than reconstructed after the fact.",
+      "passed": true,
+      "evidence": "policy_version (bound at decision time)\u2026 must be recorded at decision, not reconstructed"
+    },
+    {
+      "text": "The response warns that a missing outcome record is not evidence the action was blocked, and names at least one benign cause that produces an identical pattern.",
+      "passed": false,
+      "evidence": "Response warns missing outcome receipts cannot be assumed to prove denial, but it does not name any benign cause (e.g., a crashed worker) that could produce the same pattern."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:21:22.561876+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,3 @@
+The contradiction is a **risk_tier spoofing** finding: the manifest declares `risk_tier: L0`, but the declared permissions — `shell: true` and an effective `write` scope (allowed writes to `reports/summary.md` without being fully shadowed by `deny_write`) — derive a minimum risk floor of **L3** under rule 3. Declaring `L0` understates the actual risk.
+
+**Fix:** Update the `risk_tier` to `L3` to reflect the true risk level derived from the permission set. The permission block is not in scope for renegotiation, but the `risk_tier` must not be below the floor it implies.

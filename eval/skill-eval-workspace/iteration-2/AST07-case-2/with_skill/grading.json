@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to conclude that a rollback attack occurred, and states that a decreased resolved version is on its own insufficient because it convicts legitimate operator-initiated rollbacks too.",
+      "passed": true,
+      "evidence": "NEVER convict Rollback Attack on \u201cthe resolved version decreased\u201d alone."
+    },
+    {
+      "text": "The response asks for a resolver decision record (the requested constraint, the candidate versions offered, and the version resolved) and separately for an operator-intent record, naming both rather than only one.",
+      "passed": true,
+      "evidence": "requires ... what constraint was requested, what version was resolved, and critically, an operator\u2011intent record\u2026 Gather resolver logs \u2026 showing the constraint, candidate set, and resolution outcome."
+    },
+    {
+      "text": "The response states that the team's recollection that nobody requested the downgrade is not a substitute for the operator-intent record.",
+      "passed": false,
+      "evidence": "The response never mentions the team\u2019s recollection or that it is not a substitute for the operator\u2011intent record."
+    },
+    {
+      "text": "The response states that the package at fixtures/AST01/C4-social-engineering-prereq cannot answer the question because a single package snapshot carries no version history.",
+      "passed": false,
+      "evidence": "The response says a single skill package alone cannot determine the issue, but does not state it is because the snapshot lacks version history."
+    },
+    {
+      "text": "The response leaves Rollback Attack explicitly undecided rather than reporting it as either confirmed or cleared.",
+      "passed": true,
+      "evidence": "\u201cyou cannot make this call\u201d and \u201cOnly after that analysis \u2026 should you consider escalation\u201d \u2013 the attack is left undecided."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:18:25.915062+00:00",
+  "grader_attempts": 1
+}

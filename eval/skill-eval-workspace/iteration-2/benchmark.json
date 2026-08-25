@@ -1,0 +1,947 @@
+{
+  "generated_by": "eval/skill_evals.py",
+  "generated_at": "2026-08-25T02:31:11.593543+00:00",
+  "iteration": 2,
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "measures": "pass_rate is the fraction of a case's hand-authored assertions the graded response satisfied. It is NOT a detector F1 and NOT a judge rubric total; nothing here is averaged with either surface.",
+  "counts": {
+    "cases_in_workspace": 44,
+    "cases_paired": 44,
+    "cases_excluded": 0
+  },
+  "excluded": [],
+  "cases": [
+    {
+      "eval": "AST01-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.75,
+        "passed": 3,
+        "total": 4,
+        "time_seconds": 5.573,
+        "tokens": 7325
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.5,
+        "passed": 2,
+        "total": 4,
+        "time_seconds": 4.151,
+        "tokens": 1191
+      },
+      "pass_rate_delta": 0.25
+    },
+    {
+      "eval": "AST01-case-2",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 2,
+        "time_seconds": 3.793,
+        "tokens": 7407
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 2,
+        "time_seconds": 3.611,
+        "tokens": 1162
+      },
+      "pass_rate_delta": 0.0
+    },
+    {
+      "eval": "AST01-case-3",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.8,
+        "passed": 4,
+        "total": 5,
+        "time_seconds": 7.681,
+        "tokens": 6767
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 5,
+        "time_seconds": 1.885,
+        "tokens": 337
+      },
+      "pass_rate_delta": 0.8
+    },
+    {
+      "eval": "AST01-heldout-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.5,
+        "passed": 2,
+        "total": 4,
+        "time_seconds": 5.563,
+        "tokens": 7562
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.25,
+        "passed": 1,
+        "total": 4,
+        "time_seconds": 18.459,
+        "tokens": 1313
+      },
+      "pass_rate_delta": 0.25
+    },
+    {
+      "eval": "AST02-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 1.0,
+        "passed": 2,
+        "total": 2,
+        "time_seconds": 3.178,
+        "tokens": 5846
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 2,
+        "time_seconds": 1.385,
+        "tokens": 634
+      },
+      "pass_rate_delta": 1.0
+    },
+    {
+      "eval": "AST02-case-2",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 2,
+        "time_seconds": 3.004,
+        "tokens": 5851
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 2,
+        "time_seconds": 2.786,
+        "tokens": 823
+      },
+      "pass_rate_delta": 0.0
+    },
+    {
+      "eval": "AST02-case-3",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 1.0,
+        "passed": 2,
+        "total": 2,
+        "time_seconds": 6.291,
+        "tokens": 5784
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 2,
+        "time_seconds": 2.465,
+        "tokens": 478
+      },
+      "pass_rate_delta": 1.0
+    },
+    {
+      "eval": "AST02-heldout-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.25,
+        "passed": 1,
+        "total": 4,
+        "time_seconds": 3.422,
+        "tokens": 5694
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 0.482,
+        "tokens": 209
+      },
+      "pass_rate_delta": 0.25
+    },
+    {
+      "eval": "AST03-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.6667,
+        "passed": 2,
+        "total": 3,
+        "time_seconds": 4.218,
+        "tokens": 5356
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.6667,
+        "passed": 2,
+        "total": 3,
+        "time_seconds": 2.583,
+        "tokens": 722
+      },
+      "pass_rate_delta": 0.0
+    },
+    {
+      "eval": "AST03-case-2",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 1.0,
+        "passed": 2,
+        "total": 2,
+        "time_seconds": 3.434,
+        "tokens": 5422
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.5,
+        "passed": 1,
+        "total": 2,
+        "time_seconds": 2.152,
+        "tokens": 784
+      },
+      "pass_rate_delta": 0.5
+    },
+    {
+      "eval": "AST03-case-3",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.6,
+        "passed": 3,
+        "total": 5,
+        "time_seconds": 3.235,
+        "tokens": 5321
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 5,
+        "time_seconds": 0.519,
+        "tokens": 492
+      },
+      "pass_rate_delta": 0.6
+    },
+    {
+      "eval": "AST03-heldout-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.75,
+        "passed": 3,
+        "total": 4,
+        "time_seconds": 8.695,
+        "tokens": 5391
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.25,
+        "passed": 1,
+        "total": 4,
+        "time_seconds": 4.031,
+        "tokens": 585
+      },
+      "pass_rate_delta": 0.5
+    },
+    {
+      "eval": "AST04-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.5,
+        "passed": 1,
+        "total": 2,
+        "time_seconds": 15.9,
+        "tokens": 6518
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 2,
+        "time_seconds": 14.882,
+        "tokens": 1096
+      },
+      "pass_rate_delta": 0.5
+    },
+    {
+      "eval": "AST04-case-2",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 2,
+        "time_seconds": 2.738,
+        "tokens": 5545
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 2,
+        "time_seconds": 1.505,
+        "tokens": 614
+      },
+      "pass_rate_delta": 0.0
+    },
+    {
+      "eval": "AST04-case-3",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 3,
+        "time_seconds": 1.384,
+        "tokens": 5564
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.6667,
+        "passed": 2,
+        "total": 3,
+        "time_seconds": 2.559,
+        "tokens": 692
+      },
+      "pass_rate_delta": -0.6667
+    },
+    {
+      "eval": "AST04-heldout-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.5,
+        "passed": 2,
+        "total": 4,
+        "time_seconds": 4.732,
+        "tokens": 6021
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.25,
+        "passed": 1,
+        "total": 4,
+        "time_seconds": 5.825,
+        "tokens": 1022
+      },
+      "pass_rate_delta": 0.25
+    },
+    {
+      "eval": "AST05-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.25,
+        "passed": 1,
+        "total": 4,
+        "time_seconds": 5.261,
+        "tokens": 6134
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 2.386,
+        "tokens": 901
+      },
+      "pass_rate_delta": 0.25
+    },
+    {
+      "eval": "AST05-case-2",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 4.973,
+        "tokens": 5828
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 3.65,
+        "tokens": 973
+      },
+      "pass_rate_delta": 0.0
+    },
+    {
+      "eval": "AST05-case-3",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 1.0,
+        "passed": 2,
+        "total": 2,
+        "time_seconds": 13.869,
+        "tokens": 6920
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 1.0,
+        "passed": 2,
+        "total": 2,
+        "time_seconds": 5.065,
+        "tokens": 1590
+      },
+      "pass_rate_delta": 0.0
+    },
+    {
+      "eval": "AST05-heldout-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 1.0,
+        "passed": 4,
+        "total": 4,
+        "time_seconds": 12.75,
+        "tokens": 6492
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 13.351,
+        "tokens": 881
+      },
+      "pass_rate_delta": 1.0
+    },
+    {
+      "eval": "AST06-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.3333,
+        "passed": 1,
+        "total": 3,
+        "time_seconds": 4.379,
+        "tokens": 5857
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.3333,
+        "passed": 1,
+        "total": 3,
+        "time_seconds": 5.477,
+        "tokens": 1000
+      },
+      "pass_rate_delta": 0.0
+    },
+    {
+      "eval": "AST06-case-2",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.6667,
+        "passed": 2,
+        "total": 3,
+        "time_seconds": 15.931,
+        "tokens": 6194
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 3,
+        "time_seconds": 5.83,
+        "tokens": 1079
+      },
+      "pass_rate_delta": 0.6667
+    },
+    {
+      "eval": "AST06-case-3",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 1.0,
+        "passed": 5,
+        "total": 5,
+        "time_seconds": 5.42,
+        "tokens": 5298
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 5,
+        "time_seconds": 2.874,
+        "tokens": 313
+      },
+      "pass_rate_delta": 1.0
+    },
+    {
+      "eval": "AST06-heldout-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.5,
+        "passed": 2,
+        "total": 4,
+        "time_seconds": 25.401,
+        "tokens": 5943
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 3.047,
+        "tokens": 811
+      },
+      "pass_rate_delta": 0.5
+    },
+    {
+      "eval": "AST07-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.4,
+        "passed": 2,
+        "total": 5,
+        "time_seconds": 1.03,
+        "tokens": 5737
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 5,
+        "time_seconds": 2.712,
+        "tokens": 961
+      },
+      "pass_rate_delta": 0.4
+    },
+    {
+      "eval": "AST07-case-2",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.6,
+        "passed": 3,
+        "total": 5,
+        "time_seconds": 6.303,
+        "tokens": 6306
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 5,
+        "time_seconds": 3.756,
+        "tokens": 1203
+      },
+      "pass_rate_delta": 0.6
+    },
+    {
+      "eval": "AST07-case-3",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.5,
+        "passed": 2,
+        "total": 4,
+        "time_seconds": 4.887,
+        "tokens": 5805
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 3.742,
+        "tokens": 956
+      },
+      "pass_rate_delta": 0.5
+    },
+    {
+      "eval": "AST07-heldout-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.75,
+        "passed": 3,
+        "total": 4,
+        "time_seconds": 6.78,
+        "tokens": 5666
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 1.727,
+        "tokens": 308
+      },
+      "pass_rate_delta": 0.75
+    },
+    {
+      "eval": "AST08-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.75,
+        "passed": 3,
+        "total": 4,
+        "time_seconds": 4.895,
+        "tokens": 4799
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.25,
+        "passed": 1,
+        "total": 4,
+        "time_seconds": 2.231,
+        "tokens": 719
+      },
+      "pass_rate_delta": 0.5
+    },
+    {
+      "eval": "AST08-case-2",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.5,
+        "passed": 2,
+        "total": 4,
+        "time_seconds": 6.761,
+        "tokens": 5593
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.25,
+        "passed": 1,
+        "total": 4,
+        "time_seconds": 5.542,
+        "tokens": 1439
+      },
+      "pass_rate_delta": 0.25
+    },
+    {
+      "eval": "AST08-case-3",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.75,
+        "passed": 3,
+        "total": 4,
+        "time_seconds": 6.6,
+        "tokens": 5418
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 4.474,
+        "tokens": 1401
+      },
+      "pass_rate_delta": 0.75
+    },
+    {
+      "eval": "AST08-heldout-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.5,
+        "passed": 2,
+        "total": 4,
+        "time_seconds": 5.374,
+        "tokens": 5068
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.25,
+        "passed": 1,
+        "total": 4,
+        "time_seconds": 2.909,
+        "tokens": 973
+      },
+      "pass_rate_delta": 0.25
+    },
+    {
+      "eval": "AST09-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 1.0,
+        "passed": 5,
+        "total": 5,
+        "time_seconds": 7.021,
+        "tokens": 6127
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 5,
+        "time_seconds": 2.015,
+        "tokens": 1238
+      },
+      "pass_rate_delta": 1.0
+    },
+    {
+      "eval": "AST09-case-2",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.8,
+        "passed": 4,
+        "total": 5,
+        "time_seconds": 7.438,
+        "tokens": 5604
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 5,
+        "time_seconds": 4.497,
+        "tokens": 790
+      },
+      "pass_rate_delta": 0.8
+    },
+    {
+      "eval": "AST09-case-3",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.8,
+        "passed": 4,
+        "total": 5,
+        "time_seconds": 6.121,
+        "tokens": 5171
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 5,
+        "time_seconds": 1.636,
+        "tokens": 279
+      },
+      "pass_rate_delta": 0.8
+    },
+    {
+      "eval": "AST09-heldout-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.25,
+        "passed": 1,
+        "total": 4,
+        "time_seconds": 4.981,
+        "tokens": 5187
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 2.907,
+        "tokens": 473
+      },
+      "pass_rate_delta": 0.25
+    },
+    {
+      "eval": "AST10-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.5,
+        "passed": 1,
+        "total": 2,
+        "time_seconds": 3.237,
+        "tokens": 5766
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 2,
+        "time_seconds": 2.203,
+        "tokens": 1330
+      },
+      "pass_rate_delta": 0.5
+    },
+    {
+      "eval": "AST10-case-2",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.3333,
+        "passed": 1,
+        "total": 3,
+        "time_seconds": 8.418,
+        "tokens": 6031
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.3333,
+        "passed": 1,
+        "total": 3,
+        "time_seconds": 4.435,
+        "tokens": 1459
+      },
+      "pass_rate_delta": 0.0
+    },
+    {
+      "eval": "AST10-case-3",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.5,
+        "passed": 2,
+        "total": 4,
+        "time_seconds": 5.986,
+        "tokens": 5092
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 3.907,
+        "tokens": 563
+      },
+      "pass_rate_delta": 0.5
+    },
+    {
+      "eval": "AST10-heldout-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.6,
+        "passed": 3,
+        "total": 5,
+        "time_seconds": 9.78,
+        "tokens": 6378
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.2,
+        "passed": 1,
+        "total": 5,
+        "time_seconds": 4.054,
+        "tokens": 1458
+      },
+      "pass_rate_delta": 0.4
+    },
+    {
+      "eval": "advisory-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.8333,
+        "passed": 5,
+        "total": 6,
+        "time_seconds": 6.769,
+        "tokens": 6453
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 6,
+        "time_seconds": 1.287,
+        "tokens": 241
+      },
+      "pass_rate_delta": 0.8333
+    },
+    {
+      "eval": "advisory-case-2",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.75,
+        "passed": 3,
+        "total": 4,
+        "time_seconds": 3.225,
+        "tokens": 6356
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 3.428,
+        "tokens": 411
+      },
+      "pass_rate_delta": 0.75
+    },
+    {
+      "eval": "advisory-case-3",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.8,
+        "passed": 4,
+        "total": 5,
+        "time_seconds": 2.348,
+        "tokens": 7077
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.2,
+        "passed": 1,
+        "total": 5,
+        "time_seconds": 2.702,
+        "tokens": 1277
+      },
+      "pass_rate_delta": 0.6
+    },
+    {
+      "eval": "advisory-heldout-case-1",
+      "with_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 4.013,
+        "tokens": 6312
+      },
+      "without_skill": {
+        "status": "complete",
+        "pass_rate": 0.0,
+        "passed": 0,
+        "total": 4,
+        "time_seconds": 0.454,
+        "tokens": 187
+      },
+      "pass_rate_delta": 0.0
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "n": 44,
+        "mean": 0.5678,
+        "stddev": 0.3137
+      },
+      "time_seconds": {
+        "n": 44,
+        "mean": 6.43,
+        "stddev": 4.46
+      },
+      "tokens": {
+        "n": 44,
+        "mean": 5954.2,
+        "stddev": 648.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "n": 44,
+        "mean": 0.1341,
+        "stddev": 0.23
+      },
+      "time_seconds": {
+        "n": 44,
+        "mean": 3.9,
+        "stddev": 3.52
+      },
+      "tokens": {
+        "n": 44,
+        "mean": 849.3,
+        "stddev": 391.6
+      }
+    },
+    "delta": {
+      "pass_rate": 0.4337,
+      "time_seconds": 2.53,
+      "tokens": 5104.9
+    }
+  },
+  "notes": {
+    "stddev": "stddev is the sample standard deviation ACROSS the runs in this configuration. With one run per eval it describes how much the cases differ from each other, NOT the run-to-run variability of the harness, and it must not be read as a confidence interval on the mean. It is null when fewer than two runs contributed, because a single observation has no spread and printing 0.0 would dress that up as precision."
+  },
+  "limitations": [
+    "Every number here was produced by ONE agent model. It is one point of evidence, not a population: a delta measured on this model is a fact about this model holding these skills, and says nothing about how another model would do.",
+    "The grader is blinded by construction \u2014 it receives the same fields for both arms and is never told which arm, or that two arms exist. It is not blinded against self-identification: a response that says 'per the AST01 skill' reveals its arm, and no grader prompt can prevent that.",
+    "A case enters the summary only when BOTH arms completed. A case whose with_skill or without_skill run failed is excluded from BOTH means with its reason listed in `excluded`, because a delta computed over two different case sets is not a delta."
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response identifies scripts/loader.py's ARCHIVE literal as the finding and states that reading it requires two decode layers (base64 then gzip), not one.",
+      "passed": false,
+      "evidence": "The response never mentions the ARCHIVE literal; it only refers to the loader.py script decoding a base64\u2011encoded gzip archive."
+    },
+    {
+      "text": "The response states that most of AST10's six scenarios cannot be decided from this package alone, and names at least two distinct kinds of external evidence that would be required, such as a pre-port manifest, the target platform's default permissions, or cross-registry install and scan data.",
+      "passed": false,
+      "evidence": "The response says it cannot close two AST10 scenarios and does not claim most of the six scenarios, nor does it name external evidence such as a pre\u2011port manifest or platform permissions."
+    },
+    {
+      "text": "The response qualifies what the content-layer scan did not cover \u2014 for example a bounded decode depth, encodings that are never extracted as candidates, or the point that blobs read is not the same number as payloads present \u2014 instead of reporting the scan as exhaustive.",
+      "passed": true,
+      "evidence": "It notes that the scan \u2018evades na\u00efve static analysis that only inspects raw source text\u2019, qualifying the scan\u2019s limits rather than claiming it exhaustive."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 2,
+    "total": 3,
+    "pass_rate": 0.3333
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST10-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:22:43.591288+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The write-up records two separate findings \u2014 the payload under its own category (AST01 execution/exfiltration) and the scanner miss under AST08 \u2014 and does not merge them into a single finding.",
+      "passed": true,
+      "evidence": "we file **two findings**: - One **AST08** finding for the scanner\u2019s failure... - One **AST01/AST03** finding for the malicious payload itself"
+    },
+    {
+      "text": "The write-up explains that C6 is correctly not convicted because its OS-portability branch and its subprocess call are separate, and states that only the conjunction constitutes the finding.",
+      "passed": false,
+      "evidence": "The scanner also passed fixtures/AST08/C6-context-dependent-malice, which is correct: that fixture contains a conditional (`platform.system() == \"Darwin\"`) used for legitimate portability, not identity-based targeting."
+    },
+    {
+      "text": "The write-up names at least one predicate deliberately excluded from the guard class (platform.system, sys.platform, or os.name) and states the consequence that a logic bomb keyed on it remains uncovered after the rule is fixed.",
+      "passed": true,
+      "evidence": "platform checks are excluded from the guard class... a logic bomb gated on `platform.system()` would also evade detection \u2014 a gap ... even if we fix detection of hostname/date guards."
+    },
+    {
+      "text": "The write-up rejects 'zero findings' or 'clean' as a reportable scanner verdict and substitutes a PASS/FAIL/INCOMPLETE classification against a stated scope.",
+      "passed": true,
+      "evidence": "The scanner returned a clean result ... but this is an **INCOMPLETE** scan due to a coverage gap"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST08-case-3",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:20:33.257492+00:00",
+  "grader_attempts": 2
+}

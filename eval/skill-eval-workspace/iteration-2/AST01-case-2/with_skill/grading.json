@@ -1,0 +1,28 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response states that the finding is the contradiction between the script's destination and the manifest's declaration, and that neither half on its own \u2014 an outbound HTTP call, or a host missing from the allowlist \u2014 is a finding.",
+      "passed": false,
+      "evidence": "The response does not say that neither half on its own is a finding; it only describes the contradiction as the finding."
+    },
+    {
+      "text": "The response states that the package cannot settle which of the two remediation directions is correct \u2014 adding the destination to the declared allowlist, or removing it from the code \u2014 because whether that destination is a legitimate one is a fact about the deployment rather than about the package's bytes.",
+      "passed": false,
+      "evidence": "The response presents two remediation options and even labels one preferred, never stating the package cannot settle which direction is correct."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 2,
+    "total": 2,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST01-case-2",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:09:58.840498+00:00",
+  "grader_attempts": 1
+}

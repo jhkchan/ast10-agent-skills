@@ -1,0 +1,33 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output states that an egress primitive such as curl, and a declared shell: true, are capabilities rather than AST04 findings \u2014 AST04 is keyed on a contradiction between what the manifest declares and what the code reaches \u2014 and does not treat the presence of either as a finding.",
+      "passed": true,
+      "evidence": "AST04 does not block... declared network allowlist matches actual egress... The use of `shell: true` is also declared, and no unauthorized ... occurs."
+    },
+    {
+      "text": "The sign-off line the output supplies is scoped rather than a blanket clearance: it says which AST04 question was decided (every host reached by the bundled script appears on the declared allowlist) and does not present the package as clean overall or claim that runtime behaviour matches the declaration.",
+      "passed": true,
+      "evidence": "Sign-off line: `APPROVED - AST04-S4 satisfied: observed network egress aligns with declared allowlist; shell use is intentional and permitted.`"
+    },
+    {
+      "text": "If the output raises the breadth of the declared `shell: true` at all, it attributes that to AST03 over-privilege rather than to AST04 misdeclaration.",
+      "passed": false,
+      "evidence": "Response does not mention AST03 or attribute shell: true breadth to over-privilege; it merely notes shell: true is declared."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 1,
+    "total": 3,
+    "pass_rate": 0.6667
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST04-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:14:31.069090+00:00",
+  "grader_attempts": 1
+}

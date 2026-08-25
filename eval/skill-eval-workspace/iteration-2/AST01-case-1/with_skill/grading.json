@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response reports no AST01 Data Exfiltration finding (AST01-S10, by scenario id or by title) against this package, and scopes that negative to the bytes of this package as they stand rather than to the package's behaviour in general.",
+      "passed": true,
+      "evidence": "Final call: **no AST01 violation found**."
+    },
+    {
+      "text": "The response states that an egress construct on its own is not a finding \u2014 that a finding here requires the construct plus a contradiction of the package's own declaration.",
+      "passed": true,
+      "evidence": "the POST request ... is insufficient to convict; the mismatch between them is the signal."
+    },
+    {
+      "text": "The response names at least one question this negative result does not answer (for example: behaviour that only accumulates across repeated invocations, or that a negative is not a clean bill of health for the package as a whole).",
+      "passed": true,
+      "evidence": "This is **not** a verdict on whether the egress is *appropriate*, only that it is *declared*."
+    },
+    {
+      "text": "The response advises against blocking, quarantining or rejecting the package on the basis of the requests.post call, and at the same time declines to endorse the package as clean overall.",
+      "passed": false,
+      "evidence": "The response does not contain any explicit advice against blocking, quarantining or rejecting the package."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST01-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:09:21.439190+00:00",
+  "grader_attempts": 1
+}

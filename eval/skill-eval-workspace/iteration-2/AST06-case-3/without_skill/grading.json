@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output declines to close the finding on the evidence offered.",
+      "passed": false,
+      "evidence": "\"Yes, that should be sufficient to close the AST06 finding.\" \u2013 the response affirms closure rather than declines it."
+    },
+    {
+      "text": "The output states that a sandbox which is optional or available-if-configured is evidence for the finding, because the exposed population is the one running the default execution mode.",
+      "passed": false,
+      "evidence": "The response contains no statement that an optional/available\u2011if\u2011configured sandbox is evidence for the finding or that the default execution mode is exposed."
+    },
+    {
+      "text": "The output states that a loopback-bound control interface is not sufficient isolation without authentication, and cites the named precedent (ClawJacked / CVE-2026-32025) or an equivalent documented loopback WebSocket bypass.",
+      "passed": false,
+      "evidence": "The response makes no claim that a loopback\u2011bound interface is insufficient isolation, nor does it cite ClawJacked or CVE\u20112026\u201132025."
+    },
+    {
+      "text": "The output distinguishes evidence about the product (vendor page, config reference, capability statement) from evidence about the deployment, and states that only the latter can close the finding.",
+      "passed": false,
+      "evidence": "The response does not differentiate product\u2011level evidence from deployment\u2011level evidence, nor say that only deployment evidence can close the finding."
+    },
+    {
+      "text": "The output names the specific evidence that would close it: this deployment runs sandboxed by default with host mode behind a documented explicit opt-in.",
+      "passed": false,
+      "evidence": "The response never states that this deployment runs sandboxed by default with host mode behind a documented explicit opt\u2011in."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST06-case-3",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:17:44.920144+00:00",
+  "grader_attempts": 1
+}

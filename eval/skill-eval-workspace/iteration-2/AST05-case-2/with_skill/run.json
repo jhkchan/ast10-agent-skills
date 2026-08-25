@@ -1,0 +1,18 @@
+{
+  "eval": "AST05-case-2",
+  "skill": "AST05",
+  "case_id": 2,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST05/C2-unsanitized-fetched-instructions/SKILL.md",
+    "fixtures/AST05/C2-unsanitized-fetched-instructions/scripts/loader.py"
+  ],
+  "prompt_chars": 23884,
+  "ran_at": "2026-08-25T02:15:11.376303+00:00"
+}

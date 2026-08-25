@@ -1,0 +1,3 @@
+I cannot re-run the AST01 review or analyze the `changelog-writer` package because I have no tool access, no filesystem access, and no capability to inspect external packages, compute content hashes, or review code in this session. The requested security review requires tools and access that are explicitly unavailable to me.  
+
+Based on your description—increased memory usage, looping behavior, and abnormally long responses—it’s possible the skill’s runtime behavior has changed despite an unchanged package hash. I recommend pausing its use and involving your platform security team with appropriate tooling to perform a live behavioral and static analysis. Without deeper investigation, I cannot confirm the skill is still operating as intended.

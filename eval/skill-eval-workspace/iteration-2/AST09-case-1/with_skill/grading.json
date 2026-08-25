@@ -1,0 +1,43 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to record AST09 as a pass, clean, or green for this package.",
+      "passed": true,
+      "evidence": "No, you cannot tick AST09 as a pass, and you must not write \"inconclusive\" either."
+    },
+    {
+      "text": "The response declines the 'inconclusive' wording on the ground that nothing was checked \u2014 no AST09 question was put to the package at all \u2014 rather than on the ground that the scan result was conclusive.",
+      "passed": true,
+      "evidence": "NEVER write \"inconclusive\" \u2014 because it mimics a scan that was run but couldn\u2019t decide, when in reality, no valid detection mechanism was applied at all."
+    },
+    {
+      "text": "The response states that no scan of a single package can decide AST09, and gives the reason that approval, inventory and offboarding state are held by the organisation rather than inside the artifact.",
+      "passed": true,
+      "evidence": "A scanner ... can\u2019t determine if the skill was approved, who installed it, whether the installer has left the company, or whether execution is being recorded..."
+    },
+    {
+      "text": "The response names at least three specific organisational records or checks that would decide it, such as an inventory row keyed on the content hash, the installer's identity and offboarding state, the credential the skill runs under, an execution record over a real interval, or the discovery method used.",
+      "passed": true,
+      "evidence": "join the package\u2019s content hash to: - Your skill inventory, - Installer and credential identity, - Execution audit receipts, - The documented discovery process."
+    },
+    {
+      "text": "The response frames the outcome as a named missing system or process that should be written down as the finding, rather than as a status value, and does not advise closing the ticket on the scanner result.",
+      "passed": true,
+      "evidence": "the correct status is \u201cnot assessed\u201d \u2026 Close the ticket? Only after you\u2019ve answered the real questions AST09 raises \u2026 not from a single package scan."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:20:56.018962+00:00",
+  "grader_attempts": 1
+}

@@ -1,0 +1,28 @@
+{
+  "assertion_results": [
+    {
+      "text": "The output derives the floor from the declared permissions and names both contributing grants \u2014 shell execution, and a write entry that no deny_write entry shadows \u2014 and states that a write entry fully shadowed by deny_write would not raise the floor.",
+      "passed": false,
+      "evidence": "Response does not mention deny_write shadowing or that a fully shadowed write would not raise the floor."
+    },
+    {
+      "text": "The output states what correcting the declared tier does and does not change: it resolves the declaration against the derived floor, and it leaves the package's actual privileges, and the floor they derive, exactly where they were.",
+      "passed": false,
+      "evidence": "Response does not state that raising the tier leaves privileges and derived floor unchanged."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 2,
+    "total": 2,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST04-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:14:05.525112+00:00",
+  "grader_attempts": 1
+}

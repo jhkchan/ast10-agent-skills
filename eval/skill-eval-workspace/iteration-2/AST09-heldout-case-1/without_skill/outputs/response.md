@@ -1,0 +1,7 @@
+The issue isn't primarily about credential scope (read vs. write), so the suggested action to "reduce the credential scope to read-only" misses the real problem. The core security concern is that a former employee’s service credential is still active and deployed on production systems, regardless of its permissions. That constitutes AST03 (over-privileged or orphaned access) not because of what the credential can do, but because it shouldn't exist at all.
+
+An ex-employee’s credentials—especially those embedded in systems—must be fully revoked and removed post-departure, regardless of privilege level. Leaving any credential in place creates risk: it could be exfiltrated, reused, or escalated. The status "pending package scan" is insufficient because it delays remediation and implies passive monitoring rather than active risk reduction.
+
+The correct action is: **revoke and remove the former engineer’s service credential immediately, and uninstall or decommission the `invoice-sync` skill from both agent hosts unless it is actively maintained and required.** If the service is still in use, it should be re-provisioned with a new, properly scoped credential owned by a current team or service account, not tied to an individual.
+
+So yes, the draft is wrong. The concern is not over-privilege in operation—it’s orphaned access. The action should reflect full credential lifecycle management, not just scope reduction.

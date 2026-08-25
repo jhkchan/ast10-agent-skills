@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response declines to confirm Hot-Reload Abuse from the before-and-after content hashes, and states that the hash pair establishes only that the bytes changed.",
+      "passed": true,
+      "evidence": "You cannot confirm Hot-Reload Abuse ... based on content\u2011hash drift alone, ... you have evidence the file changed (`hash A \u2192 hash B`)."
+    },
+    {
+      "text": "The response names the further evidence the claim requires and says what each item establishes that the hash pair does not \u2014 a host reload event for that path, showing the change took effect without a restart, and the identity that wrote the file, attributing it.",
+      "passed": true,
+      "evidence": "you lack directory ownership telemetry: proof of who wrote the new version ... the only valid verdict ... naming which ... (predecessor binding, resolver records, or reload telemetry) could not be completed."
+    },
+    {
+      "text": "The response leaves the scenario explicitly undecided rather than reporting it confirmed or cleared, and states that the write-up must name which evidence could not be obtained instead of converting the gap into either a confirmation or a clean result.",
+      "passed": true,
+      "evidence": "AST07 verdicts are never confirmed or clean \u2014 only declared\u2011and\u2011uncovered ... naming which ... could not be completed."
+    },
+    {
+      "text": "The response rejects a stronger pin as the remediation and states that the control for hot-reload is configuration-level \u2014 prohibiting hot-reload outside development environments \u2014 because detecting malicious hot-reloaded content is a losing race against arbitrary content.",
+      "passed": false,
+      "evidence": "It says \"Pin the skill harder\" is not the fix and recommends disabling hot\u2011reload, but does not state that detecting malicious hot\u2011reloaded content is a losing race."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST07-heldout-case-1",
+  "configuration": "with_skill",
+  "graded_at": "2026-08-25T02:29:13.709293+00:00",
+  "grader_attempts": 1
+}

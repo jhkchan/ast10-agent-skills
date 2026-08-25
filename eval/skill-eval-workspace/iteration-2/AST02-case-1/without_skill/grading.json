@@ -1,0 +1,28 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response names the two variables the env block actually sets (EDITOR and PAGER) and states the discriminator as a rule rather than as an observation about these two variables: the finding is an override of a control-plane variable \u2014 one that steers where the agent sends traffic or what it loads \u2014 and a variable that steers neither is not one.",
+      "passed": false,
+      "evidence": "The response names EDITOR and PAGER but only observes they are benign; it does not state the rule that only control\u2011plane variables count as overrides."
+    },
+    {
+      "text": "The response names at least one limit of this negative result \u2014 for example that the check reads config shipped inside the package rather than the workspace repository the agent opens, or that the set of config paths scanned is closed and host-specific.",
+      "passed": false,
+      "evidence": "The response does not mention any limitation such as the check only reading package\u2011shipped config or other scope limits."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 2,
+    "total": 2,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST02-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:11:12.818496+00:00",
+  "grader_attempts": 1
+}

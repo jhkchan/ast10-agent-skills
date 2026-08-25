@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response names the origin as the absent revocation step in the offboarding workflow rather than as an over-broad grant, and states that this is a routine, high-frequency offboarding gap rather than something an incident-response playbook would trigger on.",
+      "passed": false,
+      "evidence": "The response never mentions an absent revocation step, routine high\u2011frequency offboarding gap, or incident\u2011response playbook."
+    },
+    {
+      "text": "The response rejects reducing the credential's scope as the remediation, and gives the reason that it leaves the offboarding path untouched so the same condition recurs at the next departure.",
+      "passed": false,
+      "evidence": "It rejects scope reduction but does not say it leaves the offboarding path untouched or will recur at the next departure."
+    },
+    {
+      "text": "The response rejects the 'pending package scan' status and states that no scan of the package can decide this, because approval, inventory and identity state are records the organisation holds about the artifact rather than facts in it.",
+      "passed": false,
+      "evidence": "It calls the pending package scan status insufficient, but does not claim no scan can decide because approval, inventory and identity are just records."
+    },
+    {
+      "text": "The response requires an inventory lookup keyed on the package's content hash to also record which file surface produced that hash, giving the reason that two teams hashing the same package over different surfaces produce two keys and an empty join that then reads as an approval that never happened.",
+      "passed": false,
+      "evidence": "The response contains no discussion of inventory lookup keyed on content hash, file surfaces, or empty joins."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST09-heldout-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:30:21.878479+00:00",
+  "grader_attempts": 1
+}

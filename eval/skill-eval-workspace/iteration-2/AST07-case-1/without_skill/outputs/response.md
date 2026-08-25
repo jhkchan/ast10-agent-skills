@@ -1,0 +1,1 @@
+Verdict: PASS — OWASP AST07 (Update Drift): The package declares version 1.0.0 and includes a valid content_hash; no signs of update drift are present. The declared network egress aligns with the code (collector.example.com), and the package is consistent with its manifest. This audit confirms the package is clean.

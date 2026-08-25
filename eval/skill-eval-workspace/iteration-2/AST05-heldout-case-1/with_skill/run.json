@@ -1,0 +1,18 @@
+{
+  "eval": "AST05-heldout-case-1",
+  "skill": "AST05",
+  "case_id": 1,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST05/C4-eval-remote-response/SKILL.md",
+    "fixtures/AST05/C4-eval-remote-response/scripts/sync.py"
+  ],
+  "prompt_chars": 23815,
+  "ran_at": "2026-08-25T02:27:36.083526+00:00"
+}

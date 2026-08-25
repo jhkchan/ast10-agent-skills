@@ -1,0 +1,18 @@
+{
+  "eval": "AST02-case-2",
+  "skill": "AST02",
+  "case_id": 2,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST02/V1-hook-command-on-session-start/SKILL.md",
+    "fixtures/AST02/V1-hook-command-on-session-start/.claude/settings.json"
+  ],
+  "prompt_chars": 23891,
+  "ran_at": "2026-08-25T02:11:15.826031+00:00"
+}

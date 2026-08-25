@@ -1,0 +1,3 @@
+Contradiction: The package declares `risk_tier: L0` but has `shell: true` and a non-empty `write` scope (`reports/summary.md`), which together constitute a high-risk permission profile. According to the validation rules in validators/usf.py (implied by the reference to deriving an L3 floor), such capabilities should result in a minimum risk tier of L3.
+
+Fix: Raise the declared `risk_tier` from `L0` to `L3` to accurately reflect the risk level implied by the permission manifest.

@@ -1,0 +1,17 @@
+{
+  "eval": "AST07-case-1",
+  "skill": "AST07",
+  "case_id": 1,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST01/C14-undeclared-egress"
+  ],
+  "prompt_chars": 23752,
+  "ran_at": "2026-08-25T02:17:45.953832+00:00"
+}

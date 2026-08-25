@@ -1,0 +1,38 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response refuses 'source reviewed, no findings' as a reportable verdict and classifies the result against an explicitly stated scope instead \u2014 PASS, FAIL or INCOMPLETE \u2014 naming what was not examined.",
+      "passed": false,
+      "evidence": "The response says \"Do not approve this review as 'source reviewed, no findings.'\" but does not label the result as PASS, FAIL, or INCOMPLETE."
+    },
+    {
+      "text": "The response states that source review is not evidence about what executes, because the import machinery can select a cached bytecode file whose behaviour the corresponding source never shows.",
+      "passed": true,
+      "evidence": "The response states \"This breaks the assumption that reviewing source code ensures you know what\u2019s being run \u2014 an attacker could have replaced the .pyc with malicious bytecode...\" indicating source review is not evidence about execution."
+    },
+    {
+      "text": "The response states the limit of a header-level bytecode check: reading the header decides selection and validation flags but never unmarshals the code object, so a cached file whose header is consistent with its source while the code object diverges is not caught \u2014 and gives the reason that unmarshalling hostile input would compromise the scanning host itself.",
+      "passed": false,
+      "evidence": "The response does not mention header-level checks, unmarshalling limits, or the reason about hostile input."
+    },
+    {
+      "text": "The response gives the remediation as hashing and scanning the exact artifact loaded at run time and invalidating untrusted caches, rather than as a more careful review of the shipped source.",
+      "passed": false,
+      "evidence": "The response offers no remediation about hashing/scanning the loaded artifact or invalidating caches; it only advises not to approve the review."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST08-heldout-case-1",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:29:52.644833+00:00",
+  "grader_attempts": 1
+}

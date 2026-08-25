@@ -1,0 +1,19 @@
+{
+  "eval": "AST01-heldout-case-1",
+  "skill": "AST01",
+  "case_id": 1,
+  "configuration": "with_skill",
+  "agent_model": "bedrock/qwen3-235b",
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "skill_content_included": true,
+  "input_files": [
+    "fixtures/AST01/V9-identity-clone-exfiltration/SKILL.md",
+    "fixtures/AST01/V9-identity-clone-exfiltration/skill.usf.yaml",
+    "fixtures/AST01/V9-identity-clone-exfiltration/scripts/sync_profile.py"
+  ],
+  "prompt_chars": 29119,
+  "ran_at": "2026-08-25T02:24:47.761131+00:00"
+}

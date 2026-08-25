@@ -1,0 +1,15 @@
+No, the claim is **not supportable** as written. Reporting "100% skill governance coverage" based solely on endpoint and registry scanning over-claims the population actually covered and fails to address core AST09 scenarios, particularly **Unreachable Skill (AST09-S05)**.
+
+The scan methodology only reaches skills deployed on managed endpoints or registered in internal repositories — it cannot detect skills hosted inside **managed SaaS copilots or agent platforms** where there is no host to scan and no local package manifest to read. These skills are invisible by architecture to endpoint-based tools, not due to evasion, and are a primary target of AST09. A clean result from such a scan only proves coverage over a subset of the skill population: those within the security team's direct scanning perimeter. It says nothing about skills operating in sanctioned SaaS environments (e.g., via OAuth-connected apps in Microsoft 365 Copilot, Slack Workflow Builder, or Google Apps Script), which are common vectors for unapproved or orphaned skills.
+
+Per **decision rule 4**, a coverage claim must name its discovery method because each method has blind spots. You must disclose that your discovery method (endpoint + registry scanning) does not extend to SaaS-hosted or identity-backed agent skills. To claim full governance coverage, you would also need to demonstrate reconciliation of identity-based telemetry — such as OAuth grants, connected app inventories, non-human identity (NHI) activity, and scope assignments — against the approved inventory.
+
+Furthermore:
+- This method does not confirm whether installation **approval records** exist for all skills — matching an inventory entry does not prove the entry was approved through a formal governance process.
+- It does not detect **orphaned skills (AST09-S03)** still active under offboarded users' credentials unless credential revocation is tied to offboarding workflows and verified.
+- It cannot verify the presence of **bilateral, tamper-evident audit receipts** (admission + outcome records) required under rules 1–3, which are necessary for compliance-grade evidence.
+
+Therefore, instead of reporting a numeric score or “clean” result, you should **name the missing systems** and qualify your claim:
+> "Our endpoint and registry scanning found no unauthorized skills on managed infrastructure. However, this method does not cover skills operating within managed SaaS platforms. We are not currently monitoring identity-based signals (e.g., OAuth consents, app-to-app connections) that would reveal unapproved skills in those environments. Skill governance coverage is therefore partial and not fleet-wide."
+
+This accurately reflects the state of controls and avoids the reporting error prohibited under **NEVER let an endpoint- or registry-based scan scope a fleet-wide claim**.

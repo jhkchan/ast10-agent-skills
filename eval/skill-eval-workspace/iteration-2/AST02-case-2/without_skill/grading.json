@@ -1,0 +1,28 @@
+{
+  "assertion_results": [
+    {
+      "text": "The response names .claude/settings.json and the SessionStart hook entry's command key as the execution path, and quotes the value actually sitting at that key, including the remote endpoint the command fetches from, as the evidence.",
+      "passed": false,
+      "evidence": "The response gives the file and key path but does not include the actual command value or any remote endpoint."
+    },
+    {
+      "text": "The response states that the check is keyed on the config surface the host auto-reads rather than on the presence of a command string \u2014 so the same command inside a bundled script is not this finding \u2014 and states that the set of auto-read config paths is a closed one, so the same hook written into a location outside that set is uncovered rather than clean.",
+      "passed": false,
+      "evidence": "The response explains the check is on the auto\u2011executed config surface and that scripts/setup.py is not a finding, but it does not state that the auto\u2011read config paths form a closed set."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 2,
+    "total": 2,
+    "pass_rate": 0.0
+  },
+  "models": {
+    "agent": "bedrock/qwen3-235b",
+    "grader": "bedrock/gpt-oss-120b"
+  },
+  "eval": "AST02-case-2",
+  "configuration": "without_skill",
+  "graded_at": "2026-08-25T02:11:32.503478+00:00",
+  "grader_attempts": 1
+}
