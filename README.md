@@ -493,113 +493,98 @@ which is why it carries a verdict and no number.
 
 ### Reading the columns
 
-Three independent states per category, and collapsing them is the mistake the two tables exist
-to prevent: one says what code exists, one says what the detector was measured at, and one
-says how the *knowledge package* scored against an independent judge panel. A category can
-have no detector at all and still be a strong skill, and a category with a perfect F1 can
-still be blocked by the judge gate.
+Each category carries three independent states: what the **detector** does, what its **F1** was
+measured over, and how the *knowledge package* scored against the judge panel. They do not track
+each other. A category with no detector at all can still be a strong skill, and a category with a
+perfect F1 can still be blocked by the judge gate.
 
-**Detector state** — derived, not asserted. `scenarios/registry.yaml` is authoritative on
-which scenarios are `static-detectable`; `fixtures/manifest.yaml` is authoritative on
-which of those carry a shipped check and a labeled fixture pair.
-`tests/test_docs.py::test_readme_detector_state_matches_the_state_derived_from_the_manifests`
-re-derives every value in the roster from those two files and fails on drift, so that column
-cannot describe a check that does not exist:
+**Detector state** is re-derived on every test run from `scenarios/registry.yaml` (which scenarios
+one package's own bytes can decide) and `fixtures/manifest.yaml` (which of those carry a shipped
+check and a labeled fixture pair), so the column cannot describe a check that does not exist.
 
-- **`implemented`** — every scenario the registry tiers `static-detectable` for this
-  category has a check in `skills/<AST>/scripts/detector.py` and a labeled fixture pair.
-  Nothing decidable is unbuilt.
-- **`coverage-debt`** — the registry tiers a scenario `static-detectable`, so one package's
-  own bytes *can* decide it, and no shipped check does. Decidable-but-unbuilt, which is a
-  different and more embarrassing thing than undetectable. **No category is in this state
-  today.** The state is defined and tested for anyway, so that regressing into it shows up
-  on the front page instead of only inside a matrix.
-- **`declared-and-uncovered`** — the registry tiers *every* scenario in the category
-  `agent-judgable` or `out-of-artifact`. There is nothing for a static check to decide, so
-  no check ships and no F1 is published at any corpus size.
+| State | What it means |
+| --- | --- |
+| **`implemented`** | Every decidable scenario in the category has a shipped check and a labeled fixture pair. Nothing decidable is unbuilt. |
+| **`coverage-debt`** | A scenario is decidable and no shipped check decides it. **No category is in this state today** — it exists so that regressing into it shows up here rather than only inside a matrix. |
+| **`declared-and-uncovered`** | Nothing in the category is statically decidable. No check ships, and no F1 is published at any corpus size. |
 
-**F1 scope** — what was measured, normalised to `scope value (n)` and derived from
-`fixtures/manifest.yaml`. Every number carries the scope it was measured at:
+**F1 scope** records what each number was measured over, written as `scope value (n)` and derived
+from `fixtures/manifest.yaml`.
 
-- **`scenario-level`** — measured over checks that decide a named whitepaper scenario's
-  *defining condition*.
-- **`artifact-signal-only`** — measured over checks that decide an enabling *precondition*
-  a benign package can also exhibit (an unbounded retry loop, an unpinned reference, an
-  absent permissions block). It is **not** coverage of any named scenario and may never be
-  quoted as one. AST05 publishes only this.
-- **two entries joined by `+`** — a `mixed-proxy` category, scored separately per scope so the
-  proxy half cannot ride on the scenario half. The manifest writes the same split with a `;`.
-- **`declared-and-uncovered`** — no number, at any corpus size. This is the never-pad rule:
-  an empty detectable tier is reported as empty rather than filled with fixtures written to
-  separate perfectly.
-- **AST10 alone** stores `published_f1` as a JSON float rather than a labeled string. Its
-  scope lives in the sibling `f1_scope` field and its `n` in `cases_present`, which is where
-  the results table gets the label it prints beside the number, and what
-  `python3 cli/ast10.py status` prints beside it too.
+| Scope | What it means |
+| --- | --- |
+| **`scenario-level`** | Decides a named whitepaper scenario's defining condition. |
+| **`artifact-signal-only`** | Decides an enabling *precondition* a benign package can also exhibit — an unbounded retry loop, an unpinned reference, an absent permissions block. It is **not** coverage of any named scenario and may never be quoted as one. AST05 publishes only this. |
+| two scopes joined by `+` | A mixed category, scored separately per scope so the proxy half cannot ride on the scenario half. |
+| **`declared-and-uncovered`** | No number, at any corpus size. An empty detectable tier is reported as empty rather than filled with fixtures written to separate perfectly. |
 
-### Four readings that are easy to get backwards
+### Common misreadings
 
-**Shipped checks and measured checks are different counts, on purpose.** AST01 ships ten
-checks and publishes an F1 over eight: its two `content_hash` checks decide a
-*precondition* rather than a named scenario, so they run on every audit and enter no
-denominator. AST03 (4 shipped / 3 labeled), AST04 (6 / 5), AST05 (5 / 3) and AST06 (5 / 3)
-have the same shape. A check that runs and is never scored is not a hidden number — it is
-a check whose `CHECK_COVERAGE` entry says outright that firing it proves nothing about a
-whitepaper scenario.
+**Shipped checks and measured checks are different counts, on purpose.** AST01 ships ten checks and
+publishes an F1 over eight: its two `content_hash` checks decide a *precondition* rather than a
+named scenario, so they run on every audit and enter no denominator. AST03 (4 shipped / 3 labeled),
+AST04 (6 / 5), AST05 (5 / 3) and AST06 (5 / 3) have the same shape. A check that runs and is never
+scored is not a hidden number — its `CHECK_COVERAGE` entry says outright that firing it proves
+nothing about a whitepaper scenario.
 
-**AST07 and AST09 publish nothing, and that is the registry talking, not a backlog.** Both
-have **zero** static-detectable scenarios in the whitepaper's own enumeration — every
-scenario is temporal or organisational — so no corpus size would give them a denominator.
+**AST07 and AST09 publish nothing, and that is the registry talking, not a backlog.** Neither has a
+single statically-detectable scenario in the whitepaper's own enumeration — every one is temporal or
+organisational — so no corpus size would give them a denominator.
 
-**AST05 ships five checks and still covers no scenario.** It has an empty detectable tier
-like AST07 and AST09, yet it publishes a number, because its checks decide real
-preconditions and the corpus that measures them is real. What stops that from being a
-padded F1 is the scope label: `artifact-signal-only` is not comparable with a
-`scenario-level` number and cannot be quoted as AST05 coverage.
-`tests/test_coverage_matrix.py::test_ast05_publishes_no_scenario_level_number_because_its_detectable_tier_is_empty` fails if
-AST05's `published_f1` ever says `scenario-level`.
+**AST05 ships five checks and still covers no scenario.** Its detectable tier is empty, like AST07's
+and AST09's, yet it publishes a number, because its checks decide real preconditions over a real
+corpus. What keeps that from being a padded F1 is the scope label: `artifact-signal-only` is not
+comparable with a `scenario-level` number and cannot be quoted as AST05 coverage.
 
-**A 1.00 is a discrimination claim about one hand-built corpus.** AST10's single
-static-detectable scenario (AST10-S06, Silent Supply Chain Injection) is implemented and
-measured over six labeled cases whose three *clean* packages each carry a real encoded
-blob — one of them the same gzip-under-base64 shape as the vulnerable case — so a check
-that fired on "contains an encoded blob" scores 0.67, not 1.00, and the matrix shows that
-arithmetic. Read `skills/AST10/coverage-matrix.md` before quoting the number. The same
-caveat applies to every 1.00 in the column.
+**A 1.00 is a discrimination claim about one hand-built corpus.** AST10's single detectable scenario
+(AST10-S06, Silent Supply Chain Injection) is measured over six labeled cases whose three *clean*
+packages each carry a real encoded blob — one of them the same gzip-under-base64 shape as the
+vulnerable case — so a check that fired on "contains an encoded blob" would score 0.67, not 1.00.
+Read [`skills/AST10/coverage-matrix.md`](skills/AST10/coverage-matrix.md) before quoting the number.
+The same caveat applies to every 1.00 in the column.
+
+### The rubric is not ours
+
+Every judged number on this page is scored against
+[**skill-judge**](https://github.com/softaworks/agent-toolkit/tree/main/skills/skill-judge), the
+8-dimension, 120-point rubric from **softaworks/agent-toolkit**, (c) 2026 **Leonardo Flores**,
+**MIT**. Its dimensions D1-D8, their weights, and the per-dimension floors this repository's ship
+gate enforces are all its definitions: this repo vendors the rubric and applies it, it did not
+author it, and softaworks endorses this repository no more than OWASP does.
+
+It ships verbatim at [`vendor/skill-judge/SKILL.md`](vendor/skill-judge/SKILL.md), with its MIT
+licence and [`PROVENANCE.md`](vendor/skill-judge/PROVENANCE.md) beside it, and it is pinned twice:
+`RUBRIC_SHA` names the upstream commit, and `RUBRIC_CONTENT_SHA256` hashes the vendored bytes,
+recomputed by `tests/test_rubric_pin.py` on every run and re-asserted by the judge harness before a
+prompt is built. A score here is therefore attributable to *specific rubric bytes*, not to "the
+rubric" in the abstract.
 
 ### How the ship gate was set
 
-**The gate has been changed exactly once, and run 5 is the first corpus judged under the change.**
-After run 4 was published, [ADR-0006](docs/adr/0006-confidence-bound-on-the-pooled-mean.md)
-retired the `mean − σ ≥ 105` clause and replaced it with `mean − 1.0 × σ/√n ≥ 108` — a confidence
-bound on the mean instead of a spread statistic — because the retired clause was shown not to be a
-function of the artifact: `AST08`'s `SKILL.md` is byte-identical between runs 3 and 4 and that
-clause alone flipped its verdict. The replacement constant was recorded **before** the run judged
-by it, and it bought nothing **on the corpus it was adopted against**: nine of eleven shipped under
-either rule on the run-4 corpus, and no verdict changed. That is checked, not asserted —
-`tests/test_generate_dashboard.py` re-derives all eleven run-4 verdicts through today's gate
-against the frozen `eval/scorecards-run4/`.
+The gate has changed exactly once, and run 5 is the first corpus judged under the change. After run
+4 was published, [ADR-0006](docs/adr/0006-confidence-bound-on-the-pooled-mean.md) retired the
+`mean - σ ≥ 105` clause and replaced it with `mean - 1.0 × σ/√n ≥ 108` — a confidence bound on the
+mean rather than a spread statistic — because the retired clause was shown not to be a function of
+the artifact: `AST08`'s `SKILL.md` is byte-identical between runs 3 and 4, and that clause alone
+flipped its verdict. The replacement constant was recorded *before* the run it judged.
 
-**On run 5 it bought a ship, and that has to be said in the same breath.** Under the retired clause
-run 5 is **10 of 11**: `AST01` clears the mean (110.1 ≥ 108) and misses `mean − σ` at
-110.1 − 6.65 = **103.4**, against 105. Under the clause in force it is 11 of 11. The change was
-recorded before the run and no constant moved to produce that, but "the new rule costs nothing" is
-a claim about run 4 and is false about run 5.
+**On run 5 the change bought a ship.** Under the retired clause run 5 is **10 of 11**: `AST01`
+clears the mean (110.1 ≥ 108) and misses `mean - σ` at 103.4, against 105. Under the clause in
+force it is 11 of 11. No constant moved to produce that — but "the new rule costs nothing" is a
+claim about run 4, not run 5. On run 4 it was true: nine of eleven shipped under either rule and no
+verdict changed, which `tests/test_generate_dashboard.py` re-derives through today's gate against
+the frozen `eval/scorecards-run4/`.
 
-Nor is the confidence bound reliably the *stricter* rule. `mean − σ ≥ 105` and
-`mean − σ/√n ≥ 108` are the bars `mean ≥ 105 + σ` and `mean ≥ 108 + σ/√n`, so the adopted clause
-demands more only when `σ < 3/(1 − 1/√n)` — about 4.0 at `n = 16`. **At every one of run 5's eleven
-`(n, σ)` pairs the adopted clause demands a lower mean than the retired one**, by 0.12 to 1.99
-points, because this run's per-skill σ never falls below 4.16. Across all five recorded runs — 55
-skill-runs — it has demanded a strictly higher mean on exactly three (`advisory` in run 3 at
-σ 3.44, and `AST04` and `AST05` in run 4), with one exact tie (`AST06` in run 4, both clauses
-demanding 109.04) counted apart from them. ADR-0006 replaced a clause that was **not a function of the artifact**;
-it did not replace it with a uniformly stricter one, and on the corpus it now gates it is the more
-permissive of the two.
+**Nor is the confidence bound reliably the stricter rule.** It demands a higher mean only where σ is
+small, and run 5's per-skill σ never is — at all eleven `(n, σ)` pairs the adopted clause sets a
+*lower* bar than the retired one. Across all five recorded runs, 55 skill-runs, it has demanded a
+strictly higher mean on exactly three, with one exact tie (`AST06` in run 4). ADR-0006 replaced a
+clause that was not a function of the artifact; it did not replace it with a uniformly stricter one,
+and on the corpus it now gates it is the more permissive of the two.
 
-`AST01` is the row where all of this lands at once: it is the skill the gate change buys, the skill
-three of six single-judge exclusions block, and the skill whose two missing judgments flip it when
-they are refilled at the means of the judges that lost them. See
+`AST01` is the row where all of this lands at once: the skill the gate change buys, the skill three
+of six single-judge exclusions block, and the skill whose two missing judgments flip it when they
+are refilled at the means of the judges that lost them. See
 [How fragile 11 of 11 is](docs/skill-judge-dashboard.md#how-fragile-11-of-11-is).
 
 ---
@@ -609,77 +594,58 @@ they are refilled at the means of the judges that lost them. See
 Every skill in the table above clears the ship rule. That is the best number this repository has
 ever published and it is the one most likely to be misread, so the four limits on it sit here
 rather than in a footnote. The full board, the per-judge bias table and the judge-quality
-diagnostics are in
-[`docs/skill-judge-dashboard.md`](docs/skill-judge-dashboard.md).
-
-The rubric those scores are graded *against* is not this project's work.
-[**skill-judge**](https://github.com/softaworks/agent-toolkit/tree/main/skills/skill-judge),
-from **softaworks/agent-toolkit**, (c) 2026 **Leonardo Flores**, **MIT** — that is the
-8-dimension, 120-point rubric behind every judged number on this page. Its dimensions D1–D8,
-their weights, and the per-dimension floors this repository's ship gate enforces are all its
-definitions, not ours: this repo vendors the rubric and applies it, it did not author it, and
-softaworks endorses this repository no more than OWASP does. It ships here verbatim at
-[`vendor/skill-judge/SKILL.md`](vendor/skill-judge/SKILL.md), with its MIT licence and
-[`vendor/skill-judge/PROVENANCE.md`](vendor/skill-judge/PROVENANCE.md) beside it, and it is
-pinned twice: `RUBRIC_SHA` names the upstream commit, and `RUBRIC_CONTENT_SHA256` hashes the
-vendored bytes — recomputed by `tests/test_rubric_pin.py` on every run, and re-asserted by the
-judge harness before a prompt is built. A score here is therefore attributable to *specific
-rubric bytes*, not to "the rubric" in the abstract.
+diagnostics are in [`docs/skill-judge-dashboard.md`](docs/skill-judge-dashboard.md).
 
 **The corpus is self-authored.** The same project wrote the eleven skills, the fixtures, the
-scenario registry *and* the rubric-grounded prompt the judges read. A high pooled score is
-therefore evidence of **internal consistency** — these artifacts satisfy this repository's own
-statement of what a good skill is — and it is **not** external validation. Nobody outside this
-project has scored these files.
+scenario registry *and* the rubric-grounded prompt the judges read. A high pooled score is evidence
+of **internal consistency** — these artifacts satisfy this repository's own statement of what a good
+skill is — and it is **not** external validation. Nobody outside this project has scored these files.
 
 **The panel disagrees by most of a grade band.** Across the same eleven files the six judges span
-an **11.4-point spread**, from `bedrock/qwen3-235b` at +6.5 to `bedrock/gpt-oss-120b` at −4.9,
-while no judge moves more than 2.3 points between its own rounds — so the spread is systematic
-bias, not noise. `bedrock/qwen3-235b` is `COARSE` on this run (79% of its dimension scores sit at
-a dimension's maximum and 34% of its judgments return the full 120) and was flagged
-`NON-DISCRIMINATING` on run 4; it is pooled into every published figure in both states, because
-dropping a judge for what it said needs its own recorded decision. **Dropping it alone takes the
-board to 8 of 11**: `AST01`, `AST07` and `AST08` fall below the confidence bound, at 106.7, 107.7
-and 107.5. `AST01` fails on two further single-judge exclusions as well — drop
-`anthropic-compatible/glm-5.2` and it reads 107.2, drop `claude-cli/sonnet` and it reads 107.7 —
-so **three of the six possible single-judge exclusions block it**, and only three of the six leave
-the board whole. The full table is in [How fragile 11 of 11
-is](docs/skill-judge-dashboard.md#how-fragile-11-of-11-is). A pooled mean is a statement
-about *the rubric as read by these six judges*, and
-[ADR-0005](docs/adr/0005-judge-panel-calibration-and-the-lower-bound.md) explains why it may not
-be quoted beside a single-judge score.
+an **11.4-point spread**, from `bedrock/qwen3-235b` at +6.5 to `bedrock/gpt-oss-120b` at −4.9, while no
+judge moves more than 2.3 points between its own rounds — so the spread is systematic bias, not
+noise. `bedrock/qwen3-235b` is `COARSE` on this run (79% of its dimension scores sit at a
+dimension's maximum, and 34% of its judgments return the full 120) and was flagged
+`NON-DISCRIMINATING` on run 4. It is pooled into every published figure in both states, because
+dropping a judge for what it said needs its own recorded decision. Dropping it alone takes the board
+to **8 of 11**: `AST01`, `AST07` and `AST08` fall below the confidence bound, at 106.7, 107.7 and
+107.5. `AST01` fails on two further exclusions as well — drop `anthropic-compatible/glm-5.2` and it
+reads 107.2, drop `claude-cli/sonnet` and it reads 107.7 — so three of the six possible
+single-judge exclusions block it, and only three leave the board whole. The full table is in
+[How fragile 11 of 11 is](docs/skill-judge-dashboard.md#how-fragile-11-of-11-is), and
+[ADR-0005](docs/adr/0005-judge-panel-calibration-and-the-lower-bound.md) explains why a pooled mean
+may not be quoted beside a single-judge score.
 
 **`k = 1.0` is one standard error of margin, and it is not a confidence level.** The judgments
-behind a pooled mean are clustered — six judges read about three times each, each carrying a large
-fixed offset — so they are not independent draws. Measured on run 4, the panel's intraclass
-correlation is 0.666 and its design effect 2.15, which means `σ/√n` **understates** the true
-standard error of the mean by roughly **1.47×**. The clause is published in points (it moves the
-effective bar from 108.0 to about 109.2 here) and never as a percentage, and
-[ADR-0006](docs/adr/0006-confidence-bound-on-the-pooled-mean.md) records the shortfall as the
-first thing a future record should fix.
+behind a pooled mean are clustered — six judges reading about three times each, each carrying a
+large fixed offset — so they are not independent draws. Measured on run 4, the panel's intraclass
+correlation is 0.666 and its design effect 2.15, which means `σ/√n` understates the true standard
+error of the mean by roughly **1.47×**. The clause is published in points — it moves the effective
+bar from 108.0 to about 109.2 here — and never as a percentage, and
+[ADR-0006](docs/adr/0006-confidence-bound-on-the-pooled-mean.md) records the shortfall as the first
+thing a future record should fix.
 
 **Ten of the 198 attempted judgments never reached the pool, and the run that discarded them
-recorded nothing.** The board is 188 binding judgments; the harness that refused the other ten
-built its audit trail in memory, and the reasons and the raw responses are gone. Which skill,
-judge and round each was IS recoverable from the order the surviving judgments are stored in, and
-[`eval/run5-refusals.md`](eval/run5-refusals.md) is that reconstruction. It matters because the
-gap is not neutral: **`AST01` lost the two judges that scored `AST01` lowest** (100.5 and 104.5
-against its pooled 110.1), and replacing each missing attempt with that judge's own observed mean
-on that skill puts `AST01` at 109.2 with a confidence bound of 107.6 — below the bar. Nothing is
-imputed into any published figure and no verdict is re-issued; the eleventh ship simply depends on
-two judgments nobody can produce. The harness now persists every refusal, and
-`python3 scripts/refusal_ledger.py` fails if a scorecard's pooled `n` ever again falls below its
-attempted `n` with nothing accounting for the difference.
+recorded nothing.** The board is 188 binding judgments; the harness that refused the other ten built
+its audit trail in memory, and the reasons and the raw responses are gone. Which skill, judge and
+round each was is recoverable from the order the surviving judgments are stored in, and
+[`eval/run5-refusals.md`](eval/run5-refusals.md) is that reconstruction. It matters because the gap
+is not neutral: `AST01` lost the two judges that scored `AST01` lowest (100.5 and 104.5 against its
+pooled 110.1), and replacing each missing attempt with that judge's own observed mean on that skill
+puts `AST01` at 109.2 with a confidence bound of **107.6** — below the bar. Nothing is imputed into
+any published figure and no verdict is re-issued; the eleventh ship simply depends on two judgments
+nobody can produce. The harness now persists every refusal, and `python3 scripts/refusal_ledger.py`
+fails if a scorecard's pooled `n` ever again falls below its attempted `n` with nothing accounting
+for the difference.
 
-Two further things a reader is entitled to know before quoting the count. `AST01` and `AST08`
-clear the confidence bound by 0.4 and 0.7 points respectively, and this repository's own doctrine
-says a threshold cleared by less than the instrument's run-to-run movement is not cleared.
-And `AST09` went BLOCKED → SHIP between runs 4 and 5 **without its `SKILL.md` changing by a
-byte**, on a pooled mean that rose 2.9 points: ADR-0006 stopped the gate depending on how much the
-panel agreed, but nothing stops the mean itself moving between runs.
+Two further things a reader is entitled to know before quoting the count. `AST01` and `AST08` clear
+the confidence bound by 0.4 and 0.7 points respectively, and this repository's own doctrine says a
+threshold cleared by less than the instrument's run-to-run movement is not cleared. And `AST09` went
+BLOCKED → SHIP between runs 4 and 5 without its `SKILL.md` changing by a byte, on a pooled mean that
+rose 2.9 points: ADR-0006 stopped the gate depending on how much the panel agreed, but nothing stops
+the mean itself moving between runs.
 
 ---
-
 ## What this does not do
 
 The single hardest limit: **a detector reads one skill package at one moment in time.**
