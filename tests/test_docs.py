@@ -53,6 +53,12 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 README = REPO_ROOT / "README.md"
 DASHBOARD = REPO_ROOT / "docs" / "skill-judge-dashboard.md"
 ARCHITECTURE = REPO_ROOT / "docs" / "architecture.md"
+#: Pages the README's long-form detail moved to. The guards follow the content;
+#: they are not relaxed because it left the front page.
+DETECTORS = REPO_ROOT / "docs" / "detectors.md"
+LIMITS = REPO_ROOT / "docs" / "limits.md"
+READING = REPO_ROOT / "docs" / "reading-the-results.md"
+DEVELOPMENT = REPO_ROOT / "docs" / "development.md"
 SIGNING = REPO_ROOT / "docs" / "signing.md"
 F1_REPORT = REPO_ROOT / "docs" / "f1-report.md"
 DOGFOOD_REPORT = REPO_ROOT / "docs" / "dogfood-report.md"
@@ -128,18 +134,21 @@ def test_readme_never_claims_authorship_of_the_publication():
 # ---------------------------------------------------------------------------
 
 #: (heading fragment, a token proving the method points at something real)
+#: The three documented install paths, each pinned by the token that proves the
+#: page actually documents it. The plugin path is the only one that delivers the
+#: slash commands, which is why it is named first and asserted first.
 INSTALL_METHODS = (
-    ("Method 1", "~/.claude/skills"),
-    ("Method 2", ".claude-plugin/marketplace.json"),
-    ("Method 3", "cli/ast10.py"),
+    ("As a Claude Code plugin — recommended", "claude plugin marketplace add"),
+    ("Copy the skills only", "~/.claude/skills"),
+    ("CLI, no install", "cli/ast10.py"),
 )
 
 
 @pytest.mark.parametrize("heading,token", INSTALL_METHODS)
 def test_readme_documents_three_install_methods(heading, token):
     flat = _flat(README)
-    assert f"### {heading}" in flat, f"README.md is missing install {heading}"
-    assert token in flat, f"install {heading} must reference {token!r}"
+    assert f"### {heading}" in flat, f"README.md is missing install path {heading!r}"
+    assert token in flat, f"install path {heading!r} must reference {token!r}"
 
 
 def test_install_methods_point_at_paths_that_exist():
@@ -150,8 +159,12 @@ def test_install_methods_point_at_paths_that_exist():
 
 
 def test_readme_install_section_lists_exactly_three_methods():
-    headings = re.findall(r"^### Method \d+", README.read_text(encoding="utf-8"), re.M)
-    assert len(headings) == 3, f"expected exactly three install methods, got {headings}"
+    """Three paths, and the plugin one is first because it is the only complete one."""
+    body = README.read_text(encoding="utf-8")
+    install = body[body.index("\n## Install") : body.index("\n## Usage")]
+    headings = re.findall(r"^### (.+)$", install, re.M)
+    assert len(headings) == 3, f"expected exactly three install paths, got {headings}"
+    assert "plugin" in headings[0].lower(), f"the plugin path must be listed first, got {headings[0]!r}"
 
 
 # ---------------------------------------------------------------------------
@@ -368,7 +381,7 @@ def test_readme_skills_table_matches_the_fixture_manifest(category):
     cell = _results_row(category)[1]
     assert cell == normalised, f"README's F1 cell for {category} is {cell!r}; the manifest normalises to {normalised!r}"
     verbatim = _manifest_f1_state(category)
-    assert f"`{verbatim}`" in _readme_detail_block(category), (
+    assert f"`{verbatim}`" in _detector_detail_block(category), (
         f"{category}'s block must quote fixtures/manifest.yaml verbatim: `{verbatim}`"
     )
 
@@ -399,7 +412,7 @@ def test_every_category_keeps_its_long_form_detector_description(category):
     A block deleted or emptied would leave the front page publishing a check
     roster it never describes, which is worse than the wall of text was.
     """
-    block = _readme_detail_block(category)
+    block = _detector_detail_block(category)
     assert f"<code>{_skill_name(category)}</code>" in block, f"{category}'s block must name the skill it describes"
     assert f"skills/{category}/coverage-matrix.md" in block, (
         f"{category}'s block must point at its scenario-by-scenario matrix"
@@ -416,7 +429,7 @@ def test_the_advisory_row_publishes_no_f1_because_it_has_no_corpus():
     )
     cell = _results_row("advisory")[1]
     assert not re.search(r"\d", cell), f"advisory publishes no F1; its cell must carry no number, got {cell!r}"
-    assert "no F1" in _readme_detail_block("advisory"), (
+    assert "no F1" in _detector_detail_block("advisory"), (
         "advisory's block must say outright that it publishes no F1, not leave the dash unexplained"
     )
 
@@ -466,10 +479,10 @@ def test_architecture_states_the_three_rules_the_third_surface_lives_by(claim):
 def test_readme_distinguishes_all_three_kinds_of_evidence():
     """A reader must be able to tell a pass_rate from an F1 from a judge total, and
     the README is where most of them will meet all three for the first time."""
-    flat = _flat(README)
+    flat = _flat(DEVELOPMENT)
     assert "Three kinds of evidence" in flat
-    for link in ("docs/skill-judge-dashboard.md", "docs/f1-report.md", "docs/skill-eval-report.md"):
-        assert link in flat, f"the README's evidence table must link {link}"
+    for link in ("skill-judge-dashboard.md", "f1-report.md", "skill-eval-report.md"):
+        assert link in flat, f"the evidence table must link {link}"
     for question in (
         "Is the **text** of a `SKILL.md` well written",
         "Do the shipped Python check scripts separate",
@@ -804,8 +817,8 @@ def test_readme_slash_command_count_matches_the_directory():
 
 def test_readme_registry_scenario_count_matches_the_registry():
     total = len(yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))["scenarios"])
-    assert f"{total} whitepaper scenarios" in _flat(README), (
-        f"README.md's repository-layout block must say '{total} whitepaper scenarios'"
+    assert f"{total} whitepaper scenarios" in _flat(DEVELOPMENT), (
+        f"docs/development.md's repository-layout block must say '{total} whitepaper scenarios'"
     )
 
 
@@ -912,11 +925,11 @@ def _results_row(directory: str) -> list[str]:
     return rows[key]
 
 
-def _readme_detail_block(label: str) -> str:
-    """The one `<details>` block README.md devotes to a skill, by its bold label."""
-    blocks = re.findall(r"<details>.*?</details>", README.read_text(encoding="utf-8"), re.S)
+def _detector_detail_block(label: str) -> str:
+    """The one `<details>` block docs/detectors.md devotes to a skill, by its bold label."""
+    blocks = re.findall(r"<details>.*?</details>", DETECTORS.read_text(encoding="utf-8"), re.S)
     hits = [b for b in blocks if f"<b>{label}</b>" in b]
-    assert len(hits) == 1, f"README.md must carry exactly one <details> block for {label}, found {len(hits)}"
+    assert len(hits) == 1, f"docs/detectors.md must carry exactly one <details> block for {label}, found {len(hits)}"
     return hits[0]
 
 
@@ -1033,12 +1046,12 @@ def test_declared_and_uncovered_categories_really_register_no_check(category):
 
 
 def test_readme_legend_defines_every_state_it_uses():
-    """Every value the two state columns can take must be defined above the table."""
-    flat = _flat(README)
+    """Every value the two state columns can take must be defined where they are explained."""
+    flat = _flat(READING)
     states = {_derived_detector_state(c) for c in AST_IDS} | {"coverage-debt"}
     scopes = {str((_manifest_category(c).get("f1_scope") or "")).strip() for c in AST_IDS} - {"", "none", "mixed-proxy"}
     for token in sorted(states | scopes):
-        assert f"**`{token}`**" in flat, f"README.md's skills legend must define the state `{token}`"
+        assert f"**`{token}`**" in flat, f"docs/reading-the-results.md must define the state `{token}`"
 
 
 # ---------------------------------------------------------------------------
@@ -1083,14 +1096,28 @@ def test_no_skill_points_at_a_references_directory_it_does_not_ship(skill):
     )
 
 
-def test_readme_does_not_imply_a_references_directory_that_exists_nowhere():
-    shipped = [p.name for p in SKILLS_DIR.iterdir() if (p / "references").is_dir()]
-    flat = _flat(README)
-    if shipped:
+def test_no_page_implies_a_references_directory_that_exists_nowhere():
+    """Whichever page names `references/` has to say no skill ships one.
+
+    The claim used to live only on the README, so moving the prose into docs/
+    would have silently retired the guard. It now follows the mention.
+    """
+    if [p.name for p in SKILLS_DIR.iterdir() if (p / "references").is_dir()]:
         return
-    assert "which no skill ships today" in flat, (
-        "no skill ships a `references/` directory; README.md must say so where it names one"
+    caveats = ("which no skill ships today", "no skill ships a `references/` directory")
+    # docs/architecture.md is the page that enumerates the hashed surface globs,
+    # so it is where a reader meets `references/*.md` as a thing that could exist.
+    # Other pages name it inside a glob list or as a layout convention; the claim
+    # that matters is that the repository states somewhere that none ships.
+    architecture = _flat(ARCHITECTURE)
+    assert any(c in architecture for c in caveats), (
+        "docs/architecture.md enumerates `references/*.md` as a hashed surface; it must say no skill ships one"
     )
+    readme = _flat(README)
+    if "references/" in readme:
+        assert any(c in readme for c in caveats), (
+            "README.md names `references/`, which no skill ships; it must say so where it names it"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -1115,12 +1142,26 @@ def test_no_install_path_copies_the_commands_directory(tmp_path):
         assert not (skill / "commands").exists(), f"{skill.name} was installed with a commands/ payload"
 
 
-def test_readme_does_not_claim_an_install_method_brings_in_the_commands():
+def test_readme_is_accurate_about_which_install_path_delivers_the_commands():
+    """One install path delivers the slash commands and the others do not.
+
+    The retired version of this guard required the README to say no install
+    method brings them, which was true only while the manifest was a flat
+    index. The plugin now declares `./commands/ast`, so `/plugin install`
+    delivers them — and `cli/ast10.py install` and a `cp -r` of `skills/` still
+    do not, which is asserted against the real installer in
+    `test_no_install_path_copies_the_commands_directory`. A README that makes
+    one blanket claim is wrong either way, so it has to distinguish them.
+    """
     flat = _flat(README).lower()
-    for overclaim in ("also brings in commands/", "installs commands/", "installing via method 2 also brings"):
-        assert overclaim not in flat, f"README.md must not claim: {overclaim!r} — no install path copies commands/"
-    assert "none of the three methods above copies them" in flat, (
-        "README.md must state plainly that no install method copies commands/ast/"
+    assert "none of the three methods above copies them" not in flat, (
+        "README.md still carries the retired blanket claim; the plugin install now delivers the commands"
+    )
+    assert "installs the skills and the slash commands together" in flat, (
+        "README.md must say which install path delivers commands/ast/"
+    )
+    assert "does not copy `commands/ast/`" in flat, (
+        "README.md must say which install paths do not deliver commands/ast/"
     )
 
 
@@ -1129,23 +1170,29 @@ def test_readme_does_not_claim_an_install_method_brings_in_the_commands():
 # ---------------------------------------------------------------------------
 
 
-def test_architecture_does_not_invent_marketplace_plugins():
-    """It is a flat skill index; it declares no plugins, and said so wrongly once."""
+def test_architecture_names_only_plugins_the_manifest_actually_declares():
+    """The manifest is a real plugin marketplace now, so the page may describe
+    plugins — but only the ones it declares, and by the names it declares them
+    under. It named two invented plugins once and nothing caught it."""
     marketplace = json.loads(MARKETPLACE.read_text(encoding="utf-8"))
-    assert "plugins" not in marketplace, "marketplace.json now declares plugins; update docs/architecture.md"
+    declared = {plugin["name"] for plugin in marketplace["plugins"]}
     flat = _flat(ARCHITECTURE)
-    assert "declares two plugins" not in flat
+    assert "declares two plugins" not in flat, f"the manifest declares {len(declared)} plugin(s): {sorted(declared)}"
     for invented in ("ast-detectors", "ast-advisory"):
-        assert invented not in flat, (
+        assert invented not in flat or invented in declared, (
             f"docs/architecture.md names a marketplace plugin that does not exist: {invented!r}"
         )
+    for name in declared:
+        assert name in flat, f"docs/architecture.md does not name the plugin the manifest ships: {name!r}"
 
 
-def test_architecture_states_the_marketplace_skill_count_the_file_carries():
+def test_architecture_states_the_skill_count_the_plugin_installs():
+    """Derived from the directory the plugin installs from, not from a restated
+    index — the manifest no longer carries a count to drift against."""
     marketplace = json.loads(MARKETPLACE.read_text(encoding="utf-8"))
-    count = len(marketplace["skills"])
-    assert count == 11
-    assert "eleven skills" in _flat(ARCHITECTURE), "docs/architecture.md must state how many skills the index carries"
+    installed = (REPO_ROOT / marketplace["plugins"][0]["skills"]).resolve()
+    assert len([d for d in installed.iterdir() if d.is_dir()]) == 11
+    assert "eleven skills" in _flat(ARCHITECTURE), "docs/architecture.md must state how many skills the plugin installs"
 
 
 # ---------------------------------------------------------------------------
@@ -1407,14 +1454,15 @@ def test_the_readme_states_what_the_gate_change_bought_on_the_run_it_gates():
     flat = _plain(README)
     if retired == live:
         pytest.skip(f"both clauses ship {live} of {total} on this corpus; there is nothing to disclose")
-    assert f"run 5 is {retired} of {total}" in flat, (
+    assert f"run 5 is {retired} of {total}" in _plain(READING), (
         f"the live corpus ships {live} of {total} under the rule in force and {retired} of {total} "
-        f"under the retired one; the README must say so"
+        f"under the retired one; docs/reading-the-results.md must say so"
     )
-    assert "it bought nothing when adopted" not in flat, (
-        "the README must not claim the gate change bought nothing without naming the run that is "
-        f"true of — it bought {live - retired} ship(s) on the corpus it now gates"
-    )
+    for name, page in (("README.md", flat), ("docs/reading-the-results.md", _plain(READING))):
+        assert "it bought nothing when adopted" not in page, (
+            f"{name} must not claim the gate change bought nothing without naming the run that is "
+            f"true of — it bought {live - retired} ship(s) on the corpus it now gates"
+        )
 
 
 def test_the_docs_do_not_present_the_confidence_bound_as_the_stricter_rule():
@@ -1511,7 +1559,7 @@ def test_the_crossover_tally_every_page_publishes_is_the_one_the_corpora_yield()
     tied = [(c, s) for c, s, _n, _sd, ret, ado in rows if ado == ret]
 
     pages = {
-        "README.md": _plain(README),
+        "docs/reading-the-results.md": _plain(READING),
         "the dashboard": _plain(DASHBOARD),
         "ADR-0006": _plain(REPO_ROOT / "docs" / "adr" / "0006-confidence-bound-on-the-pooled-mean.md"),
     }
@@ -1663,9 +1711,9 @@ REQUIRED_CAVEATS: tuple[tuple[str, tuple[str, ...]], ...] = (
 
 def _caveat_section() -> str:
     """The body of the caveats section, heading excluded, next `##` excluded."""
-    text = README.read_text(encoding="utf-8")
+    text = LIMITS.read_text(encoding="utf-8")
     start = text.find(f"## {CAVEAT_SECTION}")
-    assert start != -1, f"README no longer has a '## {CAVEAT_SECTION}' section"
+    assert start != -1, f"docs/limits.md no longer has a '## {CAVEAT_SECTION}' section"
     rest = text[start + len(CAVEAT_SECTION) :]
     end = rest.find("\n## ")
     return rest[:end] if end != -1 else rest
@@ -1701,12 +1749,38 @@ def test_the_caveat_section_states_its_own_length_correctly():
     leads = re.findall(r"^\*\*(.+?)\*\*", section, re.MULTILINE | re.DOTALL)
     count = len(leads)
     word = {3: "three", 4: "four", 5: "five", 6: "six"}[count]
-    flat = _plain(README)
+    flat = _plain(LIMITS)
     assert f"the {word} limits on it sit here" in flat, (
         f"the section opens with {count} bolded limits ({leads}); its preamble must say '{word}'"
     )
-    assert f"it is {word} paragraphs" in flat, (
-        f"the cross-reference above the table must call the section {word} paragraphs, not another count"
+    assert f"it is {word} paragraphs" in _plain(READING), (
+        f"the cross-reference to the limits page must call it {word} paragraphs, not another count"
     )
     for stale in {"three", "four", "five", "six"} - {word}:
         assert f"the {stale} limits on it sit here" not in flat
+
+
+def test_the_readme_audit_example_is_real_output_from_the_command_it_shows():
+    """A fabricated sample transcript is a lie a reader cannot check.
+
+    The README shows a trimmed `audit` run. Every non-elided line of it must
+    appear in the real output of the exact command printed above it, so the
+    example cannot drift from the tool and cannot have been invented.
+    """
+    body = README.read_text(encoding="utf-8")
+    command = next(line for line in body.splitlines() if line.startswith("node cli/bin/cli.js audit fixtures/")).strip()
+    block = next(
+        chunk for chunk in body.split("```") if "AST01-obfuscated-payload-exec" in chunk and "FINDING" in chunk
+    )
+
+    result = subprocess.run(command.split(), cwd=REPO_ROOT, capture_output=True, text=True, check=False)
+    # `--fail-on-detect` on a fixture that detects: a non-zero exit IS the contract,
+    # and a zero exit here would mean the example no longer demonstrates a finding.
+    assert result.returncode != 0, f"the documented example stopped detecting anything:\n{result.stdout}"
+    produced = " ".join(result.stdout.split())
+    for line in (ln.strip() for ln in block.splitlines()):
+        if not line or line.startswith("AST01   Malicious Skills"):
+            continue  # the header carries column padding the shell may reflow
+        assert " ".join(line.split()) in produced, (
+            f"README's audit example shows a line the command does not print: {line!r}"
+        )

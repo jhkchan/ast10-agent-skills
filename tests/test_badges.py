@@ -515,10 +515,14 @@ def test_the_licence_badge_matches_the_licence_file_and_both_manifests():
     committed = badge("license")
     assert committed.message == "Apache-2.0"
     assert committed.link == "LICENSE"
-    for manifest in (REPO_ROOT / "package.json", REPO_ROOT / ".claude-plugin" / "marketplace.json"):
-        declared = json.loads(manifest.read_text(encoding="utf-8"))["license"]
-        assert declared == committed.message, (
-            f"{manifest.name} declares {declared!r}; the badge says {committed.message!r}"
+    declared = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))["license"]
+    assert declared == committed.message, f"package.json declares {declared!r}; the badge says {committed.message!r}"
+    # marketplace.json is a plugin marketplace manifest: the licence is a property
+    # of the plugin being installed, not of the marketplace listing it.
+    marketplace = json.loads((REPO_ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
+    for plugin in marketplace["plugins"]:
+        assert plugin["license"] == committed.message, (
+            f"plugin {plugin['name']!r} declares {plugin['license']!r}; the badge says {committed.message!r}"
         )
 
 

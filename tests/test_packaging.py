@@ -37,6 +37,8 @@ from __future__ import annotations
 import json
 import pathlib
 import re
+import shutil
+import subprocess
 
 import pytest
 import yaml
@@ -99,86 +101,135 @@ def test_marketplace_manifest_parses_as_json(marketplace):
     assert isinstance(marketplace, dict)
 
 
-def test_marketplace_declares_the_expected_top_level_schema(marketplace):
-    """The field set mirrors the reference marketplace manifest this repo's
-    packaging was modelled on: identity, provenance, and a flat skill index."""
-    for key in ("name", "description", "version", "author", "license", "skills"):
-        assert key in marketplace, f"marketplace.json is missing top-level {key!r}"
-    assert marketplace["license"] == "Apache-2.0"
-    assert marketplace["author"] == "Jacky Chan"
-    assert isinstance(marketplace["skills"], list)
+def test_marketplace_declares_the_documented_schema(marketplace):
+    """The manifest is a Claude Code plugin marketplace, so it answers to that schema.
+
+    It used to be a bespoke `skills[]` index sitting at the path Claude Code
+    reserves for a marketplace manifest, which meant `/plugin marketplace add`
+    on this repository failed. `name`, `owner.name` and `plugins[]` are the
+    documented required set.
+    """
+    for key in ("name", "owner", "plugins"):
+        assert key in marketplace, f"marketplace.json is missing required top-level {key!r}"
+    assert marketplace["owner"]["name"] == "Jacky Chan"
+    assert isinstance(marketplace["plugins"], list) and marketplace["plugins"], "plugins[] must be a non-empty list"
 
 
-def test_marketplace_lists_every_skill_directory(marketplace):
-    """Both directions. A skill absent from the manifest cannot be installed;
-    a manifest entry with no skill behind it is a broken install."""
-    listed = {entry["name"] for entry in marketplace["skills"]}
+def test_marketplace_ships_exactly_one_plugin(marketplace):
+    """One plugin carries the whole repository. Splitting it is a real choice
+    with an install-story cost, so it fails here until it is made deliberately."""
+    assert len(marketplace["plugins"]) == 1, "the repository ships as a single plugin"
+
+
+def test_the_plugin_declares_both_component_paths(marketplace):
+    """The skills were always installable; the fourteen commands were not.
+
+    A marketplace entry that declares `skills` and omits `commands` installs
+    two thirds of this repository and silently drops every slash command, which
+    is the exact gap this manifest was rewritten to close.
+    """
+    plugin = marketplace["plugins"][0]
+    for key in ("name", "source", "skills", "commands", "license"):
+        assert key in plugin, f"the plugin entry is missing {key!r}"
+    assert plugin["license"] == "Apache-2.0"
+
+
+def test_the_plugin_component_paths_resolve_on_disk(marketplace):
+    """A declared path with nothing behind it is a broken install."""
+    plugin = marketplace["plugins"][0]
+    for key in ("skills", "commands"):
+        target = (REPO_ROOT / plugin[key]).resolve()
+        assert target.is_dir(), f"the plugin declares {key} -> {plugin[key]!r}, which is not a directory"
+
+
+def test_the_declared_skills_path_holds_every_skill_directory(marketplace):
+    """Both directions, as before. A skill outside the declared path cannot be
+    installed; a declared path holding a directory with no SKILL.md is a broken
+    install. The manifest no longer restates the roster, so this is the drift
+    guard that replaces the old name-by-name index comparison."""
+    plugin = marketplace["plugins"][0]
+    declared = (REPO_ROOT / plugin["skills"]).resolve()
+    assert declared == SKILLS_DIR.resolve(), f"the plugin installs from {declared}, but the skills live in {SKILLS_DIR}"
+
     on_disk = {frontmatter_name(d) for d in skill_dirs()}
+    assert len(on_disk) == 11, "the roster is ten AST categories plus advisory"
+    for directory in skill_dirs():
+        assert (directory / "SKILL.md").is_file(), (
+            f"{directory.name} is inside the declared skills path with no SKILL.md"
+        )
 
-    assert not (on_disk - listed), (
-        f"skills present on disk but unlisted in marketplace.json: {sorted(on_disk - listed)}"
+
+def test_the_declared_commands_path_holds_every_slash_command(marketplace):
+    """The count is derived, not asserted: every `.md` under the declared path
+    is a command a user gets, and every command file must live under it."""
+    plugin = marketplace["plugins"][0]
+    declared = (REPO_ROOT / plugin["commands"]).resolve()
+    on_disk = sorted(p.name for p in declared.glob("*.md"))
+    assert on_disk, "the declared commands path holds no command files"
+
+    everywhere = sorted(p.name for p in (REPO_ROOT / "commands").rglob("*.md"))
+    assert on_disk == everywhere, (
+        f"commands exist outside the declared path and will not install: {sorted(set(everywhere) - set(on_disk))}"
     )
-    assert not (listed - on_disk), (
-        f"marketplace.json lists names with no skill directory behind them: {sorted(listed - on_disk)}"
-    )
 
 
-def test_marketplace_lists_all_eleven_skills(marketplace):
-    assert len(skill_dirs()) == 11, "the roster is ten AST categories plus advisory"
-    assert len(marketplace["skills"]) == 11
-
-
-def test_marketplace_skill_count_matches_the_list_it_annotates(marketplace):
-    """A count that disagrees with the list is the cheapest possible lie about
-    coverage, and the one most likely to survive review."""
-    assert marketplace["skill_count"] == len(marketplace["skills"])
-
-
-def test_every_marketplace_entry_has_a_name_and_a_description(marketplace):
-    for entry in marketplace["skills"]:
-        assert set(entry) == {"name", "description"}, f"unexpected keys in {entry}"
-        assert entry["name"].strip()
-        assert len(entry["description"].strip()) > 40, f"{entry['name']}: description too thin to route on"
-
-
-def test_marketplace_entries_are_unique_and_sorted(marketplace):
-    names = [entry["name"] for entry in marketplace["skills"]]
-    assert len(names) == len(set(names)), "duplicate skill name in marketplace.json"
-    assert names == sorted(names), "keep the skill index sorted so diffs stay readable"
+def test_plugin_json_agrees_with_the_marketplace_entry(marketplace):
+    """Two manifests describing one plugin is two places to drift."""
+    plugin = marketplace["plugins"][0]
+    manifest = json.loads((REPO_ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+    for key in ("name", "displayName", "description", "version", "license", "homepage", "repository"):
+        assert manifest.get(key) == plugin.get(key), (
+            f"plugin.json and the marketplace entry disagree on {key!r}: {manifest.get(key)!r} vs {plugin.get(key)!r}"
+        )
 
 
 def test_marketplace_description_carries_the_non_endorsement_disclaimer(marketplace):
     """The manifest is often the only text a plugin browser shows. A repo named
-    after a standards body it is not part of has to say so where it is read."""
-    description = marketplace["description"]
-    assert "NOT an OWASP project" in description
-    assert "endorsement" in description
+    after a standards body it is not part of has to say so where it is read —
+    and now in both places a browser reads from."""
+    for label, description in (
+        ("the marketplace", marketplace["description"]),
+        ("the plugin entry", marketplace["plugins"][0]["description"]),
+    ):
+        assert "NOT an OWASP project" in description, f"{label} description drops the non-endorsement disclaimer"
+        assert "endorsement" in description, f"{label} description does not use the word 'endorsement'"
 
 
-def test_marketplace_display_name_itself_marks_the_independence(marketplace):
+def test_the_rendered_names_themselves_mark_the_independence(marketplace):
     """The NAME, not only the description, has to carry the disclaimer.
 
-    A plugin picker renders the display name and routinely truncates or drops
-    the description, so at the one moment that matters — the click that
-    installs — "OWASP Agentic Skills Top 10 …" unqualified reads as an
-    OWASP-published artifact. That is the AST04 brand-impersonation shape this
-    repository exists to flag, committed by the repository itself.
+    A plugin picker renders the name and routinely truncates or drops the
+    description, so at the one moment that matters — the click that installs —
+    "OWASP Agentic Skills Top 10 ..." unqualified reads as an OWASP-published
+    artifact. That is the AST04 brand-impersonation shape this repository
+    exists to flag, committed by the repository itself. `displayName` is what
+    the picker actually renders, so it is checked alongside the identifier.
     """
     name = marketplace["name"]
-    assert "OWASP" in name, "the name may name the standard it implements"
+    assert "owasp" in name.lower(), "the name may name the standard it implements"
     assert name.lower().startswith("unofficial"), (
-        f"marketplace.json's display name must lead with its independence, got {name!r}"
+        f"marketplace.json's name must lead with its independence, got {name!r}"
+    )
+
+    display = marketplace["plugins"][0]["displayName"]
+    assert "OWASP" in display, "the rendered plugin name may name the standard it implements"
+    assert display.lower().startswith("unofficial"), (
+        f"the plugin's displayName is what a picker renders and must lead with its independence, got {display!r}"
     )
 
 
-def test_marketplace_is_a_flat_skill_index_not_a_plugin_bundle(marketplace):
-    """docs/architecture.md and README.md both describe it this way; if it ever
-    grows a plugin/bundle/commands declaration, those pages become wrong."""
-    for invented in ("plugins", "commands", "bundles", "hooks", "mcpServers"):
-        assert invented not in marketplace, (
-            f"marketplace.json now declares {invented!r}; README.md and docs/architecture.md "
-            "describe it as a flat skill index and must be updated together"
-        )
+def test_marketplace_installs_skills_and_commands_together(marketplace):
+    """The inverse of the guard this replaces.
+
+    The manifest used to be a flat skill index, and a test asserted it never
+    grew a `plugins`/`commands` declaration so that README.md and
+    docs/architecture.md stayed true. Those pages now describe a real plugin,
+    so the guard points the other way: dropping either component declaration
+    silently narrows what `/plugin install` delivers.
+    """
+    plugin = marketplace["plugins"][0]
+    assert plugin.get("skills"), "the plugin must declare its skills path"
+    assert plugin.get("commands"), "the plugin must declare its commands path"
 
 
 # --------------------------------------------------------------- eval.yml (CI)
@@ -575,3 +626,23 @@ def test_gitignore_covers_the_required_pattern(pattern):
         if line.strip() and not line.strip().startswith("#")
     }
     assert pattern in lines, f".gitignore does not ignore {pattern}"
+
+
+def test_the_marketplace_manifest_passes_the_real_claude_cli_validator():
+    """The schema assertions above are this repo's reading of the format.
+
+    `claude plugin validate` is the format's own reading. Where the CLI is
+    installed, it is the authority and runs; in CI, where it is not, the
+    hand-written assertions above still hold the shape.
+    """
+    claude = shutil.which("claude")
+    if not claude:
+        pytest.skip("the claude CLI is not installed; the schema assertions above still apply")
+    result = subprocess.run(
+        [claude, "plugin", "validate", str(MARKETPLACE_PATH)],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, f"claude plugin validate rejected the manifest:\n{result.stdout}{result.stderr}"

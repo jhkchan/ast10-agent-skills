@@ -45,6 +45,7 @@ ROBUSTNESS_JSON = REPO_ROOT / "eval" / "robustness.json"
 CALIBRATION_PY = REPO_ROOT / "eval" / "calibration.py"
 DASHBOARD = REPO_ROOT / "docs" / "skill-judge-dashboard.md"
 README = REPO_ROOT / "README.md"
+READING = REPO_ROOT / "docs" / "reading-the-results.md"
 LEDGER = REPO_ROOT / "eval" / "run5-refusals.md"
 SCORECARDS = REPO_ROOT / "eval" / "scorecards"
 
@@ -359,7 +360,9 @@ def test_the_readme_carries_the_two_counts_a_reader_would_otherwise_miss(compute
     assert f"{lojo['worst_ships']} of {lojo['of']}" in flat, (
         "the README publishes the ship count; it must publish the leave-one-judge-out count beside it"
     )
-    assert "does not survive imputation" in flat
+    # The imputation result travels with the fragility prose it belongs to; the
+    # README links there rather than restating it.
+    assert "does not survive imputation" in _flat(READING)
 
 
 def test_the_ledger_and_the_robustness_report_agree_on_every_what_if(computed):

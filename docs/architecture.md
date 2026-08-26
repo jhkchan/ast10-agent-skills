@@ -406,15 +406,24 @@ The CLI reads the repository's own manifests for every number it prints, so it c
 report a coverage state the manifests disagree with, and `route` delegates to the advisory
 skill's own `triage.py` rather than keeping a second copy of the decision tree.
 
-`.claude-plugin/marketplace.json` is a **flat index of the eleven skills** — top-level
-identity fields plus one `{name, description}` entry per skill, keyed on the SKILL.md
-frontmatter `name` a runtime routes on. It declares no plugins, no bundles and no
-`commands/` payload, and nothing installs *from* it: `tests/test_packaging.py` checks it
-against `skills/` in both directions, which makes it safe to script an install loop
-against, and the install itself is `cli/ast10.py install` or a `cp -r`. Its top-level
-`name` leads with **"Unofficial"** because a plugin picker renders the name and often
-drops the description, and the moment of installation is exactly where "OWASP Agentic
-Skills Top 10" without a qualifier reads as an OWASP-published artifact.
+`.claude-plugin/marketplace.json` is a **Claude Code plugin marketplace manifest**:
+marketplace identity plus a single `plugins[]` entry, `owasp-ast10`, whose `source` is the
+repository root and which declares both component paths — `./skills` for the eleven skills,
+keyed on the SKILL.md frontmatter `name` a runtime routes on, and `./commands/ast` for the
+fourteen slash commands. It was a flat `{name, description}` index until that was found to
+be sitting at the path Claude Code reserves for a marketplace, where
+`/plugin marketplace add` on this repository failed outright and no install path delivered
+the commands. `.claude-plugin/plugin.json` carries the same identity for the plugin itself,
+and `tests/test_packaging.py` fails the build if the two manifests disagree, if either
+declared path stops resolving to what is on disk, or if a command file appears outside the
+declared path and would silently not install. The manifest no longer restates the skill
+roster, so there is no index left to drift.
+
+The marketplace `name` leads with **"unofficial"**, and the plugin's `displayName` — the
+string a picker actually renders — leads with **"Unofficial"**, because a picker often drops
+the description, and the moment of installation is exactly where "OWASP Agentic Skills Top
+10" without a qualifier reads as an OWASP-published artifact. `cli/ast10.py install` and a
+`cp -r` of `skills/` remain the non-plugin paths, and neither copies `commands/ast/`.
 
 ---
 

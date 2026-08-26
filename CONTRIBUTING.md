@@ -54,9 +54,8 @@ re-stamp the manifest: `references/*.md` is inside the `content_hash` surface
 `SKILL.md` plus `scripts/*.py` and nothing else.
 
 The frontmatter needs a `name` and a `description`. The `name` is the
-identifier a runtime matches invocations against, so it must equal the entry in
-`.claude-plugin/marketplace.json` — `tests/test_packaging.py` fails the build if
-those two drift. Write the `description` for *retrieval*: it is the only text an
+identifier a runtime matches invocations against, and the directory it installs
+to takes that name. Write the `description` for *retrieval*: it is the only text an
 agent sees when deciding whether to load the skill, so it should name the
 concrete symptoms and the triage decisions the skill can settle, not summarize
 the category in the abstract.
@@ -94,8 +93,12 @@ can verify manufactures exactly the false trust signal AST10 warns about, and th
 maintainer signs the roster at release with a key that never enters this
 repository or CI.
 
-**3. List the skill in the marketplace manifest.** Add a `{name, description}`
-entry to `.claude-plugin/marketplace.json` and bump `skill_count`.
+**3. Nothing to register.** `.claude-plugin/marketplace.json` is a plugin
+marketplace manifest that installs the whole `skills/` directory, so a new skill
+is picked up by being in it — there is no index to update and none to drift.
+`tests/test_packaging.py` fails the build if a skill directory ships without a
+`SKILL.md`, or if a slash command lands outside the declared `commands/` path
+where it would silently not install.
 
 **4. Point the repo's own detectors at your skill.**
 

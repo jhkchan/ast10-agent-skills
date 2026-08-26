@@ -431,10 +431,17 @@ def licence_id() -> str:
     if "Apache License" not in text or "Version 2.0" not in text:
         raise BadgeError("LICENSE is not the Apache License, Version 2.0 text; refusing to badge it as one")
     identifier = "Apache-2.0"
-    for manifest in (PACKAGE_JSON, MARKETPLACE):
-        declared = json.loads(manifest.read_text(encoding="utf-8")).get("license")
-        if declared != identifier:
-            raise BadgeError(f"{manifest.name} declares license {declared!r}; LICENSE is {identifier}")
+    declared = json.loads(PACKAGE_JSON.read_text(encoding="utf-8")).get("license")
+    if declared != identifier:
+        raise BadgeError(f"{PACKAGE_JSON.name} declares license {declared!r}; LICENSE is {identifier}")
+    # marketplace.json is a plugin marketplace manifest: the licence is a property
+    # of the plugin being installed, not of the marketplace listing it.
+    for plugin in json.loads(MARKETPLACE.read_text(encoding="utf-8")).get("plugins", []):
+        if plugin.get("license") != identifier:
+            raise BadgeError(
+                f"{MARKETPLACE.name} plugin {plugin.get('name')!r} declares license "
+                f"{plugin.get('license')!r}; LICENSE is {identifier}"
+            )
     return identifier
 
 

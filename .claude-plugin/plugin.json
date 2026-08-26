@@ -1,0 +1,21 @@
+{
+  "name": "owasp-ast10",
+  "displayName": "Unofficial OWASP Agentic Skills Top 10",
+  "description": "Audit a candidate agent-skill package against the OWASP Agentic Skills Top 10: ten per-category detector skills, an advisory router, and fourteen slash commands. Independent community implementation — NOT an OWASP project and carrying no OWASP endorsement.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jacky Chan",
+    "url": "https://github.com/jhkchan"
+  },
+  "homepage": "https://github.com/jhkchan/owasp-ast10-agent-skills",
+  "repository": "https://github.com/jhkchan/owasp-ast10-agent-skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "security",
+    "owasp",
+    "agent-skills",
+    "supply-chain",
+    "static-analysis",
+    "universal-skill-format"
+  ]
+}
