@@ -25,7 +25,7 @@ One check: a command-bearing value in a config file the host auto-executes **at 
 `.claude/settings.json` hooks, an MCP/env control-plane override, a `.vscode/tasks.json`
 `folderOpen` task. Registry flooding, dependency confusion and maintainer-account takeover are
 tiered `out-of-artifact` and no check claims them. Manifest F1
-`scenario-level 1.000 (AST02-S03, n=6)`;
+`scenario-level 1.000 (AST02-S03, n=8)`;
 [`skills/AST02/coverage-matrix.md`](../skills/AST02/coverage-matrix.md).
 
 </details>

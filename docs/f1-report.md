@@ -40,7 +40,7 @@ claimed anywhere in this repository, and AST08's own mitigations ask for one.
 | Category | Registry static-detectable | Cases (floor) | Precision | Recall | F1 | Proxy F1 | Clean leakage | Gate |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | `AST01` Malicious Skills | 7 | 16 (16) | 1.000 | 1.000 | **1.000** | — | 0/8 | PASS |
-| `AST02` Supply Chain Compromise | 1 | 6 (6) | 1.000 | 1.000 | **1.000** | — | 0/3 | PASS |
+| `AST02` Supply Chain Compromise | 1 | 8 (6) | 1.000 | 1.000 | **1.000** | — | 0/4 | PASS |
 | `AST03` Over-Privileged Skills | 1 | 6 (6) | 1.000 | 1.000 | **1.000** | 1.000 *(n=4)* | 0/3 | PASS |
 | `AST04` Insecure Metadata | 5 | 10 (10) | 1.000 | 1.000 | **1.000** | — | 0/5 | PASS |
 | `AST05` Untrusted External Instructions | 0 | 6 (6) | — | — | — *(no scenario-level corpus)* | 1.000 *(n=6)* | 0/3 | declared-and-uncovered |
@@ -80,14 +80,14 @@ No check in this module fires on any of its 8 clean packages — not only the la
 
 Registry tiering: **1 static-detectable**, 0 agent-judgable, 3 out-of-artifact of 4 named scenarios. Corpus scope: `scenario-level`. Gate: **PASS**.
 
-Corpus: **6 cases** (3 vulnerable / 3 clean) across 1 labeled check(s); the `max(6, 2 × detectable)` floor for that many checks is 6.
+Corpus: **8 cases** (4 vulnerable / 4 clean) across 1 labeled check(s); the `max(6, 2 × detectable)` floor for that many checks is 6.
 
 | Check | Detector | Covers | Registry scenario | TP | FP | FN | TN | P | R | F1 |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `AST02-S03` | `AST02-config-file-hijacking` | full | `AST02-S03` | 3 | 0 | 0 | 3 | 1.000 | 1.000 | 1.000 |
+| `AST02-S03` | `AST02-config-file-hijacking` | full | `AST02-S03` | 4 | 0 | 0 | 4 | 1.000 | 1.000 | 1.000 |
 
-Scenario-level total (n=6): precision 1.000, recall 1.000, **F1 1.000**.
-No check in this module fires on any of its 3 clean packages — not only the labeled one.
+Scenario-level total (n=8): precision 1.000, recall 1.000, **F1 1.000**.
+No check in this module fires on any of its 4 clean packages — not only the labeled one.
 
 > One labeled check for the category's one static-detectable scenario. The other three scenarios are out-of-artifact and are published as such below rather than proxied: for two of them the registry records no artifact_signal at all, and the third (AST02-S02's pin posture) is a proxy the never-pad rule forbids labeling as AST02 coverage. Three quarters of this category's named attack surface is still not decidable from one package, and that has not changed.
 

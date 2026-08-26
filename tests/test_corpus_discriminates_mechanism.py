@@ -32,6 +32,7 @@ import importlib.util
 import json
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -121,18 +122,29 @@ def _ablate_ast01(check: str, pkg: dict) -> bool:
 
 
 def _ablate_ast02(check: str, pkg: dict) -> bool:
-    """Syntax only: a command-looking string inside any shipped JSON config.
+    """Syntax only: a command-looking string inside any shipped config document.
 
     Drops both halves of the real predicate: whether the file is one a host reads
     at project open, and whether the value sits under a key the host executes.
+
+    TOML is read as well as JSON, because the check reads both. A baseline that
+    only reached JSON would never touch the Codex `.codex/config.toml` pair, and
+    a clean case no baseline reaches is not a near miss -- it would pass this
+    module by being invisible to it rather than by being hard.
     """
     assert check == "AST02-config-file-hijacking"
     for path, content in pkg["files"].items():
-        if not path.endswith(".json"):
-            continue
-        try:
-            json.loads(content)
-        except json.JSONDecodeError:
+        if path.endswith(".json"):
+            try:
+                json.loads(content)
+            except json.JSONDecodeError:
+                continue
+        elif path.endswith(".toml"):
+            try:
+                tomllib.loads(content)
+            except tomllib.TOMLDecodeError:
+                continue
+        else:
             continue
         if _ANY_COMMANDISH.search(content):
             return True

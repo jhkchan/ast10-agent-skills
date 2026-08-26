@@ -85,14 +85,14 @@ scan_status:
 # the package bytes and the identity anchor above. Written and re-checked by
 # scripts/sign_usf.py; anyone can check it against the published key with:
 #   python3 scripts/sign_usf.py verify --identity did:web:jhkchan.github.io
-signature: "ed25519:820662776d84e2adb56e07e40ce82c2db544a867a0572c4331ca08c1cddc273274eef52548e0920f6d351ef3d9b25df35f7b5e814afa936b48dfbaa2d480ef0d"
+signature: "ed25519:4d97c29bc5b134d4c3940ab655090255bb395ada5cb7b9647e2a5e2e3a639614919c71c134de70417ee29a8a3dfc7630b6e3f977bdb91e2e5dfd08e1d71ebd0a"
 
 # sha256 over this skill's shipped surface as defined by scripts/content_hash.py
 # (SKILL.md, references/*.md, scripts/*.py, evals/evals.json). This file is
 # outside that surface, which is what stops the hash depending on the field that
 # carries it. Regenerate with:
 #   python3 validators/usf.py --update-content-hash skills/AST02/skill.usf.yaml
-content_hash: "sha256:74e5cff50f44f397ee2c5223e134c28888895ebe7d573659bffcfabc7f60a4a8"
+content_hash: "sha256:5ac73e6fe1cb66fea72428a720859062d76fba4aaec5caa97831ed1d017ed194"
 
 changelog:
   - version: "1.0.0"

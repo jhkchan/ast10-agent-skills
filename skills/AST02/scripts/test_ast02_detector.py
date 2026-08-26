@@ -225,7 +225,23 @@ def corpus_fixtures():
 
 
 def test_the_corpus_is_the_size_the_manifest_declares(corpus_fixtures):
-    assert len(corpus_fixtures) == 6
+    """Derived from the manifest, not restated. The corpus grew from six cases to
+    eight when the Codex surface was added (ADR-0007), and a hand-typed count here
+    is one more place that has to be remembered."""
+    declared = corpus.load_manifest()["categories"]["AST02"]["cases"]
+    assert len(corpus_fixtures) == len(declared)
+
+
+def test_the_corpus_covers_every_surface_the_check_reads(corpus_fixtures):
+    """One vulnerable case per auto-read config surface the check knows about.
+
+    The check's surface list and the corpus are edited in different files; this
+    fails when a surface is added to one and not the other.
+    """
+    surfaces = {
+        path.rsplit("/", 1)[0] for pkg, expected in corpus_fixtures if expected for path in pkg["files"] if "/" in path
+    }
+    assert {".claude", ".vscode", ".codex"} <= surfaces, f"vulnerable corpus reaches only {sorted(surfaces)}"
 
 
 def test_the_check_separates_the_vulnerable_cases_from_the_clean_ones(corpus_fixtures):
@@ -237,7 +253,8 @@ def test_the_check_separates_the_vulnerable_cases_from_the_clean_ones(corpus_fix
             fired_on_vulnerable += len(detected & expected)
         else:
             fired_on_clean.extend(sorted(detected))
-    assert fired_on_vulnerable == 3
+    vulnerable = sum(1 for _pkg, expected in corpus_fixtures if expected)
+    assert fired_on_vulnerable == vulnerable
     assert fired_on_clean == []
 
 

@@ -22,7 +22,7 @@ in checks that count toward a published F1 — two of them now fixed, one still
 open.
 
 1. **F1 = 1.000 was measured in a world the wild does not resemble.** 50 of the
-   64 labeled fixture cases declare a `permissions` block. 0 of the 360 real
+66 labeled fixture cases declare a `permissions` block. 0 of the 360 real
    packages do. Every check whose logic reads a manifest was therefore
    scored exclusively on packages that have one, and behaves differently on
    packages that do not — which is all of them.
@@ -56,17 +56,17 @@ declare nothing.
 
 |  | labeled fixture cases | real packages audited |
 | --- | --- | --- |
-| declares a `permissions` block | 50/64 (78%) | 0/360 (0%) |
-| declares `permissions.network` | 50/64 (78%) | 0/360 (0%) |
-| declares a `content_hash` | 22/64 (34%) | 0/360 (0%) |
-| ships a `skill.usf.yaml` | 22/64 (34%) | 0/360 (0%) |
+| declares a `permissions` block | 50/66 (76%) | 0/360 (0%) |
+| declares `permissions.network` | 50/66 (76%) | 0/360 (0%) |
+| declares a `content_hash` | 22/66 (33%) | 0/360 (0%) |
+| ships a `skill.usf.yaml` | 22/66 (33%) | 0/360 (0%) |
 
 Per category, in the corpus every published F1 is measured over:
 
 | category | labeled cases | declare `permissions` | declare `permissions.network` |
 | --- | --- | --- | --- |
 | AST01 | 16 | 16 | 16 |
-| AST02 | 6 | 0 | 0 |
+| AST02 | 8 | 0 | 0 |
 | AST03 | 6 | 6 | 6 |
 | AST04 | 10 | 10 | 10 |
 | AST05 | 6 | 6 | 6 |

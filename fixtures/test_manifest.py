@@ -43,7 +43,14 @@ def test_manifest_declares_all_ten_categories(manifest):
 
 @pytest.mark.parametrize("category", CATEGORIES)
 def test_case_count_matches_locked_gate4_formula(manifest, category):
-    """gate-4: cases = max(MIN_FLOOR, 2 * detectable_scenarios), MIN_FLOOR = 6."""
+    """gate-4: cases >= max(MIN_FLOOR, 2 * detectable_scenarios), MIN_FLOOR = 6.
+
+    A floor, not an equality, per ADR-0007. The equality also forbade a category
+    from carrying MORE cases than the formula yields, which stopped a corpus
+    being strengthened by a further real surface of a scenario it already covers.
+    Class balance and the discrimination ablation bound the corpus from the other
+    side, so cases cannot be added to move a number.
+    """
     min_floor = manifest["min_floor"]
     cat = manifest["categories"][category]
     n_detectable = len(cat["detectable_scenarios"])
@@ -54,8 +61,8 @@ def test_case_count_matches_locked_gate4_formula(manifest, category):
         assert cat["status"] == "declared-and-uncovered"
         assert cat.get("published_f1") is None
     else:
-        assert len(cat["cases"]) == expected, (
-            f"{category}: expected exactly {expected} cases "
+        assert len(cat["cases"]) >= expected, (
+            f"{category}: expected at least {expected} cases "
             f"(max({min_floor}, 2*{n_detectable})), got {len(cat['cases'])}"
         )
 

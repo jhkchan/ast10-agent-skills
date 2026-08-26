@@ -113,8 +113,10 @@ writing, that the pair "does not exercise that trigger" while still declaring
 contract exists to prevent: a corpus labeled against a scenario whose defining condition it
 never encodes, passed by a detector that never existed.
 
-The pair is **deleted from AST01's corpus**, and AST02 now ships six cases of its own that
-exercise the project-open trigger on the three surfaces the whitepaper names. Nothing was
+The pair is **deleted from AST01's corpus**, and AST02 now ships eight cases of its own that
+exercise the project-open trigger on four surfaces: the three the whitepaper names, plus a
+Codex `.codex/config.toml` MCP entry whose `command`/`args` spawn a process when the
+project's config layer loads. Nothing was
 retuned to make a detector pass: the fixture was wrong about the scenario and was replaced.
 
 Remaining debt for this category is the three out-of-artifact scenarios, which is not debt
@@ -127,7 +129,7 @@ scenario coverage.
 three vulnerable/clean pairs that `fixtures/manifest.yaml` did not declare: a typosquat pair
 proxying an AST01 scenario the registry tiers agent-judgable, a pin-posture pair proxying
 AST02-S02's `artifact_signal`, and a lockfile-hash pair mapping to no named scenario. None
-of them encoded AST02-S03, and none of them is among the six cases the directory holds now.
+of them encoded AST02-S03, and none of them is among the eight cases the directory holds now.
 `tests/test_coverage_matrix_ast07_ast08.py::test_ast02_ships_no_orphan_fixture_corpus` names
 all six by directory so re-adding one cannot hide inside a legitimate corpus.
 
@@ -139,11 +141,11 @@ out-of-artifact and are excluded from the denominator, published above as declar
 uncovered.
 
 **Published number.** `fixtures/manifest.yaml` publishes
-`scenario-level 1.000 (AST02-S03, n=6)`, recomputed from the corpus by
-`skills/AST02/scripts/test_ast02_detector.py` on every run. Measured: tp 3, fp 0, fn 0
-across 3 vulnerable and 3 clean cases.
+`scenario-level 1.000 (AST02-S03, n=8)`, recomputed from the corpus by
+`skills/AST02/scripts/test_ast02_detector.py` on every run. Measured: tp 4, fp 0, fn 0
+across 4 vulnerable and 4 clean cases.
 
-**What that number is and is not.** It is one scenario, six hand-authored cases, and an
+**What that number is and is not.** It is one scenario, eight hand-authored cases, and an
 author who also wrote the detector — internal consistency, not field performance. It is
 also not a statement about the category: three quarters of AST02's named attack surface is
 still exactly as undetectable as before, and the number carries the scenario id precisely
@@ -158,12 +160,14 @@ near-miss chosen so a command-string grep would score 0.5 rather than 1.0:
 
 That claim is measured rather than asserted. `tests/test_corpus_discriminates_mechanism.py`
 re-runs this corpus through an ablated check — a command-looking string inside any shipped
-JSON, with both halves of the real predicate (is the file auto-read at project open? does
-the value sit under a key the host executes?) deleted. It scores **F1 0.667**
-(tp 2, fp 1, fn 1) against the shipped check's 1.000: it misses the environment-override
-case entirely, because that vulnerable file contains a URL and no command, and it
-false-positives on the clean folder-open case, which carries the byte-identical command
-with no trigger. Both errors are the corpus doing its job.
+JSON or TOML config, with both halves of the real predicate (is the file auto-read at
+project open? does the value sit under a key the host executes?) deleted. It scores
+**F1 0.667** (tp 3, fp 2, fn 1) against the shipped check's 1.000: it misses the
+environment-override case entirely, because that vulnerable file contains a URL and no
+command, and it false-positives on both clean near misses — the folder-open case, which
+carries the byte-identical command with no trigger, and the Codex case, which carries the
+identical command string under `description`, a key nothing executes. Every one of those
+errors is the corpus doing its job.
 
 **Why a number here is not the padding the never-pad rule forbids.** The rule bars
 manufacturing an F1 for a category whose detectable tier is empty. AST02's is not empty —
@@ -189,10 +193,10 @@ drawn only from the static-detectable tier.
 | **Entitlement at full registry coverage** | **6** | `max(6, 2 x 1)` |
 | Labeled detectable checks in the corpus | 1 | `fixtures/manifest.yaml` `detectable_scenarios` |
 | Entitlement at present labeling | 6 | `max(6, 2 x 1)` — the floor, not the doubling |
-| **Actual fixture count under `fixtures/AST02/`** | **6** | 3 vulnerable + 3 clean |
+| **Actual fixture count under `fixtures/AST02/`** | **8** | 4 vulnerable + 4 clean |
 
-The floor of 6 over a single scenario is what pushed the corpus to cover three distinct
-surfaces of AST02-S03 rather than one shape three times. That is the formula doing useful
+The floor of 6 over a single scenario is what pushed the corpus to cover four distinct
+surfaces of AST02-S03 rather than one shape repeated. That is the formula doing useful
 work: a one-scenario category still has to show the scenario in more than one dress.
 
 ```

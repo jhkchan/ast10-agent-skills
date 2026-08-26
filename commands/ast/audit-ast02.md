@@ -120,7 +120,7 @@ COVERS:   full (AST02-S03)
 CHECKS RUN:  1 detector check at the static-detectable tier, 1 DETECTED
 REGISTRY:    4 named scenario(s): 1 static-detectable, 0 agent-judgable, 3 out-of-artifact
 NOT DECIDED: 3 out-of-artifact scenarios are not decidable from one package
-F1:          scenario-level 1.000 (AST02-S03, n=6)
+F1:          scenario-level 1.000 (AST02-S03, n=8)
              status=covered, scope=scenario-level, corpus=6 case(s)
 ```
 

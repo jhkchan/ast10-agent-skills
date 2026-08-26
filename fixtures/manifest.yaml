@@ -305,7 +305,7 @@ categories:
     # hand-authored cases, each clean half a deliberate near-miss of its vulnerable half:
     # the same settings file with no execution path, the same `env` block with variables
     # that steer nothing, the same task command with no folder-open trigger.
-    published_f1: "scenario-level 1.000 (AST02-S03, n=6)"
+    published_f1: "scenario-level 1.000 (AST02-S03, n=8)"
     registry_coverage:
       registry_scenarios: 4
       registry_static_detectable: 1
@@ -314,7 +314,7 @@ categories:
       cases_at_full_static_coverage: 6
       labeled_detectable_checks: 1
       declared_expected_cases: 6
-      cases_present: 6
+      cases_present: 8
       uncovered_static_detectable:
         []
       note: >-
@@ -331,7 +331,7 @@ categories:
         registry_ids: [AST02-S03]
         covers: full
         detector_check: AST02-config-file-hijacking
-        reason: "A command-bearing value under a key the host auto-executes at project open, inside a config file that ships with the package. The three vulnerable cases are the three surfaces the whitepaper names -- a SessionStart hook command, an ANTHROPIC_BASE_URL override, and an editor task declared runOn: folderOpen -- and each clean case is the same file and the same command with only the auto-execution trigger removed, so a command-string grep scores 0.5 on this corpus."
+        reason: "A command-bearing value under a key the host auto-executes at project open, inside a config file that ships with the package. The four vulnerable cases are the three surfaces the whitepaper names -- a SessionStart hook command, an ANTHROPIC_BASE_URL override, and an editor task declared runOn: folderOpen -- plus a Codex `.codex/config.toml` MCP entry whose command/args spawn a process, and each clean case is the same file and the same command with only the auto-execution trigger removed, so a command-string grep scores 0.5 on this corpus."
     out_of_artifact_scenarios:
       - id: AST02-S01
         name: "Registry Flooding"
@@ -376,6 +376,14 @@ categories:
         scenario_id: AST02-S03
         label: clean
         path: fixtures/AST02/C6-folder-open-task/SKILL.md
+      - id: AST02-V7
+        scenario_id: AST02-S03
+        label: vulnerable
+        path: fixtures/AST02/V7-codex-mcp-server-spawn/SKILL.md
+      - id: AST02-C8
+        scenario_id: AST02-S03
+        label: clean
+        path: fixtures/AST02/C8-codex-mcp-server-spawn/SKILL.md
 
   AST03:
     name: "Over-Privileged Skills"

@@ -68,6 +68,7 @@ from __future__ import annotations
 
 import json
 import re
+import tomllib
 from typing import Callable
 
 from detectors.scaffold import Finding, scenario_detectors, static_detectable
@@ -134,7 +135,16 @@ _AUTO_EXEC_CONFIG_SUFFIXES: tuple[str, ...] = (
     ".cursor/settings.json",
     ".vscode/tasks.json",
     ".vscode/settings.json",
+    # Codex reads a project-scoped `.codex/config.toml` that ships in the
+    # repository. Its `[mcp_servers.<name>]` entries carry `command`/`args`,
+    # which is a process spawn declared by a package-shipped config file --
+    # the same key-and-value match as the three surfaces above, in TOML.
+    ".codex/config.toml",
 )
+
+#: Container keys under which a server entry's `command` is spawned. Codex
+#: spells it `mcp_servers`; the JSON hosts spell it `mcpServers`.
+_MCP_CONTAINER_KEYS: frozenset[str] = frozenset({"mcpServers", "servers", "mcp_servers"})
 
 #: Environment variables whose value changes where the agent sends traffic,
 #: what credential it presents, or what code is loaded into every child
@@ -176,6 +186,23 @@ def _config_files(pkg: dict) -> dict[str, str]:
     return out
 
 
+def _argv_suffix(node: dict) -> str:
+    """``args`` joined onto a command, when the spawn is split across two keys.
+
+    Codex writes `command = "bash"` and `args = ["-c", "<payload>"]`. Reporting
+    only the command reads as a finding on `bash`, which hides the payload the
+    finding is actually about.
+    """
+    for actual, value in node.items():
+        if actual.lower() != "args":
+            continue
+        if isinstance(value, list) and value and all(isinstance(v, str) for v in value):
+            return " " + " ".join(value).strip()
+        if isinstance(value, str) and value.strip():
+            return " " + value.strip()
+    return ""
+
+
 def _command_value(node) -> str | None:
     """A command-bearing scalar directly under a command key of ``node``."""
     if not isinstance(node, dict):
@@ -185,7 +212,7 @@ def _command_value(node) -> str | None:
             if actual.lower() != key:
                 continue
             if isinstance(value, str) and value.strip():
-                return value.strip()
+                return (value.strip() + _argv_suffix(node)).strip()
             if isinstance(value, list) and value and all(isinstance(v, str) for v in value):
                 return " ".join(value).strip()
     return None
@@ -214,9 +241,9 @@ def _hook_finding(path: str, document) -> str | None:
 
 def _mcp_finding(path: str, document) -> str | None:
     for trail, node in _walk(document):
-        if not trail or trail[-1] in {"mcpServers", "servers"}:
+        if not trail or trail[-1] in _MCP_CONTAINER_KEYS:
             continue
-        if not any(part in {"mcpServers", "servers"} for part in trail):
+        if not any(part in _MCP_CONTAINER_KEYS for part in trail):
             continue
         command = _command_value(node)
         if command:
@@ -265,12 +292,14 @@ def detect_config_file_hijacking(pkg: dict) -> Finding:
     if not configs:
         return Finding(scenario, False, "package ships no config file a host auto-reads at project open")
     for path, content in sorted(configs.items()):
+        toml = path.replace("\\", "/").lower().endswith(".toml")
         try:
-            document = json.loads(content)
-        except json.JSONDecodeError as exc:
+            document = tomllib.loads(content) if toml else json.loads(content)
+        except (json.JSONDecodeError, tomllib.TOMLDecodeError) as exc:
             # Malformed config is AST04's parsing surface, not an execution
             # path; recorded rather than silently treated as clean.
-            return Finding(scenario, False, f"{path}: unparseable JSON ({exc.msg}); no execution path decided")
+            fmt = "TOML" if toml else "JSON"
+            return Finding(scenario, False, f"{path}: unparseable {fmt} ({exc}); no execution path decided")
         for rule in _CONFIG_RULES:
             evidence = rule(path, document)
             if evidence:

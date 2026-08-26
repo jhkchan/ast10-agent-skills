@@ -320,30 +320,30 @@
       },
       "corpus": {
         "labeled_detectable_checks": 1,
-        "cases": 6,
+        "cases": 8,
         "formula_minimum": 6,
         "meets_formula": true,
         "class_balance": {
-          "vulnerable": 3,
-          "clean": 3
+          "vulnerable": 4,
+          "clean": 4
         }
       },
       "scenario_level": {
         "checks": [
           "AST02-S03"
         ],
-        "cases": 6,
-        "true_positives": 3,
+        "cases": 8,
+        "true_positives": 4,
         "false_positives": 0,
         "false_negatives": 0,
-        "true_negatives": 3,
+        "true_negatives": 4,
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0
       },
       "artifact_signal_only": null,
       "any_check_firing_on_a_clean_case": {
-        "clean_cases": 3,
+        "clean_cases": 4,
         "firings": []
       },
       "checks": [
@@ -354,10 +354,10 @@
           "registry_ids": [
             "AST02-S03"
           ],
-          "true_positives": 3,
+          "true_positives": 4,
           "false_positives": 0,
           "false_negatives": 0,
-          "true_negatives": 3,
+          "true_negatives": 4,
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
@@ -390,6 +390,16 @@
             },
             {
               "case": "AST02-C6",
+              "predicted_vulnerable": false,
+              "labeled_vulnerable": false
+            },
+            {
+              "case": "AST02-V7",
+              "predicted_vulnerable": true,
+              "labeled_vulnerable": true
+            },
+            {
+              "case": "AST02-C8",
               "predicted_vulnerable": false,
               "labeled_vulnerable": false
             }

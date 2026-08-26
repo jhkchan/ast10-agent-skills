@@ -3,7 +3,7 @@
  "run": {
   "date": "2026-08-25",
   "before_tree": "091928ab27fe8dbd681b0ada5bfac22ecf616100",
-  "after_tree": "091928ab + the two fixes under review (uncommitted working tree)"
+  "after_tree": "091928ab + the AST01/AST08 fixes, re-audited after the AST02 Codex config surface and the AST04 TOML allowlist scoping (ADR-0007). Firings unchanged at 1085."
  },
  "corpora": [
   {
@@ -37,6 +37,11 @@
    }
   }
  ],
+ "corpus_hygiene": {
+  "distinct_skill_md_digests": 352,
+  "exact_duplicate_packages": 8,
+  "note": "Measured, not corrected. Trimming a corpus after seeing its results is how a false-positive rate gets talked downwards."
+ },
  "totals": {
   "packages": 360,
   "checks_per_package": 36,
@@ -68,7 +73,7 @@
     "usf_manifest_file": 16
    },
    "AST02": {
-    "cases": 6,
+    "cases": 8,
     "declares_permissions": 0,
     "declares_network": 0,
     "declares_content_hash": 0,
@@ -118,7 +123,7 @@
    }
   },
   "total": {
-   "cases": 64,
+   "cases": 66,
    "declares_permissions": 50,
    "declares_network": 50,
    "declares_content_hash": 22,
@@ -583,10 +588,5 @@
    "verdict": "accurate signal \u2014 never a conviction",
    "what": "the package does fetch external content and its prose does not state an instruction-versus-data boundary. A true statement about the artifact, recorded beside AST05-S04/S05 rather than as coverage of them"
   }
- ],
- "corpus_hygiene": {
-  "distinct_skill_md_digests": 352,
-  "exact_duplicate_packages": 8,
-  "note": "Measured, not corrected. Trimming a corpus after seeing its results is how a false-positive rate gets talked downwards."
- }
+ ]
 }

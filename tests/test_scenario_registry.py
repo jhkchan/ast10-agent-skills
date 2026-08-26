@@ -297,7 +297,9 @@ def test_declared_expected_size_follows_the_locked_formula(manifest, category):
 
     expected = max(min_floor, 2 * labeled) if labeled else 0
     assert coverage["declared_expected_cases"] == expected
-    assert len(cat["cases"]) == expected
+    # ADR-0007: the formula is a floor. `declared_expected_cases` stays the
+    # entitlement the formula yields; the corpus may exceed it, and AST02 does.
+    assert len(cat["cases"]) >= expected
 
 
 @pytest.mark.parametrize("category", CATEGORIES)

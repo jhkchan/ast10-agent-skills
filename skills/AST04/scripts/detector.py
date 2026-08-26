@@ -179,7 +179,10 @@ CHECK_COVERAGE: dict[str, dict] = {
             "structure: a redefined single-bracket table (the precedence violation, found by "
             "text scan BEFORE tomllib is asked to parse, because tomllib raises on a "
             "redefinition and the raise used to swallow the finding), and a top-level key "
-            "outside the schema allowlist."
+            "outside the schema allowlist. The allowlist shape judges only a package's own "
+            "root-level metadata TOML: applied to a nested tool config or a build manifest it "
+            "fired on every legitimate key those formats define, which is a false positive on "
+            "any package shipping one. The redefinition shape still scans every .toml."
         ),
     },
     "AST04-invisible-unicode-smuggling": {
@@ -342,6 +345,32 @@ _EXPECTED_TOML_TOP_LEVEL_KEYS = {
     "permissions",
     "metadata",
 }
+
+#: TOML filenames that are some other tool's manifest, never the skill's own.
+#: The allowlist above is a schema for a package's own metadata file; applied to
+#: a build or tool manifest it fires on every legitimate key those formats
+#: define, which is a false positive on essentially every real package.
+_FOREIGN_TOML_MANIFESTS = frozenset(
+    {"pyproject.toml", "cargo.toml", "ruff.toml", "poetry.toml", "rustfmt.toml", "netlify.toml"}
+)
+
+
+def _is_own_metadata_toml(path: str) -> bool:
+    """Whether the allowlist shape may judge this file's top-level keys.
+
+    Two exclusions, both learned from a false positive rather than guessed. A
+    TOML nested under a directory is another tool's config -- `.codex/config.toml`
+    declares `mcp_servers`, which is correct for Codex and outside any skill
+    manifest schema. A root-level file with a build-tool name is that tool's
+    manifest for the same reason. The redefined-table shape still scans every
+    `.toml`, because a redefinition is a precedence violation wherever it occurs.
+    """
+    normalized = path.replace("\\", "/").removeprefix("./")
+    if "/" in normalized:
+        return False
+    return normalized.lower() not in _FOREIGN_TOML_MANIFESTS
+
+
 #: Single-bracket table headers only. `[[array_of_tables]]` legitimately repeats;
 #: a repeated `[table]` is the precedence violation AST04-S07 names.
 _TOML_TABLE_HEADER_RE = re.compile(r"^[ \t]*\[([^\[\]\n]+)\][ \t]*$", re.MULTILINE)
@@ -370,6 +399,8 @@ def detect_toml_injection(pkg: dict) -> Finding:
                 f"{path}: table(s) {duplicates} redefined; a later definition overrides the "
                 f"declared one with no precedence rule enforced",
             )
+        if not _is_own_metadata_toml(path):
+            continue
         try:
             data = tomllib.loads(content)
         except tomllib.TOMLDecodeError:

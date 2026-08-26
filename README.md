@@ -53,8 +53,9 @@ jhkchan/owasp-ast10-agent-skills` then `/plugin`. You get eleven skills and four
 
 ### Copy the skills only
 
-For any runtime that discovers skills from a directory. This does not copy `commands/ast/` —
-point your runtime's command directory at it separately if you want the slash commands.
+`SKILL.md` in a named folder is a cross-agent format, so the eleven skills load in any
+runtime that reads skill directories. This path does not copy `commands/ast/` — point your
+runtime's command directory at it separately if you want the slash commands.
 
 ```bash
 git clone https://github.com/jhkchan/owasp-ast10-agent-skills.git
@@ -62,6 +63,21 @@ cd owasp-ast10-agent-skills
 cp -r skills/AST03 ~/.claude/skills/ast03-over-privileged-skills   # one category
 python3 cli/ast10.py install --all --target ~/.claude/skills       # all eleven
 ```
+
+`--target` is the whole story: point it at whatever directory your runtime reads.
+**`~/.agents/skills/` is the widest single target** — Cursor, OpenClaw and Pi all read it.
+
+| Runtime | `--target` |
+| --- | --- |
+| Claude Code | `~/.claude/skills/` (or use the plugin above) |
+| Cursor | `~/.agents/skills/`, `~/.cursor/skills/`, or `~/.claude/skills/` — it reads all three |
+| Codex | `~/.codex/skills/` |
+| VS Code / Copilot | `<your-project>/.github/skills/` |
+| OpenClaw | `~/.agents/skills/`, or a workspace `skills/` directory |
+| Pi | `~/.agents/skills/` or `~/.pi/agent/skills/` |
+
+Paths are from each runtime's own documentation; only Claude Code is exercised here, and the
+manifests declare only what has been exercised — see [Tested with](#tested-with).
 
 ### CLI, no install
 
@@ -150,7 +166,7 @@ perfect F1 does not clear the judge gate.
 | Skill | F1 (measured) | Judged (run 5) |
 | --- | --- | --- |
 | `ast01-malicious-skills` | `scenario-level 1.00 (n=16)` | **SHIP** 110.1 |
-| `ast02-supply-chain-compromise` | `scenario-level 1.00 (n=6)` | **SHIP** 111.8 |
+| `ast02-supply-chain-compromise` | `scenario-level 1.00 (n=8)` | **SHIP** 111.8 |
 | `ast03-over-privileged-skills` | `scenario-level 1.00 (n=2)` + `artifact-signal-only 1.00 (n=4)` | **SHIP** 112.2 |
 | `ast04-insecure-metadata` | `scenario-level 1.00 (n=10)` | **SHIP** 111.6 |
 | `ast05-untrusted-external-instructions` | `artifact-signal-only 1.00 (n=6)` | **SHIP** 110.6 |
@@ -179,11 +195,17 @@ bias is indistinguishable from a score. Per-judge bias and quality diagnostics a
 | Judge panel (run 5, 188 binding judgments) | `anthropic-compatible/glm-5.2`, `bedrock/deepseek-v3.2`, `bedrock/gpt-oss-120b`, `bedrock/nova-pro`, `bedrock/qwen3-235b`, `claude-cli/sonnet` |
 | Output eval | agent `bedrock/qwen3-235b`, blind grader `bedrock/gpt-oss-120b` |
 
-**Agent runtimes.** Every manifest declares `platforms: [claude]`, and Claude Code is the
-runtime the plugin, the commands and the evals are exercised against. The skills are plain
-`SKILL.md` folders with no runtime-specific calls, so any agent that loads skills from a
-directory can read them — but nothing here has been measured on one, and the manifests do not
-claim it.
+**Agent runtimes.** Claude Code is the runtime the plugin, the commands and the evals are
+exercised against, and every manifest declares `platforms: [claude]` — that value is a closed
+five-item enumeration in USF v1.0 (`claude`, `codex`, `cursor`, `openclaw`, `vscode`), and
+widening it is a security claim, not a convenience: AST10 exists because a permission block
+that one runtime enforces may be inert on the next. The skills load elsewhere (see the install
+table above) and nothing here is Claude-specific, but portability of the *format* is not
+evidence about a runtime's *enforcement*, so the manifests still claim only what was measured.
+
+The detectors are deliberately not Claude-only. AST02's config-hijack check reads the
+auto-executed surfaces of Claude Code, Cursor, VS Code and Codex, which is the whitepaper's own
+AST10 mitigation — "build platform-agnostic skill scanners".
 
 ## The rubric is not ours
 
