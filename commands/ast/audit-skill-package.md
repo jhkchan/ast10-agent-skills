@@ -31,11 +31,11 @@ routes_to:
   - advisory
 ---
 
-# /owasp-ast10:audit-skill-package
+# /ast10:audit-skill-package
 
 Activates all ten detector skills (`skills/AST01/` … `skills/AST10/`) in numeric order over
 one candidate package, then the `advisory` skill (`skills/advisory/`) to triage anything the
-ten did not decide. Use `/owasp-ast10:audit-ast01` … `/owasp-ast10:audit-ast10` when you already know which
+ten did not decide. Use `/ast10:audit-ast01` … `/ast10:audit-ast10` when you already know which
 category you care about.
 
 ## What it does
@@ -99,7 +99,7 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 ## Example invocation
 
 ```text
-/owasp-ast10:audit-skill-package ./invoice-helper
+/ast10:audit-skill-package ./invoice-helper
 ```
 
 `invoice-helper` is a package whose manifest declares no `content_hash`, an empty
@@ -116,7 +116,7 @@ totals are the roster totals — neither is a per-example figure.
 
 ```text
 PACKAGE: ./invoice-helper
-MANIFEST: skill.usf.yaml present - validated first (see /owasp-ast10:validate-usf-manifest)
+MANIFEST: skill.usf.yaml present - validated first (see /ast10:validate-usf-manifest)
 
 AST01  Malicious Skills                  1/10 DETECTED
   DETECTED  AST01-content-hash-missing        manifest.content_hash.value is unset
@@ -165,8 +165,8 @@ COVERAGE LEDGER
 VERDICT: 6 DETECTED finding(s). Highest-severity seam: AST03 + AST06 together -
   arbitrary shell with unrestricted egress and no deny_write is the exfiltration
   primitive, not two independent hygiene nits.
-NEXT: /owasp-ast10:check-coverage AST05   (why this category's number is proxy-scoped)
-      /owasp-ast10:validate-usf-manifest ./invoice-helper/skill.usf.yaml
+NEXT: /ast10:check-coverage AST05   (why this category's number is proxy-scoped)
+      /ast10:validate-usf-manifest ./invoice-helper/skill.usf.yaml
 ```
 
 A sweep with zero DETECTED findings means "none of the 36 implemented checks fired against
@@ -189,8 +189,8 @@ when they co-occur:
 
 ## Related
 
-- `/owasp-ast10:audit-ast01` … `/owasp-ast10:audit-ast10` — one category, with that category's decision
+- `/ast10:audit-ast01` … `/ast10:audit-ast10` — one category, with that category's decision
   rules and neighbour seams spelled out in full.
-- `/owasp-ast10:validate-usf-manifest` — step 2 on its own.
-- `/owasp-ast10:check-coverage <ASTnn>` — the full per-scenario expansion of any ledger line.
-- `/owasp-ast10:triage-finding` — for the findings a human raises that no detector can.
+- `/ast10:validate-usf-manifest` — step 2 on its own.
+- `/ast10:check-coverage <ASTnn>` — the full per-scenario expansion of any ledger line.
+- `/ast10:triage-finding` — for the findings a human raises that no detector can.

@@ -185,7 +185,7 @@ Two consequences of the same review are recorded elsewhere and belong to this co
 ## References
 
 - `scenarios/registry.yaml` — the authoritative per-scenario registry this contract governs.
-- `features/owasp-ast10-agent-skills/spec.md` — Gate 02 decision `gate-1` and the originating
+- `features/ast10-agent-skills/spec.md` — Gate 02 decision `gate-1` and the originating
   "Proposed ADRs" draft this record accepts.
-- `features/owasp-ast10-agent-skills/plan.md` — T-1.1 (tier-lock ADR authoring), T-1.5 (tier-lock
+- `features/ast10-agent-skills/plan.md` — T-1.1 (tier-lock ADR authoring), T-1.5 (tier-lock
   tripwire), T-3.1 (coverage-matrix authoring against this contract).

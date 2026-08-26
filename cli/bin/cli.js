@@ -1343,7 +1343,7 @@ function cmdStatus(options) {
     return 0;
   }
 
-  console.log("\nowasp-ast10-agent-skills — status");
+  console.log("\nast10-agent-skills — status");
   console.log(DISCLAIMER);
   console.log(rule());
   console.log(

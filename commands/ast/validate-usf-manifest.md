@@ -20,7 +20,7 @@ nl_triggers:
 routes_to: ast10-cross-platform-reuse
 ---
 
-# /owasp-ast10:validate-usf-manifest
+# /ast10:validate-usf-manifest
 
 Activates the `ast10-cross-platform-reuse` skill (`skills/AST10/`) and runs
 `validators/usf.py` over one or more manifests. USF is the whitepaper's own proposed
@@ -67,7 +67,7 @@ escalation shape in a new coat.
 ## Example invocation
 
 ```text
-/owasp-ast10:validate-usf-manifest ./invoice-helper/skill.usf.yaml
+/ast10:validate-usf-manifest ./invoice-helper/skill.usf.yaml
 ```
 
 Equivalent deterministic run:
@@ -120,11 +120,11 @@ skills/AST01/skill.usf.yaml: OK (signature=signed, risk_tier floor=L0, 0 error(s
 
 ## Related
 
-- `/owasp-ast10:audit-ast10` — the category this manifest standard mitigates, and the reason its
+- `/ast10:audit-ast10` — the category this manifest standard mitigates, and the reason its
   detector ships zero functions: the work lives in the validator, not in a detector.
-- `/owasp-ast10:audit-ast04` — a manifest that parses cleanly can still lie. Metadata deception and
+- `/ast10:audit-ast04` — a manifest that parses cleanly can still lie. Metadata deception and
   unsafe frontmatter deserialization are AST04's surface, not USF's.
-- `/owasp-ast10:audit-skill-package` — runs this validator as its first step whenever the candidate
+- `/ast10:audit-skill-package` — runs this validator as its first step whenever the candidate
   package carries a `skill.usf.yaml`.
 - `schemas/usf-v1.schema.json` and `validators/usf.py` — the shape half and the semantic
   half. Where they disagree, the validator's error text names which rule it is applying.

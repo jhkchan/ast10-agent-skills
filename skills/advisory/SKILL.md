@@ -10,7 +10,10 @@ risk_tier: L0
 
 # Advisory - routing a finding to the category that owns it
 
-> Unofficial community implementation of the OWASP Agentic Skills Top 10 v1.0. NOT an OWASP project; no OWASP endorsement. Source publication: https://owasp.org/www-project-agentic-skills-top-10/
+> Unofficial community implementation of the OWASP® Agentic Skills Top 10 standard, v1.0.
+> NOT an OWASP project; no OWASP endorsement. OWASP is a registered
+> trademark of the OWASP Foundation, used here descriptively to identify the standard
+> implemented. Source: https://owasp.org/www-project-agentic-skills-top-10/
 
 Pattern: Process. A scope gate, then three phases - name the origin, resolve the co-fires,
 hand off - at medium freedom, with the two halves of that freedom named below. Deliberately

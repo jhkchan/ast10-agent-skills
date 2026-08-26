@@ -20,7 +20,7 @@ the defect.
 | Detector | `skills/AST07/scripts/detector.py` |
 | Corpus labelling | `fixtures/manifest.yaml`, category `AST07` (`tier_lock_hash: d57441e6771d6e62845b3cec9efbea906b6e4b09bd309d0723d06225323b84c7`) |
 | Fixture files on disk | none — `fixtures/AST07/` was deleted (see [Corpus entitlement](#corpus-entitlement-versus-what-is-on-disk)) |
-| Sizing and never-pad rules | `features/owasp-ast10-agent-skills/spec.md` gate-4, S-003, S-007 |
+| Sizing and never-pad rules | `features/ast10-agent-skills/spec.md` gate-4, S-003, S-007 |
 
 AST07 is one of the two categories where the whitepaper's table of contents and its body
 agree on the scenario count: three, in both. Nothing was recovered or lost in extraction

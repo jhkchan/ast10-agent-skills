@@ -585,7 +585,7 @@ the judgments are the evidence. Any disagreement is `BLOCKED`, not a rounding no
 
 The judge matrix is multi-provider on purpose: a single judge's idiosyncrasies become the
 rubric otherwise. Availability was verified live from this build environment on
-2026-08-21 (`features/owasp-ast10-agent-skills/build-notes.md`).
+2026-08-21 (`features/ast10-agent-skills/build-notes.md`).
 
 ### Available — verified live
 

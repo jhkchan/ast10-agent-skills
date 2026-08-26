@@ -28,7 +28,7 @@ its own scepticism. Read *What the published 1.0 is, and what it is not* before 
 | Detector | `skills/AST08/scripts/detector.py`, plus the shared scan in `detectors/scaffold.py` |
 | Corpus labelling | `fixtures/manifest.yaml`, category `AST08` (`tier_lock_hash: 08ea76d31a710007ab28c9d14480159426cd9e98c46f08950ceb22a8aa82dbd3`) |
 | Fixture files on disk | `fixtures/AST08/` |
-| Sizing and never-pad rules | `features/owasp-ast10-agent-skills/spec.md` gate-4, S-003, S-007 |
+| Sizing and never-pad rules | `features/ast10-agent-skills/spec.md` gate-4, S-003, S-007 |
 
 ### The count is eight, and the whitepaper says seven
 

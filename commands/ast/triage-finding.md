@@ -19,7 +19,7 @@ nl_triggers:
 routes_to: advisory
 ---
 
-# /owasp-ast10:triage-finding
+# /ast10:triage-finding
 
 Activates the `advisory` skill (`skills/advisory/`) — the orchestration layer above the ten
 per-category detector skills. It is **not** an eleventh detector: it never scans a package,
@@ -69,7 +69,7 @@ matters. "Broad access to secrets" routes; "it can do too much" does not.
 ## Example invocation
 
 ```text
-/owasp-ast10:triage-finding a skill shipped a hidden payload and the obfuscated instruction slipped past the scanner
+/ast10:triage-finding a skill shipped a hidden payload and the obfuscated instruction slipped past the scanner
 ```
 
 Equivalent deterministic run:
@@ -108,7 +108,7 @@ GUIDANCE:     Treat this as a publish-time compromise: quarantine the skill,
               cryptographic signatures (ed25519) bound to a resolvable,
               revocable publisher identity before trusting further skills from
               that publisher.
-NEXT:         /owasp-ast10:audit-ast01 <package-path>
+NEXT:         /ast10:audit-ast01 <package-path>
 ```
 
 ### When nothing matches
@@ -134,8 +134,8 @@ detection-accuracy number.
 
 ## Related
 
-- `/owasp-ast10:audit-ast01` … `/owasp-ast10:audit-ast10` — once the category is named, audit the package
+- `/ast10:audit-ast01` … `/ast10:audit-ast10` — once the category is named, audit the package
   against it.
-- `/owasp-ast10:audit-skill-package` — when you have a package but no finding yet.
-- `/owasp-ast10:check-coverage <ASTnn>` — when the route lands on a category and you need to know
+- `/ast10:audit-skill-package` — when you have a package but no finding yet.
+- `/ast10:check-coverage <ASTnn>` — when the route lands on a category and you need to know
   whether this repo can actually decide it from the artifact.

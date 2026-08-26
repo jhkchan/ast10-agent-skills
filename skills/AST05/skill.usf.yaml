@@ -4,7 +4,7 @@
 #   validator: ../../validators/usf.py
 #   check:     python3 validators/usf.py skills/AST05/skill.usf.yaml
 #
-# Part of `owasp-ast10-agent-skills`, an independent community reference
+# Part of `ast10-agent-skills`, an independent community reference
 # implementation of the OWASP Agentic Skills Top 10 whitepaper's AST10 proposal.
 # This is NOT an OWASP project and carries no OWASP endorsement.
 ---
@@ -22,7 +22,7 @@ description: >-
   instruction.
 
 author:
-  name: "owasp-ast10-agent-skills contributors"
+  name: "ast10-agent-skills contributors"
   # `identity` and `signing_key` are written by scripts/sign_usf.py in the same
   # operation as `signature` below, and both are INSIDE the signed payload. A
   # signature whose key anchors to nothing is the false trust signal AST10 warns
@@ -83,14 +83,14 @@ scan_status:
 # the package bytes and the identity anchor above. Written and re-checked by
 # scripts/sign_usf.py; anyone can check it against the published key with:
 #   python3 scripts/sign_usf.py verify --identity did:web:jhkchan.github.io
-signature: "ed25519:ed54a27f487ef6134346d5def57a0a3b0b7aedc35ca79ca8ff6579678108fb9a4067b0c45cf6e52ac271bf349e0ab60a32ebb37acd14d6b070247e49ad11980f"
+signature: "ed25519:b1f48a01f1efcda0ac39aaf777f83a2e1cccf53bd344f52b51f5095ae4b999f4158ccf85ce589a4a739eed1a69165d764a0eea03607ec1e080d60daab7e17b09"
 
 # sha256 over this skill's shipped surface as defined by scripts/content_hash.py
 # (SKILL.md, references/*.md, scripts/*.py, evals/evals.json). This file is
 # outside that surface, which is what stops the hash depending on the field that
 # carries it. Regenerate with:
 #   python3 validators/usf.py --update-content-hash skills/AST05/skill.usf.yaml
-content_hash: "sha256:4639d99c0800d7ee67ca06967303a5c8a33fe1b2bbf8640cf5d54790290da3b6"
+content_hash: "sha256:bcb705e68e7e8e1260e2785da82a5a5d454e20cff859466b2f4b299fda1704a3"
 
 changelog:
   - version: "1.0.0"

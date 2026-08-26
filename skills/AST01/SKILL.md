@@ -5,7 +5,10 @@ description: "Detect and triage OWASP AST01 Malicious Skills — hidden payloads
 
 # AST01 - Malicious Skills
 
-> Unofficial community implementation of the OWASP Agentic Skills Top 10 v1.0. NOT an OWASP project; no OWASP endorsement. Source publication: https://owasp.org/www-project-agentic-skills-top-10/
+> Unofficial community implementation of the OWASP® Agentic Skills Top 10 standard, v1.0.
+> NOT an OWASP project; no OWASP endorsement. OWASP is a registered
+> trademark of the OWASP Foundation, used here descriptively to identify the standard
+> implemented. Source: https://owasp.org/www-project-agentic-skills-top-10/
 
 Pattern: Knowledge. Read the orientation block, take a route, then descend only as far as
 the route sends you. No mechanism is in this file: the static checks live in

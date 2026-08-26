@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:owasp-ast10-agent-skills:schemas:usf-v1",
+  "$id": "urn:ast10-agent-skills:schemas:usf-v1",
   "title": "Universal Agentic Skill Format v1.0",
   "description": "Structural schema for the Universal Skill Format manifest proposed in the OWASP Agentic Skills Top 10 whitepaper, AST10 (Cross-Platform Reuse). This file constrains SHAPE only -- types, required keys, enumerations, and the syntax of the version/hash/signature fields. Permission SEMANTICS (default-deny network precedence, deny_write-wins-over-write, no wildcards in permissions.files, identity-file protection, and risk_tier validated against the declared permission set) are NOT expressible here and are enforced by validators/usf.py. A manifest that passes this schema is well-formed, not policy-conformant.",
   "type": "object",

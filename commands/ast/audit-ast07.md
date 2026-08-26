@@ -20,10 +20,10 @@ routes_to: ast07-update-drift
 ast_category: AST07
 ---
 
-# /owasp-ast10:audit-ast07
+# /ast10:audit-ast07
 
 Activates the `ast07-update-drift` skill (`skills/AST07/`) and audits one candidate skill
-package against **AST07 - Update Drift** and nothing else. Use `/owasp-ast10:audit-skill-package`
+package against **AST07 - Update Drift** and nothing else. Use `/ast10:audit-skill-package`
 when you want all ten categories in one pass.
 
 ## What AST07 actually is
@@ -73,7 +73,7 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 ## Example invocation
 
 ```text
-/owasp-ast10:audit-ast07 ./invoice-helper
+/ast10:audit-ast07 ./invoice-helper
 ```
 
 The package argument is still required and still read — AST07 is *declared*, not
@@ -122,10 +122,10 @@ fixture author's imagination, not a detector.
 
 ## Related
 
-- `/owasp-ast10:audit-skill-package` — the same package across all ten categories in one sweep.
-- `/owasp-ast10:check-coverage AST07` — the full per-scenario tiering and the written reason
+- `/ast10:audit-skill-package` — the same package across all ten categories in one sweep.
+- `/ast10:check-coverage AST07` — the full per-scenario tiering and the written reason
   behind every uncovered row above.
-- `/owasp-ast10:triage-finding` — when you have a finding in prose and do not yet know it is
+- `/ast10:triage-finding` — when you have a finding in prose and do not yet know it is
   AST07.
 - `skills/AST07/coverage-matrix.md` — the authority this command's footer is read from.
 

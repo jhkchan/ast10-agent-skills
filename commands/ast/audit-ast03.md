@@ -18,11 +18,11 @@ routes_to: ast03-over-privileged-skills
 ast_category: AST03
 ---
 
-# /owasp-ast10:audit-ast03
+# /ast10:audit-ast03
 
 Activates the `ast03-over-privileged-skills` skill (`skills/AST03/`) and audits one
 candidate skill package against **AST03 - Over-Privileged Skills** and nothing else. Use
-`/owasp-ast10:audit-skill-package` when you want all ten categories in one pass.
+`/ast10:audit-skill-package` when you want all ten categories in one pass.
 
 ## What AST03 actually is
 
@@ -62,7 +62,7 @@ skill with a tight manifest that the runtime ignores is AST06, not AST03.
 Check ids are the detector's own, not registry scenario ids (`AST03-S01`, `AST03-S02`, …).
 Which registry scenario each check maps to — and how honestly it measures that scenario,
 versus measuring an enabling artifact signal — is recorded in `fixtures/manifest.yaml`'s
-`covers:` field and expanded by `/owasp-ast10:check-coverage AST03`.
+`covers:` field and expanded by `/ast10:check-coverage AST03`.
 
 ## Arguments
 
@@ -77,7 +77,7 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 ## Example invocation
 
 ```text
-/owasp-ast10:audit-ast03 ./invoice-helper
+/ast10:audit-ast03 ./invoice-helper
 ```
 
 `invoice-helper` below is a package whose manifest declares no `content_hash`, an
@@ -137,10 +137,10 @@ proxy F1 and must be reported as such.
 
 ## Related
 
-- `/owasp-ast10:audit-skill-package` — the same package across all ten categories in one sweep.
-- `/owasp-ast10:check-coverage AST03` — the full per-scenario tiering and the written reason
+- `/ast10:audit-skill-package` — the same package across all ten categories in one sweep.
+- `/ast10:check-coverage AST03` — the full per-scenario tiering and the written reason
   behind every uncovered row above.
-- `/owasp-ast10:triage-finding` — when you have a finding in prose and do not yet know it is
+- `/ast10:triage-finding` — when you have a finding in prose and do not yet know it is
   AST03.
 - `skills/AST03/coverage-matrix.md` — the authority this command's footer is read from.
 

@@ -19,10 +19,10 @@ routes_to: ast08-poor-scanning
 ast_category: AST08
 ---
 
-# /owasp-ast10:audit-ast08
+# /ast10:audit-ast08
 
 Activates the `ast08-poor-scanning` skill (`skills/AST08/`) and audits one candidate skill
-package against **AST08 - Poor Scanning** and nothing else. Use `/owasp-ast10:audit-skill-package`
+package against **AST08 - Poor Scanning** and nothing else. Use `/ast10:audit-skill-package`
 when you want all ten categories in one pass.
 
 ## What AST08 actually is
@@ -65,7 +65,7 @@ AST08's eight scenarios (`AST08-S01` Natural-Language Bypass, `AST08-S03` Scanne
 Impersonation) are agent-judgable and are not implemented as code — deciding that prose is
 *written to evade a scanner* rather than merely verbose is a reading of intent — and two
 (`AST08-S05`, `AST08-S06`) are not decidable from one package at all.
-`/owasp-ast10:check-coverage AST08` expands every row.
+`/ast10:check-coverage AST08` expands every row.
 
 An `INCOMPLETE:` prefix on a finding's evidence is not a payload: it means a bound or a
 parser stopped the scan, which per this category's own rule is never a clean verdict.
@@ -83,7 +83,7 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 ## Example invocation
 
 ```text
-/owasp-ast10:audit-ast08 ./invoice-helper
+/ast10:audit-ast08 ./invoice-helper
 ```
 
 `invoice-helper` below is a package whose manifest declares no `content_hash`, an
@@ -163,10 +163,10 @@ evasion. `skills/AST08/coverage-matrix.md` states each one.
 
 ## Related
 
-- `/owasp-ast10:audit-skill-package` — the same package across all ten categories in one sweep.
-- `/owasp-ast10:check-coverage AST08` — the full per-scenario tiering and the written reason
+- `/ast10:audit-skill-package` — the same package across all ten categories in one sweep.
+- `/ast10:check-coverage AST08` — the full per-scenario tiering and the written reason
   behind every uncovered row above.
-- `/owasp-ast10:triage-finding` — when you have a finding in prose and do not yet know it is
+- `/ast10:triage-finding` — when you have a finding in prose and do not yet know it is
   AST08.
 - `skills/AST08/coverage-matrix.md` — the authority this command's footer is read from.
 

@@ -18,11 +18,11 @@ routes_to: ast05-untrusted-external-instructions
 ast_category: AST05
 ---
 
-# /owasp-ast10:audit-ast05
+# /ast10:audit-ast05
 
 Activates the `ast05-untrusted-external-instructions` skill (`skills/AST05/`) and audits one
 candidate skill package against **AST05 - Untrusted External Instructions** and nothing
-else. Use `/owasp-ast10:audit-skill-package` when you want all ten categories in one pass.
+else. Use `/ast10:audit-skill-package` when you want all ten categories in one pass.
 
 ## What AST05 actually is
 
@@ -72,7 +72,7 @@ scoped `artifact-signal-only`.
 Check ids are the detector's own, not registry scenario ids (`AST05-S01`, `AST05-S02`, …).
 Which registry scenario each check maps to — and how honestly it measures that scenario,
 versus measuring an enabling artifact signal — is recorded in `fixtures/manifest.yaml`'s
-`covers:` field and expanded by `/owasp-ast10:check-coverage AST05`.
+`covers:` field and expanded by `/ast10:check-coverage AST05`.
 
 ## Arguments
 
@@ -87,7 +87,7 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 ## Example invocation
 
 ```text
-/owasp-ast10:audit-ast05 ./invoice-helper
+/ast10:audit-ast05 ./invoice-helper
 ```
 
 `invoice-helper` below is a package whose manifest declares no `content_hash`, an
@@ -165,10 +165,10 @@ block. `tests/test_coverage_matrix.py` fails if `published_f1` here ever says
 
 ## Related
 
-- `/owasp-ast10:audit-skill-package` — the same package across all ten categories in one sweep.
-- `/owasp-ast10:check-coverage AST05` — the full per-scenario tiering and the written reason
+- `/ast10:audit-skill-package` — the same package across all ten categories in one sweep.
+- `/ast10:check-coverage AST05` — the full per-scenario tiering and the written reason
   behind every uncovered row above.
-- `/owasp-ast10:triage-finding` — when you have a finding in prose and do not yet know it is
+- `/ast10:triage-finding` — when you have a finding in prose and do not yet know it is
   AST05.
 - `skills/AST05/coverage-matrix.md` — the authority this command's footer is read from.
 

@@ -311,7 +311,7 @@ platforms: [openclaw, claude, cursor, vscode]
 description: >-
   Fixture package for AST10-S06 (Silent Supply Chain Injection), labeled clean.
 author:
-  name: "owasp-ast10-agent-skills fixture corpus"
+  name: "ast10-agent-skills fixture corpus"
 permissions:
   files:
     read:

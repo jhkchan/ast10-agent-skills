@@ -407,7 +407,7 @@ report a coverage state the manifests disagree with, and `route` delegates to th
 skill's own `triage.py` rather than keeping a second copy of the decision tree.
 
 `.claude-plugin/marketplace.json` is a **Claude Code plugin marketplace manifest**:
-marketplace identity plus a single `plugins[]` entry, `owasp-ast10`, whose `source` is the
+marketplace identity plus a single `plugins[]` entry, `ast10`, whose `source` is the
 repository root and which declares both component paths — `./skills` for the eleven skills,
 keyed on the SKILL.md frontmatter `name` a runtime routes on, and `./commands/ast` for the
 fourteen slash commands. It was a flat `{name, description}` index until that was found to
@@ -424,7 +424,7 @@ The plugin's `displayName` — the string a picker actually renders — leads wi
 installation is exactly where "OWASP Agentic Skills Top 10" without a qualifier reads as an
 OWASP-published artifact. The marketplace `name` does not: it is the kebab identifier typed
 after `@`, never rendered as a title, and qualifying it produced
-`owasp-ast10@unofficial-owasp-ast10-agent-skills`, which repeats what the rendered name
+`ast10@unofficial-ast10-agent-skills`, which repeats what the rendered name
 already says. The disclaimer is carried where it is read, not in every field that could hold
 it. `cli/ast10.py install` and a
 `cp -r` of `skills/` remain the non-plugin paths, and neither copies `commands/ast/`.

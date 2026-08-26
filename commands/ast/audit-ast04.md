@@ -18,11 +18,11 @@ routes_to: ast04-insecure-metadata
 ast_category: AST04
 ---
 
-# /owasp-ast10:audit-ast04
+# /ast10:audit-ast04
 
 Activates the `ast04-insecure-metadata` skill (`skills/AST04/`) and audits one candidate
 skill package against **AST04 - Insecure Metadata** and nothing else. Use
-`/owasp-ast10:audit-skill-package` when you want all ten categories in one pass.
+`/ast10:audit-skill-package` when you want all ten categories in one pass.
 
 ## What AST04 actually is
 
@@ -62,7 +62,7 @@ malicious while the metadata tells the truth.
 Check ids are the detector's own, not registry scenario ids (`AST04-S01`, `AST04-S02`, …).
 Which registry scenario each check maps to — and how honestly it measures that scenario,
 versus measuring an enabling artifact signal — is recorded in `fixtures/manifest.yaml`'s
-`covers:` field and expanded by `/owasp-ast10:check-coverage AST04`.
+`covers:` field and expanded by `/ast10:check-coverage AST04`.
 
 ## Arguments
 
@@ -77,7 +77,7 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 ## Example invocation
 
 ```text
-/owasp-ast10:audit-ast04 ./invoice-helper
+/ast10:audit-ast04 ./invoice-helper
 ```
 
 `invoice-helper` below is a package whose manifest declares no `content_hash`, an
@@ -149,10 +149,10 @@ from 6 to 10.
 
 ## Related
 
-- `/owasp-ast10:audit-skill-package` — the same package across all ten categories in one sweep.
-- `/owasp-ast10:check-coverage AST04` — the full per-scenario tiering and the written reason
+- `/ast10:audit-skill-package` — the same package across all ten categories in one sweep.
+- `/ast10:check-coverage AST04` — the full per-scenario tiering and the written reason
   behind every uncovered row above.
-- `/owasp-ast10:triage-finding` — when you have a finding in prose and do not yet know it is
+- `/ast10:triage-finding` — when you have a finding in prose and do not yet know it is
   AST04.
 - `skills/AST04/coverage-matrix.md` — the authority this command's footer is read from.
 

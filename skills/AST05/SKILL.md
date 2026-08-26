@@ -5,7 +5,10 @@ description: "Detect and triage OWASP AST05 Untrusted External Instructions — 
 
 # AST05 - Untrusted External Instructions
 
-> Unofficial community implementation of the OWASP Agentic Skills Top 10 v1.0. NOT an OWASP project; no OWASP endorsement. Source publication: https://owasp.org/www-project-agentic-skills-top-10/
+> Unofficial community implementation of the OWASP® Agentic Skills Top 10 standard, v1.0.
+> NOT an OWASP project; no OWASP endorsement. OWASP is a registered
+> trademark of the OWASP Foundation, used here descriptively to identify the standard
+> implemented. Source: https://owasp.org/www-project-agentic-skills-top-10/
 
 Pattern: Knowledge. The category exists because textual external references have none
 of the tooling that code dependencies already have — no hash-pin field, no lockfile

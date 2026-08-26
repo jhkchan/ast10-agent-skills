@@ -129,7 +129,7 @@ BASE58BTC_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz
 ED25519_MULTIBASE_VM_TYPES = ("Ed25519VerificationKey2020", "Multikey")
 
 _MAX_DID_DOCUMENT_BYTES = 1 << 20
-_USER_AGENT = "owasp-ast10-agent-skills sign_usf.py"
+_USER_AGENT = "ast10-agent-skills sign_usf.py"
 _DEFAULT_TIMEOUT = 10.0
 
 _EXIT_OK = 0

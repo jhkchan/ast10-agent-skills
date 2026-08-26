@@ -147,7 +147,7 @@ categories to that split.
    would report a mismatch for every well-formed package — and it costs the other eight
    checks visibility into anything outside those globs. Concretely: a candidate shipping
    its output template as `templates/reply.tmpl`, or a payload in `setup.sh` rather than
-   `scripts/*.py`, is not reached through `/owasp-ast10:audit-ast01`, though it is reached by
+   `scripts/*.py`, is not reached through `/ast10:audit-ast01`, though it is reached by
    calling the module directly. Closing it needs per-check scoping in the bridge rather
    than per-category, which is a change to the CLI contract and is recorded here rather
    than made silently.

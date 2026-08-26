@@ -195,28 +195,44 @@ def test_marketplace_description_carries_the_non_endorsement_disclaimer(marketpl
         assert "endorsement" in description, f"{label} description does not use the word 'endorsement'"
 
 
-def test_the_rendered_names_themselves_mark_the_independence(marketplace):
+def test_no_product_identifier_carries_the_owasp_word_mark(marketplace):
+    """OWASP's mark-usage guidelines, NO USE IN COMPANY NAMES.
+
+        "The OWASP Word Mark (or any variation thereof) must not be used in any
+        company name, product name, model number, part number, service name, or
+        domain name."
+        -- https://policy.owasp.org/operational/mark-usage-guidelines
+
+    Four strings in this repository function as product names: the npm package,
+    the plugin id, the marketplace id, and the rendered `displayName` a picker
+    shows at the moment of installation. They carried the mark until 2026-08-26.
+    Naming the standard in PROSE is nominative use and is untouched by this --
+    the guidelines' own USE AS ADJECTIVE clause contemplates it. What may not
+    happen is the mark appearing in an identifier again.
+    """
+    plugin = marketplace["plugins"][0]
+    package = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
+    identifiers = {
+        "marketplace.json name": marketplace["name"],
+        "plugin name": plugin["name"],
+        "plugin displayName": plugin["displayName"],
+        "package.json name": package["name"],
+    }
+    for label, value in identifiers.items():
+        assert "owasp" not in value.lower(), (
+            f"{label} is {value!r}; the OWASP word mark may not appear in a product identifier"
+        )
+
+
+def test_the_rendered_name_still_marks_the_independence(marketplace):
     """The NAME, not only the description, has to carry the disclaimer.
 
-    A plugin picker renders the name and routinely truncates or drops the
-    description, so at the one moment that matters — the click that installs —
-    "OWASP Agentic Skills Top 10 ..." unqualified reads as an OWASP-published
-    artifact. That is the AST04 brand-impersonation shape this repository
-    exists to flag, committed by the repository itself. `displayName` is what
-    the picker actually renders, so it is the one this asserts.
-
-    The marketplace `name` is deliberately exempt. It is the kebab identifier a
-    user types after `@`, never rendered as a title, and carrying the word there
-    made the install line say "owasp-ast10@unofficial-owasp-ast10-agent-skills"
-    -- redundant with the displayName beside it. Dropping it from the identifier
-    was the maintainer's call; dropping it from the rendered name would not be,
-    which is why that assertion stays and is the one that matters.
+    A plugin picker renders `displayName` and routinely truncates or drops the
+    description, so at the one moment that matters -- the click that installs --
+    a name that reads as an official artifact is the AST04 brand-impersonation
+    shape this repository exists to flag, committed by the repository itself.
     """
-    name = marketplace["name"]
-    assert "owasp" in name.lower(), "the name may name the standard it implements"
-
     display = marketplace["plugins"][0]["displayName"]
-    assert "OWASP" in display, "the rendered plugin name may name the standard it implements"
     assert display.lower().startswith("unofficial"), (
         f"the plugin's displayName is what a picker renders and must lead with its independence, got {display!r}"
     )
@@ -667,9 +683,12 @@ def test_the_repo_states_which_whitepaper_edition_it_implements():
     """
     readme = README_PATH.read_text(encoding="utf-8")
     flat = " ".join(readme.split())
-    assert f"OWASP Agentic Skills Top 10 {WHITEPAPER_VERSION}" in flat, (
-        f"README.md must state the edition it implements ({WHITEPAPER_VERSION})"
+    # The mark is written as an adjective followed by a generic noun, per the
+    # guidelines' USE AS ADJECTIVE clause, so the edition trails the noun.
+    assert "OWASP® Agentic Skills Top 10 standard" in flat, (
+        "README.md must name the standard it implements, with the mark as an adjective"
     )
+    assert WHITEPAPER_VERSION in flat, f"README.md must state the edition it implements ({WHITEPAPER_VERSION})"
     assert WHITEPAPER_PDF in readme, "README.md must link the whitepaper PDF it implements"
 
     notice = NOTICE_PATH.read_text(encoding="utf-8")
@@ -678,3 +697,44 @@ def test_the_repo_states_which_whitepaper_edition_it_implements():
 
     architecture = (REPO_ROOT / "docs" / "architecture.md").read_text(encoding="utf-8")
     assert WHITEPAPER_PDF in architecture, "the authority chain's rank 1 is the whitepaper; it must say which edition"
+
+
+#: Documents a reader or the mark's owner would actually look at. Each shows the
+#: OWASP word mark, so each answers to the guidelines' NOTICE SYMBOLS and
+#: ATTRIBUTION clauses on its own -- a legend in a file nobody opens is not one.
+MARK_BEARING_DOCS: tuple[str, ...] = (
+    "README.md",
+    "NOTICE",
+    "CONTRIBUTING.md",
+    "THIRD_PARTY_LICENSES.md",
+)
+
+
+def test_every_document_showing_the_mark_carries_the_symbol_and_the_legend():
+    """OWASP mark-usage guidelines, NOTICE SYMBOLS and ATTRIBUTION.
+
+        "The OWASP Word Mark ... should appear with the registered trademark
+        symbol or unregistered trademark symbol, as applicable."
+        "OWASP Foundation requires you to attribute ownership of the OWASP Word
+        Mark ... by using a trademark ownership legend in all training
+        materials, web pages, marketing collateral, and all other materials
+        that show the wordmark."
+        -- https://policy.owasp.org/operational/mark-usage-guidelines
+
+    The repository used the mark in over a hundred files with the symbol nowhere
+    and the ownership legend in three. This asserts both on the documents that
+    show it, and on every SKILL.md, which the README tells users to copy
+    standalone -- so each one travels without the rest of the repository.
+    """
+    targets = [REPO_ROOT / name for name in MARK_BEARING_DOCS]
+    targets += sorted(SKILLS_DIR.glob("*/SKILL.md"))
+    for path in targets:
+        text = path.read_text(encoding="utf-8")
+        rel = path.relative_to(REPO_ROOT)
+        if "OWASP" not in text:
+            continue
+        assert "OWASP®" in text, f"{rel} shows the OWASP word mark with no ® on first use"
+        flat = " ".join(text.split()).lower()
+        assert "trademark of the owasp foundation" in flat, (
+            f"{rel} shows the OWASP word mark without a trademark ownership legend"
+        )

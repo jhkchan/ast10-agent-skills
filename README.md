@@ -5,13 +5,13 @@
 [![USF v1.0: 11/11 skills ship a schema-validated manifest, each carrying an ed25519 signature that verifies over its own RFC 8785 payload against the key did:web:jhkchan.github.io publishes — which says who published these packages, never that they are safe to run](https://img.shields.io/badge/USF%20v1.0-11%2F11%20skills%20%C2%B7%20schema--validated%20%C2%B7%20signed-6f42c1)](schemas/usf-v1.schema.json) [![scenarios: 62 whitepaper attack scenarios, tiered by decidability](https://img.shields.io/badge/scenarios-62%20%C2%B7%20tiered%20by%20decidability-495057)](scenarios/registry.yaml) [![rubric: third-party work vendored from softaworks/agent-toolkit](https://img.shields.io/badge/rubric-softaworks%2Fagent--toolkit-495057)](https://github.com/softaworks/agent-toolkit) [![license: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-495057)](LICENSE)
 <!-- END:badges -->
 
-The [**OWASP Agentic Skills Top 10**](https://owasp.org/www-project-agentic-skills-top-10/)
-(AST01–AST10) operationalised as eleven installable agent skills: ten per-category detectors
+The [**OWASP® Agentic Skills Top 10**](https://owasp.org/www-project-agentic-skills-top-10/)
+standard (AST01–AST10), operationalised as eleven installable agent skills: ten per-category detectors
 plus an advisory skill that routes a free-text finding to its category, and fourteen slash
 commands that drive them. Point it at a candidate skill package before you install that
 package, and it tells you what it found, what needs a human, and what it could not decide.
 
-**This implements OWASP Agentic Skills Top 10 v1.0.** Every category, every named attack
+**This implements the OWASP® Agentic Skills Top 10 standard, v1.0.** Every category, every named attack
 scenario, the decision tree and the Universal Skill Format schema come from that edition and
 no other — the counts on this page (AST01–AST10, 62 scenarios) are only meaningful against it.
 
@@ -46,8 +46,10 @@ review, or affiliation — despite the repository name.**
   **the whitepaper wins** — see [`docs/architecture.md`](docs/architecture.md) for the authority
   chain each skill is bound to.
 
-`OWASP` is a trademark of the OWASP Foundation. The name appears here descriptively, to
-identify the standard being implemented.
+`OWASP` is a registered trademark of the OWASP Foundation. It appears here descriptively, as
+an adjective identifying the standard this repository implements — never as the name of this
+software, and with no claim of licence to the mark. See OWASP's
+[mark-usage guidelines](https://policy.owasp.org/operational/mark-usage-guidelines).
 
 ## Install
 
@@ -56,13 +58,13 @@ identify the standard being implemented.
 This is the only path that installs the skills and the slash commands together.
 
 ```bash
-claude plugin marketplace add jhkchan/owasp-ast10-agent-skills
-claude plugin install owasp-ast10@owasp-ast10-agent-skills
+claude plugin marketplace add jhkchan/ast10-agent-skills
+claude plugin install ast10@ast10-agent-skills
 ```
 
 Or, from inside an interactive session, `/plugin marketplace add
-jhkchan/owasp-ast10-agent-skills` then `/plugin`. You get eleven skills and fourteen
-`/owasp-ast10:…` commands.
+jhkchan/ast10-agent-skills` then `/plugin`. You get eleven skills and fourteen
+`/ast10:…` commands.
 
 ### Copy the skills only
 
@@ -71,8 +73,8 @@ runtime that reads skill directories. This path does not copy `commands/ast/` �
 runtime's command directory at it separately if you want the slash commands.
 
 ```bash
-git clone https://github.com/jhkchan/owasp-ast10-agent-skills.git
-cd owasp-ast10-agent-skills
+git clone https://github.com/jhkchan/ast10-agent-skills.git
+cd ast10-agent-skills
 cp -r skills/AST03 ~/.claude/skills/ast03-over-privileged-skills   # one category
 python3 cli/ast10.py install --all --target ~/.claude/skills       # all eleven
 ```
@@ -114,11 +116,11 @@ The fourteen commands wrap the same detectors the skills use.
 
 | Command | Does |
 | --- | --- |
-| `/owasp-ast10:audit-skill-package` | Full AST01–AST10 sweep over one candidate skill directory, closing with a coverage ledger |
-| `/owasp-ast10:audit-ast01` … `/owasp-ast10:audit-ast10` | One category's checks, when you already know what you are looking for |
-| `/owasp-ast10:triage-finding` | Walk the whitepaper's decision tree on a free-text finding |
-| `/owasp-ast10:validate-usf-manifest` | Structural + semantic pass over a `skill.usf.yaml` |
-| `/owasp-ast10:check-coverage` | What the sweep decided, what needs a judge, what is not decidable at all |
+| `/ast10:audit-skill-package` | Full AST01–AST10 sweep over one candidate skill directory, closing with a coverage ledger |
+| `/ast10:audit-ast01` … `/ast10:audit-ast10` | One category's checks, when you already know what you are looking for |
+| `/ast10:triage-finding` | Walk the whitepaper's decision tree on a free-text finding |
+| `/ast10:validate-usf-manifest` | Structural + semantic pass over a `skill.usf.yaml` |
+| `/ast10:check-coverage` | What the sweep decided, what needs a judge, what is not decidable at all |
 
 A sweep over a package, against a fixture in this repo so you can run it yourself:
 

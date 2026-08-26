@@ -4,7 +4,7 @@ Four things are asserted here, all of them promises this repository makes to a
 reader who never opens a Python file:
 
 1. `README.md` carries the non-endorsement disclaimer, in the words that make it
-   unambiguous — a repo named `owasp-ast10-agent-skills` that does not say
+   unambiguous — a repo named `ast10-agent-skills` that does not say
    loudly that it is not an OWASP project is itself the AST04 shape (a
    brand-impersonating name with understated provenance).
 2. `README.md` documents all three installation methods, each pointing at

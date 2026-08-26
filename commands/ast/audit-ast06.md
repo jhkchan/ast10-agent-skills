@@ -18,10 +18,10 @@ routes_to: ast06-weak-isolation
 ast_category: AST06
 ---
 
-# /owasp-ast10:audit-ast06
+# /ast10:audit-ast06
 
 Activates the `ast06-weak-isolation` skill (`skills/AST06/`) and audits one candidate skill
-package against **AST06 - Weak Isolation** and nothing else. Use `/owasp-ast10:audit-skill-package`
+package against **AST06 - Weak Isolation** and nothing else. Use `/ast10:audit-skill-package`
 when you want all ten categories in one pass.
 
 ## What AST06 actually is
@@ -68,7 +68,7 @@ scenario — AST06-S01 Host Escape — which is why the published F1 is `mixed-p
 Check ids are the detector's own, not registry scenario ids (`AST06-S01`, `AST06-S02`, …).
 Which registry scenario each check maps to — and how honestly it measures that scenario,
 versus measuring an enabling artifact signal — is recorded in `fixtures/manifest.yaml`'s
-`covers:` field and expanded by `/owasp-ast10:check-coverage AST06`.
+`covers:` field and expanded by `/ast10:check-coverage AST06`.
 
 ## Arguments
 
@@ -83,7 +83,7 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 ## Example invocation
 
 ```text
-/owasp-ast10:audit-ast06 ./invoice-helper
+/ast10:audit-ast06 ./invoice-helper
 ```
 
 `invoice-helper` below is a package whose manifest declares no `content_hash`, an
@@ -157,10 +157,10 @@ because whether two agents share writable state is a deployment fact.
 
 ## Related
 
-- `/owasp-ast10:audit-skill-package` — the same package across all ten categories in one sweep.
-- `/owasp-ast10:check-coverage AST06` — the full per-scenario tiering and the written reason
+- `/ast10:audit-skill-package` — the same package across all ten categories in one sweep.
+- `/ast10:check-coverage AST06` — the full per-scenario tiering and the written reason
   behind every uncovered row above.
-- `/owasp-ast10:triage-finding` — when you have a finding in prose and do not yet know it is
+- `/ast10:triage-finding` — when you have a finding in prose and do not yet know it is
   AST06.
 - `skills/AST06/coverage-matrix.md` — the authority this command's footer is read from.
 

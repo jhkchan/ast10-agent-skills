@@ -1,4 +1,4 @@
-owasp-ast10-agent-skills
+ast10-agent-skills
 Copyright 2026 Jacky Chan
 
 This product operationalizes the OWASP Agentic Skills Top 10 (AST01-AST10)
@@ -13,7 +13,7 @@ vendors.
 Source material — OWASP Agentic Skills Top 10
 ================================================================================
 
-The OWASP Agentic Skills Top 10 whitepaper, version 1.0, is the SOURCE MATERIAL
+The OWASP® Agentic Skills Top 10 whitepaper, version 1.0, is the SOURCE MATERIAL
 for this repository, and this repository implements that edition and no other.
 It is published at
 https://owasp.org/www-project-agentic-skills-top-10/assets/publications/ast10-top10-whitepaper-2.pdf

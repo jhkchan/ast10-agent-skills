@@ -388,7 +388,7 @@ platforms: [claude]
 description: >-
   Fixture package for AST01-S08, labeled vulnerable.
 author:
-  name: "owasp-ast10-agent-skills fixture corpus"
+  name: "ast10-agent-skills fixture corpus"
 permissions:
   files:
     read:

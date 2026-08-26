@@ -4,10 +4,11 @@ Thanks for looking. Before anything else, two things about what this repo is.
 
 **It is not an OWASP project.** The repository name says OWASP; the project is not
 one, is not published by OWASP, and carries no OWASP endorsement or review. The
-[OWASP Agentic Skills Top 10](https://owasp.org/www-project-agentic-skills-top-10/) whitepaper is the *source
+[OWASP® Agentic Skills Top 10](https://owasp.org/www-project-agentic-skills-top-10/) whitepaper is the *source
 material* this repo implements, and credit for the taxonomy, the attack-scenario
 catalog, the decision tree, and the Universal Skill Format proposal belongs to
-that project and its contributors. [Ken Huang](https://github.com/kenhuangus) leads it. See the README's
+that project and its contributors. [Ken Huang](https://github.com/kenhuangus) leads it. OWASP is a registered
+trademark of the OWASP Foundation, used here descriptively to identify that standard. See the README's
 disclaimer for the full statement — a contribution that blurs that line will be
 asked to change, however good the code is.
 

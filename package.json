@@ -1,5 +1,5 @@
 {
-  "name": "owasp-ast10-agent-skills",
+  "name": "ast10-agent-skills",
   "version": "1.0.0",
   "private": true,
   "description": "CLI for an independent community reference implementation of the OWASP Agentic Skills Top 10 (AST01-AST10). NOT an OWASP project and carrying no OWASP endorsement, despite the name.",

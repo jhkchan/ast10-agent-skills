@@ -1,6 +1,6 @@
 # Project Context
 
-Canonical domain glossary for `owasp-ast10-agent-skills`. Terms below are adopted as-is by
+Canonical domain glossary for `ast10-agent-skills`. Terms below are adopted as-is by
 `spec.md`, `plan.md`, and skill packages; new or conflicting terms are proposed as glossary deltas
 in a feature's `spec.md` before being appended here at Ship.
 
