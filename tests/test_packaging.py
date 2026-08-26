@@ -203,13 +203,17 @@ def test_the_rendered_names_themselves_mark_the_independence(marketplace):
     "OWASP Agentic Skills Top 10 ..." unqualified reads as an OWASP-published
     artifact. That is the AST04 brand-impersonation shape this repository
     exists to flag, committed by the repository itself. `displayName` is what
-    the picker actually renders, so it is checked alongside the identifier.
+    the picker actually renders, so it is the one this asserts.
+
+    The marketplace `name` is deliberately exempt. It is the kebab identifier a
+    user types after `@`, never rendered as a title, and carrying the word there
+    made the install line say "owasp-ast10@unofficial-owasp-ast10-agent-skills"
+    -- redundant with the displayName beside it. Dropping it from the identifier
+    was the maintainer's call; dropping it from the rendered name would not be,
+    which is why that assertion stays and is the one that matters.
     """
     name = marketplace["name"]
     assert "owasp" in name.lower(), "the name may name the standard it implements"
-    assert name.lower().startswith("unofficial"), (
-        f"marketplace.json's name must lead with its independence, got {name!r}"
-    )
 
     display = marketplace["plugins"][0]["displayName"]
     assert "OWASP" in display, "the rendered plugin name may name the standard it implements"

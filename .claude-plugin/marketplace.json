@@ -1,5 +1,5 @@
 {
-  "name": "unofficial-owasp-ast10-agent-skills",
+  "name": "owasp-ast10-agent-skills",
   "description": "Eleven agent skills operationalizing the OWASP Agentic Skills Top 10 (AST01-AST10) whitepaper: ten per-category triage skills plus an advisory router, with fourteen slash commands that drive them. Independent community implementation — NOT an OWASP project and carrying no OWASP endorsement.",
   "version": "1.0.0",
   "owner": {

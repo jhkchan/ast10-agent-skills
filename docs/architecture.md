@@ -419,10 +419,14 @@ declared path stops resolving to what is on disk, or if a command file appears o
 declared path and would silently not install. The manifest no longer restates the skill
 roster, so there is no index left to drift.
 
-The marketplace `name` leads with **"unofficial"**, and the plugin's `displayName` — the
-string a picker actually renders — leads with **"Unofficial"**, because a picker often drops
-the description, and the moment of installation is exactly where "OWASP Agentic Skills Top
-10" without a qualifier reads as an OWASP-published artifact. `cli/ast10.py install` and a
+The plugin's `displayName` — the string a picker actually renders — leads with
+**"Unofficial"**, because a picker often drops the description, and the moment of
+installation is exactly where "OWASP Agentic Skills Top 10" without a qualifier reads as an
+OWASP-published artifact. The marketplace `name` does not: it is the kebab identifier typed
+after `@`, never rendered as a title, and qualifying it produced
+`owasp-ast10@unofficial-owasp-ast10-agent-skills`, which repeats what the rendered name
+already says. The disclaimer is carried where it is read, not in every field that could hold
+it. `cli/ast10.py install` and a
 `cp -r` of `skills/` remain the non-plugin paths, and neither copies `commands/ast/`.
 
 ---

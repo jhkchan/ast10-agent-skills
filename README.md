@@ -44,7 +44,7 @@ This is the only path that installs the skills and the slash commands together.
 
 ```bash
 claude plugin marketplace add jhkchan/owasp-ast10-agent-skills
-claude plugin install owasp-ast10@unofficial-owasp-ast10-agent-skills
+claude plugin install owasp-ast10@owasp-ast10-agent-skills
 ```
 
 Or, from inside an interactive session, `/plugin marketplace add
