@@ -21,8 +21,9 @@ validated by validators/usf.py and schemas/usf-v1.schema.json originate in that
 publication. They are adopted here, not invented here. Verbatim scenario titles
 are reproduced for identification and traceability.
 
-Ken Huang (DistributedApps.ai) is the project leader of the OWASP Agentic
-Skills Top 10 and originated the taxonomy and the source repository.
+Ken Huang (DistributedApps.ai, https://github.com/kenhuangus) is the project
+leader of the OWASP Agentic Skills Top 10 and originated the taxonomy and the
+source repository.
 
 THIS REPOSITORY IS NOT AN OWASP PROJECT. It is an independent community
 implementation and carries no OWASP endorsement, review, or affiliation,

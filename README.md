@@ -22,7 +22,7 @@ review, or affiliation — despite the repository name.**
   — is the source publication this repository implements. Full credit for the taxonomy, the
   attack-scenario catalog, the decision tree, and the Universal Skill Format proposal belongs
   to that project and its contributors. Go read it there, not here.
-- **Ken Huang (DistributedApps.ai) is the project leader** of the OWASP Agentic Skills Top 10,
+- **[Ken Huang](https://github.com/kenhuangus) (DistributedApps.ai) is the project leader** of the OWASP Agentic Skills Top 10,
   and originated the taxonomy and the source repository. He did not author, review, or endorse
   this repository.
 - The maintainer of this repository, **Jacky Chan (Beever AI / Votee AI), is a credited

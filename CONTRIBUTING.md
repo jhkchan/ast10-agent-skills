@@ -7,7 +7,7 @@ one, is not published by OWASP, and carries no OWASP endorsement or review. The
 [OWASP Agentic Skills Top 10](https://owasp.org/) whitepaper is the *source
 material* this repo implements, and credit for the taxonomy, the attack-scenario
 catalog, the decision tree, and the Universal Skill Format proposal belongs to
-that project and its contributors. Ken Huang leads it. See the README's
+that project and its contributors. [Ken Huang](https://github.com/kenhuangus) leads it. See the README's
 disclaimer for the full statement — a contribution that blurs that line will be
 asked to change, however good the code is.
 
