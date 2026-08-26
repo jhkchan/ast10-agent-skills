@@ -5,6 +5,8 @@ description: "Detect and triage OWASP AST09 No Governance — no skill inventory
 
 # AST09 - No Governance
 
+> Unofficial community implementation of the OWASP Agentic Skills Top 10 v1.0. NOT an OWASP project; no OWASP endorsement. Source publication: https://owasp.org/www-project-agentic-skills-top-10/
+
 Pattern: Knowledge. The decision rule this category turns on: a log an operator
 controls can be edited after the fact; a receipt an independent verifier can
 cryptographically check cannot — "we have logging" and "we have compliance-grade
@@ -156,7 +158,7 @@ evidence per scenario.
 
 Two commands exist and neither returns a verdict. `node cli/bin/cli.js audit <pkg>` prints
 `AST09  No Governance  no static detectors` and lists all seven scenarios as "declared
-out-of-artifact, not decidable from one package"; `/ast:audit-ast09 <pkg> --evidence-plan`
+out-of-artifact, not decidable from one package"; `/owasp-ast10:audit-ast09 <pkg> --evidence-plan`
 emits the same seven with the evidence each needs. Read a clean run of either as *not asked*,
 never as *asked and cleared* — a package that passes the other nine categories has said
 nothing about this one. The review itself is four joins, and the package supplies the key

@@ -20,11 +20,11 @@ routes_to: ast02-supply-chain-compromise
 ast_category: AST02
 ---
 
-# /ast:audit-ast02
+# /owasp-ast10:audit-ast02
 
 Activates the `ast02-supply-chain-compromise` skill (`skills/AST02/`) and audits one
 candidate skill package against **AST02 - Supply Chain Compromise** and nothing else. Use
-`/ast:audit-skill-package` when you want all ten categories in one pass.
+`/owasp-ast10:audit-skill-package` when you want all ten categories in one pass.
 
 ## What AST02 actually is
 
@@ -81,7 +81,7 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 ## Example invocation
 
 ```text
-/ast:audit-ast02 ./invoice-helper
+/owasp-ast10:audit-ast02 ./invoice-helper
 ```
 
 The command returns one decided verdict plus three declarations and their reasons, so the
@@ -142,10 +142,10 @@ which is why the F1 string carries the scenario id rather than the category name
 
 ## Related
 
-- `/ast:audit-skill-package` — the same package across all ten categories in one sweep.
-- `/ast:check-coverage AST02` — the full per-scenario tiering and the written reason
+- `/owasp-ast10:audit-skill-package` — the same package across all ten categories in one sweep.
+- `/owasp-ast10:check-coverage AST02` — the full per-scenario tiering and the written reason
   behind every uncovered row above.
-- `/ast:triage-finding` — when you have a finding in prose and do not yet know it is
+- `/owasp-ast10:triage-finding` — when you have a finding in prose and do not yet know it is
   AST02.
 - `skills/AST02/coverage-matrix.md` — the authority this command's footer is read from.
 

@@ -5,6 +5,8 @@ description: "Detect and triage OWASP AST04 Insecure Metadata — brand-imperson
 
 # AST04 - Insecure Metadata
 
+> Unofficial community implementation of the OWASP Agentic Skills Top 10 v1.0. NOT an OWASP project; no OWASP endorsement. Source publication: https://owasp.org/www-project-agentic-skills-top-10/
+
 Pattern: Knowledge. The decision rule that governs this whole category: metadata is
 the *only* signal most reviewers and installing agents act on, yet it is
 attacker-controlled and deserialized automatically — often silently, with the agent's

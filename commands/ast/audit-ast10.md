@@ -22,11 +22,11 @@ routes_to: ast10-cross-platform-reuse
 ast_category: AST10
 ---
 
-# /ast:audit-ast10
+# /owasp-ast10:audit-ast10
 
 Activates the `ast10-cross-platform-reuse` skill (`skills/AST10/`) and audits one candidate
 skill package against **AST10 - Cross-Platform Reuse** and nothing else. Use
-`/ast:audit-skill-package` when you want all ten categories in one pass.
+`/owasp-ast10:audit-skill-package` when you want all ten categories in one pass.
 
 ## What AST10 actually is
 
@@ -85,7 +85,7 @@ into one.
 | `AST10-S06` | static-detectable | AST10-S06 (full) | an encoded run (base64, bare hex, `\xNN` escape, percent-encoding, plus one gzip/zlib layer and one further encoding layer beneath it) **decodes** to payload behaviour, or a decoded literal reaches an execution sink. The presence of an encoded blob alone never fires it |
 
 The other five AST10 scenarios are `out-of-artifact` and are tabled below rather than
-checked; `/ast:check-coverage AST10` expands every row.
+checked; `/owasp-ast10:check-coverage AST10` expands every row.
 
 ## What it deliberately does not flag
 
@@ -119,7 +119,7 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 ## Example invocation
 
 ```text
-/ast:audit-ast10 ./invoice-helper
+/owasp-ast10:audit-ast10 ./invoice-helper
 ```
 
 The declared half of the category is still reported, not skipped: the reviewer leaves with
@@ -183,11 +183,11 @@ all about the five out-of-artifact scenarios, which publish no number and cannot
 
 ## Related
 
-- `/ast:audit-skill-package` — the same package across all ten categories in one sweep.
-- `/ast:check-coverage AST10` — the full per-scenario tiering and the written reason
+- `/owasp-ast10:audit-skill-package` — the same package across all ten categories in one sweep.
+- `/owasp-ast10:check-coverage AST10` — the full per-scenario tiering and the written reason
   behind every declared row above.
-- `/ast:triage-finding` — when you have a finding in prose and do not yet know it is
+- `/owasp-ast10:triage-finding` — when you have a finding in prose and do not yet know it is
   AST10.
-- `/ast:validate-usf-manifest` — the manifest half of this category: the USF rules
+- `/owasp-ast10:validate-usf-manifest` — the manifest half of this category: the USF rules
   live in `validators/usf.py`.
 - `skills/AST10/coverage-matrix.md` — the authority this command's footer is read from.

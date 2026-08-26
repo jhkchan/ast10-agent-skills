@@ -34,7 +34,7 @@ scan_status:
   last_scanned: null
   result: "unscanned"
 signature: "unsigned"
-content_hash: "sha256:9231a5652db63c5ab711ca1c2d6b63c6c6731ba612408a3a25b6ef07fa97b9f2"
+content_hash: "sha256:a691a846ef3aac1f57bdb70f919fd28d136b13911e7ff2da3179d8552e770a4c"
 changelog:
   - version: "1.0.0"
     date: "2026-08-23"

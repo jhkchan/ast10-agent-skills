@@ -20,7 +20,7 @@ nl_triggers:
 routes_to: advisory
 ---
 
-# /ast:check-coverage
+# /owasp-ast10:check-coverage
 
 Activates the `advisory` skill (`skills/advisory/`) as the reader across all ten categories,
 and reports one category's coverage honestly — including the parts that are empty.
@@ -83,7 +83,7 @@ prints both the declared and the present count so an under-filled corpus cannot 
 ## Example invocation
 
 ```text
-/ast:check-coverage AST05
+/owasp-ast10:check-coverage AST05
 ```
 
 Equivalent deterministic run:
@@ -176,9 +176,9 @@ publishing any number this command reports.
 
 ## Related
 
-- `/ast:audit-ast01` … `/ast:audit-ast10` — the audit whose coverage footer this command
+- `/owasp-ast10:audit-ast01` … `/owasp-ast10:audit-ast10` — the audit whose coverage footer this command
   expands.
-- `/ast:audit-skill-package` — the full sweep, which prints the one-line version of this
+- `/owasp-ast10:audit-skill-package` — the full sweep, which prints the one-line version of this
   for every category.
 - `skills/AST05/coverage-matrix.md` (and its nine siblings) — the per-category authored
   matrix, including the coverage-debt itemisation where a detector's interim tier table

@@ -22,8 +22,23 @@ Every category (AST01-AST10), every attack scenario enumerated in
 scenarios/registry.yaml, the "Which AST Does My Finding Belong To?" decision
 tree implemented by skills/advisory, and the Universal Skill Format proposal
 validated by validators/usf.py and schemas/usf-v1.schema.json originate in that
-publication. They are adopted here, not invented here. Verbatim scenario titles
-are reproduced for identification and traceability.
+publication. They are adopted here, not invented here.
+
+The whitepaper is licensed CC BY-SA 4.0 (Creative Commons
+Attribution-ShareAlike 4.0 International), as stated at
+https://owasp.org/www-project-agentic-skills-top-10/
+
+This repository reproduces the whitepaper's scenario identifiers, titles and
+defining conditions -- principally in scenarios/registry.yaml and in each
+skills/<AST>/coverage-matrix.md -- for identification, traceability and
+per-scenario tiering. Those reproduced portions remain the whitepaper's work
+under CC BY-SA 4.0 and are used with attribution. Everything this project
+authored -- the detectors, the CLI, the evaluation harnesses, the schema, the
+fixtures and the prose -- is Apache-2.0 as stated above. CC BY-SA 4.0 is a
+copyleft licence: anyone redistributing the reproduced portions carries the
+same ShareAlike obligation, and a reuser who intends to build on that text
+rather than on this repository's code should read the licence rather than
+assume Apache-2.0 covers it.
 
 Ken Huang (DistributedApps.ai, https://github.com/kenhuangus) is the project
 leader of the OWASP Agentic Skills Top 10 and originated the taxonomy and the

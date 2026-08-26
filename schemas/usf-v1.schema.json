@@ -50,7 +50,9 @@
     },
     "author": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "additionalProperties": false,
       "properties": {
         "name": {
@@ -72,12 +74,20 @@
     },
     "permissions": {
       "type": "object",
-      "required": ["files", "network", "shell"],
+      "required": [
+        "files",
+        "network",
+        "shell"
+      ],
       "additionalProperties": false,
       "properties": {
         "files": {
           "type": "object",
-          "required": ["read", "write", "deny_write"],
+          "required": [
+            "read",
+            "write",
+            "deny_write"
+          ],
           "additionalProperties": false,
           "description": "All three lists are required even when empty. A declared-empty list and an absent list are the same thing to a permissive target runtime, which is precisely the AST10 implicit-privilege-escalation path; requiring the key forces the author to state the floor.",
           "properties": {
@@ -94,7 +104,9 @@
         },
         "network": {
           "type": "object",
-          "required": ["allow"],
+          "required": [
+            "allow"
+          ],
           "additionalProperties": false,
           "properties": {
             "allow": {
@@ -154,12 +166,20 @@
       }
     },
     "risk_tier": {
-      "enum": ["L0", "L1", "L2", "L3"],
+      "enum": [
+        "L0",
+        "L1",
+        "L2",
+        "L3"
+      ],
       "description": "L0=safe, L1=low, L2=elevated, L3=destructive. An untrusted author assertion: validators/usf.py independently derives a floor from the declared permission set and rejects under-declaration."
     },
     "scan_status": {
       "type": "object",
-      "required": ["scanner", "result"],
+      "required": [
+        "scanner",
+        "result"
+      ],
       "additionalProperties": false,
       "properties": {
         "scanner": {
@@ -168,17 +188,27 @@
           "maxLength": 128
         },
         "last_scanned": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
         },
         "result": {
-          "enum": ["pass", "fail", "warn", "unscanned"]
+          "enum": [
+            "pass",
+            "fail",
+            "warn",
+            "unscanned"
+          ]
         }
       },
       "allOf": [
         {
           "if": {
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "properties": {
               "result": {
                 "const": "unscanned"
@@ -193,7 +223,9 @@
             }
           },
           "else": {
-            "required": ["last_scanned"],
+            "required": [
+              "last_scanned"
+            ],
             "properties": {
               "last_scanned": {
                 "type": "string"
@@ -225,7 +257,11 @@
       "maxItems": 1024,
       "items": {
         "type": "object",
-        "required": ["version", "date", "notes"],
+        "required": [
+          "version",
+          "date",
+          "notes"
+        ],
         "additionalProperties": false,
         "properties": {
           "version": {
@@ -251,8 +287,9 @@
       "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-((?:0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
     },
     "platform": {
-      "enum": ["openclaw", "claude", "cursor", "codex", "vscode"],
-      "description": "Closed enumeration. A free-text or \"other\" platform value would reintroduce the normalization gap the format exists to close."
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,31}$",
+      "description": "A runtime slug. The whitepaper's USF proposal shows `platforms: [openclaw, claude, cursor, vscode]` as an example array and defines no closed enumeration, no `MUST be one of`, and no registry \u2014 so this schema does not invent one. It constrains the SHAPE (lowercase slug) rather than the membership, because the ecosystem gained SKILL.md hosts after v1.0 was written and a closed list would make a conformant package unrepresentable. Known hosts that load `<name>/SKILL.md` from a directory: claude, codex, cursor, openclaw, pi, vscode. Declaring one is a claim that this package was checked against that runtime."
     },
     "pathList": {
       "type": "array",

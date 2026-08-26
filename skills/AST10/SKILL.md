@@ -5,6 +5,8 @@ description: "Detect and triage OWASP AST10 Cross-Platform Reuse — security me
 
 # AST10 - Cross-Platform Reuse
 
+> Unofficial community implementation of the OWASP Agentic Skills Top 10 v1.0. NOT an OWASP project; no OWASP endorsement. Source publication: https://owasp.org/www-project-agentic-skills-top-10/
+
 Pattern: Knowledge. The decision rule this category turns on: AST10 is not a protocol
 problem (MCP already standardizes the transport) — it is that no shared vocabulary for
 *security metadata itself* exists, so identical intent (deny this skill write access to

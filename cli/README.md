@@ -25,7 +25,7 @@ other, so it does not matter which one a reader reaches for.
 node cli/bin/cli.js help
 node cli/bin/cli.js list --tier static-detectable
 node cli/bin/cli.js route "the scanner missed an obfuscated instruction"
-node cli/bin/cli.js audit fixtures/AST01/V1-obfuscated-payload
+node cli/bin/cli.js audit fixtures/AST01/V1-obfuscated-payload-exec
 node cli/bin/cli.js coverage
 node cli/bin/cli.js status
 ```

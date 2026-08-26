@@ -91,15 +91,24 @@ SURFACE_INDEX: tuple[tuple[str, str, str], ...] = (
 )
 
 
+#: Every authored eval corpus a run can draw from. `evals.json` is the tuned set;
+#: `regression.json` and `control.json` were added in later iterations and are
+#: held out. Counting only `evals.json` produced a denominator smaller than the
+#: numerator -- the report published "44 of 33" and "55 of 33" -- because an
+#: iteration that ran the held-out corpora was scored against the tuned one.
+AUTHORED_CORPORA: tuple[str, ...] = ("evals.json", "regression.json", "control.json")
+
+
 def authored_case_count(skills_dir: Path = SKILLS_DIR) -> tuple[int, int]:
-    """`(cases, assertions)` across every `skills/*/evals/evals.json` on disk."""
+    """`(cases, assertions)` across every authored eval corpus on disk."""
     cases = 0
     assertions = 0
-    for path in sorted(skills_dir.glob("*/evals/evals.json")):
-        payload = json.loads(path.read_text(encoding="utf-8"))
-        for case in payload.get("evals", []):
-            cases += 1
-            assertions += len(case.get("assertions", []))
+    for name in AUTHORED_CORPORA:
+        for path in sorted(skills_dir.glob(f"*/evals/{name}")):
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            for case in payload.get("evals", []):
+                cases += 1
+                assertions += len(case.get("assertions", []))
     return cases, assertions
 
 
@@ -233,11 +242,13 @@ def render(iterations: list[tuple[int, dict[str, Any]]], authored: tuple[int, in
     add("## The authored corpus")
     add("")
     add(
-        f"`skills/*/evals/evals.json` currently holds **{cases} cases** carrying "
+        f"`skills/*/evals/` currently holds **{cases} cases** carrying "
         f"**{assertions} assertions**, hand-authored in the field names the "
         "[agentskills.io evaluating-skills guidance](https://agentskills.io/skill-creation/evaluating-skills) "
-        "fixes. A full iteration is therefore "
-        f"{cases} × 2 = {cases * 2} agent runs. `tests/test_eval_cases.py` gates the shape of "
+        "fixes, across the tuned set and the two held-out corpora. An iteration that runs the "
+        f"whole corpus is therefore {cases} × 2 = {cases * 2} agent runs; earlier iterations ran "
+        "the subset that existed at the time, which is what the coverage column reports. "
+        "`tests/test_eval_cases.py` gates the shape of "
         "every case; `python3 eval/skill_evals.py --dry-run` prints the plan without calling a model."
     )
     add("")

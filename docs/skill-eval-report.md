@@ -18,7 +18,7 @@ The three are never averaged and never plotted together. A `pass_rate` on this p
 
 ## The authored corpus
 
-`skills/*/evals/evals.json` currently holds **33 cases** carrying **120 assertions**, hand-authored in the field names the [agentskills.io evaluating-skills guidance](https://agentskills.io/skill-creation/evaluating-skills) fixes. A full iteration is therefore 33 × 2 = 66 agent runs. `tests/test_eval_cases.py` gates the shape of every case; `python3 eval/skill_evals.py --dry-run` prints the plan without calling a model.
+`skills/*/evals/` currently holds **55 cases** carrying **209 assertions**, hand-authored in the field names the [agentskills.io evaluating-skills guidance](https://agentskills.io/skill-creation/evaluating-skills) fixes, across the tuned set and the two held-out corpora. An iteration that runs the whole corpus is therefore 55 × 2 = 110 agent runs; earlier iterations ran the subset that existed at the time, which is what the coverage column reports. `tests/test_eval_cases.py` gates the shape of every case; `python3 eval/skill_evals.py --dry-run` prints the plan without calling a model.
 
 ## Results by iteration
 
@@ -26,9 +26,9 @@ The three are never averaged and never plotted together. A `pass_rate` on this p
 
 | Iteration | Coverage | Agent under test | Grader | with_skill | without_skill | Δ pass_rate |
 | --- | --- | --- | --- | --- | --- | --- |
-| iteration-1 | 33 of 33 | `bedrock/qwen3-235b` | `bedrock/gpt-oss-120b` | 0.78 | 0.41 | +0.37 |
-| iteration-2 | 44 of 33 | `bedrock/qwen3-235b` | `bedrock/gpt-oss-120b` | 0.57 | 0.13 | +0.43 |
-| iteration-3 | 55 of 33 | `bedrock/qwen3-235b` | `bedrock/gpt-oss-120b` | 0.62 | 0.12 | +0.50 |
+| iteration-1 | 33 of 55 | `bedrock/qwen3-235b` | `bedrock/gpt-oss-120b` | 0.78 | 0.41 | +0.37 |
+| iteration-2 | 44 of 55 | `bedrock/qwen3-235b` | `bedrock/gpt-oss-120b` | 0.57 | 0.13 | +0.43 |
+| iteration-3 | 55 of 55 | `bedrock/qwen3-235b` | `bedrock/gpt-oss-120b` | 0.62 | 0.12 | +0.50 |
 
 The agent under test and the grader are always different models, enforced rather than encouraged: `eval/skill_evals.py` exits rather than let one model grade its own output, and both names are written into every `timing.json`, every `grading.json` and every `benchmark.json`.
 

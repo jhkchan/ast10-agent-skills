@@ -6,7 +6,7 @@ someone else owns.
 
 | # | Component | Kind | License | Holder |
 | --- | --- | --- | --- | --- |
-| 0 | OWASP Agentic Skills Top 10 whitepaper | source material | see below | OWASP project + contributors |
+| 0 | OWASP Agentic Skills Top 10 whitepaper v1.0 | source material; scenario ids, titles and defining conditions reproduced | **CC BY-SA 4.0** | OWASP project + contributors |
 | 1 | `scripts/ship_floor.py`, `scripts/content_hash.py`, `scripts/eval_counts.py` | vendored copy, commit-pinned | Apache-2.0 | 2026 Votee AI |
 | 2 | skill-judge 8-dimension rubric (`vendor/skill-judge/`) | vendored verbatim, commit- and content-pinned | MIT | (c) 2026 Leonardo Flores |
 | 3 | `PyYAML`, `jsonschema`, `cryptography` | installed dependency | MIT / MIT / Apache-2.0 OR BSD-3-Clause | upstream |

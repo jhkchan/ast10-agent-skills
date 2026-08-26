@@ -208,7 +208,14 @@ SCHEMA_INVALID_CASES = [
     # enumerations
     (["risk_tier"], "L4", "L4"),
     (["risk_tier"], "low", "low"),
-    (["platforms"], ["telepathy"], "telepathy"),
+    # `platforms` is an OPEN list of runtime slugs, not a closed enumeration: the
+    # whitepaper shows `platforms: [openclaw, claude, cursor, vscode]` as an example
+    # array and defines no membership rule, so an unknown-but-well-formed slug like
+    # "telepathy" is CONFORMANT and is not asserted against here. What the schema
+    # still rejects is a malformed slug, which is what these three pin.
+    (["platforms"], ["Claude"], "Claude"),
+    (["platforms"], ["not a slug"], "not a slug"),
+    (["platforms"], [""], "''"),
     (["platforms"], [], "[]"),
     (["scan_status", "result"], "maybe", "maybe"),
     # syntax

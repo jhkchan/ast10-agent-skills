@@ -14,7 +14,7 @@ version: "1.0.0"
 # Declared only for the runtime this package is authored and tested against.
 # Adding a platform is a re-validation event, not an edit: AST10's premise is
 # that a skill's security properties are lost in translation between runtimes.
-platforms: [claude]
+platforms: [claude, codex, cursor, openclaw, pi, vscode]
 
 description: >-
   Read-only triage of OWASP AST10 Cross-Platform Reuse: validates a Universal Skill
@@ -81,14 +81,14 @@ scan_status:
 # the package bytes and the identity anchor above. Written and re-checked by
 # scripts/sign_usf.py; anyone can check it against the published key with:
 #   python3 scripts/sign_usf.py verify --identity did:web:jhkchan.github.io
-signature: "ed25519:7e05d226a7d5da35ccd71a43cc1236cbee899aaacb964cd6f5f91dee1e1f36cf29f0e0605d4614725d37b50120d74858eee73b0754b7c5d423fa03894982ae01"
+signature: "ed25519:f2644078b27a56123a4bdef3a2e87ed17476e9acb9630356463e894b040ee6adb4be9b46677b74c67f093779e0e1de782def8b5665dcf5e031f487dbefbe7d08"
 
 # sha256 over this skill's shipped surface as defined by scripts/content_hash.py
 # (SKILL.md, references/*.md, scripts/*.py, evals/evals.json). This file is
 # outside that surface, which is what stops the hash depending on the field that
 # carries it. Regenerate with:
 #   python3 validators/usf.py --update-content-hash skills/AST10/skill.usf.yaml
-content_hash: "sha256:aa18f5798b3729fd25ad3e1baed364f2e5625727999ab027ec66252c54486f46"
+content_hash: "sha256:c99c6712a928a48fc99efbfcfeb44b02afabab39f860a1a02c9e83b4ceb4245e"
 
 changelog:
   - version: "1.0.0"

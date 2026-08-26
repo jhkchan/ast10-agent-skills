@@ -17,7 +17,7 @@ full below](#what-11-of-11-is-and-what-it-is-not).
 | Skill | F1 (measured) | Judged (run 5) |
 | --- | --- | --- |
 | `ast01-malicious-skills` | `scenario-level 1.00 (n=16)` | **SHIP** 110.1 |
-| `ast02-supply-chain-compromise` | `scenario-level 1.00 (n=6)` | **SHIP** 111.8 |
+| `ast02-supply-chain-compromise` | `scenario-level 1.00 (n=8)` | **SHIP** 111.8 |
 | `ast03-over-privileged-skills` | `scenario-level 1.00 (n=2)` + `artifact-signal-only 1.00 (n=4)` | **SHIP** 112.2 |
 | `ast04-insecure-metadata` | `scenario-level 1.00 (n=10)` | **SHIP** 111.6 |
 | `ast05-untrusted-external-instructions` | `artifact-signal-only 1.00 (n=6)` | **SHIP** 110.6 |

@@ -92,3 +92,7 @@ id_dsa*
 # DEFAULT_KEY_PATH, so moving the default without updating this fails the suite.
 did-web/
 jhkchan.github.io/
+
+# Feature-workflow planning artifacts: internal working material, not a deliverable.
+# Removed from history in the 2026-08-26 rewrite; keep it that way.
+features/

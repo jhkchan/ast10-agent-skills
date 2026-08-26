@@ -5,6 +5,8 @@ description: "Detect and triage OWASP AST03 Over-Privileged Skills — permissio
 
 # AST03 - Over-Privileged Skills
 
+> Unofficial community implementation of the OWASP Agentic Skills Top 10 v1.0. NOT an OWASP project; no OWASP endorsement. Source publication: https://owasp.org/www-project-agentic-skills-top-10/
+
 Pattern: Knowledge. Read the orientation block, take a route, then descend only as far as
 the route sends you. Mechanism (manifest-vs-behavior diffing) lives in
 `scripts/detector.py`; frozen scenario tiers live in `coverage-matrix.md`.

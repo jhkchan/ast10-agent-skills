@@ -20,11 +20,11 @@ routes_to: ast01-malicious-skills
 ast_category: AST01
 ---
 
-# /ast:audit-ast01
+# /owasp-ast10:audit-ast01
 
 Activates the `ast01-malicious-skills` skill (`skills/AST01/`) and audits one candidate
 skill package against **AST01 - Malicious Skills** and nothing else. Use
-`/ast:audit-skill-package` when you want all ten categories in one pass.
+`/owasp-ast10:audit-skill-package` when you want all ten categories in one pass.
 
 ## What AST01 actually is
 
@@ -78,7 +78,7 @@ computed it — and is not a registry scenario id either.)
 Check ids are the detector's own, not registry scenario ids (`AST01-S01`, `AST01-S02`, …).
 Which registry scenario each check maps to — and how honestly it measures that scenario,
 versus measuring an enabling artifact signal — is recorded in `fixtures/manifest.yaml`'s
-`covers:` field and expanded by `/ast:check-coverage AST01`.
+`covers:` field and expanded by `/owasp-ast10:check-coverage AST01`.
 
 ## Arguments
 
@@ -93,7 +93,7 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 ## Example invocation
 
 ```text
-/ast:audit-ast01 ./invoice-helper
+/owasp-ast10:audit-ast01 ./invoice-helper
 ```
 
 `invoice-helper` below is a package whose manifest declares no `content_hash`, an
@@ -170,10 +170,10 @@ keyword-matching detector scores 0.5 on this corpus.
 
 ## Related
 
-- `/ast:audit-skill-package` — the same package across all ten categories in one sweep.
-- `/ast:check-coverage AST01` — the full per-scenario tiering and the written reason
+- `/owasp-ast10:audit-skill-package` — the same package across all ten categories in one sweep.
+- `/owasp-ast10:check-coverage AST01` — the full per-scenario tiering and the written reason
   behind every uncovered row above.
-- `/ast:triage-finding` — when you have a finding in prose and do not yet know it is
+- `/owasp-ast10:triage-finding` — when you have a finding in prose and do not yet know it is
   AST01.
 - `skills/AST01/coverage-matrix.md` — the authority this command's footer is read from.
 

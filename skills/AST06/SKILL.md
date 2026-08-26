@@ -5,6 +5,8 @@ description: "Detect and triage OWASP AST06 Weak Isolation — skills executing 
 
 # AST06 - Weak Isolation
 
+> Unofficial community implementation of the OWASP Agentic Skills Top 10 v1.0. NOT an OWASP project; no OWASP endorsement. Source publication: https://owasp.org/www-project-agentic-skills-top-10/
+
 Pattern: Knowledge. The decision rule for this category: isolation is a binary
 architectural default, not a tunable policy — a runtime either sandboxes by default
 or it doesn't, and "sandboxing is available if configured" is evidence *for* this

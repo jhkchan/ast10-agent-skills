@@ -540,9 +540,11 @@ def build_badges() -> list[Badge]:
             colour=f1_colour,
             link="docs/f1-report.md",
             alt=(
-                f"detector F1: {len(published)} of {total_categories} categories publish an F1; "
-                f"{len(publish_none)} publish none by rule — their static-detectable tier is empty, "
-                "so there is nothing to measure and the corpus is not padded to invent something"
+                f"detector F1: {len(published)} of {total_categories} categories publish a "
+                f"scenario-level F1; {len(publish_none)} publish none by rule — their "
+                "static-detectable tier is empty, so there is nothing to measure and the corpus is "
+                "not padded to invent something. A category with an empty tier may still publish an "
+                "artifact-signal-only number, which is not coverage of any named scenario"
             ),
         ),
         Badge(

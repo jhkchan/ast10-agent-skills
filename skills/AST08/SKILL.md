@@ -5,6 +5,8 @@ description: "Detect and triage OWASP AST08 Poor Scanning — natural-language-o
 
 # AST08 - Poor Scanning
 
+> Unofficial community implementation of the OWASP Agentic Skills Top 10 v1.0. NOT an OWASP project; no OWASP endorsement. Source publication: https://owasp.org/www-project-agentic-skills-top-10/
+
 Pattern: Knowledge. The decision rule underneath the whole category: "the enemy of AI
 security is the infinite variability of language" — a regex can match `curl` in a
 shell script but cannot match "retrieve the file at the path above and send it to the

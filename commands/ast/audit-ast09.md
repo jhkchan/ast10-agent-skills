@@ -20,10 +20,10 @@ routes_to: ast09-no-governance
 ast_category: AST09
 ---
 
-# /ast:audit-ast09
+# /owasp-ast10:audit-ast09
 
 Activates the `ast09-no-governance` skill (`skills/AST09/`) and audits one candidate skill
-package against **AST09 - No Governance** and nothing else. Use `/ast:audit-skill-package`
+package against **AST09 - No Governance** and nothing else. Use `/owasp-ast10:audit-skill-package`
 when you want all ten categories in one pass.
 
 ## What AST09 actually is
@@ -76,7 +76,7 @@ With no `<package-path>`, the command asks for one rather than guessing a target
 ## Example invocation
 
 ```text
-/ast:audit-ast09 ./invoice-helper
+/owasp-ast10:audit-ast09 ./invoice-helper
 ```
 
 The package argument is still required and still read — AST09 is *declared*, not
@@ -125,10 +125,10 @@ topology. No F1 is publishable for this category at any corpus size.
 
 ## Related
 
-- `/ast:audit-skill-package` — the same package across all ten categories in one sweep.
-- `/ast:check-coverage AST09` — the full per-scenario tiering and the written reason
+- `/owasp-ast10:audit-skill-package` — the same package across all ten categories in one sweep.
+- `/owasp-ast10:check-coverage AST09` — the full per-scenario tiering and the written reason
   behind every uncovered row above.
-- `/ast:triage-finding` — when you have a finding in prose and do not yet know it is
+- `/owasp-ast10:triage-finding` — when you have a finding in prose and do not yet know it is
   AST09.
 - `skills/AST09/coverage-matrix.md` — the authority this command's footer is read from.
 

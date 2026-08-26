@@ -5,7 +5,7 @@ here from the results table; this is the long form.
 
 ## What 11 of 11 is, and what it is not
 
-Every skill in the table above clears the ship rule. That is the best number this repository has
+Every skill in the README's results table clears the ship rule. That is the best number this repository has
 ever published and it is the one most likely to be misread, so the four limits on it sit here
 rather than in a footnote. The full board, the per-judge bias table and the judge-quality
 diagnostics are in [`docs/skill-judge-dashboard.md`](skill-judge-dashboard.md).
@@ -80,7 +80,7 @@ pretend otherwise rather than shipping a proxy that scores well.
 - **No sandbox, no enforcement, no blocking.** These skills report; they do not quarantine
   a package, revoke a signature, or stop an install. A verified signature answers *who
   published this*, never *is this safe*, and this repo will not conflate the two.
-- **Every published F1 is a floor, not a rate.** The per-category numbers in the table above
+- **Every published F1 is a floor, not a rate.** The per-category numbers in the README's results table
   are measured over that category's own hand-labeled corpus at the locked gate-4 size —
   `max(6, 2 x detectable_scenarios)` — by authors who also wrote the checks. They establish
   that each check separates its vulnerable case from its clean one; they do not estimate

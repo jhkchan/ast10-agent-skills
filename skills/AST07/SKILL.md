@@ -5,6 +5,8 @@ description: "Detect and triage OWASP AST07 Update Drift — skills installed wi
 
 # AST07 - Update Drift
 
+> Unofficial community implementation of the OWASP Agentic Skills Top 10 v1.0. NOT an OWASP project; no OWASP endorsement. Source publication: https://owasp.org/www-project-agentic-skills-top-10/
+
 Pattern: Knowledge. The decision rule this category turns on: a version string is an
 attacker-controlled claim, not a security property — "v1.0.1" looks like a patch and
 can just as easily carry a new payload, because nothing about a semver bump is
@@ -207,7 +209,7 @@ list, in good faith, and the step will look complete.
    that they took effect without a restart.
 
 **Then write the verdict as `declared-and-uncovered`, naming which of steps 2–4 you could
-not complete and why.** `/ast:audit-ast07 <package> --evidence-plan` emits that shortlist
+not complete and why.** `/owasp-ast10:audit-ast07 <package> --evidence-plan` emits that shortlist
 in the command's own format if you want it generated rather than written;
 `coverage-matrix.md` enumerates the full evidence set behind each step. The failure this
 procedure exists to prevent is short and common: a reviewer completes step 1, sees a
