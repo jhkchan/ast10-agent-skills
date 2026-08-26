@@ -69,7 +69,7 @@ rubric's bands in the prompt, and the first judged under the clause ADR-0006 put
 one this record diagnoses. The decision below is unchanged; the panel figures are new, and the
 worked example is deliberately **not** new — it is run-4 evidence, labelled as such, because a
 clause that no longer runs cannot produce a fresh instance of itself.
-**Deciders:** Jacky Chan (Reviewer/Contributor, feature owner)
+**Deciders:** [Jacky Chan](https://github.com/jhkchan) (Reviewer/Contributor, feature owner)
 
 Every figure quoted below is printed by `python3 eval/calibration.py`, which derives it from
 `eval/scorecards/*.json` and nothing else. `tests/test_calibration.py` fails if this document

@@ -12,7 +12,7 @@ status: accepted
 Accepted
 
 **Date:** 2026-08-21
-**Deciders:** Jacky Chan (Reviewer/Contributor, feature owner)
+**Deciders:** [Jacky Chan](https://github.com/jhkchan) (Reviewer/Contributor, feature owner)
 
 ## Context
 

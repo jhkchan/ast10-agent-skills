@@ -12,7 +12,7 @@
     "node": ">=18"
   },
   "license": "Apache-2.0",
-  "author": "Jacky Chan",
+  "author": "Jacky Chan (https://github.com/jhkchan)",
   "dependencies": {},
   "devDependencies": {},
   "scripts": {

@@ -11,6 +11,17 @@ plus an advisory skill that routes a free-text finding to its category, and four
 commands that drive them. Point it at a candidate skill package before you install that
 package, and it tells you what it found, what needs a human, and what it could not decide.
 
+**This implements OWASP Agentic Skills Top 10 v1.0.** Every category, every named attack
+scenario, the decision tree and the Universal Skill Format schema come from that edition and
+no other — the counts on this page (AST01–AST10, 62 scenarios) are only meaningful against it.
+
+| Source | |
+| --- | --- |
+| Whitepaper (PDF) | [`ast10-top10-whitepaper-2.pdf`](https://owasp.org/www-project-agentic-skills-top-10/assets/publications/ast10-top10-whitepaper-2.pdf) |
+| Project page | [owasp.org/www-project-agentic-skills-top-10](https://owasp.org/www-project-agentic-skills-top-10/) |
+| Release announcement | [Substack](https://kenhuangus.substack.com/p/for-immediate-release-owasp-publishes) · [LinkedIn](https://www.linkedin.com/pulse/owasp-publishes-agentic-skills-top-10-v10-ken-huang-vsd8e/) |
+| Video walkthrough | [YouTube](https://www.youtube.com/watch?v=l-uwnCzRRE0) |
+
 ## ⚠️ Not an OWASP project
 
 **This repository is an independent, community open-source implementation. It is NOT an
@@ -25,8 +36,9 @@ review, or affiliation — despite the repository name.**
 - **[Ken Huang](https://github.com/kenhuangus) (DistributedApps.ai) is the project leader** of the OWASP Agentic Skills Top 10,
   and originated the taxonomy and the source repository. He did not author, review, or endorse
   this repository.
-- The maintainer of this repository, **Jacky Chan (Beever AI / Votee AI), is a credited
-  Reviewer/Contributor to the publication** — listed in its "Reviewers and Contributors" table.
+- The maintainer of this repository, **[Jacky Chan](https://github.com/jhkchan) ([Beever AI](https://github.com/Beever-AI) /
+  [Votee AI](https://github.com/Votee-AI)), is a credited Reviewer/Contributor to the publication** — listed in its
+  "Reviewers and Contributors" table.
   That is the extent of the relationship: contributor credit on the publication, not authorship
   of it, not leadership of the project, and not a mandate to implement it.
 - Nothing here should be read as OWASP guidance. Where this repo and the whitepaper disagree,

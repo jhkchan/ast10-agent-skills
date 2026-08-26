@@ -29,7 +29,7 @@ thing in the repository. When two artifacts disagree, the lower rank is a bug.
 
 | Rank | Artifact | Authoritative on |
 | --- | --- | --- |
-| 1 | The whitepaper's "Attack Scenarios" body for that category | the enumeration — how many scenarios exist, and their titles verbatim |
+| 1 | The [OWASP Agentic Skills Top 10 **v1.0**](https://owasp.org/www-project-agentic-skills-top-10/assets/publications/ast10-top10-whitepaper-2.pdf) whitepaper's "Attack Scenarios" body for that category | the enumeration — how many scenarios exist, and their titles verbatim |
 | 2 | `scenarios/registry.yaml` | the **tier** of each scenario, and the written reason for it |
 | 3 | `skills/<AST>/coverage-matrix.md` | the F1 denominator, the corpus accounting, the coverage debt |
 | 4 | `fixtures/manifest.yaml` | which fixture case is labeled against which check |

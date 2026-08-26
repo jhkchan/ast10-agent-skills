@@ -650,3 +650,31 @@ def test_the_marketplace_manifest_passes_the_real_claude_cli_validator():
         check=False,
     )
     assert result.returncode == 0, f"claude plugin validate rejected the manifest:\n{result.stdout}{result.stderr}"
+
+
+#: The edition this repository implements. Every scenario count, category id and
+#: USF field on the front page is only meaningful against a named version.
+WHITEPAPER_VERSION = "v1.0"
+WHITEPAPER_PDF = "https://owasp.org/www-project-agentic-skills-top-10/assets/publications/ast10-top10-whitepaper-2.pdf"
+
+
+def test_the_repo_states_which_whitepaper_edition_it_implements():
+    """ "62 scenarios" is a claim about an edition, not about a project.
+
+    The repository named the publication everywhere and its version nowhere, so
+    a reader could not tell which edition the counts were derived from, and a
+    later edition would silently make every number on the page wrong.
+    """
+    readme = README_PATH.read_text(encoding="utf-8")
+    flat = " ".join(readme.split())
+    assert f"OWASP Agentic Skills Top 10 {WHITEPAPER_VERSION}" in flat, (
+        f"README.md must state the edition it implements ({WHITEPAPER_VERSION})"
+    )
+    assert WHITEPAPER_PDF in readme, "README.md must link the whitepaper PDF it implements"
+
+    notice = NOTICE_PATH.read_text(encoding="utf-8")
+    assert "version 1.0" in notice, "NOTICE must name the edition it treats as source material"
+    assert WHITEPAPER_PDF in notice, "NOTICE must link the source publication it names"
+
+    architecture = (REPO_ROOT / "docs" / "architecture.md").read_text(encoding="utf-8")
+    assert WHITEPAPER_PDF in architecture, "the authority chain's rank 1 is the whitepaper; it must say which edition"

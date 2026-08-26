@@ -13,8 +13,12 @@ vendors.
 Source material — OWASP Agentic Skills Top 10
 ================================================================================
 
-The OWASP Agentic Skills Top 10 whitepaper is the SOURCE MATERIAL for this
-repository. Every category (AST01-AST10), every attack scenario enumerated in
+The OWASP Agentic Skills Top 10 whitepaper, version 1.0, is the SOURCE MATERIAL
+for this repository, and this repository implements that edition and no other.
+It is published at
+https://owasp.org/www-project-agentic-skills-top-10/assets/publications/ast10-top10-whitepaper-2.pdf
+
+Every category (AST01-AST10), every attack scenario enumerated in
 scenarios/registry.yaml, the "Which AST Does My Finding Belong To?" decision
 tree implemented by skills/advisory, and the Universal Skill Format proposal
 validated by validators/usf.py and schemas/usf-v1.schema.json originate in that
@@ -27,8 +31,9 @@ source repository.
 
 THIS REPOSITORY IS NOT AN OWASP PROJECT. It is an independent community
 implementation and carries no OWASP endorsement, review, or affiliation,
-despite the repository name. Jacky Chan, the maintainer of this repository, is
-a credited entry in the whitepaper's "Reviewers and Contributors" table; that
+despite the repository name. Jacky Chan (https://github.com/jhkchan), the maintainer of this
+repository, is a credited entry in the whitepaper's "Reviewers and
+Contributors" table; that
 is contributor credit on the publication, and is not authorship of it, not
 leadership of the project, and not a mandate to implement it. Nothing here is
 OWASP guidance. Where this repository and the whitepaper disagree, the

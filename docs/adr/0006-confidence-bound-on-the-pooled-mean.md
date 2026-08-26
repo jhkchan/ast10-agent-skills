@@ -27,7 +27,7 @@ What run 5 produced, and what it does and does not license, is under
 [Outcome](#outcome--what-run-5-measured) at the end of this record. Adoption is complete.
 
 **Date:** 2026-08-24
-**Deciders:** Jacky Chan (Reviewer/Contributor, feature owner)
+**Deciders:** [Jacky Chan](https://github.com/jhkchan) (Reviewer/Contributor, feature owner)
 
 This is the superseding record that [ADR-0005](0005-judge-panel-calibration-and-the-lower-bound.md)
 item 4 requires: *"a recorded decision superseding this one, naming the rule and its constants
