@@ -241,6 +241,6 @@ is fixed in `coverage-matrix.md`.
 ## References
 
 Full attack-scenario catalog and preventive-mitigation list are the whitepaper's own
-AST08 section (source: the OWASP Agentic Skills Top 10 publication, section AST08 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)), including NVIDIA SkillSpector, Agent Threat
+AST08 section (source: the OWASP Agentic Skills Top 10 publication, section AST08 (no local copy: this repository points at the publication rather than bundling it, so the authority chain cannot drift from a stale copy; the whitepaper is CC BY-SA 4.0)), including NVIDIA SkillSpector, Agent Threat
 Rules, and the Trail of Bits `overtly-malicious-skills` corpus. This file is the delta
 on top of it.

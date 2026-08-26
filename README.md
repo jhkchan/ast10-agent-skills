@@ -33,9 +33,10 @@ review, or affiliation — despite the repository name.**
   — is the source publication this repository implements. Full credit for the taxonomy, the
   attack-scenario catalog, the decision tree, and the Universal Skill Format proposal belongs
   to that project and its contributors. Go read it there, not here.
-- **[Ken Huang](https://github.com/kenhuangus) (DistributedApps.ai) is the project leader** of the OWASP Agentic Skills Top 10,
-  and originated the taxonomy and the source repository. He did not author, review, or endorse
-  this repository.
+- **[Ken Huang](https://github.com/kenhuangus) (DistributedApps.ai) is the project leader** of the
+  OWASP Agentic Skills Top 10, and originated the taxonomy and the source repository. The project
+  co-leads are **Akram Sheriff, Aonan Guan, Bhavya Gupta, Fabio Cerullo, Hammad Atta, Iftach Orr
+  and Niv Hoffman**. None of them authored, reviewed, or endorsed this repository.
 - The maintainer of this repository, **[Jacky Chan](https://github.com/jhkchan) ([Beever AI](https://github.com/Beever-AI) /
   [Votee AI](https://github.com/Votee-AI)), is a credited Reviewer/Contributor to the publication** — listed in its
   "Reviewers and Contributors" table.
@@ -95,8 +96,10 @@ manifests declare only what has been exercised — see [Tested with](#tested-wit
 
 `cli/ast10.py` needs Python 3.11+ and PyYAML. A Node 18+ front end,
 `cli/bin/cli.js`, ships alongside it with zero npm dependencies and adds `audit` and
-`coverage`; both shell out to one implementation, so they cannot disagree. Full verb list in
-[`cli/README.md`](cli/README.md).
+`coverage`. `route` and `audit` shell out to `cli/lib/bridge.py`, so the decision tree and the
+detectors have exactly one implementation; `coverage` is native JavaScript that reads the same
+manifests, and `tests/test_cli.py` fails if the two front ends ever disagree on a number. Full
+verb list in [`cli/README.md`](cli/README.md).
 
 ```bash
 python3 cli/ast10.py list                    # every skill + its F1 state

@@ -40,9 +40,10 @@ same ShareAlike obligation, and a reuser who intends to build on that text
 rather than on this repository's code should read the licence rather than
 assume Apache-2.0 covers it.
 
-Ken Huang (DistributedApps.ai, https://github.com/kenhuangus) is the project
-leader of the OWASP Agentic Skills Top 10 and originated the taxonomy and the
-source repository.
+Ken Huang (DistributedApps.ai) is the project leader; the co-leads are Akram Sheriff, Aonan Guan, Bhavya Gupta, Fabio Cerullo, Hammad Atta, Iftach Orr and Niv Hoffman.
+Ken Huang's profile is https://github.com/kenhuangus. He originated the taxonomy
+and the source repository. None of them authored, reviewed or endorsed this
+repository.
 
 THIS REPOSITORY IS NOT AN OWASP PROJECT. It is an independent community
 implementation and carries no OWASP endorsement, review, or affiliation,
@@ -55,8 +56,13 @@ OWASP guidance. Where this repository and the whitepaper disagree, the
 whitepaper is authoritative.
 
 "OWASP" is a trademark of the OWASP Foundation. It is used here descriptively,
-to identify the standard being implemented, under the terms of section 6 of the
-Apache License, Version 2.0.
+to identify the standard this repository implements -- not as a source
+identifier for this software, and not with any claim of licence to the mark.
+Apache-2.0 section 6 is a WITHHOLDING clause about the Licensor's own marks and
+grants nothing here; it was cited as authority in an earlier revision of this
+file and that citation was wrong. OWASP's mark-usage guidelines are at
+https://policy.owasp.org/operational/mark-usage-guidelines and this repository
+holds no agreement under them.
 
 ================================================================================
 Third-party attributions

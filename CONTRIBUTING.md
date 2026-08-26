@@ -48,7 +48,7 @@ conditions, what makes a finding *this* category rather than a neighbour's.
 Executable logic lives in `scripts/`; long-form material lives in
 `references/`. A `SKILL.md` that is mostly a procedure has the split backwards.
 No skill in this repository ships a `references/` directory today — the long-form
-source is the whitepaper, which is not redistributable here — so if you add one,
+source is the whitepaper, which is not bundled here — so if you add one,
 re-stamp the manifest: `references/*.md` is inside the `content_hash` surface
 (`scripts/content_hash.py`) and every stamped digest here currently covers
 `SKILL.md` plus `scripts/*.py` and nothing else.

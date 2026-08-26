@@ -353,5 +353,5 @@ do not infer a tier from this prose.
 
 Treat this file as the delta on top of that section, not a restatement of it. This package
 ships no `references/` directory: the source it would excerpt is the whitepaper, which is
-not redistributable here, so the pointer is to the publication rather than to a local copy
+not bundled here, so the pointer is to the publication rather than to a local copy
 of it.

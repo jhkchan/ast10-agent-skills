@@ -117,6 +117,15 @@ def f1_state(category: str) -> str:
     published = entry.get("published_f1")
     if published in (None, "null"):
         return str(entry.get("status") or "declared-and-uncovered")
+    if isinstance(published, (int, float)):
+        # One category stores `published_f1` as a bare number with its scope in
+        # the sibling `f1_scope` field. Printing it raw put an unlabelled `1.0`
+        # next to nine labelled numbers, which is the one shape this repository
+        # tells everyone else never to quote. Label it from its own siblings.
+        scope = str(entry.get("f1_scope") or "").strip() or "unscoped"
+        cases = (entry.get("registry_coverage") or {}).get("cases_present")
+        suffix = f", n={cases}" if cases else ""
+        return f"{scope} {float(published):.3f}{suffix and ' (' + suffix.lstrip(', ') + ')'}"
     return str(published)
 
 

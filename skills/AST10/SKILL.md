@@ -268,5 +268,5 @@ assert a tier for them.
 The full Universal Skill Format proposal (complete field list: identity, signatures,
 content hashes, permissions, `deny_write`, network allowlists, required tools, risk
 tier, scan status, changelog) and the whitepaper's browser-only metadata-loss
-simulator are in the whitepaper's own AST10 section (source: the OWASP Agentic Skills Top 10 publication, section AST10 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)). This file is
+simulator are in the whitepaper's own AST10 section (source: the OWASP Agentic Skills Top 10 publication, section AST10 (no local copy: this repository points at the publication rather than bundling it, so the authority chain cannot drift from a stale copy; the whitepaper is CC BY-SA 4.0)). This file is
 the delta on top of it.

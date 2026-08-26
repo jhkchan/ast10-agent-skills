@@ -366,6 +366,23 @@ function f1State(entry) {
   if (entry.published_f1 === "pending-detector") {
     return { value: "pending-detector", published: false, reason: "no-detector-consumes-corpus" };
   }
+  const bareNumber =
+    typeof entry.published_f1 === "number" ||
+    (typeof entry.published_f1 === "string" && /^\d+(?:\.\d+)?$/.test(entry.published_f1.trim()));
+  if (bareNumber) {
+    // One category stores `published_f1` as a bare number with its scope in the
+    // sibling `f1_scope` field. Printing it raw put an unlabelled `1.0` next to
+    // nine labelled numbers -- the one shape this repo tells everyone else never
+    // to quote. Label it from its own siblings, exactly as cli/ast10.py does.
+    const scope = String(entry.f1_scope || "").trim() || "unscoped";
+    const cases = (entry.registry_coverage || {}).cases_present || entry.cases;
+    const suffix = cases ? ` (n=${cases})` : "";
+    return {
+      value: `${scope} ${Number(entry.published_f1).toFixed(3)}${suffix}`,
+      published: true,
+      reason: "published",
+    };
+  }
   return { value: String(entry.published_f1), published: true, reason: "published" };
 }
 

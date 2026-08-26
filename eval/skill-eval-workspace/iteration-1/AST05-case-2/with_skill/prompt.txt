@@ -282,7 +282,7 @@ number the proxy corpus does publish, are fixed in `coverage-matrix.md`.
 
 Full attack-scenario catalog (including Malicious Instructions Embedded in Documents,
 resource-exhaustion DoS) and the complete preventive-mitigation list are the
-whitepaper's own AST05 section (source: the OWASP Agentic Skills Top 10 publication, section AST05 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)). This file is the delta on top of
+whitepaper's own AST05 section (source: the OWASP Agentic Skills Top 10 publication, section AST05 (no local copy: this repository points at the publication rather than bundling it, so the authority chain cannot drift from a stale copy; the whitepaper is CC BY-SA 4.0)). This file is the delta on top of
 it.
 
 >>>>>>>>>> END INSTALLED SKILL: ast05-untrusted-external-instructions <<<<<<<<<<

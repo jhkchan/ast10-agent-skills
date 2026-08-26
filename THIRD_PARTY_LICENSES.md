@@ -25,7 +25,7 @@ sits with the other attributions rather than only in prose:
 | The Universal Skill Format (USF) v1.0 proposal | `schemas/usf-v1.schema.json`, `validators/usf.py`, every `skills/*/skill.usf.yaml` |
 
 Credit for all of the above belongs to the OWASP Agentic Skills Top 10 project
-and its contributors; **[Ken Huang](https://github.com/kenhuangus) (DistributedApps.ai) is the project leader**
+and its contributors; **[Ken Huang](https://github.com/kenhuangus) (DistributedApps.ai) is the project leader**, with co-leads Akram Sheriff, Aonan Guan, Bhavya Gupta, Fabio Cerullo, Hammad Atta, Iftach Orr and Niv Hoffman,
 and originated the taxonomy. Scenario titles are reproduced verbatim for
 identification and traceability — `tests/test_coverage_matrix*.py` fails on a
 paraphrase, because a renamed scenario is an untraceable one.

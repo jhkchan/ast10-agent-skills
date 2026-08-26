@@ -270,7 +270,7 @@ not pre-empt that lock.
 | --- | --- |
 | `coverage-matrix.md` | you must cite the authoritative tier of a named AST02 scenario, or the written reason three of the four are out-of-artifact |
 | `scripts/detector.py` | you are extending the closed config-path list for a new host — never to find out what the check decides |
-| the whitepaper's own AST02 section (source: the OWASP Agentic Skills Top 10 publication, section AST02 (no local copy: the whitepaper is not redistributable here, so this points at the publication rather than at a file in this package)) | you need the full attack-scenario catalog, the real-world config-hijacking evidence, the Trail of Bits (Jun 3, 2026) scanner-bypass result, or the preventive-mitigation list |
+| the whitepaper's own AST02 section (source: the OWASP Agentic Skills Top 10 publication, section AST02 (no local copy: this repository points at the publication rather than bundling it, so the authority chain cannot drift from a stale copy; the whitepaper is CC BY-SA 4.0)) | you need the full attack-scenario catalog, the real-world config-hijacking evidence, the Trail of Bits (Jun 3, 2026) scanner-bypass result, or the preventive-mitigation list |
 
 This file is the delta on top of that section, not a restatement of it.
 
