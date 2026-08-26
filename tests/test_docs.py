@@ -1784,3 +1784,43 @@ def test_the_readme_audit_example_is_real_output_from_the_command_it_shows():
         assert " ".join(line.split()) in produced, (
             f"README's audit example shows a line the command does not print: {line!r}"
         )
+
+
+def test_no_commit_in_history_names_a_sibling_repo():
+    """The working-tree guard above is structurally blind to history.
+
+    `_committed_files()` builds its list from `git ls-files`, so it sees the
+    tree as it is now. A pre-publication audit found six pushed commits naming
+    every forbidden sibling repo -- including a clickable URL to a private one
+    -- while that guard passed, because the names had been scrubbed from the
+    tree and left in history. Publishing makes every commit browsable, so the
+    tree being clean proves nothing on its own.
+
+    History was rewritten on 2026-08-26 to remove them. This is what keeps it
+    that way: it scans every commit, not the checkout.
+    """
+    if not (REPO_ROOT / ".git").exists():
+        pytest.skip("not a git checkout")
+    revs = subprocess.run(["git", "rev-list", "--all"], cwd=REPO_ROOT, capture_output=True, text=True, check=False)
+    if revs.returncode != 0:
+        pytest.skip("git rev-list unavailable")
+    commits = revs.stdout.split()
+    assert commits, "no commits to scan"
+
+    pattern = "|".join(FORBIDDEN_NAMES)
+    dirty: list[str] = []
+    for commit in commits:
+        hit = subprocess.run(
+            ["git", "grep", "-l", "-I", "-E", pattern, commit, "--"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if hit.returncode == 0 and hit.stdout.strip():
+            files = sorted({line.split(":", 1)[-1] for line in hit.stdout.strip().splitlines()})
+            dirty.append(f"{commit[:8]}: {files[:4]}")
+    assert not dirty, (
+        "commits in history name a sibling repository; a clean working tree does not fix this, "
+        "because publishing makes every commit browsable:\n  " + "\n  ".join(dirty)
+    )
