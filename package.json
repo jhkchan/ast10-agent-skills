@@ -1,7 +1,6 @@
 {
   "name": "ast10-agent-skills",
   "version": "1.0.0",
-  "private": true,
   "description": "CLI for an independent community reference implementation of the OWASP Agentic Skills Top 10 (AST01-AST10). NOT an OWASP project and carrying no OWASP endorsement, despite the name.",
   "type": "module",
   "bin": {
@@ -20,18 +19,44 @@
     "list": "node cli/bin/cli.js list",
     "coverage": "node cli/bin/cli.js coverage",
     "status": "node cli/bin/cli.js status",
-    "test": "python3 -m pytest -q"
+    "test": "python3 -m pytest -q",
+    "prepack": "find cli skills detectors scripts validators schemas -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true"
   },
   "files": [
     "cli/",
     "skills/",
+    "detectors/",
+    "scripts/",
+    "validators/",
+    "schemas/",
+    "scenarios/",
+    "fixtures/manifest.yaml",
     "NOTICE",
-    "LICENSE"
+    "LICENSE",
+    "README.md",
+    "!**/__pycache__/**",
+    "!**/*.pyc",
+    "!**/.pytest_cache/**",
+    "!**/.ruff_cache/**"
   ],
   "keywords": [
     "agent-skills",
     "skill-security",
     "supply-chain",
-    "owasp-agentic-skills-top-10"
-  ]
+    "ai-security",
+    "appsec",
+    "llm-security",
+    "static-analysis",
+    "skill-md",
+    "claude-code",
+    "agentic-ai"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jhkchan/ast10-agent-skills.git"
+  },
+  "homepage": "https://github.com/jhkchan/ast10-agent-skills#readme",
+  "bugs": {
+    "url": "https://github.com/jhkchan/ast10-agent-skills/issues"
+  }
 }
