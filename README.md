@@ -163,6 +163,30 @@ AST01   Malicious Skills   10 check(s): 1 finding, 0 signals, 0 observed propert
 That last line is the point: the tool states what it could not decide instead of implying a
 clean package.
 
+### SARIF, for code scanning
+
+`--sarif` emits SARIF 2.1.0, which GitHub code scanning ingests directly:
+
+```bash
+npx ast10-agent-skills audit ./some-candidate-skill --sarif > ast10.sarif
+```
+
+The mapping keeps the decidability contract rather than flattening it into "no findings".
+A check that ran and cleared is `kind: pass`; a scenario tiered `agent-judgable` is
+`kind: open`, meaning decidable from this package but not by a static check; and one tiered
+`out-of-artifact` is `kind: notApplicable`. A detection is `kind: fail`, at `level: error`
+when it decides a named scenario and `level: warning` when it decides only an enabling
+precondition, because `artifact-signal-only` is not scenario coverage.
+
+```yaml
+- run: npx ast10-agent-skills audit ./skills/my-skill --sarif > ast10.sarif
+- uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: ast10.sarif
+```
+
+Add `--fail-on-detect` to gate the merge instead of only annotating it.
+
 `skills/<AST>/coverage-matrix.md` is the artifact behind any number a sweep prints: it tiers
 every named scenario for that category and ships the command that re-derives its own figures
 from the registry, so you can check the table rather than believe it.

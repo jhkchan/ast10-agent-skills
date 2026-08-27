@@ -134,7 +134,20 @@ function rule(width = 78) {
 
 function fail(message, code = 1) {
   console.error(`error: ${message}`);
-  process.exit(code);
+  // `process.exitCode`, never `process.exit`: stdout to a PIPE is asynchronous in
+  // Node, and exiting outright discards whatever has not drained. A 116 kB SARIF
+  // report truncated at 64 kB under `--sarif > out.sarif`, silently, and only
+  // when the consumer was a pipe rather than a terminal.
+  process.exitCode = code;
+  throw new ExitSignal(code);
+}
+
+/** Thrown by `fail()` so the process can unwind without discarding buffered stdout. */
+class ExitSignal extends Error {
+  constructor(code) {
+    super(`exit ${code}`);
+    this.code = code;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -969,9 +982,169 @@ function declarationNote(payload) {
   ];
 }
 
+// ---------------------------------------------------------------------------
+// SARIF 2.1.0 — for GitHub code scanning and any other SARIF consumer
+// ---------------------------------------------------------------------------
+//
+// The interesting part of this mapping is `kind`. A scanner that emits only its
+// detections teaches a reader that silence means safety, and SARIF has vocabulary
+// for the rest: `pass` for a check that ran and cleared, `open` for a scenario
+// this repository tiers `agent-judgable` (declared, decidable, but not by a static
+// check), and `notApplicable` for one tiered `out-of-artifact`, whose defining
+// condition is not in the package at any depth. The per-scenario decidability
+// contract therefore survives the format conversion instead of being flattened
+// into "no findings".
+/** The published version, read from package.json so it cannot drift from the release. */
+function packageVersion() {
+  try {
+    return JSON.parse(readFileSync(join(REPO_ROOT, "package.json"), "utf8")).version || "0.0.0";
+  } catch {
+    return "0.0.0";
+  }
+}
+
+const SARIF_SCHEMA =
+  "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json";
+
+/** A `path/to/file.py: message` or `path/to/file.py:12: message` evidence prefix.
+ *
+ * The path in the evidence is relative to the audited PACKAGE, so it is joined
+ * onto the target to produce a URI relative to where the command was run. GitHub
+ * code scanning resolves `artifactLocation.uri` against the repository root, and
+ * an unjoined `scripts/setup.py` would annotate the wrong file whenever the
+ * audited package is a subdirectory. */
+function sarifLocation(evidence, target) {
+  if (typeof evidence !== "string") return null;
+  const match = evidence.match(/^([\w./-]+\.[A-Za-z0-9]+)(?::(\d+))?[:\s]/);
+  if (!match) return null;
+  const base = String(target || "").replace(/^\.\//, "").replace(/\/$/, "");
+  const uri = base && base !== "." ? `${base}/${match[1]}` : match[1];
+  const region = match[2] ? { startLine: Number(match[2]) } : undefined;
+  return {
+    physicalLocation: {
+      artifactLocation: { uri },
+      ...(region ? { region } : {}),
+    },
+  };
+}
+
+function sarifRule(finding, category) {
+  const ids = finding.registry_ids || [];
+  const decides = ids.length ? `Decides ${ids.join(", ")}.` : "Decides no named scenario on its own.";
+  return {
+    id: finding.scenario,
+    name: finding.scenario.replace(/-/g, ""),
+    shortDescription: { text: `${category}: ${finding.scenario}` },
+    fullDescription: {
+      text:
+        `${decides} Tier: ${finding.tier}. Coverage: ${finding.covers}. ` +
+        "A check whose coverage is not `full` decides an enabling precondition, not a named scenario.",
+    },
+    helpUri: `https://owasp.org/www-project-agentic-skills-top-10/#${category.toLowerCase()}`,
+    properties: {
+      category,
+      tier: finding.tier,
+      covers: finding.covers,
+      "registry-ids": ids,
+      tags: ["security", "agent-skills", category, `tier/${finding.tier}`],
+    },
+  };
+}
+
+function sarifResults(payload) {
+  const rules = new Map();
+  const results = [];
+  for (const cat of payload.categories || []) {
+    for (const f of cat.findings || []) {
+      if (!rules.has(f.scenario)) rules.set(f.scenario, sarifRule(f, cat.category));
+      const detected = Boolean(f.detected);
+      const full = f.covers === "full";
+      const loc = detected ? sarifLocation(f.evidence, payload.path) : null;
+      results.push({
+        ruleId: f.scenario,
+        kind: detected ? "fail" : "pass",
+        // `artifact-signal-only` fires on a precondition a benign package can also
+        // show, so it is a warning rather than an error even when it fires.
+        level: detected ? (full ? "error" : "warning") : "none",
+        message: {
+          text: detected
+            ? f.evidence || `${f.scenario} detected`
+            : `${f.scenario}: ran and cleared`,
+        },
+        locations: loc ? [loc] : [{ physicalLocation: { artifactLocation: { uri: payload.path } } }],
+        properties: { category: cat.category, tier: f.tier, covers: f.covers },
+      });
+    }
+    // Declared and NOT decided by this run. Emitted rather than dropped.
+    for (const [ids, kind, why] of [
+      [cat.agent_judgable || [], "open", "declared agent-judgable: decidable from this package, but not by a static check"],
+      [cat.out_of_artifact || [], "notApplicable", "declared out-of-artifact: the defining condition is not in this package at any depth"],
+    ]) {
+      for (const id of ids) {
+        const ruleId = `${id}-undecided`;
+        if (!rules.has(ruleId)) {
+          rules.set(ruleId, {
+            id: ruleId,
+            name: ruleId.replace(/-/g, ""),
+            shortDescription: { text: `${cat.category}: ${id} not decided by a static run` },
+            fullDescription: { text: why },
+            helpUri: `https://owasp.org/www-project-agentic-skills-top-10/#${cat.category.toLowerCase()}`,
+            properties: { category: cat.category, tags: ["security", "agent-skills", cat.category, "undecided"] },
+          });
+        }
+        results.push({
+          ruleId,
+          kind,
+          level: "none",
+          message: { text: `${id}: ${why}. This run makes no claim about it.` },
+          locations: [{ physicalLocation: { artifactLocation: { uri: payload.path } } }],
+          properties: { category: cat.category },
+        });
+      }
+    }
+  }
+  return { rules: [...rules.values()], results };
+}
+
+function toSarif(payload) {
+  const { rules, results } = sarifResults(payload);
+  return {
+    $schema: SARIF_SCHEMA,
+    version: "2.1.0",
+    runs: [
+      {
+        tool: {
+          driver: {
+            name: "ast10-agent-skills",
+            version: packageVersion(),
+            informationUri: "https://github.com/jhkchan/ast10-agent-skills",
+            organization: "Independent community implementation — NOT an OWASP project",
+            shortDescription: {
+              text: "Audits an agent-skill package against the OWASP Agentic Skills Top 10 standard, v1.0.",
+            },
+            rules,
+          },
+        },
+        automationDetails: { id: `ast10-agent-skills/audit/${payload.path}` },
+        invocations: [
+          {
+            executionSuccessful: true,
+            commandLine: `ast10-skills audit ${payload.path}`,
+          },
+        ],
+        results,
+      },
+    ],
+  };
+}
+
 function cmdAudit(target, options) {
   if (!target) fail("audit needs a path to a candidate skill package");
   const payload = runBridge(["audit", target]);
+  if (options.sarif) {
+    console.log(JSON.stringify(toSarif(payload), null, 2));
+    return payload.totals.detected > 0 && options.failOnDetect ? 1 : 0;
+  }
   if (options.json) {
     console.log(JSON.stringify(payload, null, 2));
     return payload.totals.detected > 0 && options.failOnDetect ? 1 : 0;
@@ -1441,6 +1614,7 @@ Commands:
 
 Global:
   --json                   Machine-readable output (every command).
+  --sarif                  SARIF 2.1.0 (audit only) for GitHub code scanning.
 
 Decision tree used by \`route\` (the whitepaper's own ordering):
   1  the skill itself is malicious at publish time          -> AST01
@@ -1462,11 +1636,12 @@ the detectors have exactly one implementation. Override the interpreter with AST
 // ---------------------------------------------------------------------------
 
 function parseArgs(argv) {
-  const options = { json: false, tier: null, failOnDetect: false };
+  const options = { json: false, sarif: false, tier: null, failOnDetect: false };
   const positional = [];
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--json") options.json = true;
+    else if (arg === "--sarif") options.sarif = true;
     else if (arg === "--fail-on-detect") options.failOnDetect = true;
     else if (arg === "--tier") {
       options.tier = argv[i + 1];
@@ -1503,4 +1678,10 @@ function main() {
   }
 }
 
-process.exit(main());
+// Set the code and let the event loop drain stdout, rather than exiting inside it.
+try {
+  process.exitCode = main();
+} catch (err) {
+  if (err instanceof ExitSignal) process.exitCode = err.code;
+  else throw err;
+}
