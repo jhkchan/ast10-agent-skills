@@ -2,7 +2,7 @@
   "name": "ast10",
   "displayName": "Unofficial AST10 Agent Skills",
   "description": "Audit a candidate agent-skill package against the OWASP Agentic Skills Top 10: ten per-category detector skills, an advisory router, and fourteen slash commands. Independent community implementation — NOT an OWASP project and carrying no OWASP endorsement.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "Jacky Chan",
     "url": "https://github.com/jhkchan"

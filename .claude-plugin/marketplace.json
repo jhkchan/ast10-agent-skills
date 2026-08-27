@@ -1,7 +1,7 @@
 {
   "name": "ast10-agent-skills",
   "description": "Eleven agent skills operationalizing the OWASP Agentic Skills Top 10 (AST01-AST10) whitepaper: ten per-category triage skills plus an advisory router, with fourteen slash commands that drive them. Independent community implementation — NOT an OWASP project and carrying no OWASP endorsement.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "owner": {
     "name": "Jacky Chan",
     "url": "https://github.com/jhkchan"
@@ -12,7 +12,7 @@
       "displayName": "Unofficial AST10 Agent Skills",
       "source": "./",
       "description": "Audit a candidate agent-skill package against the OWASP Agentic Skills Top 10: ten per-category detector skills, an advisory router, and fourteen slash commands. Independent community implementation — NOT an OWASP project and carrying no OWASP endorsement.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "Jacky Chan",
         "url": "https://github.com/jhkchan"
