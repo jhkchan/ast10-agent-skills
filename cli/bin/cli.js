@@ -1006,61 +1006,86 @@ function packageVersion() {
 const SARIF_SCHEMA =
   "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json";
 
-/** The audited target, normalised once, as a repository-relative POSIX path.
+/** The directory SARIF URIs are expressed relative to.
  *
- * The raw target is user input: it can be absolute, contain `..`, or carry a
- * trailing slash, and it was previously copied verbatim into every `uri`, into
- * `automationDetails.id` and into `commandLine`. That published the operator's
- * home directory into a file uploaded to GitHub, and produced path-absolute
- * URIs no consumer can resolve against a checkout. */
-function sarifTarget(target) {
-  const abs = resolve(String(target || "."));
-  const rel = pathRelative(process.cwd(), abs).split(sep).join("/");
-  if (!rel || rel === ".") return "";
-  // A target outside the working tree has no repository-relative form; the
-  // basename keeps the report readable without leaking the path above it.
-  return rel.startsWith("..") ? abs.split(sep).filter(Boolean).pop() || "" : rel;
+ * Walks up from the audited package for a `.git`, because a SARIF consumer
+ * resolves `artifactLocation.uri` against the repository root -- not against
+ * whatever directory the operator happened to run the command from. Anchoring on
+ * `process.cwd()` meant the same package produced different, sometimes
+ * unresolvable, URIs depending on where you stood. */
+function sarifRoot(absTarget) {
+  let dir = absTarget;
+  for (let i = 0; i < 64; i += 1) {
+    if (existsSync(join(dir, ".git"))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  const cwd = process.cwd();
+  const relToCwd = pathRelative(cwd, absTarget);
+  // No repository: fall back to cwd when the target is inside it, else the
+  // package's own parent, so a URI is still resolvable relative to something.
+  return relToCwd && !relToCwd.split(sep).includes("..") ? cwd : dirname(absTarget);
 }
 
-/** Attacker-controlled text, made safe to place in a JSON document a human reads.
+/** `{ root, rel }` for the audited target: an absolute anchor and its path under it. */
+function sarifTarget(target) {
+  const abs = resolve(String(target || "."));
+  const root = sarifRoot(abs);
+  const rel = pathRelative(root, abs).split(sep).join("/");
+  return { root, rel: rel === "." ? "" : rel };
+}
+
+/** Percent-encode per segment. `encodeURI` leaves `#` and `?` intact, which turn
+ *  the rest of an attacker-chosen directory name into a fragment or query. */
+function sarifUri(relPath) {
+  return relPath.split("/").filter(Boolean).map(encodeURIComponent).join("/");
+}
+
+/** Attacker-controlled text, made safe for a document a human renders.
  *
- * Evidence comes from scanning a hostile package, so it can carry C0 control
- * characters, ANSI escapes and bidirectional overrides, and it is unbounded. */
+ * Evidence and paths come from scanning a hostile package: C0 controls
+ * (carriage return included -- it lets later output overwrite earlier lines in a
+ * terminal), ANSI escapes and bidirectional overrides are stripped. Truncation
+ * counts CODE POINTS, because slicing UTF-16 units splits a surrogate pair and
+ * leaves a lone surrogate that is not valid UTF-8 on the way out. */
 function sarifText(value, limit = 1000) {
-  const text = String(value == null ? "" : value)
+  const cleaned = String(value == null ? "" : value)
     // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
+    .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, " ")
     .replace(/[\u202A-\u202E\u2066-\u2069]/g, "");
-  return text.length > limit ? `${text.slice(0, limit)}… [truncated]` : text;
+  const points = [...cleaned];
+  return points.length > limit ? `${points.slice(0, limit).join("")}… [truncated]` : cleaned;
 }
 
 /** A location ONLY when the evidence names a path that really is a file.
  *
- * The previous regex accepted any dotted token at the head of the evidence, so
- * a field reference such as `manifest.content_hash.value: …` was joined onto the
- * package path and published as an artifact. Measured across the fixture corpus,
- * 60 of 138 detections pointed at a path that does not exist — GitHub cannot
- * annotate those, and codeql-action refuses to fingerprint them. Existence is
- * now the test: if the joined path is not a file on disk, the caller falls back
- * to the package itself rather than inventing an artifact. */
-function sarifLocation(evidence, target) {
+ * Existence is checked on the ABSOLUTE path, so the answer does not depend on
+ * the caller's working directory, and the URI is expressed relative to the
+ * repository root. A file outside that root gets no location rather than a URI
+ * a consumer would resolve onto an unrelated file of the same name. */
+function sarifLocation(evidence, absTarget, root) {
   if (typeof evidence !== "string") return null;
   const match = evidence.match(/^([\w./-]+\.[A-Za-z0-9]+)(?::(\d+))?[:\s]/);
   if (!match) return null;
-  const base = sarifTarget(target);
-  const uri = base ? `${base}/${match[1]}` : match[1];
-  let onDisk = false;
+  return fileLocation(join(absTarget, match[1]), root, match[2] ? Number(match[2]) : null);
+}
+
+/** A physicalLocation for an absolute path, or null if it is not a file under `root`. */
+function fileLocation(absPath, root, startLine) {
+  let isFile = false;
   try {
-    onDisk = statSync(uri).isFile();
+    isFile = statSync(absPath).isFile();
   } catch {
-    onDisk = false;
+    isFile = false;
   }
-  if (!onDisk) return null;
-  const region = match[2] ? { startLine: Number(match[2]) } : undefined;
+  if (!isFile) return null;
+  const rel = pathRelative(root, absPath).split(sep).join("/");
+  if (!rel || rel.split("/").includes("..")) return null;
   return {
     physicalLocation: {
-      artifactLocation: { uri: encodeURI(uri) },
-      ...(region ? { region } : {}),
+      artifactLocation: { uri: sarifUri(rel) },
+      ...(startLine ? { region: { startLine } } : {}),
     },
   };
 }
@@ -1091,19 +1116,23 @@ function sarifRule(finding, category) {
 function sarifResults(payload) {
   const rules = new Map();
   const results = [];
-  const base = sarifTarget(payload.path);
-  // Every result needs a location; where no file can be named, the package is
-  // the honest anchor. `.` is not a legal artifact, so an empty base becomes the
-  // manifest that is always present.
-  const packageLocation = {
-    physicalLocation: { artifactLocation: { uri: encodeURI(base ? `${base}/SKILL.md` : "SKILL.md") } },
-  };
+  const { root, rel } = sarifTarget(payload.path);
+  const absTarget = resolve(String(payload.path || "."));
+  // Where no file can be named, anchor on a file this run PROVED exists: the
+  // manifest it actually read, else the first file it scanned. Hard-coding
+  // SKILL.md invented a path for any package that ships only skill.usf.yaml.
+  const anchorCandidates = [payload.manifest_source, ...(payload.scan_files || [])].filter(Boolean);
+  let packageLocation = null;
+  for (const candidate of anchorCandidates) {
+    packageLocation = fileLocation(join(absTarget, candidate), root, null);
+    if (packageLocation) break;
+  }
   for (const cat of payload.categories || []) {
     for (const f of cat.findings || []) {
       if (!rules.has(f.scenario)) rules.set(f.scenario, sarifRule(f, cat.category));
       const detected = Boolean(f.detected);
       const full = f.covers === "full";
-      const loc = detected ? sarifLocation(f.evidence, payload.path) : null;
+      const loc = detected ? sarifLocation(f.evidence, absTarget, root) : null;
       results.push({
         ruleId: f.scenario,
         kind: detected ? "fail" : "pass",
@@ -1115,7 +1144,7 @@ function sarifResults(payload) {
             ? sarifText(f.evidence) || `${f.scenario} detected`
             : `${f.scenario}: ran and cleared`,
         },
-        locations: [loc || packageLocation],
+        ...(loc || packageLocation ? { locations: [loc || packageLocation] } : {}),
         properties: { category: cat.category, tier: f.tier, covers: f.covers },
       });
     }
@@ -1141,17 +1170,18 @@ function sarifResults(payload) {
           kind,
           level: "none",
           message: { text: `${id}: ${why}. This run makes no claim about it.` },
-          locations: [packageLocation],
+          ...(packageLocation ? { locations: [packageLocation] } : {}),
           properties: { category: cat.category },
         });
       }
     }
   }
-  return { rules: [...rules.values()], results };
+  return { rules: [...rules.values()], results, rel };
 }
 
 function toSarif(payload, sarifCategory) {
-  const { rules, results } = sarifResults(payload);
+  const { rules, results, rel } = sarifResults(payload);
+  const label = sarifText(rel || "package", 200);
   return {
     $schema: SARIF_SCHEMA,
     version: "2.1.0",
@@ -1174,12 +1204,12 @@ function toSarif(payload, sarifCategory) {
         // fills automationDetails when it is absent, so a tool that always writes
         // one silently disables `upload-sarif`'s own `category:` input.
         automationDetails: {
-          id: `${sarifCategory || `ast10-agent-skills/audit/${sarifTarget(payload.path) || "package"}`}/`,
+          id: `${sarifCategory ? sarifText(sarifCategory, 200) : `ast10-agent-skills/audit/${label}`}/`,
         },
         invocations: [
           {
             executionSuccessful: true,
-            commandLine: `ast10-skills audit ${sarifTarget(payload.path) || "."}`,
+            commandLine: `ast10-skills audit ${label}`,
           },
         ],
         results,
@@ -1694,7 +1724,11 @@ function parseArgs(argv) {
     if (arg === "--json") options.json = true;
     else if (arg === "--sarif") options.sarif = true;
     else if (arg === "--sarif-category") {
-      options.sarifCategory = argv[i + 1];
+      // Never consume a following FLAG as this option's value: `--sarif-category
+      // --sarif` previously ate `--sarif` and silently printed the human report.
+      const next = argv[i + 1];
+      if (next === undefined || next.startsWith("--")) fail("--sarif-category needs a value");
+      options.sarifCategory = next;
       i += 1;
     } else if (arg.startsWith("--sarif-category=")) options.sarifCategory = arg.slice("--sarif-category=".length);
     else if (arg === "--fail-on-detect") options.failOnDetect = true;
