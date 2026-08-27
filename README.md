@@ -181,11 +181,22 @@ precondition, because `artifact-signal-only` is not scenario coverage.
 ```yaml
 - run: npx ast10-agent-skills audit ./skills/my-skill --sarif > ast10.sarif
 - uses: github/codeql-action/upload-sarif@v3
+  if: always()          # keep the upload even when the gate step below fails
   with:
     sarif_file: ast10.sarif
 ```
 
-Add `--fail-on-detect` to gate the merge instead of only annotating it.
+`if: always()` matters: without it, adding `--fail-on-detect` to the `run` step makes the
+upload step skip, so the findings never reach code scanning — the failure hides the evidence
+for it. Gate on a separate step after the upload:
+
+```yaml
+- run: npx ast10-agent-skills audit ./skills/my-skill --fail-on-detect
+```
+
+Auditing several packages in one workflow run needs `--sarif-category` per package. GitHub
+derives the analysis category from `automationDetails`, and two uploads sharing a category in
+one run fail the run.
 
 `skills/<AST>/coverage-matrix.md` is the artifact behind any number a sweep prints: it tiers
 every named scenario for that category and ships the command that re-derives its own figures

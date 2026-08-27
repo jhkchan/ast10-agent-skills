@@ -31,7 +31,7 @@
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative as pathRelative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
@@ -1006,23 +1006,60 @@ function packageVersion() {
 const SARIF_SCHEMA =
   "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json";
 
-/** A `path/to/file.py: message` or `path/to/file.py:12: message` evidence prefix.
+/** The audited target, normalised once, as a repository-relative POSIX path.
  *
- * The path in the evidence is relative to the audited PACKAGE, so it is joined
- * onto the target to produce a URI relative to where the command was run. GitHub
- * code scanning resolves `artifactLocation.uri` against the repository root, and
- * an unjoined `scripts/setup.py` would annotate the wrong file whenever the
- * audited package is a subdirectory. */
+ * The raw target is user input: it can be absolute, contain `..`, or carry a
+ * trailing slash, and it was previously copied verbatim into every `uri`, into
+ * `automationDetails.id` and into `commandLine`. That published the operator's
+ * home directory into a file uploaded to GitHub, and produced path-absolute
+ * URIs no consumer can resolve against a checkout. */
+function sarifTarget(target) {
+  const abs = resolve(String(target || "."));
+  const rel = pathRelative(process.cwd(), abs).split(sep).join("/");
+  if (!rel || rel === ".") return "";
+  // A target outside the working tree has no repository-relative form; the
+  // basename keeps the report readable without leaking the path above it.
+  return rel.startsWith("..") ? abs.split(sep).filter(Boolean).pop() || "" : rel;
+}
+
+/** Attacker-controlled text, made safe to place in a JSON document a human reads.
+ *
+ * Evidence comes from scanning a hostile package, so it can carry C0 control
+ * characters, ANSI escapes and bidirectional overrides, and it is unbounded. */
+function sarifText(value, limit = 1000) {
+  const text = String(value == null ? "" : value)
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
+    .replace(/[\u202A-\u202E\u2066-\u2069]/g, "");
+  return text.length > limit ? `${text.slice(0, limit)}… [truncated]` : text;
+}
+
+/** A location ONLY when the evidence names a path that really is a file.
+ *
+ * The previous regex accepted any dotted token at the head of the evidence, so
+ * a field reference such as `manifest.content_hash.value: …` was joined onto the
+ * package path and published as an artifact. Measured across the fixture corpus,
+ * 60 of 138 detections pointed at a path that does not exist — GitHub cannot
+ * annotate those, and codeql-action refuses to fingerprint them. Existence is
+ * now the test: if the joined path is not a file on disk, the caller falls back
+ * to the package itself rather than inventing an artifact. */
 function sarifLocation(evidence, target) {
   if (typeof evidence !== "string") return null;
   const match = evidence.match(/^([\w./-]+\.[A-Za-z0-9]+)(?::(\d+))?[:\s]/);
   if (!match) return null;
-  const base = String(target || "").replace(/^\.\//, "").replace(/\/$/, "");
-  const uri = base && base !== "." ? `${base}/${match[1]}` : match[1];
+  const base = sarifTarget(target);
+  const uri = base ? `${base}/${match[1]}` : match[1];
+  let onDisk = false;
+  try {
+    onDisk = statSync(uri).isFile();
+  } catch {
+    onDisk = false;
+  }
+  if (!onDisk) return null;
   const region = match[2] ? { startLine: Number(match[2]) } : undefined;
   return {
     physicalLocation: {
-      artifactLocation: { uri },
+      artifactLocation: { uri: encodeURI(uri) },
       ...(region ? { region } : {}),
     },
   };
@@ -1054,6 +1091,13 @@ function sarifRule(finding, category) {
 function sarifResults(payload) {
   const rules = new Map();
   const results = [];
+  const base = sarifTarget(payload.path);
+  // Every result needs a location; where no file can be named, the package is
+  // the honest anchor. `.` is not a legal artifact, so an empty base becomes the
+  // manifest that is always present.
+  const packageLocation = {
+    physicalLocation: { artifactLocation: { uri: encodeURI(base ? `${base}/SKILL.md` : "SKILL.md") } },
+  };
   for (const cat of payload.categories || []) {
     for (const f of cat.findings || []) {
       if (!rules.has(f.scenario)) rules.set(f.scenario, sarifRule(f, cat.category));
@@ -1068,10 +1112,10 @@ function sarifResults(payload) {
         level: detected ? (full ? "error" : "warning") : "none",
         message: {
           text: detected
-            ? f.evidence || `${f.scenario} detected`
+            ? sarifText(f.evidence) || `${f.scenario} detected`
             : `${f.scenario}: ran and cleared`,
         },
-        locations: loc ? [loc] : [{ physicalLocation: { artifactLocation: { uri: payload.path } } }],
+        locations: [loc || packageLocation],
         properties: { category: cat.category, tier: f.tier, covers: f.covers },
       });
     }
@@ -1097,7 +1141,7 @@ function sarifResults(payload) {
           kind,
           level: "none",
           message: { text: `${id}: ${why}. This run makes no claim about it.` },
-          locations: [{ physicalLocation: { artifactLocation: { uri: payload.path } } }],
+          locations: [packageLocation],
           properties: { category: cat.category },
         });
       }
@@ -1106,7 +1150,7 @@ function sarifResults(payload) {
   return { rules: [...rules.values()], results };
 }
 
-function toSarif(payload) {
+function toSarif(payload, sarifCategory) {
   const { rules, results } = sarifResults(payload);
   return {
     $schema: SARIF_SCHEMA,
@@ -1125,11 +1169,17 @@ function toSarif(payload) {
             rules,
           },
         },
-        automationDetails: { id: `ast10-agent-skills/audit/${payload.path}` },
+        // Trailing slash makes the whole string the CATEGORY with an empty run id,
+        // per GitHub's SARIF support doc. Overridable because codeql-action only
+        // fills automationDetails when it is absent, so a tool that always writes
+        // one silently disables `upload-sarif`'s own `category:` input.
+        automationDetails: {
+          id: `${sarifCategory || `ast10-agent-skills/audit/${sarifTarget(payload.path) || "package"}`}/`,
+        },
         invocations: [
           {
             executionSuccessful: true,
-            commandLine: `ast10-skills audit ${payload.path}`,
+            commandLine: `ast10-skills audit ${sarifTarget(payload.path) || "."}`,
           },
         ],
         results,
@@ -1142,7 +1192,7 @@ function cmdAudit(target, options) {
   if (!target) fail("audit needs a path to a candidate skill package");
   const payload = runBridge(["audit", target]);
   if (options.sarif) {
-    console.log(JSON.stringify(toSarif(payload), null, 2));
+    console.log(JSON.stringify(toSarif(payload, options.sarifCategory), null, 2));
     return payload.totals.detected > 0 && options.failOnDetect ? 1 : 0;
   }
   if (options.json) {
@@ -1615,6 +1665,7 @@ Commands:
 Global:
   --json                   Machine-readable output (every command).
   --sarif                  SARIF 2.1.0 (audit only) for GitHub code scanning.
+  --sarif-category <name>  Analysis category, when auditing several packages in one run.
 
 Decision tree used by \`route\` (the whitepaper's own ordering):
   1  the skill itself is malicious at publish time          -> AST01
@@ -1636,12 +1687,16 @@ the detectors have exactly one implementation. Override the interpreter with AST
 // ---------------------------------------------------------------------------
 
 function parseArgs(argv) {
-  const options = { json: false, sarif: false, tier: null, failOnDetect: false };
+  const options = { json: false, sarif: false, sarifCategory: null, tier: null, failOnDetect: false };
   const positional = [];
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--json") options.json = true;
     else if (arg === "--sarif") options.sarif = true;
+    else if (arg === "--sarif-category") {
+      options.sarifCategory = argv[i + 1];
+      i += 1;
+    } else if (arg.startsWith("--sarif-category=")) options.sarifCategory = arg.slice("--sarif-category=".length);
     else if (arg === "--fail-on-detect") options.failOnDetect = true;
     else if (arg === "--tier") {
       options.tier = argv[i + 1];
