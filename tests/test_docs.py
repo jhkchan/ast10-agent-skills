@@ -168,8 +168,7 @@ def test_readme_install_section_lists_every_documented_method():
     install = body[body.index("\n## Install") : body.index("\n## Usage")]
     headings = re.findall(r"^### (.+)$", install, re.M)
     assert len(headings) == len(INSTALL_METHODS), (
-        f"README documents {len(headings)} install paths, INSTALL_METHODS declares "
-        f"{len(INSTALL_METHODS)}: {headings}"
+        f"README documents {len(headings)} install paths, INSTALL_METHODS declares {len(INSTALL_METHODS)}: {headings}"
     )
     assert "plugin" in headings[0].lower(), f"the plugin path must be listed first, got {headings[0]!r}"
     assert headings == [h for h, _ in INSTALL_METHODS], (
