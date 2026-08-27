@@ -66,6 +66,23 @@ Or, from inside an interactive session, `/plugin marketplace add
 jhkchan/ast10-agent-skills` then `/plugin`. You get eleven skills and fourteen
 `/ast10:…` commands.
 
+### From npm — no clone
+
+```bash
+npx ast10-agent-skills audit ./some-candidate-skill   # audit a package
+npx ast10-agent-skills list                           # every skill + its F1 state
+npx ast10-agent-skills coverage                       # per-category tiering
+```
+
+Or install it once — `npm i -g ast10-agent-skills` — and the binary is `ast10-skills`.
+
+**`audit` and `route` need Python 3.11+ and PyYAML.** They shell out to
+`cli/lib/bridge.py` so the decision tree and the detectors have exactly one implementation,
+and without Python they fail rather than degrade. `list`, `coverage` and `status` are pure
+Node and work with neither. The package ships the skills, the detectors and the scenario
+registry, and deliberately **not** the attack fixtures — those stay in the git repository,
+where [`fixtures/README.md`](fixtures/README.md) explains what they are.
+
 ### Copy the skills only
 
 `SKILL.md` in a named folder is a cross-agent format, so the eleven skills load in any
@@ -94,14 +111,14 @@ python3 cli/ast10.py install --all --target ~/.claude/skills       # all eleven
 Paths are from each runtime's own documentation; only Claude Code is exercised here, and the
 manifests declare only what has been exercised — see [Tested with](#tested-with).
 
-### CLI, no install
+### From a clone — the full repository
 
-`cli/ast10.py` needs Python 3.11+ and PyYAML. A Node 18+ front end,
-`cli/bin/cli.js`, ships alongside it with zero npm dependencies and adds `audit` and
-`coverage`. `route` and `audit` shell out to `cli/lib/bridge.py`, so the decision tree and the
-detectors have exactly one implementation; `coverage` is native JavaScript that reads the same
-manifests, and `tests/test_cli.py` fails if the two front ends ever disagree on a number. Full
-verb list in [`cli/README.md`](cli/README.md).
+The clone is what you want to audit the tool itself: it carries the fixtures, the evaluation
+harnesses and the test suite that the npm package leaves out. `cli/ast10.py` needs Python
+3.11+ and PyYAML; the Node front end `cli/bin/cli.js` needs Node 18+ and has zero npm
+dependencies. `coverage` is native JavaScript reading the same manifests, and
+`tests/test_cli.py` fails if the two front ends ever disagree on a number. Full verb list in
+[`cli/README.md`](cli/README.md).
 
 ```bash
 python3 cli/ast10.py list                    # every skill + its F1 state

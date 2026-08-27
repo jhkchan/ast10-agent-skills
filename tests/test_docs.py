@@ -139,8 +139,9 @@ def test_readme_never_claims_authorship_of_the_publication():
 #: slash commands, which is why it is named first and asserted first.
 INSTALL_METHODS = (
     ("As a Claude Code plugin — recommended", "claude plugin marketplace add"),
+    ("From npm — no clone", "npx ast10-agent-skills"),
     ("Copy the skills only", "~/.claude/skills"),
-    ("CLI, no install", "cli/ast10.py"),
+    ("From a clone — the full repository", "cli/ast10.py"),
 )
 
 
@@ -158,13 +159,22 @@ def test_install_methods_point_at_paths_that_exist():
         assert (REPO_ROOT / "skills" / skill_id / "SKILL.md").is_file()
 
 
-def test_readme_install_section_lists_exactly_three_methods():
-    """Three paths, and the plugin one is first because it is the only complete one."""
+def test_readme_install_section_lists_every_documented_method():
+    """The plugin path is first because it is the only one that also installs
+    the commands; npm is second because it is the shortest route to running
+    anything at all. The count is derived from INSTALL_METHODS so adding a path
+    means declaring it there too, with the token that proves it is documented."""
     body = README.read_text(encoding="utf-8")
     install = body[body.index("\n## Install") : body.index("\n## Usage")]
     headings = re.findall(r"^### (.+)$", install, re.M)
-    assert len(headings) == 3, f"expected exactly three install paths, got {headings}"
+    assert len(headings) == len(INSTALL_METHODS), (
+        f"README documents {len(headings)} install paths, INSTALL_METHODS declares "
+        f"{len(INSTALL_METHODS)}: {headings}"
+    )
     assert "plugin" in headings[0].lower(), f"the plugin path must be listed first, got {headings[0]!r}"
+    assert headings == [h for h, _ in INSTALL_METHODS], (
+        f"README install order {headings} does not match INSTALL_METHODS"
+    )
 
 
 # ---------------------------------------------------------------------------
